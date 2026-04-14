@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hello — Mr Wong</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,600;1,400&family=Noto+Naskh+Arabic:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1c1917;
+      --muted: #57534e;
+      --link: #1d4ed8;
+      --border: #e7e5e4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(165deg, #f8fafc 0%, #eef2f7 45%, #e8edf4 100%);
+      color: var(--ink);
+      font-family: "DM Sans", system-ui, sans-serif;
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+    .wrap {
+      max-width: 36rem;
+      margin: 0 auto;
+      padding: 0.5rem 1rem 2rem;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin: 0 0 0.75rem;
+    }
+    .tabs button {
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 500;
+      line-height: 1;
+      padding: 0.22rem 0.5rem;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .tabs button[aria-selected="true"] {
+      color: var(--ink);
+      border-color: #94a3b8;
+      font-weight: 600;
+    }
+    .panel {
+      display: none;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .panel.active { display: block; }
+    .panel[lang="ne"] { font-family: "Noto Sans Devanagari", "DM Sans", sans-serif; }
+    .panel[lang="ur"] {
+      font-family: "Noto Naskh Arabic", "DM Sans", sans-serif;
+      direction: rtl;
+      text-align: right;
+    }
+    .panel p {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    .panel a.inline {
+      color: var(--link);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+    .panel a.inline:hover {
+      color: #1e40af;
+    }
+    .foot {
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
+    }
+    .foot a {
+      color: var(--muted);
+    }
+    .foot a:hover {
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Language">
+      <button type="button" role="tab" id="tab-en" aria-selected="true" aria-controls="panel-en">English</button>
+      <button type="button" role="tab" id="tab-ne" aria-selected="false" aria-controls="panel-ne">नेपाली</button>
+      <button type="button" role="tab" id="tab-ur" aria-selected="false" aria-controls="panel-ur">اردو</button>
+    </div>
+
+    <section id="panel-en" class="panel active" role="tabpanel" lang="en" aria-labelledby="tab-en">
+      <p>Hello, I’m Mr Wong. I do <a class="inline" href="https://kenartgallery.netlify.app/2025/" target="_blank" rel="noopener noreferrer">art</a>, <a class="inline" href="https://www.youtube.com/watch?v=68BiqGcBzi8" target="_blank" rel="noopener noreferrer">music</a>, and <a class="inline" href="https://www.instagram.com/p/DVeItekD2mD/" target="_blank" rel="noopener noreferrer">interactive media</a>.</p>
+    </section>
+
+    <section id="panel-ne" class="panel" role="tabpanel" lang="ne" aria-labelledby="tab-ne" hidden>
+      <p>नमस्ते, म मिस्टर वङ हुँ। म <a class="inline" href="https://kenartgallery.netlify.app/2025/" target="_blank" rel="noopener noreferrer">कला</a>, <a class="inline" href="https://www.youtube.com/watch?v=68BiqGcBzi8" target="_blank" rel="noopener noreferrer">संगीत</a>, र <a class="inline" href="https://www.instagram.com/p/DVeItekD2mD/" target="_blank" rel="noopener noreferrer">अन्तरक्रियात्मक मिडिया</a> गर्छु।</p>
+    </section>
+
+    <section id="panel-ur" class="panel" role="tabpanel" lang="ur" aria-labelledby="tab-ur" hidden>
+      <p>السلام علیکم، میں مسٹر وونگ ہوں۔ میں <a class="inline" href="https://kenartgallery.netlify.app/2025/" target="_blank" rel="noopener noreferrer">فن</a>، <a class="inline" href="https://www.youtube.com/watch?v=68BiqGcBzi8" target="_blank" rel="noopener noreferrer">موسیقی</a>، اور <a class="inline" href="https://www.instagram.com/p/DVeItekD2mD/" target="_blank" rel="noopener noreferrer">انٹرایکٹو میڈیا</a> کرتا ہوں۔</p>
+    </section>
+
+    <p class="foot"><a href="index.html">← Lessons home</a></p>
+  </div>
+
+  <script>
+    (function () {
+      var tabs = document.querySelectorAll('[role="tab"]');
+      var panels = document.querySelectorAll('[role="tabpanel"]');
+      function show(id) {
+        tabs.forEach(function (t) {
+          t.setAttribute("aria-selected", t.id === "tab-" + id);
+        });
+        panels.forEach(function (p) {
+          var on = p.id === "panel-" + id;
+          p.classList.toggle("active", on);
+          p.hidden = !on;
+        });
+      }
+      tabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          show(tab.id.replace("tab-", ""));
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
