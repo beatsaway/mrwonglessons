@@ -44,24 +44,23 @@
       border-bottom: 1px solid #ebebeb;
     }
     .tabs {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.25rem 0.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 0.45rem;
       margin: 0;
-      align-items: stretch;
+      align-items: center;
     }
     .tabs button {
       font-family: inherit;
-      font-size: 0.72rem;
-      font-weight: 500;
-      line-height: 1.15;
-      padding: 0.32rem 0.35rem;
-      min-width: 0;
-      width: 100%;
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.2;
+      padding: 0.35rem 0.5rem;
+      min-width: 1.65rem;
       border: 0;
       border-bottom: 2px solid transparent;
       background: transparent;
-      border-radius: 4px;
+      border-radius: 0;
       cursor: pointer;
       transition: color 0.12s, border-color 0.12s, background 0.12s;
     }
