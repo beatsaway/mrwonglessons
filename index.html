@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lessons</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      height: 100%;
+    }
+    body {
+      margin: 0;
+      min-height: 100%;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      font-family: ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #1c1917;
+      background: #f8fafc;
+    }
+    .site-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.75rem;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 200;
+    }
+    .nav-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      padding: 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      color: #1e3a5f;
+    }
+    .nav-toggle:hover {
+      background: #f1f5f9;
+    }
+    .nav-toggle:focus-visible {
+      outline: 2px solid #2c5282;
+      outline-offset: 2px;
+    }
+    .nav-toggle .bar {
+      display: block;
+      width: 1.15rem;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+      position: relative;
+    }
+    .nav-toggle .bar::before,
+    .nav-toggle .bar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+    }
+    .nav-toggle .bar::before {
+      top: -6px;
+    }
+    .nav-toggle .bar::after {
+      top: 6px;
+    }
+    .site-header .title {
+      color: #1e3a5f;
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    .drawer-backdrop {
+      display: none;
+      pointer-events: none;
+    }
+    .shell {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: stretch;
+      min-height: 0;
+    }
+    .subject-panel {
+      flex: 0 0 13rem;
+      align-self: stretch;
+      padding: 1rem 0.85rem;
+      border-right: 1px solid #e2e8f0;
+      background: #fff;
+    }
+    .subject-panel .panel-title {
+      margin: 0 0 0.6rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+    }
+    .subject-panel button {
+      display: block;
+      width: 100%;
+      margin: 0 0 0.4rem;
+      padding: 0.5rem 0.65rem;
+      font: inherit;
+      font-weight: 500;
+      text-align: left;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #fff;
+      color: #334155;
+      cursor: pointer;
+    }
+    .subject-panel button:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    .subject-panel button.is-active {
+      font-weight: 600;
+      color: #1e3a5f;
+      background: #e8f1f8;
+      border-color: rgba(30, 58, 95, 0.25);
+    }
+    .main {
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      padding: 1rem 1.1rem 1.5rem;
+      overflow: auto;
+    }
+    .main ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .main li {
+      margin: 0.4rem 0;
+    }
+    .main a {
+      color: #1d4ed8;
+      text-decoration: none;
+    }
+    .main a:hover {
+      text-decoration: underline;
+    }
+    .main nav[hidden] {
+      display: none;
+    }
+
+    /* Phone / narrow: hamburger + off-canvas subject panel */
+    @media (max-width: 720px) {
+      .nav-toggle {
+        display: inline-flex;
+      }
+      .shell {
+        position: relative;
+      }
+      .drawer-backdrop {
+        display: block;
+        position: fixed;
+        top: var(--header-h, 3.25rem);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.4);
+        z-index: 50;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s;
+      }
+      body.drawer-open .drawer-backdrop {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+      .subject-panel {
+        position: fixed;
+        top: var(--header-h, 3.25rem);
+        left: 0;
+        bottom: 0;
+        width: min(17.5rem, 86vw);
+        flex: none;
+        margin: 0;
+        padding: 1rem 0.9rem;
+        border-right: 1px solid #e2e8f0;
+        box-shadow: 4px 0 24px rgba(15, 23, 42, 0.12);
+        z-index: 60;
+        transform: translateX(-105%);
+        transition: transform 0.22s ease;
+        overflow-y: auto;
+      }
+      body.drawer-open .subject-panel {
+        transform: translateX(0);
+      }
+    }
+
+    dialog {
+      max-width: 28rem;
+      width: calc(100vw - 2rem);
+      margin: auto;
+      padding: 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+    }
+    dialog::backdrop {
+      background: rgba(15, 23, 42, 0.38);
+    }
+    .notice-inner {
+      padding: 1.25rem;
+    }
+    .notice-inner h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.15rem;
+      color: #1e3a5f;
+    }
+    .notice-inner h3 {
+      margin: 1rem 0 0.5rem;
+      font-size: 1rem;
+      color: #1e3a5f;
+    }
+    .notice-inner p,
+    .notice-inner li {
+      margin: 0.5rem 0;
+    }
+    .notice-inner ul {
+      padding-left: 1.25rem;
+    }
+    .guidance-in-popup {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background: #f1f5f9;
+      color: #1e3a5f;
+    }
+    .guidance-in-popup p {
+      margin: 0;
+    }
+    .dialog-actions {
+      padding: 0 1.25rem 1.25rem;
+      text-align: right;
+    }
+    .dialog-close {
+      font: inherit;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #1e3a5f;
+      color: #fff;
+      cursor: pointer;
+    }
+    .dialog-close:hover {
+      background: #2c5282;
+    }
+    .notice-dialog a {
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <dialog id="notice-dialog" class="notice-dialog" aria-labelledby="notice-title">
+    <div class="notice-inner">
+      <h2 id="notice-title">To 5C,</h2>
+      <p>
+        Please email your images to
+        <a href="mailto:tempteacher02@bethelhk.edu.hk">tempteacher02@bethelhk.edu.hk</a>
+        if you want them printed.
+      </p>
+      <p><strong>Email title:</strong> Class + Name</p>
+      <h3>What you could print</h3>
+      <ul>
+        <li>Pictures of collections for inspiration</li>
+        <li>Pictures of artworks by an artist that you are studying</li>
+      </ul>
+      <p><strong>Important:</strong> Make sure you also write to mention what you like and dislike about those artworks and the artist that made them.</p>
+      <p>If you didn't bring your workbook home, you can write it on a piece of paper that you can glue into your workbook later.</p>
+      <div class="guidance-in-popup">
+        <p>
+          Check the
+          <a href="sba/workbook-pages-guide.html">workbook design guide</a>
+          for reference on what to do page by page.
+        </p>
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="dialog-close" data-close>Got it</button>
+    </div>
+  </dialog>
+
+  <header class="site-header">
+    <button
+      type="button"
+      class="nav-toggle"
+      id="nav-toggle"
+      aria-label="Open subject menu"
+      aria-expanded="false"
+      aria-controls="subject-sidebar"
+    >
+      <span class="bar" aria-hidden="true"></span>
+    </button>
+    <span class="title">Lessons</span>
+  </header>
+
+  <div class="shell" id="shell">
+    <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
+
+    <nav class="subject-panel" id="subject-sidebar" aria-label="Subject">
+      <p class="panel-title">Subject</p>
+      <button type="button" class="is-active" id="sub-va" data-subject="va" aria-pressed="true" aria-controls="panel-va">Visual Art</button>
+      <button type="button" id="sub-en" data-subject="en" aria-pressed="false" aria-controls="panel-en">English</button>
+    </nav>
+
+    <div class="main">
+      <nav id="panel-va" aria-labelledby="sub-va">
+        <ul>
+          <li><a href="hello.html">Hello</a></li>
+          <li><a href="ks3/ks3art.html">KS3 Art lessons</a></li>
+          <li><a href="sba/letter-trilingual.html">Why workbook?</a></li>
+          <li><a href="sba/general-guide.html">SBA — General Guide</a></li>
+          <li><a href="sba/page-directions.html">SBA — Workbook page directions</a></li>
+          <li><a href="sba/workbook-pages-guide.html">SBA — Workbook design guide</a></li>
+        </ul>
+      </nav>
+      <nav id="panel-en" hidden aria-labelledby="sub-en">
+        <ul>
+          <li><a href="https://www.bbc.co.uk/learningenglish/features/the_reading_room" target="_blank" rel="noopener noreferrer">English Reading: Advanced</a></li>
+          <li><a href="https://learnenglishkids.britishcouncil.org/read-write/reading-practice/level-2-reading" target="_blank" rel="noopener noreferrer">English Reading: For Kids</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var dlg = document.getElementById("notice-dialog");
+      var closeBtn = dlg.querySelector("[data-close]");
+      if (!dlg || typeof dlg.showModal !== "function") return;
+      dlg.showModal();
+      function close() {
+        dlg.close();
+      }
+      closeBtn.addEventListener("click", close);
+      dlg.addEventListener("click", function (e) {
+        if (e.target === dlg) close();
+      });
+    })();
+
+    (function () {
+      var panelVa = document.getElementById("panel-va");
+      var panelEn = document.getElementById("panel-en");
+      var buttons = document.querySelectorAll("#subject-sidebar button");
+      var mq = window.matchMedia("(max-width: 720px)");
+
+      function setSubject(which) {
+        var isVa = which === "va";
+        panelVa.hidden = !isVa;
+        panelEn.hidden = isVa;
+        buttons.forEach(function (btn) {
+          var on = btn.getAttribute("data-subject") === which;
+          btn.classList.toggle("is-active", on);
+          btn.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+      }
+
+      buttons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          setSubject(btn.getAttribute("data-subject"));
+          if (mq.matches) closeDrawer();
+        });
+      });
+
+      var toggle = document.getElementById("nav-toggle");
+      var backdrop = document.getElementById("drawer-backdrop");
+      var body = document.body;
+      var header = document.querySelector(".site-header");
+
+      function setHeaderHeight() {
+        document.documentElement.style.setProperty("--header-h", header.offsetHeight + "px");
+      }
+
+      function openDrawer() {
+        setHeaderHeight();
+        body.classList.add("drawer-open");
+        toggle.setAttribute("aria-expanded", "true");
+        toggle.setAttribute("aria-label", "Close subject menu");
+        backdrop.setAttribute("aria-hidden", "false");
+      }
+
+      function closeDrawer() {
+        body.classList.remove("drawer-open");
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.setAttribute("aria-label", "Open subject menu");
+        backdrop.setAttribute("aria-hidden", "true");
+      }
+
+      function toggleDrawer() {
+        if (body.classList.contains("drawer-open")) {
+          closeDrawer();
+        } else {
+          openDrawer();
+        }
+      }
+
+      function syncNavToggle() {
+        setHeaderHeight();
+        if (!mq.matches) {
+          closeDrawer();
+        }
+      }
+
+      toggle.addEventListener("click", toggleDrawer);
+      backdrop.addEventListener("click", closeDrawer);
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && body.classList.contains("drawer-open")) {
+          closeDrawer();
+        }
+      });
+
+      window.addEventListener("resize", syncNavToggle);
+      syncNavToggle();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Letter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Noto+Naskh+Arabic:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --muted: #5c5c5c;
+      --border: #e8e8e8;
+      --tab-active: #fff;
+      --tab-inactive: #f4f4f4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #fafafa;
+      color: var(--ink);
+      font-family: "Crimson Pro", Georgia, serif;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+    .wrap {
+      margin: 0;
+      max-width: none;
+      width: 100%;
+      padding: 0.4rem 0.65rem 1.25rem;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.25rem;
+      margin: 0 0 0.65rem;
+    }
+    .tabs button {
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 500;
+      line-height: 1;
+      padding: 0.22rem 0.5rem;
+      border: 1px solid var(--border);
+      background: var(--tab-inactive);
+      color: var(--muted);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .tabs button:hover {
+      background: #eee;
+      color: var(--ink);
+    }
+    .tabs button[aria-selected="true"] {
+      background: var(--tab-active);
+      color: var(--ink);
+      border-color: #ccc;
+      font-weight: 600;
+    }
+    .panel {
+      display: none;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+    .panel.active { display: block; }
+    .panel[lang="ne"] .letter-output { font-family: "Noto Sans Devanagari", "Crimson Pro", serif; }
+    .panel[lang="ur"] .letter-output {
+      font-family: "Noto Naskh Arabic", "Crimson Pro", serif;
+      direction: rtl;
+      text-align: right;
+    }
+    .letter-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      padding: 0.3rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      background: #fcfcfc;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .letter-nav button {
+      font-family: inherit;
+      font-size: 0.95rem;
+      line-height: 1;
+      min-width: 2rem;
+      padding: 0.2rem 0.45rem;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .letter-nav button:hover:not(:disabled) {
+      background: #f0f0f0;
+      border-color: #ccc;
+    }
+    .letter-nav button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .letter-meta {
+      min-width: 4.5rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .letter-output {
+      padding: 1rem 1.1rem 1.25rem;
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Language">
+      <button type="button" role="tab" id="tab-en" aria-selected="true" aria-controls="panel-en">English</button>
+      <button type="button" role="tab" id="tab-ne" aria-selected="false" aria-controls="panel-ne">नेपाली</button>
+      <button type="button" role="tab" id="tab-ur" aria-selected="false" aria-controls="panel-ur">اردو</button>
+    </div>
+
+    <section id="panel-en" class="panel active" role="tabpanel" lang="en" aria-labelledby="tab-en">
+      <header class="letter-nav" aria-label="Paragraph navigation">
+        <button type="button" class="letter-prev" aria-label="Previous paragraph">&lt;</button>
+        <span class="letter-meta"><span class="letter-idx">1</span> / <span class="letter-total">8</span></span>
+        <button type="button" class="letter-next" aria-label="Next paragraph">&gt;</button>
+      </header>
+      <p class="letter-output" aria-live="polite"></p>
+    </section>
+
+    <section id="panel-ne" class="panel" role="tabpanel" lang="ne" aria-labelledby="tab-ne" hidden>
+      <header class="letter-nav" aria-label="Paragraph navigation">
+        <button type="button" class="letter-prev" aria-label="अघिल्लो अनुच्छेद">&lt;</button>
+        <span class="letter-meta"><span class="letter-idx">1</span> / <span class="letter-total">8</span></span>
+        <button type="button" class="letter-next" aria-label="अर्को अनुच्छेद">&gt;</button>
+      </header>
+      <p class="letter-output" aria-live="polite"></p>
+    </section>
+
+    <section id="panel-ur" class="panel" role="tabpanel" lang="ur" aria-labelledby="tab-ur" hidden>
+      <header class="letter-nav" aria-label="Paragraph navigation">
+        <button type="button" class="letter-prev" aria-label="پچھلا پیرا">&lt;</button>
+        <span class="letter-meta"><span class="letter-idx">1</span> / <span class="letter-total">8</span></span>
+        <button type="button" class="letter-next" aria-label="اگلا پیرا">&gt;</button>
+      </header>
+      <p class="letter-output" aria-live="polite"></p>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      var CHAR_MS = 10;
+      var PARAGRAPHS = {
+        en: [
+          "Since you will have much less school days in Form 6, it is crucial to finish at least 2 out of the 4 SBA pieces before the end of this term, together with at least 12 pages of documentation of the making in the workbook.",
+          "It is understandable that many of you don't enjoy doing the SBA workbook. Besides the fact that it's about 20% of your grade, as part of the 50% in your SBA, what's the point of doing it anyway? Let's think about it this way:",
+          "One cannot be a good chef if not knowing what tastes good.\nOne cannot be a good musician if not knowing what sounds good.\nOne cannot be a good artist if not knowing what looks good.",
+          "Learning what moves you is essential if you want to create artworks that mean something. Good artists make art to learn more about oneself and the world.",
+          "Consider your SBA workbook as your own journal of exploration. A good workbook will let its readers catch glimpses of moments of your heart, mind, and soul; what you love, what you hate, and what makes you curious. Years from now on, you would treasure reading your workbook if you now put effort into documenting your current state of mind, how you see yourself and the world, as everyone will change as they grow up.",
+          "Remember that your finished artwork will be like an athlete at the finish line: the excitement and significance lie in how much effort you put in to get there. As you make art, your emotions, your identity, your questions and answers, your humanity, and your sense of self and reality develop. That gives meanings to your piece, not the other way round.",
+          "This is especially true in the age of AI, when anyone can generate images, videos, music and more with one click. Making art should be an exploration of your thoughts, feelings, intentions and perceptions. Without that, your art could look polished but mean little to you or to others.",
+          "So please take your workbook seriously. Document what's on your mind and how you feel because you matter. The stories of art creation are the stories of what people care about. The real value lies not in the final piece, but in the journey we, as humans, experience."
+        ],
+        ne: [
+          "फर्म ६ मा तपाईंसँग विद्यालयका दिनहरू धेरै कम हुनेछन्, त्यसैले यस टर्मको अन्त्यअघि चार SBA कृतिमध्ये कम्तीमा दुई पूरा गर्नु र कार्यपुस्तिकामा बनाउने प्रक्रियाको कम्तीमा १२ पृष्ठ दस्तावेजीकरण गर्नु अत्यन्त जरूरी छ।",
+          "धेरैजनाले SBA कार्यपुस्तिका गर्न रमाइलो लाग्दैन भन्ने बुझिन्छ। यो तपाईंको ग्रेडको लगभग २०% भएको कुरा मात्र होइन—SBA को ५०% मध्येको भागको रूपमा—यसको के अर्थ छ त? यसरी सोचौं:",
+          "राम्रो के स्वाद हो थाहा नभए राम्रो शेफ बन्न सकिँदैन।\nराम्रो के आवाज हो थाहा नभए राम्रो संगीतकार बन्न सकिँदैन।\nराम्रो के देखिन्छ थाहा नभए राम्रो कलाकार बन्न सकिँदैन।",
+          "अर्थ राख्ने कलाकृतिहरू बनाउन चाहनुहुन्छ भने पहिले केले तपाईंलाई हल्लाउँछ भनेर सिक्नु अनिवार्य छ। राम्रो कलाकारहरू आफू र संसार बारे थप बुझ्न कला बनाउँछन्।",
+          "आफ्नो SBA कार्यपुस्तिकालाई अन्वेषणको आफ्नै डायरी मान्नुहोस्। राम्रो कार्यपुस्तिकाले पाठकहरूलाई तपाईंको मन, विचार र आत्माका क्षणहरू झल्काउँछ—के माया गर्नुहुन्छ, के नापसन्द, केले जिज्ञासा जगाउँछ। वर्षौं पछि तपाईंले कार्यपुस्तिका पढ्दा मूल्य दिनुहुनेछ यदि तपाईंले अहिलेको मनस्थिति, आफू र संसारलाई कसरी देख्नुहुन्छ भनेर दस्तावेज गर्न अहिले मेहनत गर्नुहुन्छ भने; सबै बढ्दै जाँदा बदलिन्छन्।",
+          "सम्झनुहोस्: तपाईंको सम्पन्न कलाकृति फिनिस लाइनमा पुगेका खेलाडी जस्तै हो—रोमाञ्च र महत्त्व त्यहाँ पुग्न लगाएको मेहनतमा हुन्छ। कला बनाउँदै जाँदा तपाईंका भावना, पहिचान, प्रश्न र जवाफ, मानवीयता, आफू र वास्तविकताको बोध विकास हुन्छ। त्यसले तपाईंको कृतिलाई अर्थ दिन्छ—उल्टो होइन।",
+          "AI को युगमा यो विशेष सत्य छ: एक क्लिकमै छविहरू, भिडियो, संगीत र अरू धेरै सजिलै बनाउन सकिन्छ। कला बनाउनु तपाईंका विचार, भावना, नियत र अनुभूतिको अन्वेषण हुनुपर्छ। त्यो बिना, कला चम्किलो देखिन सक्छ तर तपाईं वा अरूलाई अर्थहीन लाग्न सक्छ।",
+          "कृपया कार्यपुस्तिकालाई गम्भीर रूपमा लिनुहोस्। मनमा के छ र कस्तो महसुस गर्नुहुन्छ त्यो लेख्नुहोस्—किनभने तपाईं महत्त्वपूर्ण हुनुहुन्छ। कला सिर्जनाका कथाहरू मानिसले के माया गर्छन् त्यसका कथाहरू हुन्। वास्तविक मूल्य अन्तिम टुक्रामा होइन, हामी मानवहरूले अनुभव गर्ने यात्रामा छ।"
+        ],
+        ur: [
+          "چونکہ فارم ۶ میں آپ کے سکول کے دن بہت کم ہوں گے، اس ٹرم کے اختتام سے پہلے چار SBA کاموں میں سے کم از کم دو مکمل کرنا، اور ورک بک میں بنانے کی کم از کم ۱۲ صفحات دستاویز کرنا، نہایت ضروری ہے۔",
+          "یہ سمجھ میں آتا ہے کہ بہت سے لوگ SBA ورک بک کرنا پسند نہیں کرتے۔ اس بات کے علاوہ کہ یہ آپ کے گریڈ کا تقریباً ۲۰٪ ہے—SBA کے ۵۰٪ کے حصے کے طور پر—اس کا مقصد کیا ہے؟ اس طرح سوچیں:",
+          "کوئی اچھا شیف نہیں بن سکتا اگر اسے پتہ نہ ہو کہ کیا ذائقہ اچھا ہے۔\nکوئی اچھا موسیقار نہیں بن سکتا اگر اسے پتہ نہ ہو کہ کیا آواز اچھی ہے۔\nکوئی اچھا فنکار نہیں بن سکتا اگر اسے پتہ نہ ہو کہ کیا دیکھنے میں اچھا ہے۔",
+          "کوئی معنی رکھنے والی تخلیقات بنانے کے لیے پہلے یہ جاننا ضروری ہے کہ آپ خود کیا سے متاثر ہوتے ہیں۔ اچھے فنکار فن بناتے ہیں تاکہ خود اور دنیا کے بارے میں مزید سیکھیں۔",
+          "اپنی SBA ورک بک کو کھوج کا اپنا جرنل سمجھیں۔ اچھی ورک بک قارئین کو آپ کے دل، ذہن اور روح کے لمحوں کی جھلک دے گی؛ آپ کیا پسند کرتے ہیں، کیا ناپسند، اور کیا آپ کو متجسس بناتا ہے۔ سالوں بعد آپ ورک بک پڑھ کر قدر کریں گے اگر آپ اپنی موجودہ ذہنی حالت، خود اور دنیا کو کیسے دیکھتے ہیں، اسے دستاویز کرنے میں اب محنت کریں؛ کیونکہ جیسے جیسے سب بڑے ہوتے ہیں بدلتے ہیں۔",
+          "یاد رکھیں: آپ کا مکمل کام فنش لائن پر کھلاڑی جیسا ہے—دلچسپی اور اہمیت اس محنت میں ہے جو وہاں پہنچنے کے لیے لگتی ہے۔ فن بناتے ہوئے جذبات، شناخت، سوالات و جوابات، انسانیت، خود اور حقیقت کا احساس پختہ ہوتا ہے۔ یہ آپ کے کام کو معنی دیتا ہے، الٹا نہیں۔",
+          "AI کے دور میں یہ خاص سچ ہے: ایک کلک سے تصاویر، ویڈیوز، موسیقی اور بہت کچھ بنایا جا سکتا ہے۔ فن بنانا آپ کے خیالات، جذبات، نیت اور ادراک کی کھوج ہونا چاہیے۔ اس کے بغیر، فن چمکدار لگ سکتا ہے مگر آپ یا دوسروں کے لیے معنی کم رکھتا ہے۔",
+          "براہ کرم ورک بک کو سنجیدگی سے لیں۔ جو ذہن میں ہے اور کیسا محسوس ہوتا ہے، لکھیں—کیونکہ آپ اہم ہیں۔ فن تخلیق کی کہانیاں ان چیزوں کی کہانیاں ہیں جن کی لوگ پرواہ کرتے ہیں۔ حقیقی قدر آخری ٹکڑے میں نہیں، اس سفر میں ہے جسے ہم انسان کے طور پر تجربہ کرتے ہیں۔"
+        ]
+      };
+
+      /** One paragraph position for all languages so switching tabs keeps n/8 in sync. */
+      var paraIndex = 0;
+      var timers = { en: null, ne: null, ur: null };
+
+      function clearTimer(lang) {
+        if (timers[lang]) {
+          clearInterval(timers[lang]);
+          timers[lang] = null;
+        }
+      }
+
+      function runTypewriter(lang) {
+        var panel = document.getElementById("panel-" + lang);
+        if (!panel) return;
+        var out = panel.querySelector(".letter-output");
+        var prevBtn = panel.querySelector(".letter-prev");
+        var nextBtn = panel.querySelector(".letter-next");
+        var idxEl = panel.querySelector(".letter-idx");
+        var totalEl = panel.querySelector(".letter-total");
+        var paras = PARAGRAPHS[lang];
+        var maxI = paras.length - 1;
+        var i = Math.min(Math.max(0, paraIndex), maxI);
+        paraIndex = i;
+        var full = paras[i];
+
+        clearTimer(lang);
+        out.textContent = "";
+        if (idxEl) idxEl.textContent = String(i + 1);
+        if (totalEl) totalEl.textContent = String(paras.length);
+        if (prevBtn) prevBtn.disabled = i <= 0;
+        if (nextBtn) nextBtn.disabled = i >= paras.length - 1;
+
+        var chars = Array.from(full);
+        var pos = 0;
+        timers[lang] = setInterval(function () {
+          if (pos >= chars.length) {
+            clearTimer(lang);
+            return;
+          }
+          out.textContent += chars[pos];
+          pos++;
+        }, CHAR_MS);
+      }
+
+      function bindPanel(lang) {
+        var panel = document.getElementById("panel-" + lang);
+        if (!panel) return;
+        var prevBtn = panel.querySelector(".letter-prev");
+        var nextBtn = panel.querySelector(".letter-next");
+        if (prevBtn) {
+          prevBtn.addEventListener("click", function () {
+            if (paraIndex <= 0) return;
+            paraIndex--;
+            runTypewriter(lang);
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener("click", function () {
+            if (paraIndex >= PARAGRAPHS[lang].length - 1) return;
+            paraIndex++;
+            runTypewriter(lang);
+          });
+        }
+      }
+
+      var tabs = document.querySelectorAll('[role="tab"]');
+      var panels = document.querySelectorAll('[role="tabpanel"]');
+
+      function show(id) {
+        var currentTab = document.querySelector('[role="tab"][aria-selected="true"]');
+        if (currentTab && currentTab.id === "tab-" + id) {
+          return;
+        }
+        tabs.forEach(function (t) {
+          var on = t.id === "tab-" + id;
+          t.setAttribute("aria-selected", on);
+        });
+        panels.forEach(function (p) {
+          var on = p.id === "panel-" + id;
+          p.classList.toggle("active", on);
+          p.hidden = !on;
+        });
+        if (id === "en" || id === "ne" || id === "ur") {
+          runTypewriter(id);
+        }
+      }
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          show(tab.id.replace("tab-", ""));
+        });
+      });
+
+      ["en", "ne", "ur"].forEach(bindPanel);
+      runTypewriter("en");
+    })();
+  </script>
+</body>
+</html>
