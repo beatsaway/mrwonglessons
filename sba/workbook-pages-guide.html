@@ -296,18 +296,34 @@
       gap: 0.4rem;
     }
     .site-head {
-      margin-bottom: 0.35rem;
-      padding-bottom: 0.45rem;
+      margin-bottom: 0.28rem;
+      padding: 0.3rem 0 0.32rem;
       border-bottom: 1px solid #ebebeb;
       display: flex;
       flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 0.5rem;
+      align-items: center;
+      gap: 0.4rem 0.55rem;
+    }
+    .site-head .home {
+      color: #1e3a5f;
+      text-decoration: none;
+      font-size: 1.2rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .site-head .home:hover {
+      opacity: 0.85;
+    }
+    .site-head .home:focus-visible {
+      outline: 2px solid var(--link);
+      outline-offset: 2px;
+      border-radius: 4px;
     }
     .site-head .guide-title {
       margin: 0;
-      font-size: 1rem;
+      flex: 1;
+      min-width: 0;
+      font-size: 0.95rem;
       font-weight: 600;
       letter-spacing: -0.02em;
       color: var(--ink);
@@ -315,7 +331,8 @@
     .site-head .btn-lang {
       font-family: inherit;
       font-size: 0.72rem;
-      padding: 0.25rem 0.5rem;
+      padding: 0.2rem 0.45rem;
+      margin-inline-start: auto;
       border: 1px solid var(--border);
       border-radius: 4px;
       background: #fff;
@@ -362,6 +379,7 @@
 
   <div class="wrap" id="main-wrap" hidden>
     <header class="site-head">
+      <a class="home" href="../index.html" aria-label="Lessons home">🏠</a>
       <h1 class="guide-title" id="guide-title">DSE VA Workbook Design Guide</h1>
       <button type="button" class="btn-lang" id="btn-change-lang" aria-label="Change language">Language</button>
     </header>
