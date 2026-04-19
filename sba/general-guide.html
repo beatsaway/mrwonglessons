@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SBA — General Guide</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      font-family: ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+      background: #f8fafc;
+      color: #1c1917;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem 0.6rem;
+      padding: 0.32rem 0.75rem;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff;
+    }
+    header a {
+      color: #1e3a5f;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    header a:hover { text-decoration: underline; }
+    header .label { color: #64748b; font-size: 0.86rem; }
+    header .home {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+    .frame-wrap {
+      min-height: 0;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="home" href="../index.html" aria-label="Lessons home">🏠</a>
+    <span class="label">SBA — General Guide</span>
+  </header>
+  <div class="frame-wrap">
+    <iframe
+      title="VA SBA — Start here · How to do well"
+      src="https://vadsesba.netlify.app/"
+      allow="fullscreen"
+      loading="lazy"
+    ></iframe>
+  </div>
+</body>
+</html>

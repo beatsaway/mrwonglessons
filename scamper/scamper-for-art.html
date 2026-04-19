@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en-HK">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="SCAMPER with painting examples — image + text panels." />
+  <title>SCAMPER (paintings)</title>
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --paper: #fffef9;
+      --ink: #1c1b19;
+      --muted: #5a5650;
+      --rule: #dcd6ca;
+      --accent: #6b4c2a;
+      --accent-soft: #ebe4d8;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 1.05rem;
+      line-height: 1.4;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    a:hover {
+      text-decoration-thickness: 2px;
+    }
+
+    /* —— App frame: sidebar + main —— */
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+      align-items: stretch;
+    }
+
+    .nav-toggle {
+      display: none;
+      position: fixed;
+      top: 0.65rem;
+      left: 0.65rem;
+      z-index: 400;
+      width: 2.75rem;
+      height: 2.75rem;
+      padding: 0;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--ink);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(28, 27, 25, 0.1);
+    }
+
+    .nav-toggle:hover {
+      background: var(--accent-soft);
+    }
+
+    .nav-toggle svg {
+      width: 1.35rem;
+      height: 1.35rem;
+    }
+
+    .nav-toggle .icon-close {
+      display: none;
+    }
+
+    body.sidebar-open .nav-toggle .icon-open {
+      display: none;
+    }
+
+    body.sidebar-open .nav-toggle .icon-close {
+      display: block;
+    }
+
+    .nav-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      background: rgba(28, 27, 25, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    body.sidebar-open .nav-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar {
+      align-self: stretch;
+      width: 13.75rem;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+      border-right: 1px solid var(--rule);
+      z-index: 300;
+    }
+
+    .sidebar-sticky {
+      position: sticky;
+      top: 0;
+      max-height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0.55rem 0.65rem 1rem;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    .sidebar-tools {
+      margin: 0 0 0.55rem;
+      padding-bottom: 0.55rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .slideshow-btn {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 0.4rem 0.2rem;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1.35;
+      text-align: left;
+      color: var(--accent);
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .slideshow-btn:hover {
+      background: var(--accent-soft);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .slideshow-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .slideshow-btn[aria-pressed="true"] {
+      background: var(--accent-soft);
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .sidebar-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin: 0.65rem 0 0.14rem;
+      line-height: 1.3;
+    }
+
+    .sidebar-label:first-of-type {
+      margin-top: 0;
+    }
+
+    .sidebar-nav {
+      margin: 0;
+    }
+
+    .sidebar-nav a {
+      display: block;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.22rem 0.1rem;
+      line-height: 1.45;
+    }
+
+    .sidebar-nav a:hover {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .main-wrap {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .shell {
+      max-width: 54rem;
+      margin: 0 auto;
+      padding: 1.25rem 1.15rem 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .nav-toggle {
+        display: flex;
+      }
+
+      .nav-backdrop {
+        display: block;
+      }
+
+      .app-layout {
+        display: block;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: min(19rem, 90vw);
+        height: 100%;
+        max-height: none;
+        transform: translateX(-100%);
+        transition: transform 0.22s ease;
+        box-shadow: none;
+        border-right: none;
+      }
+
+      body.sidebar-open .sidebar {
+        transform: translateX(0);
+        box-shadow: 8px 0 32px rgba(28, 27, 25, 0.18);
+      }
+
+      .sidebar-sticky {
+        max-height: none;
+        height: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
+      .main-wrap {
+        padding-top: 3.5rem;
+      }
+
+      .shell {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      article.recipe {
+        scroll-margin-top: 4rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sidebar {
+        transition: none;
+      }
+      .nav-backdrop {
+        transition: none;
+      }
+    }
+
+    header.doc-head {
+      padding-bottom: 0.85rem;
+      margin-bottom: 0.85rem;
+      border-bottom: 3px double var(--rule);
+    }
+
+    h1 {
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size: clamp(1.45rem, 4vw, 1.85rem);
+      font-weight: 600;
+      line-height: 1.25;
+      margin: 0 0 0.75rem;
+    }
+
+    .lede {
+      margin: 0 0 0.5rem;
+      color: var(--muted);
+      max-width: 40rem;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .lede:last-child {
+      margin-bottom: 0;
+    }
+
+    article.recipe {
+      scroll-margin-top: 1rem;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 0.65rem 0.85rem 0.75rem;
+      margin-bottom: 0.55rem;
+      box-shadow: 0 1px 3px rgba(28, 27, 25, 0.05);
+    }
+
+    .recipe-head {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: flex-start;
+      gap: 0.45rem 0.6rem;
+      margin-bottom: 0.45rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 0.3rem;
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: var(--paper);
+      background: var(--accent);
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .recipe-head h2 {
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size: 0.98rem;
+      margin: 0;
+      flex: 1;
+      line-height: 1.3;
+      font-weight: 600;
+    }
+
+    .ex-split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+      gap: 0.65rem 0.85rem;
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      .ex-split {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ex-media {
+      margin: 0;
+      align-self: start;
+    }
+
+    /* Natural aspect ratio: full column width, height follows the image — no grey letterboxing */
+    .ex-media img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      border: 1px solid rgba(220, 214, 202, 0.85);
+      box-shadow: 0 2px 12px rgba(28, 27, 25, 0.06);
+    }
+
+    .ex-media figcaption {
+      margin-top: 0.25rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    .ex-media-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 10rem;
+      border-radius: 6px;
+      border: 2px dashed var(--rule);
+      background: #f5f2ec;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: center;
+      padding: 0.65rem;
+      line-height: 1.35;
+    }
+
+    .ex-text p {
+      margin: 0 0 0.35rem;
+      line-height: 1.4;
+      font-size: 0.95rem;
+    }
+
+    .ex-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .ex-text .why {
+      margin-top: 0.35rem;
+      padding-left: 0.5rem;
+      border-left: 3px solid var(--accent-soft);
+    }
+
+    .ex-text .why strong {
+      color: var(--ink);
+    }
+
+    footer.doc-foot {
+      margin-top: 1.25rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--rule);
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    footer.doc-foot p {
+      margin: 0.25rem 0;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+      .nav-toggle,
+      .nav-backdrop,
+      .slideshow-btn {
+        display: none !important;
+      }
+      .sidebar {
+        position: static;
+        transform: none !important;
+        width: 12rem;
+        max-height: none;
+        border: 1px solid #ccc;
+      }
+      .sidebar-sticky {
+        position: static;
+        max-height: none;
+        overflow: visible;
+      }
+      body.sidebar-open .sidebar {
+        transform: none !important;
+      }
+      article.recipe {
+        break-inside: avoid;
+        box-shadow: none;
+      }
+      .ex-split {
+        grid-template-columns: 1fr 1.2fr;
+      }
+      a {
+        color: var(--ink);
+        text-decoration: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation">
+    <svg class="icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+    <svg class="icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  </button>
+  <div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
+
+  <div class="app-layout">
+    <aside class="sidebar" id="site-nav" aria-label="SCAMPER painting index">
+      <div class="sidebar-sticky">
+      <div class="sidebar-tools">
+        <button type="button" id="slideshow-btn" class="slideshow-btn" aria-pressed="false" title="Each painting for 15 seconds" aria-label="Play slideshow: advance to the next painting every 15 seconds">Play slideshow</button>
+      </div>
+      <nav class="sidebar-nav">
+        <p class="sidebar-label">S — Substitute</p>
+        <a href="#ex-olympia">Olympia (Manet)</a>
+        <a href="#ex-demoiselles">Les Demoiselles d’Avignon (Picasso)</a>
+        <p class="sidebar-label">C — Combine</p>
+        <a href="#ex-vertumnus">Vertumnus (Arcimboldo)</a>
+        <a href="#ex-persistence">Persistence of Memory (Dalí)</a>
+        <p class="sidebar-label">A — Adapt</p>
+        <a href="#ex-las-meninas">Las Meninas (Velázquez)</a>
+        <a href="#ex-wiley-napoleon">Napoleon… (Wiley)</a>
+        <p class="sidebar-label">M — Modify</p>
+        <a href="#ex-third-may">Third of May (Goya)</a>
+        <a href="#ex-dead-dad">Dead Dad (Mueck)</a>
+        <p class="sidebar-label">P — Put to another use</p>
+        <a href="#ex-fountain">Fountain (Duchamp)</a>
+        <a href="#ex-bed">Bed (Rauschenberg)</a>
+        <p class="sidebar-label">E — Eliminate</p>
+        <a href="#ex-thinker">The Thinker (Rodin)</a>
+        <a href="#ex-white-on-white">White on White (Malevich)</a>
+        <p class="sidebar-label">R — Reverse</p>
+        <a href="#ex-ambassadors">The Ambassadors (Holbein)</a>
+        <a href="#ex-treachery">Treachery of Images (Magritte)</a>
+      </nav>
+      </div>
+    </aside>
+
+    <div class="main-wrap">
+      <div class="shell" id="top">
+        <header class="doc-head">
+          <h1>SCAMPER for brainstorming ideas</h1>
+          <p class="lede">
+            <strong>SCAMPER</strong>: Substitute, Combine, Adapt, Modify, Put to another use, Eliminate, Reverse / Rearrange. Use the <strong>left index</strong> to jump to each technique’s examples.
+          </p>
+        </header>
+
+    <main>
+      <section aria-label="SCAMPER recipes">
+        <article class="recipe" id="ex-olympia" aria-labelledby="h-olympia">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">S</span>
+            <h2 id="h-olympia">S — Substitute · <em>Olympia</em> (Manet)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/Olympia.jpg" alt="Édouard Manet, Olympia, 1863. Reclining nude on a bed, maid with flowers." width="1200" height="900" loading="lazy" decoding="async" />
+              <figcaption>Manet · <em>Olympia</em> · 1863</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>Titian shows a goddess of love in a rich Venetian bedroom — ideal beauty, mythic story. Manet keeps the reclining nude on a bed, but substitutes the goddess with a real Paris sex worker who looks straight at the viewer.</p>
+              <p class="why"><strong>Why it works:</strong> The substitution moves the topic from myth to modern life. The viewer is no longer “safe” in a story about gods; the painting asks questions about society and the gaze.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-demoiselles" aria-labelledby="h-demoiselles">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">S</span>
+            <h2 id="h-demoiselles">S — Substitute · <em>Les Demoiselles d’Avignon</em> (Picasso)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/Les Demoiselles d'Avignon.jpg" alt="Pablo Picasso, Les Demoiselles d'Avignon, 1907. Five nude figures with mask-like faces." width="1200" height="900" loading="lazy" decoding="async" />
+              <figcaption>Picasso · <em>Les Demoiselles d’Avignon</em> · 1907</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>Ingres paints a smooth, long-backed nude in a fantasy “Eastern” style — calm, pretty, and controlled. Picasso substitutes that salon ideal with fractured bodies and mask-like faces influenced by African and Iberian sculpture.</p>
+              <p class="why"><strong>Why it works:</strong> The substitution keeps the subject (the nude) but changes the mood from soft beauty to confrontation. The same genre, but comfort is replaced by tension and debate.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-vertumnus" aria-labelledby="h-vertumnus">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">C</span>
+            <h2 id="h-vertumnus">C — Combine · <em>Vertumnus</em> (Arcimboldo)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/Vertumnus.jpg" alt="Giuseppe Arcimboldo, Vertumnus, portrait made of fruit and vegetables." width="900" height="1200" loading="lazy" decoding="async" />
+              <figcaption>Arcimboldo · <em>Vertumnus</em> · c. 1590–91</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>A ruler’s head is built from fruit, vegetables, and plants. Still life (food) and portrait (a person) are combined into one face.</p>
+              <p class="why"><strong>Why it works:</strong> Combining genres turns the sitter into an allegory — seasons, harvest, power. The meaning needs both “portrait” and “pile of food” in the same picture.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-persistence" aria-labelledby="h-persistence">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">C</span>
+            <h2 id="h-persistence">C — Combine · <em>Persistence of Memory</em> (Dalí)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/The Persistence of Memory.jpg" alt="Salvador Dalí, The Persistence of Memory, melting clocks in a landscape." width="1200" height="800" loading="lazy" decoding="async" />
+              <figcaption>Dalí · <em>The Persistence of Memory</em> · 1931</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>A quiet landscape meets pocket watches that melt like soft cheese. Hard metal and clock faces combine with something soft, limp, and dreamlike.</p>
+              <p class="why"><strong>Why it works:</strong> The combination suggests time is not rigid in the way clocks pretend. It is fluid, strange, and closer to dream logic than to a timetable.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-las-meninas" aria-labelledby="h-las-meninas">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">A</span>
+            <h2 id="h-las-meninas">A — Adapt · <em>Las Meninas</em> (Velázquez)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/Las Meninas.jpg" alt="Diego Velázquez, Las Meninas, royal family and painter in a large room." width="1200" height="900" loading="lazy" decoding="async" />
+              <figcaption>Velázquez · <em>Las Meninas</em> · 1656</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>Velázquez starts from a royal group portrait, but adapts it: he adds himself painting, a mirror that may reflect the king and queen, and a doorway that makes room for the viewer. The usual “sit still and look noble” format becomes a puzzle about who sees whom.</p>
+              <p class="why"><strong>Why it works:</strong> Adapting court portraiture turns the scene into a question about perception and power — not just a record of important people.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-wiley-napoleon" aria-labelledby="h-wiley">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">A</span>
+            <h2 id="h-wiley">A — Adapt · <em>Napoleon Leading the Army over the Alps</em> (Wiley)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/Napoleon Leading the Army over the Alps.jpg" alt="Kehinde Wiley, Napoleon Leading the Army over the Alps, rider on rearing horse." width="900" height="1200" loading="lazy" decoding="async" />
+              <figcaption>Wiley · <em>Napoleon Leading the Army over the Alps</em> · 2005</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>Wiley adapts the grand European tradition of “hero on a horse” — the kind of image used for emperors and propaganda. He places a contemporary Black sitter in that pose, wearing everyday streetwear.</p>
+              <p class="why"><strong>Why it works:</strong> The format is borrowed from old power portraits, but the people in the centre are changed. The same visual language now asks who gets to be heroic in art history.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-third-may" aria-labelledby="h-third-may">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">M</span>
+            <h2 id="h-third-may">M — Modify · <em>Third of May</em> (Goya)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/The Third of May.jpg" alt="Francisco Goya, The Third of May 1808, man with arms raised in white shirt facing firing squad." width="1200" height="900" loading="lazy" decoding="async" />
+              <figcaption>Goya · <em>The Third of May 1808</em> · 1814</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>Goya enlarges the central victim and floods him with light. The firing squad stays smaller, darker, and more anonymous.</p>
+              <p class="why"><strong>Why it works:</strong> Modifying scale and light turns one man into a symbol for many innocent people. Our eyes lock on him before we read the soldiers.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-dead-dad" aria-labelledby="h-dead-dad">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">M</span>
+            <h2 id="h-dead-dad">M — Modify · <em>Dead Dad</em> (Mueck)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/Dead Dad.jpg" alt="Ron Mueck, Dead Dad, small hyperreal figure of a dead man." width="1200" height="800" loading="lazy" decoding="async" />
+              <figcaption>Mueck · <em>Dead Dad</em> · 1996–97</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>Mueck radically shrinks a hyperreal male corpse. The viewer stands above and looks down on private grief.</p>
+              <p class="why"><strong>Why it works:</strong> Modifying scale reverses the usual “hero statue” size of the body in public space. Small size makes the loss feel intimate and uncomfortable at the same time.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-fountain" aria-labelledby="h-fountain">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">P</span>
+            <h2 id="h-fountain">P — Put to another use · <em>Fountain</em> (Duchamp)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/Fountain.jpg" alt="Marcel Duchamp, Fountain, photograph of urinal signed R. Mutt." width="900" height="1200" loading="lazy" decoding="async" />
+              <figcaption>Duchamp · <em>Fountain</em> · 1917</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>A urinal is made for a bathroom. Duchamp puts it in a gallery, signs it “R. Mutt,” and turns it into a sculpture.</p>
+              <p class="why"><strong>Why it works:</strong> The purpose shifts from plumbing to a question: what counts as art if the artist only chooses and places the object?</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-bed" aria-labelledby="h-bed">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">P</span>
+            <h2 id="h-bed">P — Put to another use · <em>Bed</em> (Rauschenberg)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/Bed.jpg" alt="Robert Rauschenberg, Bed, quilt and pillow with paint on wall." width="900" height="1200" loading="lazy" decoding="async" />
+              <figcaption>Rauschenberg · <em>Bed</em> · 1955</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>A quilt and pillow are normally for sleeping. Rauschenberg puts them on the wall, splashes paint on them, and treats them like a painting surface.</p>
+              <p class="why"><strong>Why it works:</strong> The bed becomes both support and subject. Private life enters the public language of painting.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-thinker" aria-labelledby="h-thinker">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">E</span>
+            <h2 id="h-thinker">E — Eliminate · <em>The Thinker</em> (Rodin)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/The thinker.jpg" alt="Auguste Rodin, The Thinker, nude figure seated on rock." width="900" height="1200" loading="lazy" decoding="async" />
+              <figcaption>Rodin · <em>The Thinker</em> · 1904</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>Traditional heroic sculpture often includes a pedestal, costume, props, or a clear story. Rodin strips that away: a nude man alone on a rock, thinking.</p>
+              <p class="why"><strong>Why it works:</strong> Elimination forces focus on the act of thinking itself, not on rank, battle, or identity.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-white-on-white" aria-labelledby="h-white-on-white">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">E</span>
+            <h2 id="h-white-on-white">E — Eliminate · <em>White on White</em> (Malevich)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/White%20on%20White.jpg" alt="Kazimir Malevich, White on White, 1918. Tilted white square on warm white ground." width="900" height="900" loading="lazy" decoding="async" />
+              <figcaption>Malevich · <em>White on White</em> · 1918</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>Malevich removes a clear subject, strong colour contrast, and illusion of depth. A white square on a slightly different white ground is almost all that remains.</p>
+              <p class="why"><strong>Why it works:</strong> With so much removed, what is left is pure shape and feeling. Nothing else competes for attention.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-ambassadors" aria-labelledby="h-ambassadors">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">R</span>
+            <h2 id="h-ambassadors">R — Reverse · <em>The Ambassadors</em> (Holbein)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/The Ambassadors.jpg" alt="Hans Holbein, The Ambassadors, two men with globe and lute, distorted skull on floor." width="1200" height="900" loading="lazy" decoding="async" />
+              <figcaption>Holbein · <em>The Ambassadors</em> · 1533</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>Two well-dressed men stand with globes and instruments. A strange shape stretches across the floor — it only becomes a skull when you move to the side and look from an angle.</p>
+              <p class="why"><strong>Why it works:</strong> The reversal ties wealth and learning to death in one picture. Frontal viewing is not enough; you must move your body to see the full meaning.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="recipe" id="ex-treachery" aria-labelledby="h-treachery">
+          <div class="recipe-head">
+            <span class="badge" aria-hidden="true">R</span>
+            <h2 id="h-treachery">R — Reverse · <em>Treachery of Images</em> (Magritte)</h2>
+          </div>
+          <div class="ex-split">
+            <figure class="ex-media">
+              <img src="img/The Treachery of Images.jpg" alt="René Magritte, The Treachery of Images, pipe painting with text this is not a pipe." width="900" height="1200" loading="lazy" decoding="async" />
+              <figcaption>Magritte · <em>The Treachery of Images</em> · 1929</figcaption>
+            </figure>
+            <div class="ex-text">
+              <p>A painting of a pipe with the words “Ceci n’est pas une pipe” (“This is not a pipe”). Normally we name what we see; Magritte breaks that habit.</p>
+              <p class="why"><strong>Why it works:</strong> You are looking at paint on canvas, not a smokeable object. The image and the label are not the same thing, so language and picture are split.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+        <footer class="doc-foot">
+          <p><strong>SCAMPER</strong> — Substitute · Combine · Adapt · Modify · Put to another use · Eliminate · Reverse / Rearrange.</p>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var mq = window.matchMedia("(max-width: 900px)");
+      var body = document.body;
+      var toggle = document.getElementById("nav-toggle");
+      var backdrop = document.getElementById("nav-backdrop");
+      var sidebar = document.getElementById("site-nav");
+      var slideBtn = document.getElementById("slideshow-btn");
+      var SLIDE_ORDER = [
+        "ex-olympia", "ex-demoiselles", "ex-vertumnus", "ex-persistence",
+        "ex-las-meninas", "ex-wiley-napoleon", "ex-third-may", "ex-dead-dad",
+        "ex-fountain", "ex-bed", "ex-thinker", "ex-white-on-white",
+        "ex-ambassadors", "ex-treachery"
+      ];
+      var slideTimer = null;
+      var slideIdx = 0;
+
+      function setOpen(open) {
+        body.classList.toggle("sidebar-open", open);
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+        backdrop.setAttribute("aria-hidden", open ? "false" : "true");
+      }
+
+      function closeIfMobile() {
+        if (mq.matches) setOpen(false);
+      }
+
+      function scrollToPaintingId(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (history.replaceState) history.replaceState(null, "", "#" + id);
+      }
+
+      function stopSlideshow() {
+        if (!slideTimer) return;
+        clearInterval(slideTimer);
+        slideTimer = null;
+        slideBtn.setAttribute("aria-pressed", "false");
+        slideBtn.setAttribute("aria-label", "Play slideshow: advance to the next painting every 15 seconds");
+        slideBtn.textContent = "Play slideshow";
+      }
+
+      toggle.addEventListener("click", function () {
+        setOpen(!body.classList.contains("sidebar-open"));
+      });
+
+      backdrop.addEventListener("click", function () {
+        setOpen(false);
+      });
+
+      sidebar.querySelectorAll("a[href^='#']").forEach(function (link) {
+        link.addEventListener("click", closeIfMobile);
+      });
+
+      mq.addEventListener("change", function (e) {
+        if (!e.matches) setOpen(false);
+      });
+
+      slideBtn.addEventListener("click", function () {
+        if (slideTimer) {
+          stopSlideshow();
+          return;
+        }
+        slideIdx = 0;
+        slideBtn.setAttribute("aria-pressed", "true");
+        slideBtn.setAttribute("aria-label", "Stop slideshow");
+        slideBtn.textContent = "Stop slideshow";
+        scrollToPaintingId(SLIDE_ORDER[slideIdx]);
+        slideTimer = setInterval(function () {
+          slideIdx = (slideIdx + 1) % SLIDE_ORDER.length;
+          scrollToPaintingId(SLIDE_ORDER[slideIdx]);
+        }, 15000);
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape") return;
+        if (slideTimer) {
+          stopSlideshow();
+          return;
+        }
+        if (mq.matches) setOpen(false);
+      });
+    })();
+  </script>
+</body>
+</html>

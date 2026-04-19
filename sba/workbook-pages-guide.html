@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DSE VA Workbook Design Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #fafafa;
+      --ink: #1a1a1a;
+      --muted: #6b6b6b;
+      --border: #e5e5e5;
+      --link: #1d4ed8;
+      --wb-a-ink: #1a365d;
+      --wb-a-body: #2c5282;
+      --wb-a-soft: #e8eef7;
+      --wb-b-ink: #744210;
+      --wb-b-body: #975a16;
+      --wb-b-soft: #faf5eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "DM Sans", system-ui, sans-serif;
+      font-size: 0.94rem;
+      line-height: 1.55;
+      font-weight: 400;
+    }
+    .wrap {
+      margin: 0;
+      max-width: none;
+      width: 100%;
+      padding: 0.45rem 0.75rem 2rem;
+    }
+    header.tabbar {
+      margin: 0 0 0.5rem;
+      padding: 0 0 0.28rem;
+      border-bottom: 1px solid #ebebeb;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 0.45rem;
+      margin: 0;
+      align-items: center;
+    }
+    .tabs button {
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.2;
+      padding: 0.35rem 0.5rem;
+      min-width: 1.65rem;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      border-radius: 0;
+      cursor: pointer;
+      transition: color 0.12s, border-color 0.12s, background 0.12s;
+    }
+    .tabs button.tab-a {
+      color: #3d5a80;
+    }
+    .tabs button.tab-a:hover {
+      color: var(--wb-a-ink);
+      background: var(--wb-a-soft);
+    }
+    .tabs button.tab-a[aria-selected="true"] {
+      color: var(--wb-a-ink);
+      border-bottom-color: var(--wb-a-ink);
+      background: var(--wb-a-soft);
+    }
+    .tabs button.tab-b {
+      color: #a67c2a;
+    }
+    .tabs button.tab-b:hover {
+      color: var(--wb-b-ink);
+      background: var(--wb-b-soft);
+    }
+    .tabs button.tab-b[aria-selected="true"] {
+      color: var(--wb-b-ink);
+      border-bottom-color: var(--wb-b-ink);
+      background: var(--wb-b-soft);
+    }
+    .panel {
+      display: none;
+      padding: 0.25rem 0 0;
+    }
+    .panel.active { display: block; }
+    .panel .q {
+      margin: 0 0 0.55rem;
+      color: var(--ink);
+      font-size: 1.05rem;
+      font-weight: 500;
+      line-height: 1.45;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.2rem 0.45rem;
+    }
+    .panel .q .q-label {
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    .panel .q .vid {
+      text-decoration: none;
+      color: inherit;
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .panel .q .vid span {
+      font-size: 1.35em;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .panel .q .vid:hover span {
+      transform: scale(1.12);
+    }
+    .panel .q .vid:focus-visible {
+      outline: 2px solid var(--link);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    .panel.wb-a .q { color: var(--wb-a-ink); }
+    .panel.wb-b .q { color: var(--wb-b-ink); }
+    .panel-split {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 0.75rem 1rem;
+    }
+    .panel-visual {
+      flex: 1 1 0;
+      min-width: min(100%, 14rem);
+    }
+    .panel-tips {
+      flex: 0 0 30vw;
+      width: 30vw;
+      max-width: 100%;
+      min-width: min(30vw, 100%);
+      padding: 0.65rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+    .panel.wb-a .panel-tips {
+      color: var(--wb-a-body);
+      background: var(--wb-a-soft);
+      border: 1px solid rgba(26, 54, 93, 0.12);
+    }
+    .panel.wb-b .panel-tips {
+      color: var(--wb-b-body);
+      background: var(--wb-b-soft);
+      border: 1px solid rgba(116, 66, 16, 0.15);
+    }
+    .panel-tips .tips-h {
+      margin: 0 0 0.45rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.9;
+    }
+    .panel.wb-a .panel-tips .tips-h { color: var(--wb-a-ink); }
+    .panel.wb-b .panel-tips .tips-h { color: var(--wb-b-ink); }
+    .panel-tips ul {
+      margin: 0;
+      padding-left: 1.05rem;
+    }
+    .panel-tips li {
+      margin-bottom: 0.4rem;
+    }
+    .panel-tips li:last-child {
+      margin-bottom: 0;
+    }
+    .panel-visual .ex {
+      margin: 0;
+    }
+    .panel-visual .ex img {
+      display: block;
+      width: 100%;
+      max-width: 56rem;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    .panel-visual .ex img + img {
+      margin-top: 0.5rem;
+    }
+    .panel-visual .visual-placeholder {
+      margin: 0;
+      padding: 1.25rem 0.75rem;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+      background: #fff;
+    }
+    @media (max-width: 720px) {
+      .panel-split {
+        flex-direction: column;
+      }
+      .panel-tips {
+        flex: 1 1 auto;
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    #lang-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(250, 250, 250, 0.97);
+      backdrop-filter: blur(6px);
+    }
+    #lang-overlay[hidden] {
+      display: none !important;
+    }
+    .lang-card {
+      max-width: 26rem;
+      width: 100%;
+      padding: 1.75rem 1.5rem;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+    .lang-card h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+    .lang-card .lang-lede {
+      margin: 0 0 1.1rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .lang-card .lang-prompt {
+      margin: 0 0 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .lang-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .lang-btns button {
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.65rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fafafa;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .lang-btns button:hover {
+      background: #f0f0f0;
+      border-color: #ccc;
+    }
+    .lang-btns button:focus-visible {
+      outline: 2px solid var(--link);
+      outline-offset: 2px;
+    }
+    .lang-remember {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .site-head {
+      margin-bottom: 0.28rem;
+      padding: 0.3rem 0 0.32rem;
+      border-bottom: 1px solid #ebebeb;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem 0.55rem;
+    }
+    .site-head .home {
+      color: #1e3a5f;
+      text-decoration: none;
+      font-size: 1.2rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .site-head .home:hover {
+      opacity: 0.85;
+    }
+    .site-head .home:focus-visible {
+      outline: 2px solid var(--link);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    .site-head .guide-title {
+      margin: 0;
+      flex: 1;
+      min-width: 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .site-head .btn-lang {
+      font-family: inherit;
+      font-size: 0.72rem;
+      padding: 0.2rem 0.45rem;
+      margin-inline-start: auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .site-head .btn-lang:hover {
+      color: var(--ink);
+      border-color: #ccc;
+    }
+    body.lang-ne {
+      font-family: "Noto Sans Devanagari", "DM Sans", system-ui, sans-serif;
+    }
+    body.lang-ur {
+      font-family: "Noto Naskh Arabic", "DM Sans", system-ui, sans-serif;
+      direction: rtl;
+    }
+    body.lang-ur .panel-split {
+      flex-direction: row-reverse;
+    }
+    body.lang-ur .panel-tips ul {
+      padding-right: 1.05rem;
+      padding-left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="lang-overlay" role="dialog" aria-modal="true" aria-labelledby="lang-overlay-title">
+    <div class="lang-card">
+      <h1 id="lang-overlay-title">DSE VA Workbook Design Guide</h1>
+      <p class="lang-lede" id="lang-overlay-lede">HKDSE Visual Arts — how to design workbook pages, with examples and questions.</p>
+      <p class="lang-prompt" id="lang-prompt">Choose language</p>
+      <div class="lang-btns">
+        <button type="button" id="lang-en" lang="en">English</button>
+        <button type="button" id="lang-ne" lang="ne">नेपाली</button>
+        <button type="button" id="lang-ur" lang="ur">اردو</button>
+      </div>
+      <label class="lang-remember">
+        <input type="checkbox" id="lang-remember" />
+        <span id="lang-remember-label">Remember my choice on this device</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="wrap" id="main-wrap" hidden>
+    <header class="site-head">
+      <a class="home" href="../index.html" aria-label="Lessons home">🏠</a>
+      <h1 class="guide-title" id="guide-title">DSE VA Workbook Design Guide</h1>
+      <button type="button" class="btn-lang" id="btn-change-lang" aria-label="Change language">Language</button>
+    </header>
+    <header class="tabbar">
+      <div class="tabs" role="tablist" aria-label="Workbook pages">
+        <button type="button" class="tab-a" role="tab" id="tab-p1" aria-selected="true" aria-controls="panel-p1" aria-label="Page 1">1</button>
+        <button type="button" class="tab-a" role="tab" id="tab-p2" aria-selected="false" aria-controls="panel-p2" aria-label="Page 2">2</button>
+        <button type="button" class="tab-a" role="tab" id="tab-p3" aria-selected="false" aria-controls="panel-p3" aria-label="Page 3">3</button>
+        <button type="button" class="tab-a" role="tab" id="tab-p4" aria-selected="false" aria-controls="panel-p4" aria-label="Page 4">4</button>
+        <button type="button" class="tab-a" role="tab" id="tab-p5" aria-selected="false" aria-controls="panel-p5" aria-label="Page 5">5</button>
+        <button type="button" class="tab-a" role="tab" id="tab-p6" aria-selected="false" aria-controls="panel-p6" aria-label="Page 6">6</button>
+        <button type="button" class="tab-a" role="tab" id="tab-p7" aria-selected="false" aria-controls="panel-p7" aria-label="Page 7">7</button>
+        <button type="button" class="tab-b" role="tab" id="tab-p8" aria-selected="false" aria-controls="panel-p8" aria-label="Page 8">8</button>
+        <button type="button" class="tab-b" role="tab" id="tab-p9" aria-selected="false" aria-controls="panel-p9" aria-label="Page 9">9</button>
+        <button type="button" class="tab-b" role="tab" id="tab-p10" aria-selected="false" aria-controls="panel-p10" aria-label="Page 10">10</button>
+        <button type="button" class="tab-b" role="tab" id="tab-p11" aria-selected="false" aria-controls="panel-p11" aria-label="Page 11">11</button>
+        <button type="button" class="tab-b" role="tab" id="tab-p12" aria-selected="false" aria-controls="panel-p12" aria-label="Page 12">12</button>
+        <button type="button" class="tab-b" role="tab" id="tab-p13" aria-selected="false" aria-controls="panel-p13" aria-label="Page 13">13</button>
+        <button type="button" class="tab-b" role="tab" id="tab-p14" aria-selected="false" aria-controls="panel-p14" aria-label="Page 14">14</button>
+      </div>
+    </header>
+
+    <section id="panel-p1" class="panel wb-a active" role="tabpanel" aria-labelledby="tab-p1">
+      <p class="q"><span class="q-label">Theme &amp; content mindmap</span><span class="q-dash"> — </span><span class="q-rest">What branches from my centre theme (keywords, symbols, influences)?</span>
+        <a class="vid" href="https://youtu.be/-S7kVgV8TFw?t=153" target="_blank" rel="noopener noreferrer" title="Reference video from 2:33" aria-label="Open reference video on YouTube (from 2:33)"><span>🎬</span></a>
+      </p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page1a.jpg" alt="Example: topic mindmap and research notes, part 1" loading="lazy" decoding="async" />
+            <img src="img/page1b.jpg" alt="Example: topic mindmap and research notes, part 2" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 1">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>What is my main theme (one short phrase)?</li>
+            <li>What sub-topics, keywords, images / symbols, and influences branch from it?</li>
+            <li>Can I add small pictures or labels so sources stay clear on the map?</li>
+            <li>Would an examiner understand each branch without me explaining in person?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p2" class="panel wb-a" role="tabpanel" aria-labelledby="tab-p2" hidden>
+      <p class="q"><span class="q-label">Introduction of theme</span><span class="q-dash"> — </span><span class="q-rest">What is my theme—and what is artwork 1 about?</span></p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page2a.jpg" alt="Example: theme and rationale for artwork 1, part 1" loading="lazy" decoding="async" />
+            <img src="img/page2b.jpg" alt="Example: theme and topic for artwork 1, part 2" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 2">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>What does this theme mean to <em>me</em> (not a dictionary definition)?</li>
+            <li>What experience / observation made me choose it?</li>
+            <li>What mood, message, or question do I want to explore/express/confront?</li>
+            <li>What is my topic for <strong>artwork 1</strong>—and what do I want the viewer to feel or think?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p3" class="panel wb-a" role="tabpanel" aria-labelledby="tab-p3" hidden>
+      <p class="q"><span class="q-label">Artist study</span><span class="q-dash"> — </span><span class="q-rest">Whose work connects to my theme—and what do I notice?</span>
+        <a class="vid" href="https://youtu.be/NK3R1sCmP1w?t=412" target="_blank" rel="noopener noreferrer" title="Reference video from 6:52" aria-label="Open reference video on YouTube (from 6:52)"><span>🎬</span></a>
+      </p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page3a.jpg" alt="Example: artist and artwork response, sample 1" loading="lazy" decoding="async" />
+            <img src="img/page3b.jpg" alt="Example: artist and artwork response, sample 2" loading="lazy" decoding="async" />
+            <img src="img/page3c.jpg" alt="Example: artist and artwork response, sample 3" loading="lazy" decoding="async" />
+            <img src="img/page3d.jpg" alt="Example: artist and artwork response, sample 4" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 3">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>Which artist(s) connect to my theme or my artwork idea—how, and in what context(s)?</li>
+            <li>What specific artwork(s) am I studying?</li>
+            <li>What techniques, composition, colours, materials, and meanings do I notice?</li>
+            <li>What do I like / dislike, and what can I borrow or adapt? Include 1–2 images with short notes in my own words.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p4" class="panel wb-a" role="tabpanel" aria-labelledby="tab-p4" hidden>
+      <p class="q"><span class="q-label">Draft / sketches — artwork 1</span><span class="q-dash"> — </span><span class="q-rest">What directions am I trying (formal choices, feeling, leading into the final piece)?</span>
+        <a class="vid" href="https://youtu.be/F7sqSfgrTsQ?t=515" target="_blank" rel="noopener noreferrer" title="Reference video from 8:35" aria-label="Open reference video on YouTube (from 8:35)"><span>🎬</span></a>
+      </p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page4a.jpg" alt="Example: initial ideas and thumbnails for artwork 1, part 1" loading="lazy" decoding="async" />
+            <img src="img/page4b.jpg" alt="Example: initial ideas for artwork 1, part 2" loading="lazy" decoding="async" />
+            <img src="img/page4c.jpg" alt="Example: initial ideas for artwork 1, part 3" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 4">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>Have I made <strong>1–3 sketches</strong>—each stressing particular formal choices (colour, composition, line, shape, scale, viewpoint, marks, background)?</li>
+            <li>What emotion(s) do I express or confront—and how do formal qualities help with that (e.g. tension / calm, near / far, order / chaos)?</li>
+            <li>What would I <strong>adapt or change</strong> from these sketches into the real piece—and why?</li>
+            <li>Do these directions link clearly to my theme and topic from page 2?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p5" class="panel wb-a" role="tabpanel" aria-labelledby="tab-p5" hidden>
+      <p class="q"><span class="q-label">Information collection — artwork 1</span><span class="q-dash"> — </span><span class="q-rest">What pictures, textures, or samples am I collecting?</span></p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page5a.jpg" alt="Example: reference pictures and notes for artwork 1, part 1" loading="lazy" decoding="async" />
+            <img src="img/page5b.jpg" alt="Example: reference board for artwork 1, part 2" loading="lazy" decoding="async" />
+            <img src="img/page5c.jpg" alt="Example: reference pictures for artwork 1, part 3" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 5">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>What references do I need (photos, textures, objects, interviews, facts)?</li>
+            <li>How will each reference be used in my artwork?</li>
+            <li>What notes can I write beside each image (1–2 lines)?</li>
+            <li>What gaps do I still need to collect?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p6" class="panel wb-a" role="tabpanel" aria-labelledby="tab-p6" hidden>
+      <p class="q"><span class="q-label">Experiment of media or technique — artwork 1</span><span class="q-dash"> — </span><span class="q-rest">What materials and methods am I testing?</span>
+        <a class="vid" href="https://youtu.be/dU6nHRMqBps?t=720" target="_blank" rel="noopener noreferrer" title="Reference video from 12:00" aria-label="Open reference video on YouTube (from 12:00)"><span>🎬</span></a>
+      </p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page6.jpg" alt="Example: media and technique experiments for artwork 1, part 1" loading="lazy" decoding="async" />
+            <img src="img/page6b.jpg" alt="Example: media and technique experiments for artwork 1, part 2" loading="lazy" decoding="async" />
+            <img src="img/page6c.jpg" alt="Example: media and technique experiments for artwork 1, part 3" loading="lazy" decoding="async" />
+            <img src="img/page6d.jpg" alt="Example: media and technique experiments for artwork 1, part 4" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 6">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>What materials / techniques can I test (at least 3 small tests)?</li>
+            <li>What worked well, and what failed?</li>
+            <li>How do my tests connect to the mood / meaning I want?</li>
+            <li>Which test will I use in the final artwork, and why?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p7" class="panel wb-a" role="tabpanel" aria-labelledby="tab-p7" hidden>
+      <p class="q"><span class="q-label">Final approach — artwork 1</span><span class="q-dash"> — </span><span class="q-rest">Which approach do I commit to, and why?</span></p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page7.jpg" alt="Example: final approach and commitment for artwork 1" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 7">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>Which test or sketch direction will I use in the <strong>final artwork</strong>, and why?</li>
+            <li>What would I <strong>adapt or change</strong> from sketches into the real piece?</li>
+            <li>What <strong>medium</strong> and main <strong>composition</strong> am I committing to—in plain words?</li>
+            <li>What <strong>2–3 reasons</strong> tie this decision to pages 4 and 6?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p8" class="panel wb-b" role="tabpanel" aria-labelledby="tab-p8" hidden>
+      <p class="q"><span class="q-label">Introduction of theme — artwork 2</span><span class="q-dash"> — </span><span class="q-rest">What is the specific focus of my second piece?</span></p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page8.jpg" alt="Example: topic statement for artwork 2" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 8">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>What does this focus for artwork 2 mean to <em>me</em> (not a generic line)?</li>
+            <li>What experience / observation or source feeds this piece?</li>
+            <li>What mood, message, or question do I want to explore/express/confront here?</li>
+            <li>How is this focus <strong>different from artwork 1</strong>—yet still tied to my theme?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p9" class="panel wb-b" role="tabpanel" aria-labelledby="tab-p9" hidden>
+      <p class="q"><span class="q-label">Draft / sketches — artwork 2</span><span class="q-dash"> — </span><span class="q-rest">What are my starting directions for this piece?</span></p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page9.jpg" alt="Example: initial ideas for artwork 2, part 1" loading="lazy" decoding="async" />
+            <img src="img/page9a.jpg" alt="Example: initial ideas for artwork 2, part 2" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 9">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>Have I made <strong>1–3 sketches</strong>—each stressing particular formal choices (colour, composition, line, shape, scale, viewpoint, marks, background)?</li>
+            <li>What emotion(s) do I express or confront—and how do formal qualities help with that?</li>
+            <li>What would I <strong>adapt or change</strong> into the real piece for artwork 2—and why?</li>
+            <li>Do these directions link to my focus on <strong>page 8</strong> and show a clear shift from artwork 1?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p10" class="panel wb-b" role="tabpanel" aria-labelledby="tab-p10" hidden>
+      <p class="q"><span class="q-label">Information collection — artwork 2</span><span class="q-dash"> — </span><span class="q-rest">What pictures and samples support this artwork?</span>
+        <a class="vid" href="https://youtu.be/Dmx3YQV9rAo?t=547" target="_blank" rel="noopener noreferrer" title="Reference video from 9:07" aria-label="Open reference video on YouTube (from 9:07)"><span>🎬</span></a>
+      </p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page10.jpg" alt="Example: reference pictures for artwork 2, part 1" loading="lazy" decoding="async" />
+            <img src="img/page10b.jpg" alt="Example: reference pictures for artwork 2, part 2" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 10">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>What references do I need (photos, textures, objects, interviews, facts)?</li>
+            <li>How will each reference be used in <strong>this</strong> artwork?</li>
+            <li>What notes can I write beside each image (1–2 lines)?</li>
+            <li>What gaps do I still need to collect—is this board fresh for artwork 2, not only leftovers from artwork 1?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p11" class="panel wb-b" role="tabpanel" aria-labelledby="tab-p11" hidden>
+      <p class="q"><span class="q-label">Experiment of media or technique — artwork 2</span><span class="q-dash"> — </span><span class="q-rest">What did I try, why, and what will I use in the final work?</span></p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page11a.jpg" alt="Example: media and techniques experiments leading to decision, part 1" loading="lazy" decoding="async" />
+            <img src="img/page11b.jpg" alt="Example: experimentation and notes, part 2" loading="lazy" decoding="async" />
+            <img src="img/page11c.jpg" alt="Example: final media decision, part 3" loading="lazy" decoding="async" />
+            <img src="img/page11d.jpg" alt="Example: media and techniques, part 4" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 11">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>What materials / techniques can I test (at least 3 small tests)?</li>
+            <li>What worked well, and what failed?</li>
+            <li>How do my tests connect to the mood / meaning I want for artwork 2?</li>
+            <li>Which test will I use in the final artwork, and why?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p12" class="panel wb-b" role="tabpanel" aria-labelledby="tab-p12" hidden>
+      <p class="q"><span class="q-label">Reflection</span><span class="q-dash"> — </span><span class="q-rest">What did I learn—and what was difficult or surprising?</span></p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <div class="ex">
+            <img src="img/page12.jpg" alt="Example: reflection on learning, challenges, and solutions" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 12">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>What did I learn (skills + ideas)? What surprised me in the process?</li>
+            <li>What was difficult (skills, time, composition, materials, idea)—and what did I try to solve it (step-by-step)?</li>
+            <li>What feedback did I receive, and how did I respond? What would I improve if I did this again?</li>
+            <li>What evidence can I show (photos of trials, notes, revisions)?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p13" class="panel wb-b" role="tabpanel" aria-labelledby="tab-p13" hidden>
+      <p class="q"><span class="q-label">Introduction of theme — artwork 3</span><span class="q-dash"> — </span><span class="q-rest">What is the focus of my third piece?</span></p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <p class="visual-placeholder">Add photos or scans of your own workbook page here when ready.</p>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 13">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>What does this focus for artwork 3 mean to <em>me</em> (not a generic line)?</li>
+            <li>How has my inquiry <strong>grown</strong> after artworks 1 and 2?</li>
+            <li>What mood, message, or question do I want to explore/express/confront in this piece?</li>
+            <li>What is my one <strong>clear topic</strong> for artwork 3—and how does it tie back to my theme?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="panel-p14" class="panel wb-b" role="tabpanel" aria-labelledby="tab-p14" hidden>
+      <p class="q"><span class="q-label">Draft / sketches — artwork 3</span><span class="q-dash"> — </span><span class="q-rest">What are my starting directions?</span></p>
+      <div class="panel-split">
+        <div class="panel-visual">
+          <p class="visual-placeholder">Add photos or scans of your own workbook page here when ready.</p>
+        </div>
+        <aside class="panel-tips" aria-label="Questions for page 14">
+          <p class="tips-h">Questions to ask yourself</p>
+          <ul>
+            <li>Have I made <strong>1–3 sketches</strong>—each stressing particular formal choices (colour, composition, line, shape, scale, viewpoint, marks, background)?</li>
+            <li>What emotion(s) do I express or confront—and how do formal qualities help with that?</li>
+            <li>What would I <strong>adapt or change</strong> into the real piece for artwork 3—and why?</li>
+            <li>Do these directions link to my topic on <strong>page 13</strong>—and leave room to develop further?</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+  </div>
+
+  <script src="workbook-i18n.js"></script>
+  <script>
+    (function () {
+      var SK = "dse-workbook-lang";
+      var overlay = document.getElementById("lang-overlay");
+      var mainWrap = document.getElementById("main-wrap");
+      var tablist = document.querySelector('.tabs[role="tablist"]');
+
+      function applyLang(code) {
+        var L = (window.WB_LANG && window.WB_LANG[code]) || window.WB_LANG.en;
+        if (!L) return;
+        document.documentElement.lang = code === "ne" ? "ne" : code === "ur" ? "ur" : "en";
+        document.body.classList.remove("lang-ne", "lang-ur");
+        if (code === "ne") document.body.classList.add("lang-ne");
+        if (code === "ur") document.body.classList.add("lang-ur");
+
+        document.title = L.docTitle;
+        var gt = document.getElementById("guide-title");
+        var ot = document.getElementById("lang-overlay-title");
+        if (gt) gt.textContent = L.guideTitle;
+        if (ot) ot.textContent = L.guideTitle;
+        var lede = document.getElementById("lang-overlay-lede");
+        if (lede) lede.textContent = L.guideLede;
+        var lp = document.getElementById("lang-prompt");
+        if (lp) lp.textContent = L.chooseLang;
+        var rl = document.getElementById("lang-remember-label");
+        if (rl) rl.textContent = L.rememberLabel;
+        var btnLang = document.getElementById("btn-change-lang");
+        if (btnLang) {
+          btnLang.textContent = L.changeLang;
+          btnLang.setAttribute("aria-label", L.changeLangAria);
+        }
+        if (tablist) tablist.setAttribute("aria-label", L.tablistAria);
+
+        for (var i = 1; i <= 14; i++) {
+          var sec = document.getElementById("panel-p" + i);
+          if (!sec || !L.pages[i - 1]) continue;
+          var P = L.pages[i - 1];
+          var ql = sec.querySelector(".q-label");
+          var qd = sec.querySelector(".q-dash");
+          var qr = sec.querySelector(".q-rest");
+          if (ql) ql.textContent = P.label;
+          if (qd) qd.textContent = L.dash;
+          if (qr) qr.textContent = P.rest;
+          var vid = sec.querySelector(".vid");
+          if (vid && P.vid) {
+            vid.setAttribute("title", P.vid.title);
+            vid.setAttribute("aria-label", P.vid.aria);
+          }
+          var th = sec.querySelector(".tips-h");
+          if (th) th.textContent = L.tipsHeading;
+          var ul = sec.querySelector(".panel-tips ul");
+          if (ul && P.tips) {
+            ul.innerHTML = P.tips.map(function (t) {
+              return "<li>" + t + "</li>";
+            }).join("");
+          }
+          var aside = sec.querySelector(".panel-tips");
+          if (aside) aside.setAttribute("aria-label", L.questionsForPage + " " + i);
+          var tab = document.getElementById("tab-p" + i);
+          if (tab) tab.setAttribute("aria-label", L.pageWord + " " + i);
+          var ph = sec.querySelector(".visual-placeholder");
+          if (ph) ph.textContent = L.placeholder;
+        }
+      }
+
+      function closeOverlay() {
+        overlay.hidden = true;
+        mainWrap.hidden = false;
+      }
+
+      function pickLang(code) {
+        try {
+          if (document.getElementById("lang-remember").checked) {
+            localStorage.setItem(SK, code);
+          } else {
+            localStorage.removeItem(SK);
+          }
+        } catch (e) {}
+        applyLang(code);
+        closeOverlay();
+      }
+
+      function openOverlay() {
+        overlay.hidden = false;
+        mainWrap.hidden = true;
+      }
+
+      document.getElementById("lang-en").addEventListener("click", function () {
+        pickLang("en");
+      });
+      document.getElementById("lang-ne").addEventListener("click", function () {
+        pickLang("ne");
+      });
+      document.getElementById("lang-ur").addEventListener("click", function () {
+        pickLang("ur");
+      });
+      document.getElementById("btn-change-lang").addEventListener("click", function () {
+        openOverlay();
+      });
+
+      var saved = null;
+      try {
+        saved = localStorage.getItem(SK);
+      } catch (e) {}
+      if (saved === "en" || saved === "ne" || saved === "ur") {
+        applyLang(saved);
+        closeOverlay();
+      }
+
+      var tabs = document.querySelectorAll('[role="tab"]');
+      var panels = document.querySelectorAll('[role="tabpanel"]');
+      function showTab(id) {
+        tabs.forEach(function (t) {
+          var on = t.id === "tab-" + id;
+          t.setAttribute("aria-selected", on);
+        });
+        panels.forEach(function (p) {
+          var on = p.id === "panel-" + id;
+          p.classList.toggle("active", on);
+          p.hidden = !on;
+        });
+      }
+      tabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          var id = tab.id.replace("tab-", "");
+          showTab(id);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
