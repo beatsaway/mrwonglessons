@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Op Art resources — quiz, worksheet, PDF." />
+  <title>Op Art | KS3</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --muted: #4a4a4a;
+      --accent: #2c5282;
+      --border: #e8e8e8;
+      --card: #f8fafc;
+      --core: #1a365d;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 1.05rem;
+      line-height: 1.5;
+    }
+    .lang-zh {
+      font-family: "PingFang HK", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    }
+    a {
+      color: var(--accent);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+    a:hover { text-decoration-thickness: 2px; }
+    .wrap {
+      max-width: 28rem;
+      margin: 0 auto;
+      padding: 1.25rem max(1rem, env(safe-area-inset-right)) 2rem max(1rem, env(safe-area-inset-left));
+    }
+    h1 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.05rem, 3vw, 1.25rem);
+      font-weight: 700;
+      color: var(--core);
+      text-align: center;
+    }
+    h1 .lang-zh {
+      display: block;
+      margin-top: 0.2rem;
+      font-size: 0.95em;
+    }
+    .nav-home {
+      margin: 0 0 0.85rem;
+      text-align: center;
+    }
+    .nav-home a {
+      display: inline-block;
+      font-size: 1.65rem;
+      line-height: 1;
+      text-decoration: none;
+      padding: 0.2rem;
+      border-radius: 8px;
+    }
+    .nav-home a:hover {
+      background: var(--card);
+    }
+    .nav-home a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    ul.links {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    ul.links li {
+      margin: 0;
+    }
+    ul.links a {
+      display: block;
+      padding: 0.75rem 1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-weight: 600;
+      color: var(--core);
+      text-decoration: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    ul.links a:hover {
+      border-color: var(--accent);
+      background: #fff;
+    }
+    ul.links a .lang-zh {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.92em;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    ul.links a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <p class="nav-home">
+      <a href="../../index.html" aria-label="Home · 主頁"><span aria-hidden="true">🏠</span></a>
+    </p>
+
+    <h1>
+      <span lang="en">Op Art</span>
+      <span class="lang-zh" lang="zh-HK">歐普藝術</span>
+    </h1>
+
+    <ul class="links">
+      <li>
+        <a href="optical-illusion-principles.html">
+          <span lang="en">Illusion matching quiz</span>
+          <span class="lang-zh" lang="zh-HK">視錯覺配對</span>
+        </a>
+      </li>
+      <li>
+        <a href="op-art-review-worksheet.html">
+          <span lang="en">Op Art review worksheet (fill in)</span>
+          <span class="lang-zh" lang="zh-HK">複習工作紙（填空）</span>
+        </a>
+      </li>
+      <li>
+        <a href="opart%20worksheets.pdf" target="_blank" rel="noopener noreferrer">
+          <span lang="en">Op Art worksheets (PDF)</span>
+          <span class="lang-zh" lang="zh-HK">工作紙（PDF）</span>
+        </a>
+      </li>
+    </ul>
+  </main>
+</body>
+</html>

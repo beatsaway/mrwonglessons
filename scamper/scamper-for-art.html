@@ -53,7 +53,7 @@
     }
 
     .nav-toggle {
-      display: none;
+      display: flex;
       position: fixed;
       top: 0.65rem;
       left: 0.65rem;
@@ -80,16 +80,8 @@
       height: 1.35rem;
     }
 
-    .nav-toggle .icon-close {
+    body.sidebar-panel-visible .nav-toggle {
       display: none;
-    }
-
-    body.sidebar-open .nav-toggle .icon-open {
-      display: none;
-    }
-
-    body.sidebar-open .nav-toggle .icon-close {
-      display: block;
     }
 
     .nav-backdrop {
@@ -119,6 +111,27 @@
       z-index: 300;
     }
 
+    @media (min-width: 901px) {
+      .sidebar {
+        transition: width 0.22s ease, opacity 0.18s ease, border-color 0.18s ease;
+      }
+
+      body.sidebar-collapsed .sidebar {
+        width: 0;
+        min-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        border-right-color: transparent;
+        pointer-events: none;
+      }
+
+      .nav-backdrop {
+        display: none !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+      }
+    }
+
     .sidebar-sticky {
       position: sticky;
       top: 0;
@@ -130,34 +143,55 @@
       min-height: 0;
     }
 
+    /* Room for fixed hamburger when the panel is hidden */
+    body:not(.sidebar-panel-visible) .sidebar-sticky {
+      padding-top: 3.75rem;
+    }
+
     .sidebar-tools {
       margin: 0 0 0.55rem;
       padding-bottom: 0.55rem;
       border-bottom: 1px solid var(--rule);
     }
 
+    .sidebar-tools-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem 0.5rem;
+    }
+
     .slideshow-btn {
-      display: block;
-      width: 100%;
+      position: fixed;
+      bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+      right: max(1rem, env(safe-area-inset-right, 0px));
+      z-index: 380;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
       margin: 0;
-      padding: 0.4rem 0.2rem;
+      padding: 0;
       font: inherit;
-      font-size: 0.8rem;
       font-weight: 600;
-      line-height: 1.35;
-      text-align: left;
+      line-height: 1;
+      text-align: center;
       color: var(--accent);
-      background: transparent;
-      border: none;
-      border-radius: 6px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
       cursor: pointer;
-      text-decoration: none;
+      box-shadow: 0 2px 10px rgba(28, 27, 25, 0.1);
+    }
+
+    .slideshow-btn .slideshow-emoji {
+      font-size: 1.35rem;
+      line-height: 1;
     }
 
     .slideshow-btn:hover {
       background: var(--accent-soft);
-      text-decoration: underline;
-      text-underline-offset: 3px;
     }
 
     .slideshow-btn:focus-visible {
@@ -168,7 +202,52 @@
     .slideshow-btn[aria-pressed="true"] {
       background: var(--accent-soft);
       color: var(--ink);
+    }
+
+    .pdf-worksheet {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      line-height: 1;
       text-decoration: none;
+      padding: 0.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .pdf-worksheet:hover {
+      background: var(--accent-soft);
+    }
+
+    .pdf-worksheet:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .sidebar-close-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font: inherit;
+      font-size: 1.2rem;
+      line-height: 1;
+      padding: 0.2rem;
+      margin: 0;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .sidebar-close-btn:hover {
+      background: var(--accent-soft);
+    }
+
+    .sidebar-close-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
 
     .sidebar-label {
@@ -216,10 +295,6 @@
     }
 
     @media (max-width: 900px) {
-      .nav-toggle {
-        display: flex;
-      }
-
       .nav-backdrop {
         display: block;
       }
@@ -450,7 +525,9 @@
       }
       .nav-toggle,
       .nav-backdrop,
-      .slideshow-btn {
+      .slideshow-btn,
+      .pdf-worksheet,
+      .sidebar-close-btn {
         display: none !important;
       }
       .sidebar {
@@ -484,20 +561,24 @@
 </head>
 <body>
   <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation">
-    <svg class="icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
       <path d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-    <svg class="icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path d="M18 6L6 18M6 6l12 12" />
     </svg>
   </button>
   <div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
+
+  <button type="button" id="slideshow-btn" class="slideshow-btn" aria-pressed="false" title="Each painting for 15 seconds" aria-label="Play slideshow: advance to the next painting every 15 seconds">
+    <span class="slideshow-emoji" aria-hidden="true">▶️</span>
+  </button>
 
   <div class="app-layout">
     <aside class="sidebar" id="site-nav" aria-label="SCAMPER painting index">
       <div class="sidebar-sticky">
       <div class="sidebar-tools">
-        <button type="button" id="slideshow-btn" class="slideshow-btn" aria-pressed="false" title="Each painting for 15 seconds" aria-label="Play slideshow: advance to the next painting every 15 seconds">Play slideshow</button>
+        <div class="sidebar-tools-row">
+          <a href="F5SBA.pdf" class="pdf-worksheet" target="_blank" rel="noopener noreferrer" title="Open worksheet (PDF)" aria-label="Open worksheet PDF"><span aria-hidden="true">📝</span></a>
+          <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" title="Hide navigation panel" aria-label="Hide navigation panel"><span aria-hidden="true">❌</span></button>
+        </div>
       </div>
       <nav class="sidebar-nav">
         <p class="sidebar-label">S — Substitute</p>
@@ -802,9 +883,11 @@
       var mq = window.matchMedia("(max-width: 900px)");
       var body = document.body;
       var toggle = document.getElementById("nav-toggle");
+      var sidebarCloseBtn = document.getElementById("sidebar-close-btn");
       var backdrop = document.getElementById("nav-backdrop");
       var sidebar = document.getElementById("site-nav");
       var slideBtn = document.getElementById("slideshow-btn");
+      var slideEmoji = slideBtn.querySelector(".slideshow-emoji");
       var SLIDE_ORDER = [
         "ex-olympia", "ex-demoiselles", "ex-vertumnus", "ex-persistence",
         "ex-las-meninas", "ex-wiley-napoleon", "ex-third-may", "ex-dead-dad",
@@ -814,15 +897,32 @@
       var slideTimer = null;
       var slideIdx = 0;
 
+      function updateSidebarVisibleClass() {
+        var visible = mq.matches
+          ? body.classList.contains("sidebar-open")
+          : !body.classList.contains("sidebar-collapsed");
+        body.classList.toggle("sidebar-panel-visible", visible);
+        toggle.setAttribute("aria-expanded", visible ? "true" : "false");
+        toggle.setAttribute("aria-label", visible ? "Close navigation" : "Open navigation");
+      }
+
       function setOpen(open) {
         body.classList.toggle("sidebar-open", open);
-        toggle.setAttribute("aria-expanded", open ? "true" : "false");
-        toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
         backdrop.setAttribute("aria-hidden", open ? "false" : "true");
+        updateSidebarVisibleClass();
       }
 
       function closeIfMobile() {
         if (mq.matches) setOpen(false);
+      }
+
+      function closePanel() {
+        if (mq.matches) {
+          setOpen(false);
+        } else {
+          body.classList.add("sidebar-collapsed");
+          updateSidebarVisibleClass();
+        }
       }
 
       function scrollToPaintingId(id) {
@@ -838,15 +938,40 @@
         slideTimer = null;
         slideBtn.setAttribute("aria-pressed", "false");
         slideBtn.setAttribute("aria-label", "Play slideshow: advance to the next painting every 15 seconds");
-        slideBtn.textContent = "Play slideshow";
+        if (slideEmoji) slideEmoji.textContent = "▶️";
+      }
+
+      function toggleSlideshow() {
+        if (slideTimer) {
+          stopSlideshow();
+          return;
+        }
+        slideIdx = 0;
+        slideBtn.setAttribute("aria-pressed", "true");
+        slideBtn.setAttribute("aria-label", "Stop slideshow");
+        if (slideEmoji) slideEmoji.textContent = "⏸️";
+        scrollToPaintingId(SLIDE_ORDER[slideIdx]);
+        slideTimer = setInterval(function () {
+          slideIdx = (slideIdx + 1) % SLIDE_ORDER.length;
+          scrollToPaintingId(SLIDE_ORDER[slideIdx]);
+        }, 15000);
       }
 
       toggle.addEventListener("click", function () {
-        setOpen(!body.classList.contains("sidebar-open"));
+        if (mq.matches) {
+          setOpen(!body.classList.contains("sidebar-open"));
+        } else {
+          body.classList.toggle("sidebar-collapsed");
+          updateSidebarVisibleClass();
+        }
       });
 
       backdrop.addEventListener("click", function () {
         setOpen(false);
+      });
+
+      sidebarCloseBtn.addEventListener("click", function () {
+        closePanel();
       });
 
       sidebar.querySelectorAll("a[href^='#']").forEach(function (link) {
@@ -855,25 +980,25 @@
 
       mq.addEventListener("change", function (e) {
         if (!e.matches) setOpen(false);
+        updateSidebarVisibleClass();
       });
 
       slideBtn.addEventListener("click", function () {
-        if (slideTimer) {
-          stopSlideshow();
-          return;
-        }
-        slideIdx = 0;
-        slideBtn.setAttribute("aria-pressed", "true");
-        slideBtn.setAttribute("aria-label", "Stop slideshow");
-        slideBtn.textContent = "Stop slideshow";
-        scrollToPaintingId(SLIDE_ORDER[slideIdx]);
-        slideTimer = setInterval(function () {
-          slideIdx = (slideIdx + 1) % SLIDE_ORDER.length;
-          scrollToPaintingId(SLIDE_ORDER[slideIdx]);
-        }, 15000);
+        toggleSlideshow();
       });
 
       document.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.repeat) {
+          var t = e.target;
+          if (!t) return;
+          if (t.closest && t.closest("input, textarea, select, [contenteditable='true'], a[href]")) return;
+          if (t.isContentEditable) return;
+          if (slideBtn.contains(t)) return;
+          if (t.tagName === "BUTTON") return;
+          e.preventDefault();
+          toggleSlideshow();
+          return;
+        }
         if (e.key !== "Escape") return;
         if (slideTimer) {
           stopSlideshow();
@@ -881,6 +1006,8 @@
         }
         if (mq.matches) setOpen(false);
       });
+
+      updateSidebarVisibleClass();
     })();
   </script>
 </body>

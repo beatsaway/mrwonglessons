@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Op Art review — bilingual questions with multiple choice." />
+  <title>Op Art Review Worksheet | 歐普藝術複習工作紙</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --muted: #4a4a4a;
+      --accent: #2c5282;
+      --border: #e8e8e8;
+      --card: #f8fafc;
+      --core: #1a365d;
+      --bad: #b91c1c;
+      --bad-bg: #fef2f2;
+      --good: #15803d;
+      --good-bg: #f0fdf4;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 1.02rem;
+      line-height: 1.55;
+    }
+    .lang-zh {
+      font-family: "PingFang HK", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Heiti TC", sans-serif;
+      line-height: 1.65;
+    }
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 0.28rem max(0.75rem, env(safe-area-inset-right)) 0.32rem max(0.75rem, env(safe-area-inset-left));
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--border);
+    }
+    .site-header h1 {
+      margin: 0;
+      font-size: clamp(0.82rem, 2.2vw, 1rem);
+      font-weight: 700;
+      color: var(--core);
+      line-height: 1.25;
+      text-align: center;
+    }
+    .site-header h1 .line-zh {
+      display: block;
+      margin-top: 0.06rem;
+      font-size: 0.88em;
+      font-weight: 700;
+    }
+    .wrap {
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: 0.85rem max(1rem, env(safe-area-inset-right)) 2rem max(1rem, env(safe-area-inset-left));
+    }
+    .q-card {
+      margin: 0 0 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      overflow: hidden;
+    }
+    .q-head {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-start;
+      padding: 0.75rem 0.9rem;
+    }
+    .q-num {
+      flex-shrink: 0;
+      width: 1.5rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+    .q-lines p {
+      margin: 0 0 0.45rem;
+      font-size: 0.96rem;
+      line-height: 1.55;
+    }
+    .q-lines p:last-child { margin-bottom: 0; }
+    button.blank-slot {
+      display: inline-block;
+      min-width: 5.5rem;
+      margin: 0 0.1rem;
+      padding: 0 0.15rem;
+      border: none;
+      border-bottom: 2px solid var(--accent);
+      color: var(--muted);
+      font: inherit;
+      font-weight: 600;
+      background: transparent;
+      cursor: pointer;
+      vertical-align: baseline;
+      text-align: center;
+      line-height: inherit;
+    }
+    button.blank-slot:hover:not(:disabled) {
+      color: var(--core);
+      background: rgba(44, 82, 130, 0.08);
+    }
+    button.blank-slot:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    button.blank-slot:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+    button.blank-slot.is-filled {
+      border-bottom-color: var(--good);
+      color: var(--good);
+    }
+    .q-panels {
+      border-top: 1px solid var(--border);
+      background: #fff;
+    }
+    .choice-sheet {
+      padding: 0.65rem 0.9rem 0.85rem;
+    }
+    .choice-sheet[hidden] {
+      display: none !important;
+    }
+    .choice-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+    @media (min-width: 32rem) {
+      .choice-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .choice-btn {
+      margin: 0;
+      padding: 0.5rem 0.6rem;
+      font: inherit;
+      font-size: 0.88rem;
+      text-align: left;
+      color: var(--text);
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.12s ease, background 0.12s ease;
+    }
+    .choice-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: #fff;
+    }
+    .choice-btn.is-wrong {
+      border-color: var(--bad);
+      background: var(--bad-bg);
+      color: var(--bad);
+    }
+    .choice-btn.is-correct {
+      border-color: var(--good);
+      background: var(--good-bg);
+      color: var(--good);
+    }
+    .choice-btn:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+    .choice-btn .choice-en {
+      display: block;
+      font-weight: 600;
+    }
+    .choice-btn .choice-zh {
+      display: block;
+      margin-top: 0.2rem;
+      font-size: 0.88em;
+      font-weight: 500;
+      line-height: 1.45;
+      opacity: 0.92;
+    }
+    .choice-btn.is-wrong .choice-en,
+    .choice-btn.is-wrong .choice-zh,
+    .choice-btn.is-correct .choice-en,
+    .choice-btn.is-correct .choice-zh {
+      color: inherit;
+    }
+    .q-feedback {
+      margin-top: 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      min-height: 1.25rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1 id="page-title">
+      <span class="line-en" lang="en">Op Art Review Worksheet</span>
+      <span class="line-zh lang-zh" lang="zh-HK">歐普藝術複習工作紙</span>
+    </h1>
+  </header>
+
+  <main class="wrap" id="worksheet-main"></main>
+
+  <script>
+    (function () {
+      var DATA = [
+        {
+          id: "q1",
+          lines: [
+            { lang: "en", html: 'Op Art is short for “<button type="button" class="blank-slot" data-slot="a">_______</button>,” which means visual effects.' },
+            { lang: "zh-HK", zh: true, html: '「歐普藝術」是「<button type="button" class="blank-slot" data-slot="a">_______</button>」的簡稱，意思是視覺效果。' }
+          ],
+          groups: [
+            {
+              slot: "a",
+              correct: "optical",
+              choices: [
+                { id: "optical", label: "Optical Art", labelZh: "光效應藝術（Optical Art）" },
+                { id: "original", label: "Original Art", labelZh: "原創藝術" },
+                { id: "open", label: "Open Art", labelZh: "開放藝術" },
+                { id: "objective", label: "Objective Art", labelZh: "客觀藝術" }
+              ]
+            }
+          ]
+        },
+        {
+          id: "q2",
+          lines: [
+            { lang: "en", html: 'The term was formally used in 1965 during the “<button type="button" class="blank-slot" data-slot="a">_______</button>” exhibition at the Museum of Modern Art in New York.' },
+            { lang: "zh-HK", zh: true, html: '這個詞於 1965 年在紐約現代藝術博物館的「<button type="button" class="blank-slot" data-slot="a">_______</button>」展覽中正式使用。' }
+          ],
+          groups: [
+            {
+              slot: "a",
+              correct: "responsive",
+              choices: [
+                { id: "responsive", label: "The Responsive Eye", labelZh: "《靈敏的視覺》" },
+                { id: "primary", label: "Primary Structures", labelZh: "《基本結構》" },
+                { id: "young", label: "Young America", labelZh: "《青年美國》" },
+                { id: "recent", label: "Recent Painting U.S.A.", labelZh: "《美國近期繪畫》" }
+              ]
+            }
+          ]
+        },
+        {
+          id: "q3",
+          lines: [
+            { lang: "en", html: 'Op Art works are technically <button type="button" class="blank-slot" data-slot="a">_______</button>, but they create an illusion of <button type="button" class="blank-slot" data-slot="b">_______</button> on the retina.' },
+            { lang: "zh-HK", zh: true, html: '歐普藝術作品在技術上是<button type="button" class="blank-slot" data-slot="a">_______</button>，卻能在視網膜上造成<button type="button" class="blank-slot" data-slot="b">_______</button>的錯覺。' }
+          ],
+          groups: [
+            {
+              slot: "a",
+              correct: "flat",
+              choices: [
+                { id: "flat", label: "flat / two-dimensional", labelZh: "平面／二維" },
+                { id: "three", label: "three-dimensional", labelZh: "立體／三維" },
+                { id: "textured", label: "highly textured", labelZh: "質感強烈" },
+                { id: "random", label: "randomly painted", labelZh: "隨意塗畫" }
+              ]
+            },
+            {
+              slot: "b",
+              correct: "movement",
+              choices: [
+                { id: "movement", label: "movement", labelZh: "動感／移動" },
+                { id: "colour", label: "solid colour", labelZh: "實色" },
+                { id: "depth", label: "real depth", labelZh: "真實深度" },
+                { id: "sound", label: "sound", labelZh: "聲音" }
+              ]
+            }
+          ]
+        },
+        {
+          id: "q4",
+          lines: [
+            { lang: "en", html: 'Many Op Art works have been used by psychologists as test material for <button type="button" class="blank-slot" data-slot="a">_______</button> experiments.' },
+            { lang: "zh-HK", zh: true, html: '許多歐普藝術作品曾被心理學家用作<button type="button" class="blank-slot" data-slot="a">_______</button>實驗的測試材料。' }
+          ],
+          groups: [
+            {
+              slot: "a",
+              correct: "perception",
+              choices: [
+                { id: "perception", label: "perception / visual perception", labelZh: "視覺感知" },
+                { id: "memory", label: "long-term memory", labelZh: "長期記憶" },
+                { id: "emotion", label: "emotion only", labelZh: "僅限情緒" },
+                { id: "hearing", label: "hearing", labelZh: "聽覺" }
+              ]
+            }
+          ]
+        },
+        {
+          id: "q5",
+          lines: [
+            { lang: "en", html: '<button type="button" class="blank-slot" data-slot="a">_______</button> is a Hungarian-born French artist famous for works like VP-119.' },
+            { lang: "zh-HK", zh: true, html: '<button type="button" class="blank-slot" data-slot="a">_______</button>是匈牙利裔法國藝術家，以《VP-119》等作品聞名。' }
+          ],
+          groups: [
+            {
+              slot: "a",
+              correct: "vasarely",
+              choices: [
+                { id: "vasarely", label: "Victor Vasarely", labelZh: "維克多·瓦沙雷利" },
+                { id: "riley", label: "Bridget Riley", labelZh: "布麗琪·萊利" },
+                { id: "escher", label: "M. C. Escher", labelZh: "M·C·埃舍爾" },
+                { id: "albers", label: "Josef Albers", labelZh: "約瑟夫·阿爾伯斯" }
+              ]
+            }
+          ]
+        },
+        {
+          id: "q6",
+          lines: [
+            { lang: "en", html: '<em>Blaze</em> (1964) is a famous work by the British artist <button type="button" class="blank-slot" data-slot="a">_______</button>.' },
+            { lang: "zh-HK", zh: true, html: '《Blaze》（1964）是英國藝術家<button type="button" class="blank-slot" data-slot="a">_______</button>的著名作品。' }
+          ],
+          groups: [
+            {
+              slot: "a",
+              correct: "riley",
+              choices: [
+                { id: "riley", label: "Bridget Riley", labelZh: "布麗琪·萊利" },
+                { id: "vasarely", label: "Victor Vasarely", labelZh: "維克多·瓦沙雷利" },
+                { id: "hockney", label: "David Hockney", labelZh: "大衛·霍克尼" },
+                { id: "paolozzi", label: "Eduardo Paolozzi", labelZh: "愛德華多·包洛奇" }
+              ]
+            }
+          ]
+        }
+      ];
+
+      function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i];
+          a[i] = a[j];
+          a[j] = t;
+        }
+        return a;
+      }
+
+      function slotToGroupIndex(groups, slot) {
+        for (var i = 0; i < groups.length; i++) {
+          if (groups[i].slot === slot) return i;
+        }
+        return -1;
+      }
+
+      function build() {
+        var main = document.getElementById("worksheet-main");
+        DATA.forEach(function (q, qi) {
+          var article = document.createElement("article");
+          article.className = "q-card";
+          article.id = q.id;
+
+          var head = document.createElement("div");
+          head.className = "q-head";
+
+          var num = document.createElement("span");
+          num.className = "q-num";
+          num.textContent = String(qi + 1);
+
+          var linesWrap = document.createElement("div");
+          linesWrap.className = "q-lines";
+          q.lines.forEach(function (line) {
+            var p = document.createElement("p");
+            if (line.zh) p.className = "lang-zh";
+            if (line.lang) p.setAttribute("lang", line.lang);
+            p.innerHTML = line.html;
+            linesWrap.appendChild(p);
+          });
+
+          head.appendChild(num);
+          head.appendChild(linesWrap);
+
+          var panelsWrap = document.createElement("div");
+          panelsWrap.className = "q-panels";
+
+          var feedback = document.createElement("div");
+          feedback.className = "q-feedback";
+          feedback.setAttribute("role", "status");
+
+          var state = {
+            groups: q.groups.map(function (g) {
+              return { correct: g.correct, answered: false };
+            }),
+            allDone: function () {
+              return this.groups.every(function (g) {
+                return g.answered;
+              });
+            }
+          };
+
+          q.groups.forEach(function (grp, gi) {
+            var sheet = document.createElement("div");
+            sheet.className = "choice-sheet";
+            sheet.dataset.slot = grp.slot;
+            sheet.hidden = true;
+
+            var row = document.createElement("div");
+            row.className = "choice-row";
+            var shuffled = shuffle(grp.choices);
+            shuffled.forEach(function (ch) {
+              var btn = document.createElement("button");
+              btn.type = "button";
+              btn.className = "choice-btn";
+              btn.setAttribute("data-choice-id", ch.id);
+              var spanEn = document.createElement("span");
+              spanEn.className = "choice-en";
+              spanEn.lang = "en";
+              spanEn.textContent = ch.label;
+              var spanZh = document.createElement("span");
+              spanZh.className = "choice-zh lang-zh";
+              spanZh.lang = "zh-HK";
+              spanZh.textContent = ch.labelZh || "";
+              btn.appendChild(spanEn);
+              btn.appendChild(spanZh);
+              btn.addEventListener("click", function () {
+                if (state.groups[gi].answered) return;
+                var correct = ch.id === grp.correct;
+                var groupBtns = row.querySelectorAll(".choice-btn");
+                if (correct) {
+                  groupBtns.forEach(function (b) {
+                    b.disabled = true;
+                  });
+                  btn.classList.add("is-correct");
+                  state.groups[gi].answered = true;
+                  var slotBtn = article.querySelector('button.blank-slot[data-slot="' + grp.slot + '"]');
+                  if (slotBtn) {
+                    var label = grp.choices.filter(function (c) {
+                      return c.id === grp.correct;
+                    })[0];
+                    slotBtn.textContent = label.label.split(" / ")[0].trim();
+                    slotBtn.disabled = true;
+                    slotBtn.classList.add("is-filled");
+                  }
+                  sheet.hidden = true;
+                  feedback.textContent = "";
+                  if (state.allDone()) {
+                    article.classList.add("is-answered");
+                  }
+                } else {
+                  groupBtns.forEach(function (b) {
+                    b.classList.remove("is-wrong");
+                  });
+                  btn.classList.add("is-wrong");
+                  feedback.textContent = "Try again · 再試";
+                }
+              });
+              row.appendChild(btn);
+            });
+            sheet.appendChild(row);
+            panelsWrap.appendChild(sheet);
+          });
+
+          article.appendChild(head);
+          article.appendChild(panelsWrap);
+          article.appendChild(feedback);
+
+          article.querySelectorAll("button.blank-slot").forEach(function (bblank) {
+            var slot = bblank.getAttribute("data-slot");
+            var gi = slotToGroupIndex(q.groups, slot);
+            var sheet = panelsWrap.querySelector('.choice-sheet[data-slot="' + slot + '"]');
+            if (!sheet || gi < 0) return;
+
+            bblank.setAttribute("aria-expanded", "false");
+            bblank.addEventListener("click", function () {
+              if (state.groups[gi].answered) return;
+              var wasOpen = !sheet.hidden;
+              panelsWrap.querySelectorAll(".choice-sheet").forEach(function (s) {
+                s.hidden = true;
+              });
+              article.querySelectorAll("button.blank-slot").forEach(function (ob) {
+                ob.setAttribute("aria-expanded", "false");
+              });
+              if (!wasOpen) {
+                sheet.hidden = false;
+                bblank.setAttribute("aria-expanded", "true");
+              }
+            });
+          });
+
+          main.appendChild(article);
+        });
+      }
+
+      build();
+    })();
+  </script>
+</body>
+</html>

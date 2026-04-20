@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Illusion matching quiz — match each image to its principle. KS3 Op Art." />
+  <title>Illusion matching quiz | 視錯覺配對 | KS3</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --muted: #4a4a4a;
+      --accent: #2c5282;
+      --border: #e8e8e8;
+      --card: #f8fafc;
+      --core: #1a365d;
+      --bad: #b91c1c;
+      --bad-bg: #fef2f2;
+      --good: #15803d;
+      --good-bg: #f0fdf4;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 1.02rem;
+      line-height: 1.45;
+    }
+    .lang-zh {
+      font-family: "PingFang HK", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Heiti TC", sans-serif;
+      line-height: 1.55;
+    }
+    a {
+      color: var(--accent);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 0.28rem max(0.75rem, env(safe-area-inset-right)) 0.32rem max(0.75rem, env(safe-area-inset-left));
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--border);
+    }
+    .site-header h1 {
+      margin: 0;
+      font-size: clamp(0.82rem, 2.2vw, 0.98rem);
+      font-weight: 700;
+      color: var(--core);
+      line-height: 1.22;
+      text-align: center;
+    }
+    .site-header h1 .line-zh {
+      display: block;
+      margin-top: 0.06rem;
+      font-size: 0.88em;
+      font-weight: 700;
+    }
+    .quiz-wrap {
+      max-width: min(95vw, 64rem);
+      margin: 0 auto;
+      padding: 0.65rem max(1rem, env(safe-area-inset-right)) 1.5rem max(1rem, env(safe-area-inset-left));
+    }
+    .quiz-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.45rem;
+      width: 100%;
+    }
+    .quiz-image-wrap {
+      margin: 0 auto;
+      text-align: center;
+      line-height: 0;
+      width: 100%;
+    }
+    .quiz-image-wrap img {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      display: inline-block;
+      vertical-align: top;
+    }
+    .quiz-status {
+      min-height: 1.35rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+    .quiz-status[aria-live="polite"] { outline: none; }
+    .quiz-next {
+      display: block;
+      width: 100%;
+      max-width: 16rem;
+      margin: 0.35rem auto 0;
+      padding: 0.5rem 1rem;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .quiz-next:hover {
+      filter: brightness(1.06);
+    }
+    .quiz-next:focus-visible {
+      outline: 2px solid var(--core);
+      outline-offset: 2px;
+    }
+    .quiz-next[hidden] {
+      display: none !important;
+    }
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-auto-rows: minmax(min-content, auto);
+      align-items: stretch;
+      gap: 0.4rem;
+      width: 100%;
+      max-width: min(100%, 56rem);
+      margin: 0 auto;
+    }
+    @media (min-width: 40rem) {
+      .quiz-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.45rem 0.55rem;
+      }
+    }
+    .quiz-option {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      width: 100%;
+      min-height: 4.5rem;
+      margin: 0;
+      padding: 0.75rem 0.95rem;
+      font: inherit;
+      font-size: 1.02rem;
+      line-height: 1.4;
+      text-align: left;
+      color: var(--text);
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .quiz-option:hover:not(:disabled) {
+      background: #fff;
+      border-color: var(--accent);
+    }
+    .quiz-option:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+    .quiz-option .opt-en {
+      display: block;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--core);
+    }
+    .quiz-option .opt-zh {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .quiz-option.is-wrong {
+      border-color: var(--bad);
+      background: var(--bad-bg);
+      color: var(--bad);
+    }
+    .quiz-option.is-wrong .opt-en,
+    .quiz-option.is-wrong .opt-zh { color: inherit; }
+    .quiz-option.is-correct {
+      border-color: var(--good);
+      background: var(--good-bg);
+      color: var(--good);
+    }
+    .quiz-option.is-correct .opt-en,
+    .quiz-option.is-correct .opt-zh { color: inherit; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1 id="page-title">
+      <span class="line-en" lang="en">Illusion matching quiz</span>
+      <span class="line-zh lang-zh" lang="zh-HK">視錯覺配對</span>
+    </h1>
+  </header>
+
+  <main class="quiz-wrap">
+    <div class="quiz-stage">
+      <div class="quiz-image-wrap">
+        <img id="quiz-image" src="" alt="" />
+      </div>
+      <div id="quiz-options" class="quiz-options" role="group" aria-label="Principle choices"></div>
+      <div id="quiz-status" class="quiz-status" role="status" aria-live="polite"></div>
+      <button type="button" id="quiz-next" class="quiz-next" hidden>Next · 下一題</button>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var PRINCIPLES = [
+        {
+          id: "moire",
+          img: "img/Moiré Patterns.jpg",
+          en: "Moiré Patterns (Shimmering Effect)",
+          zh: "摩爾紋樣（閃動效果）"
+        },
+        {
+          id: "grid",
+          img: "img/The Grid Illusion.jpg",
+          en: "The Grid Illusion (Flashy Dots)",
+          zh: "網格錯覺（閃爍的點）"
+        },
+        {
+          id: "vibration",
+          img: "img/High Contrast for Vibration.jpg",
+          en: "High Contrast for “Vibration”",
+          zh: "高對比造成「震動感」"
+        },
+        {
+          id: "warp",
+          img: "img/Distortion via Geometric Warping.jpg",
+          en: "Distortion via Geometric Warping",
+          zh: "幾何扭曲造成變形"
+        },
+        {
+          id: "cafe",
+          img: "img/The Café Wall Illusion.jpg",
+          en: "The Café Wall Illusion (“Bent” Lines That Are Straight)",
+          zh: "咖啡屋牆壁錯覺　看來傾斜其實是直線"
+        },
+        {
+          id: "rotation",
+          img: "img/Illusory Rotation.jpg",
+          en: "Illusory Rotation (Still Circles That Seem to Spin)",
+          zh: "假旋轉（靜止的圓卻像會轉）"
+        }
+      ];
+
+      var byId = {};
+      PRINCIPLES.forEach(function (p) {
+        byId[p.id] = p;
+      });
+
+      function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i];
+          a[i] = a[j];
+          a[j] = t;
+        }
+        return a;
+      }
+
+      var queue = [];
+      var currentId = null;
+      var imgEl = document.getElementById("quiz-image");
+      var optionsEl = document.getElementById("quiz-options");
+      var statusEl = document.getElementById("quiz-status");
+      var nextBtn = document.getElementById("quiz-next");
+      var answered = false;
+
+      function refillQueue() {
+        queue = shuffle(PRINCIPLES.map(function (p) {
+          return p.id;
+        }));
+      }
+
+      function clearOptionStyles() {
+        var btns = optionsEl.querySelectorAll(".quiz-option");
+        btns.forEach(function (b) {
+          b.classList.remove("is-wrong", "is-correct");
+          b.disabled = false;
+        });
+      }
+
+      function showQuestion() {
+        answered = false;
+        clearOptionStyles();
+        statusEl.textContent = "";
+        nextBtn.hidden = true;
+
+        if (queue.length === 0) {
+          refillQueue();
+        }
+        currentId = queue[0];
+
+        var p = byId[currentId];
+        imgEl.alt = p.en;
+        imgEl.src = encodeURI(p.img);
+
+        var order = shuffle(PRINCIPLES.map(function (x) {
+          return x.id;
+        }));
+        optionsEl.innerHTML = "";
+        order.forEach(function (oid) {
+          var item = byId[oid];
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "quiz-option";
+          btn.setAttribute("data-id", item.id);
+          var spanEn = document.createElement("span");
+          spanEn.className = "opt-en";
+          spanEn.lang = "en";
+          spanEn.textContent = item.en;
+          var spanZh = document.createElement("span");
+          spanZh.className = "opt-zh lang-zh";
+          spanZh.lang = "zh-HK";
+          spanZh.textContent = item.zh;
+          btn.appendChild(spanEn);
+          btn.appendChild(spanZh);
+          btn.addEventListener("click", onOptionClick);
+          optionsEl.appendChild(btn);
+        });
+      }
+
+      function onOptionClick(e) {
+        if (answered) return;
+        var btn = e.currentTarget;
+        var id = btn.getAttribute("data-id");
+        if (id === currentId) {
+          answered = true;
+          btn.classList.add("is-correct");
+          statusEl.textContent = "Correct · 正確";
+          var btns = optionsEl.querySelectorAll(".quiz-option");
+          btns.forEach(function (b) {
+            b.disabled = true;
+          });
+          btn.disabled = false;
+          queue.shift();
+          nextBtn.hidden = false;
+          nextBtn.focus();
+        } else {
+          optionsEl.querySelectorAll(".quiz-option.is-wrong").forEach(function (b) {
+            b.classList.remove("is-wrong");
+          });
+          btn.classList.add("is-wrong");
+          statusEl.textContent = "Try again · 再試";
+        }
+      }
+
+      nextBtn.addEventListener("click", function () {
+        showQuestion();
+      });
+
+      showQuestion();
+    })();
+  </script>
+</body>
+</html>
