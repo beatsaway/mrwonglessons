@@ -213,8 +213,8 @@
         {
           id: "q1",
           lines: [
-            { lang: "en", html: 'Op Art is short for “<button type="button" class="blank-slot" data-slot="a">_______</button>,” which means visual effects.' },
-            { lang: "zh-HK", zh: true, html: '「歐普藝術」是「<button type="button" class="blank-slot" data-slot="a">_______</button>」的簡稱，意思是視覺效果。' }
+            { lang: "en", html: 'Op Art is short for “<button type="button" class="blank-slot" data-slot="a"></button>,” which means visual effects.' },
+            { lang: "zh-HK", zh: true, html: '「歐普藝術」是「<button type="button" class="blank-slot" data-slot="a"></button>」的簡稱，意思是視覺效果。' }
           ],
           groups: [
             {
@@ -232,8 +232,8 @@
         {
           id: "q2",
           lines: [
-            { lang: "en", html: 'The term was formally used in 1965 during the “<button type="button" class="blank-slot" data-slot="a">_______</button>” exhibition at the Museum of Modern Art in New York.' },
-            { lang: "zh-HK", zh: true, html: '這個詞於 1965 年在紐約現代藝術博物館的「<button type="button" class="blank-slot" data-slot="a">_______</button>」展覽中正式使用。' }
+            { lang: "en", html: 'The term was formally used in 1965 during the “<button type="button" class="blank-slot" data-slot="a"></button>” exhibition at the Museum of Modern Art in New York.' },
+            { lang: "zh-HK", zh: true, html: '這個詞於 1965 年在紐約現代藝術博物館的「<button type="button" class="blank-slot" data-slot="a"></button>」展覽中正式使用。' }
           ],
           groups: [
             {
@@ -251,8 +251,8 @@
         {
           id: "q3",
           lines: [
-            { lang: "en", html: 'Op Art works are technically <button type="button" class="blank-slot" data-slot="a">_______</button>, but they create an illusion of <button type="button" class="blank-slot" data-slot="b">_______</button> on the retina.' },
-            { lang: "zh-HK", zh: true, html: '歐普藝術作品在技術上是<button type="button" class="blank-slot" data-slot="a">_______</button>，卻能在視網膜上造成<button type="button" class="blank-slot" data-slot="b">_______</button>的錯覺。' }
+            { lang: "en", html: 'Op Art works are technically <button type="button" class="blank-slot" data-slot="a"></button>, but they create an illusion of <button type="button" class="blank-slot" data-slot="b"></button> on the retina.' },
+            { lang: "zh-HK", zh: true, html: '歐普藝術作品在技術上是<button type="button" class="blank-slot" data-slot="a"></button>，卻能在視網膜上造成<button type="button" class="blank-slot" data-slot="b"></button>的錯覺。' }
           ],
           groups: [
             {
@@ -280,8 +280,8 @@
         {
           id: "q4",
           lines: [
-            { lang: "en", html: 'Many Op Art works have been used by psychologists as test material for <button type="button" class="blank-slot" data-slot="a">_______</button> experiments.' },
-            { lang: "zh-HK", zh: true, html: '許多歐普藝術作品曾被心理學家用作<button type="button" class="blank-slot" data-slot="a">_______</button>實驗的測試材料。' }
+            { lang: "en", html: 'Many Op Art works have been used by psychologists as test material for <button type="button" class="blank-slot" data-slot="a"></button> experiments.' },
+            { lang: "zh-HK", zh: true, html: '許多歐普藝術作品曾被心理學家用作<button type="button" class="blank-slot" data-slot="a"></button>實驗的測試材料。' }
           ],
           groups: [
             {
@@ -299,8 +299,8 @@
         {
           id: "q5",
           lines: [
-            { lang: "en", html: '<button type="button" class="blank-slot" data-slot="a">_______</button> is a Hungarian-born French artist famous for works like VP-119.' },
-            { lang: "zh-HK", zh: true, html: '<button type="button" class="blank-slot" data-slot="a">_______</button>是匈牙利裔法國藝術家，以《VP-119》等作品聞名。' }
+            { lang: "en", html: '<button type="button" class="blank-slot" data-slot="a"></button> is a Hungarian-born French artist famous for works like VP-119.' },
+            { lang: "zh-HK", zh: true, html: '<button type="button" class="blank-slot" data-slot="a"></button>是匈牙利裔法國藝術家，以《VP-119》等作品聞名。' }
           ],
           groups: [
             {
@@ -318,8 +318,8 @@
         {
           id: "q6",
           lines: [
-            { lang: "en", html: '<em>Blaze</em> (1964) is a famous work by the British artist <button type="button" class="blank-slot" data-slot="a">_______</button>.' },
-            { lang: "zh-HK", zh: true, html: '《Blaze》（1964）是英國藝術家<button type="button" class="blank-slot" data-slot="a">_______</button>的著名作品。' }
+            { lang: "en", html: '<em>Blaze</em> (1964) is a famous work by the British artist <button type="button" class="blank-slot" data-slot="a"></button>.' },
+            { lang: "zh-HK", zh: true, html: '《Blaze》（1964）是英國藝術家<button type="button" class="blank-slot" data-slot="a"></button>的著名作品。' }
           ],
           groups: [
             {
@@ -439,6 +439,7 @@
                       return c.id === grp.correct;
                     })[0];
                     slotBtn.textContent = label.label.split(" / ")[0].trim();
+                    slotBtn.removeAttribute("aria-label");
                     slotBtn.disabled = true;
                     slotBtn.classList.add("is-filled");
                   }
@@ -472,6 +473,7 @@
             if (!sheet || gi < 0) return;
 
             bblank.setAttribute("aria-expanded", "false");
+            bblank.setAttribute("aria-label", "Choose answer · 選擇答案");
             bblank.addEventListener("click", function () {
               if (state.groups[gi].answered) return;
               var wasOpen = !sheet.hidden;
