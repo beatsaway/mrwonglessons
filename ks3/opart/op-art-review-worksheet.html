@@ -91,9 +91,10 @@
       display: inline-block;
       min-width: 5.5rem;
       margin: 0 0.1rem;
-      padding: 0 0.15rem;
+      padding: 0.18rem 0.35rem 0.06rem;
       border: none;
-      border-bottom: 2px solid var(--accent);
+      border-bottom: 3px solid var(--accent);
+      border-radius: 6px 6px 0 0;
       color: var(--muted);
       font: inherit;
       font-weight: 600;
@@ -102,6 +103,8 @@
       vertical-align: baseline;
       text-align: center;
       line-height: inherit;
+      min-height: 2.15rem; /* easier click target */
+      touch-action: manipulation;
     }
     button.blank-slot:hover:not(:disabled) {
       color: var(--core);
@@ -354,9 +357,97 @@
         return -1;
       }
 
+      function forEachNode(list, fn) {
+        for (var i = 0; i < list.length; i++) fn(list[i], i);
+      }
+
+      function hasClass(el, cls) {
+        if (!el || !el.className) return false;
+        return (" " + el.className + " ").indexOf(" " + cls + " ") !== -1;
+      }
+
+      function addClass(el, cls) {
+        if (!el) return;
+        if (hasClass(el, cls)) return;
+        el.className = (el.className ? el.className + " " : "") + cls;
+      }
+
+      function removeClass(el, cls) {
+        if (!el || !el.className) return;
+        var cur = " " + el.className + " ";
+        var next = cur.replace(new RegExp(" " + cls + " ", "g"), " ");
+        el.className = next.replace(/^\s+|\s+$/g, "");
+      }
+
+      function setHidden(el, shouldHide) {
+        if (!el) return;
+        if (shouldHide) el.setAttribute("hidden", "");
+        else el.removeAttribute("hidden");
+      }
+
+      function isHidden(el) {
+        if (!el) return true;
+        return el.hasAttribute("hidden");
+      }
+
+      function bindChoiceClick(btn, ctx) {
+        btn.addEventListener("click", function () {
+          var correct = ctx.ch.id === ctx.grp.correct;
+          var groupBtns = ctx.row.querySelectorAll(".choice-btn");
+
+          forEachNode(groupBtns, function (b) {
+            removeClass(b, "is-wrong");
+            removeClass(b, "is-correct");
+          });
+
+          if (correct) {
+            addClass(ctx.btn, "is-correct");
+            ctx.state.groups[ctx.gi].answered = true;
+
+            var label = null;
+            for (var k = 0; k < ctx.grp.choices.length; k++) {
+              if (ctx.grp.choices[k].id === ctx.grp.correct) {
+                label = ctx.grp.choices[k];
+                break;
+              }
+            }
+
+            var slotBtns = ctx.article.querySelectorAll('button.blank-slot[data-slot="' + ctx.grp.slot + '"]');
+            forEachNode(slotBtns, function (slotBtn) {
+              if (label) {
+                var inZh = false;
+                var holder = slotBtn.parentNode;
+                while (holder && holder !== ctx.article) {
+                  if (holder.getAttribute && holder.getAttribute("lang") === "zh-HK") {
+                    inZh = true;
+                    break;
+                  }
+                  holder = holder.parentNode;
+                }
+                if (inZh && label.labelZh) slotBtn.textContent = String(label.labelZh).trim();
+                else slotBtn.textContent = label.label.split(" / ")[0].trim();
+              }
+              slotBtn.removeAttribute("aria-label");
+              addClass(slotBtn, "is-filled");
+            });
+
+            setHidden(ctx.sheet, true);
+            ctx.feedback.textContent = "";
+            if (ctx.state.allDone()) {
+              addClass(ctx.article, "is-answered");
+            }
+          } else {
+            addClass(ctx.btn, "is-wrong");
+            ctx.state.groups[ctx.gi].answered = false;
+            ctx.feedback.textContent = "Try again · 再試";
+          }
+        });
+      }
+
       function build() {
         var main = document.getElementById("worksheet-main");
-        DATA.forEach(function (q, qi) {
+        for (var qi = 0; qi < DATA.length; qi++) {
+          var q = DATA[qi];
           var article = document.createElement("article");
           article.className = "q-card";
           article.id = q.id;
@@ -370,13 +461,14 @@
 
           var linesWrap = document.createElement("div");
           linesWrap.className = "q-lines";
-          q.lines.forEach(function (line) {
+          for (var li = 0; li < q.lines.length; li++) {
+            var line = q.lines[li];
             var p = document.createElement("p");
             if (line.zh) p.className = "lang-zh";
             if (line.lang) p.setAttribute("lang", line.lang);
             p.innerHTML = line.html;
             linesWrap.appendChild(p);
-          });
+          }
 
           head.appendChild(num);
           head.appendChild(linesWrap);
@@ -389,26 +481,33 @@
           feedback.setAttribute("role", "status");
 
           var state = {
-            groups: q.groups.map(function (g) {
-              return { correct: g.correct, answered: false };
-            }),
+            groups: (function () {
+              var out = [];
+              for (var gi = 0; gi < q.groups.length; gi++) {
+                out.push({ correct: q.groups[gi].correct, answered: false });
+              }
+              return out;
+            })(),
             allDone: function () {
-              return this.groups.every(function (g) {
-                return g.answered;
-              });
+              for (var i = 0; i < this.groups.length; i++) {
+                if (!this.groups[i].answered) return false;
+              }
+              return true;
             }
           };
 
-          q.groups.forEach(function (grp, gi) {
+          for (var gi = 0; gi < q.groups.length; gi++) {
+            var grp = q.groups[gi];
             var sheet = document.createElement("div");
             sheet.className = "choice-sheet";
             sheet.dataset.slot = grp.slot;
-            sheet.hidden = true;
+            setHidden(sheet, true);
 
             var row = document.createElement("div");
             row.className = "choice-row";
             var shuffled = shuffle(grp.choices);
-            shuffled.forEach(function (ch) {
+            for (var ci = 0; ci < shuffled.length; ci++) {
+              var ch = shuffled[ci];
               var btn = document.createElement("button");
               btn.type = "button";
               btn.className = "choice-btn";
@@ -423,50 +522,28 @@
               spanZh.textContent = ch.labelZh || "";
               btn.appendChild(spanEn);
               btn.appendChild(spanZh);
-              btn.addEventListener("click", function () {
-                if (state.groups[gi].answered) return;
-                var correct = ch.id === grp.correct;
-                var groupBtns = row.querySelectorAll(".choice-btn");
-                if (correct) {
-                  groupBtns.forEach(function (b) {
-                    b.disabled = true;
-                  });
-                  btn.classList.add("is-correct");
-                  state.groups[gi].answered = true;
-                  var slotBtn = article.querySelector('button.blank-slot[data-slot="' + grp.slot + '"]');
-                  if (slotBtn) {
-                    var label = grp.choices.filter(function (c) {
-                      return c.id === grp.correct;
-                    })[0];
-                    slotBtn.textContent = label.label.split(" / ")[0].trim();
-                    slotBtn.removeAttribute("aria-label");
-                    slotBtn.disabled = true;
-                    slotBtn.classList.add("is-filled");
-                  }
-                  sheet.hidden = true;
-                  feedback.textContent = "";
-                  if (state.allDone()) {
-                    article.classList.add("is-answered");
-                  }
-                } else {
-                  groupBtns.forEach(function (b) {
-                    b.classList.remove("is-wrong");
-                  });
-                  btn.classList.add("is-wrong");
-                  feedback.textContent = "Try again · 再試";
-                }
+              bindChoiceClick(btn, {
+                btn: btn,
+                ch: ch,
+                grp: grp,
+                gi: gi,
+                row: row,
+                sheet: sheet,
+                article: article,
+                state: state,
+                feedback: feedback
               });
               row.appendChild(btn);
-            });
+            }
             sheet.appendChild(row);
             panelsWrap.appendChild(sheet);
-          });
+          }
 
           article.appendChild(head);
           article.appendChild(panelsWrap);
           article.appendChild(feedback);
 
-          article.querySelectorAll("button.blank-slot").forEach(function (bblank) {
+          forEachNode(article.querySelectorAll("button.blank-slot"), function (bblank) {
             var slot = bblank.getAttribute("data-slot");
             var gi = slotToGroupIndex(q.groups, slot);
             var sheet = panelsWrap.querySelector('.choice-sheet[data-slot="' + slot + '"]');
@@ -475,23 +552,36 @@
             bblank.setAttribute("aria-expanded", "false");
             bblank.setAttribute("aria-label", "Choose answer · 選擇答案");
             bblank.addEventListener("click", function () {
-              if (state.groups[gi].answered) return;
-              var wasOpen = !sheet.hidden;
-              panelsWrap.querySelectorAll(".choice-sheet").forEach(function (s) {
-                s.hidden = true;
+              var wasOpen = !isHidden(sheet);
+              forEachNode(panelsWrap.querySelectorAll(".choice-sheet"), function (s) {
+                setHidden(s, true);
               });
-              article.querySelectorAll("button.blank-slot").forEach(function (ob) {
+              forEachNode(article.querySelectorAll("button.blank-slot"), function (ob) {
                 ob.setAttribute("aria-expanded", "false");
               });
               if (!wasOpen) {
-                sheet.hidden = false;
+                // allow re-answering: clear filled display when reopening
+                var slotBtns = article.querySelectorAll('button.blank-slot[data-slot="' + slot + '"]');
+                var anyFilled = false;
+                forEachNode(slotBtns, function (sb) {
+                  if (hasClass(sb, "is-filled")) anyFilled = true;
+                });
+                if (anyFilled) {
+                  forEachNode(slotBtns, function (sb) {
+                    sb.textContent = "";
+                    removeClass(sb, "is-filled");
+                    sb.setAttribute("aria-label", "Choose answer · 選擇答案");
+                  });
+                  state.groups[gi].answered = false;
+                }
+                setHidden(sheet, false);
                 bblank.setAttribute("aria-expanded", "true");
               }
             });
           });
 
           main.appendChild(article);
-        });
+        }
       }
 
       build();
