@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>閱讀技巧 — 填空練習</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --panel: #fff;
+      --border: #e2e8f0;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --ok: #15803d;
+      --bad: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: system-ui, "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    .layout {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      min-height: 100dvh;
+    }
+    .left {
+      flex: 0 0 min(18rem, 34vw);
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      max-height: 100dvh;
+      overflow: auto;
+      padding: 1rem 0.9rem 1.5rem;
+      border-right: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: 2px 0 12px rgba(15, 23, 42, 0.06);
+    }
+    .left h2 {
+      margin: 1rem 0 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+    }
+    .left h2:first-child { margin-top: 0; }
+    .kw {
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: var(--ink);
+      padding: 0.5rem 0.55rem;
+      border-radius: 8px;
+      border: 1px dashed var(--border);
+      background: #f1f5f9;
+      user-select: text;
+    }
+    .back {
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+    }
+    .back a { color: var(--muted); text-decoration: none; }
+    .back a:hover { color: var(--accent); text-decoration: underline; }
+    .right {
+      flex: 1;
+      min-width: 0;
+      padding: 1rem 1.1rem 2.5rem;
+      max-width: 52rem;
+    }
+    h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.35rem;
+      line-height: 1.3;
+    }
+    .subtitle {
+      margin: 0 0 1rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .intro, .article {
+      margin: 0 0 1rem;
+    }
+    h2.section {
+      margin: 1.35rem 0 0.5rem;
+      font-size: 1.05rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.25rem;
+    }
+    .blank-line {
+      margin: 0.65rem 0;
+      line-height: 2;
+    }
+    input.blank {
+      display: inline-block;
+      vertical-align: baseline;
+      min-width: 4.5em;
+      max-width: 9em;
+      width: 6em;
+      margin: 0 0.12rem;
+      padding: 0.12rem 0.35rem;
+      font: inherit;
+      font-size: 0.95em;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      text-align: center;
+    }
+    input.blank:focus {
+      outline: 2px solid rgba(37, 99, 235, 0.35);
+      outline-offset: 1px;
+      border-color: var(--accent);
+    }
+    input.blank.ok { border-color: var(--ok); background: #f0fdf4; }
+    input.blank.bad { border-color: var(--bad); background: #fef2f2; }
+    .actions {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .actions button {
+      font: inherit;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+    }
+    .actions button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: #1d4ed8;
+    }
+    .actions button:hover { filter: brightness(1.03); }
+    #result {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    @media (max-width: 720px) {
+      .layout { flex-direction: column; }
+      .left {
+        position: relative;
+        max-height: none;
+        flex: none;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="left" aria-label="關鍵詞">
+      <p class="back"><a href="index.html">← Temp</a></p>
+      <h2>【關鍵詞列表】練習一</h2>
+      <p class="kw" id="kw1">
+        電影、前後文、畫面、猜測、重讀、人生經驗、偵探思維、名詞、放棄、VIP字詞、因果、預測、運用、短句、視覺化、重點、拆解、字、意思
+      </p>
+      <h2>【關鍵詞列表】練習二</h2>
+      <p class="kw" id="kw2">
+        樂趣、數學、自然科學、卡內基梅隆、語言、記憶、理解、詞彙、考試、創造力、同理心、指示、家庭作業、朋友、書
+      </p>
+    </aside>
+    <main class="right">
+      <h1>📖 6個閱讀技巧：讓你讀得更快、記得更牢</h1>
+      <p class="subtitle">運用 · 預測 · 視覺化 · 偵探思維 · 拆解 · VIP字詞</p>
+
+      <p class="intro">
+        在閱讀時，你是否曾經遇到不認識的字就卡住？或者讀完整篇文章卻不知道重點在哪裡？其實，閱讀就像學習一門技術，只要掌握正確的方法，就能越讀越順暢。以下介紹6個實用的閱讀技巧，幫助你更有效地理解和記住文章內容。
+      </p>
+
+      <article class="article">
+        <p><strong>技巧一：運用已有知識</strong><br />
+        第一個技巧是「運用已有知識」。將你正在閱讀的內容，連結到你自己的人生經驗、讀過的其他文章，或者你對這個世界的認識。當你讀到某個情境、某個人物或某個概念時，不妨問問自己：我曾經遇過類似的事情嗎？我在其他地方讀過相關的內容嗎？這和我已知的常識有什麼關聯？</p>
+        <p><strong>技巧二：預測與提問</strong><br />
+        第二個技巧是「預測與提問」。在閱讀過程中，你應該一邊讀一邊猜測接下來會發生什麼事，同時對內容提出問題。使用句式：「我在想會不會……」、「為什麼這個人會這樣做？」、「接下來可能發生什麼？」</p>
+        <p><strong>技巧三：視覺化</strong><br />
+        第三個技巧是「視覺化」。一邊閱讀，一邊在腦海中形成畫面，就像在播放一部電影。讀到描述場景、人物或動作的句子時，試著快速想像：這個地方看起來是什麼樣子？人物長什麼樣？圖像比文字更容易留在記憶中。</p>
+        <p><strong>技巧四：像偵探一樣思考</strong><br />
+        第四個技巧是「像偵探一樣思考」。找出隱藏的意思、作者沒有明說的訊息，以及事件之間的因果關係。例如，「那個男孩自己走了，沒有說再見」——作為閱讀偵探，可以推測深層含義：可能害羞，可能沒有被教導禮儀，不只看表面。</p>
+        <p><strong>技巧五：拆解與修補</strong><br />
+        第五個技巧是「拆解與修補」。當你讀不懂某個部分時，不要馬上放棄。重讀一次句子，把長句子分成幾個短句，查字典，或請教別人。運用前後文來拆解意思。</p>
+        <p><strong>技巧六：VIP字詞</strong><br />
+        第六個技巧是「VIP字詞」。你不需要認識每一個字，只需要抓住最重要的那幾個（名詞、動詞、重要形容詞），就能理解整篇文章。利用前後文來猜測VIP字詞的意思。</p>
+        <p><strong>黃金法則：</strong>你不需要認識每一個字。只需要找到VIP字詞，用前後文和已有知識猜測意思，再用視覺化和提問來確認理解。</p>
+      </article>
+
+      <h2 class="section">【填空練習】一</h2>
+      <p class="blank-line">
+        在閱讀時，為了避免遇到不認識的字就卡住，或是讀完整篇文章卻不知道
+        <input class="blank" type="text" inputmode="text" autocomplete="off" aria-label="空格1" data-accept="重點" />
+        在哪裡，可以掌握六個實用的閱讀技巧。
+      </p>
+      <p class="blank-line">
+        第一個技巧是
+        <input class="blank" type="text" autocomplete="off" aria-label="空格2" data-accept="運用" />
+        已有知識，將正在閱讀的內容連結到自己的
+        <input class="blank" type="text" autocomplete="off" aria-label="空格3" data-accept="人生經驗" />
+        、讀過的其他文章，或是對這個世界的認識。
+      </p>
+      <p class="blank-line">
+        第二個技巧是
+        <input class="blank" type="text" autocomplete="off" aria-label="空格4" data-accept="預測" />
+        與提問，一邊閱讀一邊
+        <input class="blank" type="text" autocomplete="off" aria-label="空格5" data-accept="猜測" />
+        接下來會發生什麼事，同時對內容提出問題，例如：「接下來可能發生什麼？」或「為什麼這個人會這樣做？」
+      </p>
+      <p class="blank-line">
+        第三個技巧是
+        <input class="blank" type="text" autocomplete="off" aria-label="空格6" data-accept="視覺化" />
+        ，一邊閱讀一邊在腦海中形成
+        <input class="blank" type="text" autocomplete="off" aria-label="空格7" data-accept="畫面" />
+        ，就像在播放一部
+        <input class="blank" type="text" autocomplete="off" aria-label="空格8" data-accept="電影" />
+        ，讀到描述場景、人物或動作的句子時，試著快速想像畫面和人物長相。
+      </p>
+      <p class="blank-line">
+        第四個技巧是像
+        <input class="blank" type="text" autocomplete="off" aria-label="空格9" data-accept="偵探|偵探思維" />
+        一樣思考，找出隱藏的
+        <input class="blank" type="text" autocomplete="off" aria-label="空格10" data-accept="意思" />
+        、作者沒有明說的訊息，以及事件之間的
+        <input class="blank" type="text" autocomplete="off" aria-label="空格11" data-accept="因果" />
+        關係，不只看事情的表層。
+      </p>
+      <p class="blank-line">
+        第五個技巧是
+        <input class="blank" type="text" autocomplete="off" aria-label="空格12" data-accept="拆解" />
+        與修補，當讀不懂某個部分時不要馬上
+        <input class="blank" type="text" autocomplete="off" aria-label="空格13" data-accept="放棄" />
+        ，可以
+        <input class="blank" type="text" autocomplete="off" aria-label="空格14" data-accept="重讀" />
+        一次句子、把長句子分成幾個
+        <input class="blank" type="text" autocomplete="off" aria-label="空格15" data-accept="短句" />
+        、查字典，或請教別人。
+      </p>
+      <p class="blank-line">
+        第六個技巧是
+        <input class="blank" type="text" autocomplete="off" aria-label="空格16" data-accept="VIP字詞" />
+        ，不需要認識每一個
+        <input class="blank" type="text" autocomplete="off" aria-label="空格17" data-accept="字" />
+        ，只需要抓住最重要的那些
+        <input class="blank" type="text" autocomplete="off" aria-label="空格18" data-accept="名詞" />
+        、動詞和重要形容詞，就能理解整篇文章。
+      </p>
+      <p class="blank-line">
+        黃金法則是：你不需要認識每一個字。只需要找到
+        <input class="blank" type="text" autocomplete="off" aria-label="空格19" data-accept="VIP字詞" />
+        ，用
+        <input class="blank" type="text" autocomplete="off" aria-label="空格20" data-accept="前後文" />
+        和已有知識猜測意思，再用視覺化和提問來確認理解。
+      </p>
+
+      <h2 class="section">🧠 為什麼學生應該提升閱讀能力？科學研究的13個重要發現</h2>
+      <p class="article">
+        閱讀不僅僅是打發時間的休閒活動，更是一種能夠促進大腦發育、提升學習能力與個人成長的強大工具。針對這一點，科學家們透過研究規律閱讀對學業表現的影響，已經得出了許多有趣且具啟發性的結果。舉例而言，經濟合作與發展組織（OECD）一項著名的研究發現，那些為了樂趣而閱讀的學生，在閱讀測試中取得的分數遠高於不常閱讀的同齡學生。
+      </p>
+      <p class="article">
+        更令人驚訝的是，喜愛閱讀的學生不僅在語文科表現更為出色，就連數學和自然科學的成績同樣明顯優於不愛閱讀的同學。研究人員進一步指出，每天只需要閱讀十五分鐘，就能對學業產生巨大的正面影響。
+      </p>
+      <p class="article">
+        從大腦科學的角度來看，閱讀的好處遠遠超出表面的知識累積。卡內基梅隆大學的神經科學實驗顯示，規律閱讀會實際改變大腦的結構。研究者使用磁力共振造影（MRI）掃描後發現，經常閱讀的人在大腦中控制語言、記憶和理解能力的區域，擁有比不常閱讀的人更強的神經連結。這種大腦結構的改變直接帶動了語文能力的提升：閱讀幫助學習者擴充詞彙量，改善拼字和文法，進而讓日常溝通變得更加順暢。
+      </p>
+      <p class="article">
+        英國國家讀寫能力信託基金會（National Literacy Trust）的研究也證實，每日閱讀的兒童不僅詞彙量更廣、考試表現更好，還展現出更多的創造力與同理心。即使只是閱讀小說，也對個人發展大有助益，因為小說能讓讀者接觸不同的人物、地方、想法與生活情境，而這正是培養同理心的基礎。
+      </p>
+      <p class="article">
+        然而，很少閱讀的學生則可能面臨完全相反的困境。這些學生不僅難以跟上課程進度，甚至可能在學校中難以結交朋友。他們常常在理解老師的指示、完成家庭作業或回答考試題目時遇到障礙，而這種長期的挫敗感會嚴重影響他們的自信心。正因為閱讀與不閱讀之間的差距如此明顯，老師們總是鼓勵學生在空閒時間隨時帶一本書閱讀。這不僅是提升學習能力、想像力與自信心的最佳方法之一，更是幫助學生在學業與人際關係上全面成長的關鍵習慣。
+      </p>
+      <p class="article">
+        總結來說，每天只需十五分鐘的閱讀，就能啟動大腦連結的增強，進而帶來詞彙與文法的進步，同時提升創造力與同理心，最終促成學業的全面成長。這條從微小習慣到巨大改變的路徑，清楚說明了為什麼閱讀被視為教育中最有價值的投資之一。
+      </p>
+
+      <h2 class="section">【填空練習】二</h2>
+      <p class="blank-line">
+        研究顯示，為了
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-1" data-accept="樂趣" />
+        而閱讀的學生，在閱讀測驗甚至
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-2" data-accept="數學" />
+        和
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-3" data-accept="自然科學" />
+        科目上都表現更好。來自
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-4" data-accept="卡內基梅隆" />
+        大學的科學家發現，經常閱讀能增強腦內的神經連結，特別是在控制
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-5" data-accept="語言" />
+        、
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-6" data-accept="記憶" />
+        和
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-7" data-accept="理解" />
+        的區域。每日閱讀還能幫助學生學習新
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-8" data-accept="詞彙" />
+        ，在
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-9" data-accept="考試" />
+        中表現更佳，並且變得更有
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-10" data-accept="創造力" />
+        和
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-11" data-accept="同理心" />
+        。不常閱讀的學生可能會在理解
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-12" data-accept="指示" />
+        和完成
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-13" data-accept="家庭作業" />
+        方面遇到困難，甚至更難交到
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-14" data-accept="朋友" />
+        。這就是為什麼老師總是鼓勵學生隨身攜帶一本
+        <input class="blank" type="text" autocomplete="off" aria-label="練習二-15" data-accept="書" />
+        ，來支持他們的學習與個人成長。
+      </p>
+
+      <div class="actions">
+        <button type="button" class="primary" id="btn-check">對答案</button>
+        <button type="button" id="btn-clear">清除對錯標示</button>
+        <span id="result" aria-live="polite"></span>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      function norm(s) {
+        return (s || "").trim().replace(/\s+/g, "");
+      }
+      function matches(input) {
+        var v = norm(input.value);
+        if (!v) return false;
+        var raw = input.getAttribute("data-accept") || "";
+        var opts = raw.split("|").map(norm).filter(Boolean);
+        return opts.indexOf(v) !== -1;
+      }
+      var inputs = Array.prototype.slice.call(document.querySelectorAll("input.blank"));
+      document.getElementById("btn-check").addEventListener("click", function () {
+        var ok = 0;
+        var bad = 0;
+        var empty = 0;
+        inputs.forEach(function (inp) {
+          inp.classList.remove("ok", "bad");
+          var v = norm(inp.value);
+          if (!v) {
+            empty++;
+            return;
+          }
+          if (matches(inp)) {
+            inp.classList.add("ok");
+            ok++;
+          } else {
+            inp.classList.add("bad");
+            bad++;
+          }
+        });
+        document.getElementById("result").textContent =
+          "已填 " + (ok + bad) + " 格：正確 " + ok + "，待修正 " + bad + (empty ? "，空白 " + empty : "") + "。";
+      });
+      document.getElementById("btn-clear").addEventListener("click", function () {
+        inputs.forEach(function (inp) {
+          inp.classList.remove("ok", "bad");
+        });
+        document.getElementById("result").textContent = "";
+      });
+    })();
+  </script>
+</body>
+</html>
