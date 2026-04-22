@@ -320,6 +320,7 @@
       <p class="panel-title">Subject</p>
       <button type="button" class="is-active" id="sub-va" data-subject="va" aria-pressed="true" aria-controls="panel-va">Visual Art</button>
       <button type="button" id="sub-en" data-subject="en" aria-pressed="false" aria-controls="panel-en">English</button>
+      <button type="button" id="sub-zh" data-subject="zh" aria-pressed="false" aria-controls="panel-zh">中文</button>
     </nav>
 
     <div class="main">
@@ -343,6 +344,11 @@
           <li><a href="https://learnenglishkids.britishcouncil.org/read-write/reading-practice/level-2-reading" target="_blank" rel="noopener noreferrer">English Reading: For Kids</a></li>
         </ul>
       </nav>
+      <nav id="panel-zh" hidden aria-labelledby="sub-zh">
+        <ul>
+          <li><a href="chinese/read.html">閱讀理解</a></li>
+        </ul>
+      </nav>
     </div>
   </div>
 
@@ -364,13 +370,14 @@
     (function () {
       var panelVa = document.getElementById("panel-va");
       var panelEn = document.getElementById("panel-en");
+      var panelZh = document.getElementById("panel-zh");
       var buttons = document.querySelectorAll("#subject-sidebar button");
       var mq = window.matchMedia("(max-width: 720px)");
 
       function setSubject(which) {
-        var isVa = which === "va";
-        panelVa.hidden = !isVa;
-        panelEn.hidden = isVa;
+        panelVa.hidden = which !== "va";
+        panelEn.hidden = which !== "en";
+        panelZh.hidden = which !== "zh";
         buttons.forEach(function (btn) {
           var on = btn.getAttribute("data-subject") === which;
           btn.classList.toggle("is-active", on);

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>學習的科學 — 選詞填空</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --border: #e2e8f0;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --ok-bg: #dcfce7;
+      --ok-border: #22c55e;
+      --bad-bg: #fce7f3;
+      --bad-border: #ec4899;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: system-ui, "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    .wrap {
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: 1rem 1.1rem 6rem;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      margin: 0.75rem 0 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      width: fit-content;
+      max-width: 100%;
+    }
+    .tabs button {
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.45rem 1.1rem;
+      border: none;
+      border-right: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .tabs button:last-child { border-right: none; }
+    .tabs button:hover { background: #f1f5f9; color: var(--ink); }
+    .tabs button[aria-selected="true"] {
+      background: var(--accent);
+      color: #fff;
+    }
+    .tab-panel[hidden] { display: none !important; }
+    .subtitle {
+      margin: 0 0 0.85rem;
+      font-size: 0.92rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .article { margin: 0 0 1rem; }
+    h2.section {
+      margin: 1.35rem 0 0.5rem;
+      font-size: 1.05rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.25rem;
+    }
+    .blank-line { margin: 0.65rem 0; line-height: 2; }
+    span.blank {
+      display: inline-block;
+      vertical-align: baseline;
+      min-width: 3.2em;
+      padding: 0.1rem 0.35rem;
+      margin: 0 0.08rem;
+      font-size: 0.95em;
+      border: 2px dashed #94a3b8;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.45;
+      background: #fff;
+      user-select: none;
+    }
+    span.blank:empty::before { content: "⋯"; color: #94a3b8; pointer-events: none; }
+    span.blank.is-active {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-color: var(--accent);
+    }
+    span.blank.ok { border-style: solid; border-color: var(--ok-border); background: var(--ok-bg); }
+    span.blank.bad { border-style: solid; border-color: var(--bad-border); background: var(--bad-bg); }
+    .fill-tip {
+      margin: -0.15rem 0 0.85rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .actions {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .actions button {
+      font: inherit;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+    }
+    .actions button.primary { background: var(--accent); color: #fff; border-color: #1d4ed8; }
+    #result { font-size: 0.9rem; color: var(--muted); }
+
+    .discuss {
+      margin-top: 2rem;
+      padding: 1rem 1.1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+    .discuss h2.section {
+      margin-top: 0;
+      margin-bottom: 0.65rem;
+      font-size: 1rem;
+    }
+    .discuss ol {
+      margin: 0.35rem 0 0;
+      padding-left: 1.35rem;
+    }
+    .discuss li { margin: 0.55rem 0; }
+    .discuss .form-p {
+      margin: 1rem 0 0;
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+    .discuss .form-p a {
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .discuss .form-p a:hover { text-decoration: underline; }
+    .discuss .form-pending {
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .discuss-dialog {
+      max-width: min(38rem, 94vw);
+      width: 100%;
+      margin: auto;
+      padding: 0;
+      border: none;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+    }
+    .discuss-dialog::backdrop {
+      background: rgba(15, 23, 42, 0.52);
+    }
+    .discuss-dialog .dlg-banner {
+      margin: 0;
+      padding: 0.75rem 1.1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #14532d;
+      background: #dcfce7;
+      border-radius: 12px 12px 0 0;
+      border-bottom: 1px solid #bbf7d0;
+    }
+    .discuss-dialog .discuss {
+      margin: 0;
+      border: none;
+      border-radius: 0;
+    }
+    .discuss-dialog .dlg-footer {
+      padding: 0.65rem 1rem 0.85rem;
+      border-top: 1px solid var(--border);
+      text-align: right;
+      background: #f8fafc;
+      border-radius: 0 0 12px 12px;
+    }
+    .discuss-dialog .dlg-footer button {
+      font: inherit;
+      font-weight: 600;
+      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+    }
+    .discuss-dialog .dlg-footer button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .word-sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 100;
+      max-height: min(48vh, 22rem);
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 14px 14px 0 0;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
+      padding: 0.35rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
+      transform: translateY(105%);
+      transition: transform 0.24s ease;
+    }
+    .word-sheet.is-open { transform: translateY(0); }
+    .word-sheet .sheet-bar {
+      width: 2.5rem;
+      height: 4px;
+      margin: 0.2rem auto 0.5rem;
+      border-radius: 99px;
+      background: #cbd5e1;
+    }
+    .word-sheet h2 {
+      margin: 0 0 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .chip {
+      font: inherit;
+      font-size: 0.82rem;
+      padding: 0.3rem 0.55rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #f1f5f9;
+      cursor: pointer;
+    }
+    .chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: #eff6ff;
+    }
+
+    .lesson-top {
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.94);
+    }
+    .lesson-top-inner {
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: 0.35rem 1.1rem;
+      min-height: 1.65rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.65rem;
+    }
+    .lesson-top-title {
+      margin: 0;
+      font-size: clamp(0.95rem, 2.8vw, 1.2rem);
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--ink);
+      flex: 1 1 12rem;
+      min-width: 0;
+    }
+    .lesson-home {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 0.12rem 0.4rem;
+      line-height: 1;
+    }
+    .lesson-home:hover {
+      background: #e2e8f0;
+    }
+    .lesson-home:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .lesson-home-emoji {
+      font-size: 1.12rem;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+  <header class="lesson-top">
+    <div class="lesson-top-inner">
+      <a class="lesson-home" href="index.html" aria-label="回到中文閱讀理解索引"><span class="lesson-home-emoji" aria-hidden="true">🏠</span></a>
+      <h1 class="lesson-top-title">學習的科學（The Science of Learning）</h1>
+    </div>
+  </header>
+  <main class="wrap">
+    <p class="subtitle">睡眠、記憶與注意力：課文為延伸讀寫；填空為精簡重點句。</p>
+
+    <div class="tabs" role="tablist" aria-label="內容分頁">
+      <button type="button" role="tab" id="tab-read" aria-controls="panel-read" aria-selected="true">課文</button>
+      <button type="button" role="tab" id="tab-fill" aria-controls="panel-fill" aria-selected="false">填空練習</button>
+    </div>
+
+    <div class="tab-panel" id="panel-read" role="tabpanel" aria-labelledby="tab-read">
+      <p class="article">
+        睡眠與記憶的關係，是近二十年認知神經科學裡非常活躍的主題。以睡眠研究者 Matthew Walker 在其科普著作《為什麼要睡覺》（<i>Why We Sleep</i>，2017）的綜合整理為例：深層的慢波睡眠（slow-wave sleep）與睡眠紡錘波（sleep spindles）在許多實驗中，都與白天學到的材料在夜間被「鞏固」、變得比較不容易忘有關。換句話說，睡眠並不是把大腦關機，而更像在進行資料的整理與重播，讓海馬迴與皮質之間的對話把重要片段寫進較長期的儲存。
+      </p>
+      <p class="article">
+        另一條常被拿來幫助理解的理論路線，是 Tononi 與 Cirelli 等人提出的「突觸恆定假說」（synaptic homeostasis hypothesis）：大意是清醒時學習會讓突觸連結變強、代謝成本上升，而睡眠可能協助把整體突觸強度往「可持續」的方向調整。這仍是持續演進中的科學模型，但它提醒學生：用「大腦在睡覺時順便清理多餘連結」來想像，雖然是比喻，卻能對應到「睡醒後有些細節變淡」的日常經驗。
+      </p>
+      <p class="article">
+        在學習發生的當下，「注意力」則扮演另一個關鍵角色。認知心理學長期指出：工作記憶的容量有限（常見說法約在「同時清楚掌握 4 個左右單位」的量級，例如 Cowan 的綜合分析），而注意就像一道門檻，決定哪些感官訊息能進入後續的處理與編碼。若你在課堂上沒有把注意資源分配給老師的講解與板書，那些內容往往只停留在「好像聽得懂」的表層，未必形成穩固、可在隔日提取的記憶表徵。
+      </p>
+      <p class="article">
+        因此，即使你能跟上老師的節奏、也看得懂投影片，但若同時進行會瓜分注意力的活動（例如與朋友聊天、頻繁查看訊息），學習品質仍可能下降。美國心理學會（APA）對多工（multitasking）與學習的綜合說明也強調：人腦並不擅長「同時專心做好兩件高負荷的事」，切換成本會吃掉可用於理解與練習的資源。多份課堂研究亦顯示，手機即使面朝下放在桌上，仍可能與較低的測驗表現相關——因為它會成為一個持續吸引注意的信號來源。
+      </p>
+      <p class="article">
+        把這些研究線索串起來，就會得到一個很務實的結論：大腦在睡眠時會重新處理白天的經驗，但它更傾向保留「你在清醒時認真投注注意力」的資訊；反之，若你的行為訊號顯示某些內容不重要（例如一邊上課一邊分心聊天），系統就更可能在夜間整理時把它放到較低的優先序。這不是道德評判，而是資源分配：在容量與能量都有限的前提下，大腦必須做取捨。
+      </p>
+    </div>
+
+    <div class="tab-panel" id="panel-fill" role="tabpanel" aria-labelledby="tab-fill" hidden>
+      <p class="blank-line">
+        當你要
+        <span class="blank" tabindex="0" role="button" data-accept="睡覺" aria-label="空格1"></span>
+        時，你的
+        <span class="blank" tabindex="0" role="button" data-accept="大腦" aria-label="空格2"></span>
+        會開始清理
+        <span class="blank" tabindex="0" role="button" data-accept="記憶" aria-label="空格3"></span>
+        。它會
+        <span class="blank" tabindex="0" role="button" data-accept="忘記" aria-label="空格4"></span>
+        你在白天
+        <span class="blank" tabindex="0" role="button" data-accept="經歷" aria-label="空格5"></span>
+        的大部分事情。只有你在白天付出最多
+        <span class="blank" tabindex="0" role="button" data-accept="注意力" aria-label="空格6"></span>
+        的內容，大腦才會記得久一點。
+      </p>
+      <p class="blank-line">
+        即使你完全聽得懂一節
+        <span class="blank" tabindex="0" role="button" data-accept="課程" aria-label="空格7"></span>
+        在講什麼、或課堂活動在做什麼，若你希望那些內容在睡了一覺後仍停留在大腦裡，你仍必須付出完整的
+        <span class="blank" tabindex="0" role="button" data-accept="注意力" aria-label="空格8"></span>
+        ；否則那些
+        <span class="blank" tabindex="0" role="button" data-accept="資訊" aria-label="空格9"></span>
+        仍可能被淡化。
+      </p>
+      <p class="blank-line">
+        當你在課堂上與
+        <span class="blank" tabindex="0" role="button" data-accept="朋友" aria-label="空格10"></span>
+        聊天，或做會
+        <span class="blank" tabindex="0" role="button" data-accept="妨礙" aria-label="空格11"></span>
+        你專心學習的事時，你對那堂課所學往往記不了多少。因為睡覺後你會忘記；大腦也會認為你並沒有認真看待那些
+        <span class="blank" tabindex="0" role="button" data-accept="資訊" aria-label="空格12"></span>
+        。
+      </p>
+      <div class="actions">
+        <button type="button" class="primary" id="btn-check">對答案</button>
+        <button type="button" id="btn-clear">清除對錯標示</button>
+        <span id="result" aria-live="polite"></span>
+      </div>
+      <div class="fill-bottom-spacer" aria-hidden="true">
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+      </div>
+    </div>
+  </main>
+
+  <dialog class="discuss-dialog" id="discuss-success-dialog" aria-labelledby="discuss-dlg-banner">
+    <p class="dlg-banner" id="discuss-dlg-banner">全部填空正確！請完成下列討論題。</p>
+    <section class="discuss" aria-labelledby="discuss-title">
+      <h2 class="section" id="discuss-title">【討論題】</h2>
+      <p>請依序思考以下題目，並到 <strong>Google 表單</strong> 寫下完整作答（可引用課文用語，並寫出你的想法）。</p>
+      <ol>
+        <li>你覺得「睡覺會讓大腦整理記憶」這件事，如何改變你對「當天複習」或「睡前安排」的想法？</li>
+        <li>課文把「注意力」和「睡覺後還記不記得」連在一起。你在課堂上最容易分心的是什麼？你可以做哪一件小事來幫助自己更專心？</li>
+        <li>「聽得懂」和「專心投入」有什麼不同？你曾經有聽得懂卻考後就忘的經驗嗎？你覺得原因可能是什麼？</li>
+        <li>和朋友聊天一定不好嗎？你認為在什麼情況下聊天會最傷害學習？在什麼情況下比較不會？</li>
+      </ol>
+      <p class="form-p" id="discussion-form-line">
+        <a id="discussion-google-form" href="#" target="_blank" rel="noopener noreferrer">開啟 Google 表單作答</a>
+      </p>
+    </section>
+    <div class="dlg-footer">
+      <button type="button" id="discuss-dialog-close">關閉</button>
+    </div>
+  </dialog>
+
+  <div class="word-sheet" id="word-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true">
+    <div class="sheet-bar" aria-hidden="true"></div>
+    <h2 id="sheet-title">【關鍵詞列表】</h2>
+    <div class="chips" id="kw-chips" role="group" aria-label="可選詞"></div>
+  </div>
+
+  <script>
+    (function () {
+      /** 學習的科學 — 討論題 Google 表單（由老師填入有效網址） */
+      var GOOGLE_DISCUSSION_FORM_URL =
+        "https://docs.google.com/forms/d/e/1FAIpQLSczy5qrpgHNqnBOa7FKnYR0SUJqVYBJfyeaOXm3Z65tfkWx9g/viewform?usp=publish-editor";
+
+      var WORDS =
+        "睡覺、大腦、記憶、忘記、經歷、注意力、課程、資訊、朋友、妨礙".split("、");
+
+      function shuffleInPlace(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = arr[i];
+          arr[i] = arr[j];
+          arr[j] = t;
+        }
+        return arr;
+      }
+
+      var chipsEl = document.getElementById("kw-chips");
+      var sheet = document.getElementById("word-sheet");
+      var activeBlank = null;
+
+      shuffleInPlace(WORDS).forEach(function (w) {
+        var t = w.trim();
+        if (!t) return;
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip";
+        b.setAttribute("data-word", t);
+        b.textContent = t;
+        chipsEl.appendChild(b);
+      });
+
+      function openSheet() {
+        sheet.classList.add("is-open");
+        sheet.setAttribute("aria-hidden", "false");
+      }
+      function closeSheet() {
+        sheet.classList.remove("is-open");
+        sheet.setAttribute("aria-hidden", "true");
+        document.querySelectorAll("span.blank.is-active").forEach(function (s) {
+          s.classList.remove("is-active");
+        });
+        activeBlank = null;
+      }
+
+      function setActiveBlank(el) {
+        document.querySelectorAll("span.blank.is-active").forEach(function (s) {
+          s.classList.remove("is-active");
+        });
+        activeBlank = el;
+        if (!el) {
+          closeSheet();
+          return;
+        }
+        el.classList.add("is-active");
+        openSheet();
+      }
+
+      function norm(s) {
+        return (s || "").trim().replace(/\s+/g, "");
+      }
+      function blankValue(el) {
+        return norm(el.textContent);
+      }
+      function matchesBlank(el) {
+        var v = blankValue(el);
+        if (!v) return false;
+        var raw = el.getAttribute("data-accept") || "";
+        var opts = raw.split("|").map(norm).filter(Boolean);
+        return opts.indexOf(v) !== -1;
+      }
+
+      var blanks = Array.prototype.slice.call(document.querySelectorAll("span.blank"));
+      blanks.forEach(function (el) {
+        el.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          setActiveBlank(el);
+        });
+        el.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            setActiveBlank(el);
+          }
+        });
+      });
+
+      chipsEl.addEventListener("click", function (e) {
+        var btn = e.target.closest(".chip");
+        if (!btn || !activeBlank) return;
+        activeBlank.textContent = btn.getAttribute("data-word") || btn.textContent;
+        activeBlank.classList.remove("ok", "bad");
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && sheet.classList.contains("is-open")) closeSheet();
+      });
+
+      var discussDlg = document.getElementById("discuss-success-dialog");
+
+      function revealAllAnswersFromData() {
+        var panelFill = document.getElementById("panel-fill");
+        if (!panelFill || panelFill.hidden) return;
+        closeSheet();
+        blanks.forEach(function (b) {
+          var raw = b.getAttribute("data-accept") || "";
+          var display = (raw.split("|")[0] || "").trim().replace(/\s+/g, " ");
+          if (display) b.textContent = display;
+          b.classList.remove("bad");
+          b.classList.add("ok");
+        });
+        var res = document.getElementById("result");
+        if (res) res.textContent = "已顯示參考答案。請對照課文自行檢討。";
+      }
+
+      document.addEventListener("keydown", function (e) {
+        if (e.code !== "Space" && e.key !== " ") return;
+        var panelFill = document.getElementById("panel-fill");
+        if (!panelFill || panelFill.hidden) return;
+        if (discussDlg && discussDlg.open) return;
+        var t = e.target;
+        if (t && t.closest && t.closest("#discuss-success-dialog")) return;
+        if (t && t.closest && t.closest(".chips")) return;
+        if (t && t.closest && t.closest(".tabs") && t.tagName === "BUTTON") return;
+        if (t && t.tagName === "BUTTON" && (t.id === "btn-check" || t.id === "btn-clear" || t.id === "discuss-dialog-close")) return;
+        e.preventDefault();
+        e.stopPropagation();
+        revealAllAnswersFromData();
+      }, true);
+
+      document.getElementById("btn-check").addEventListener("click", function () {
+        closeSheet();
+        var ok = 0, bad = 0, empty = 0;
+        blanks.forEach(function (inp) {
+          inp.classList.remove("ok", "bad");
+          var v = blankValue(inp);
+          if (!v) {
+            empty++;
+            return;
+          }
+          if (matchesBlank(inp)) {
+            inp.classList.add("ok");
+            ok++;
+          } else {
+            inp.classList.add("bad");
+            bad++;
+          }
+        });
+        var total = blanks.length;
+        var allCorrect = bad === 0 && empty === 0 && ok === total;
+        if (allCorrect) {
+          document.getElementById("result").textContent =
+            "全部 " + total + " 格皆正確！討論題視窗已開啟，請前往 Google 表單作答。";
+          if (discussDlg && typeof discussDlg.showModal === "function") {
+            try {
+              if (discussDlg.open) discussDlg.close();
+              discussDlg.showModal();
+            } catch (err) {}
+          }
+        } else {
+          document.getElementById("result").textContent =
+            "已填 " + (ok + bad) + " 格：正確 " + ok + "，待修正 " + bad + (empty ? "，空白 " + empty : "") + "。";
+        }
+      });
+      document.getElementById("btn-clear").addEventListener("click", function () {
+        blanks.forEach(function (inp) {
+          inp.classList.remove("ok", "bad");
+        });
+        document.getElementById("result").textContent = "";
+        if (discussDlg && discussDlg.open) discussDlg.close();
+      });
+
+      if (discussDlg) {
+        document.getElementById("discuss-dialog-close").addEventListener("click", function () {
+          discussDlg.close();
+        });
+      }
+
+      var tabRead = document.getElementById("tab-read");
+      var tabFill = document.getElementById("tab-fill");
+      var panelRead = document.getElementById("panel-read");
+      var panelFill = document.getElementById("panel-fill");
+      function setTab(which) {
+        var isRead = which === "read";
+        tabRead.setAttribute("aria-selected", isRead ? "true" : "false");
+        tabFill.setAttribute("aria-selected", isRead ? "false" : "true");
+        panelRead.hidden = !isRead;
+        panelFill.hidden = isRead;
+        if (isRead) closeSheet();
+      }
+      tabRead.addEventListener("click", function () { setTab("read"); });
+      tabFill.addEventListener("click", function () { setTab("fill"); });
+
+      (function setupDiscussionForm() {
+        var a = document.getElementById("discussion-google-form");
+        var line = document.getElementById("discussion-form-line");
+        if (!a || !line) return;
+        var u = (GOOGLE_DISCUSSION_FORM_URL || "").trim();
+        if (/^https?:\/\//i.test(u)) {
+          a.href = u;
+        } else {
+          a.removeAttribute("href");
+          a.setAttribute("role", "presentation");
+          a.style.pointerEvents = "none";
+          a.style.opacity = "0.55";
+          a.textContent = "Google 表單（連結稍後公布）";
+          var note = document.createElement("span");
+          note.className = "form-pending";
+          note.textContent = "表單連結稍後由老師公布；公布後即可由此按鈕前往填寫。";
+          line.appendChild(document.createElement("br"));
+          line.appendChild(note);
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>
