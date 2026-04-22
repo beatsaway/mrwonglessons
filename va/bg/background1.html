@@ -66,6 +66,7 @@
   </head>
   <body>
     <div id="countdown">--</div>
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
       (() => {
         const minMs = 30_000;
@@ -74,6 +75,8 @@
         let sections = [];
 
         let i = 0;
+        let activeIndex = 0;
+        const players = [];
 
         const nextDelayMs = () => minMs + Math.floor(Math.random() * (maxMs - minMs + 1));
 
@@ -81,6 +84,30 @@
           if (!countdownEl) return;
           const sec = Math.max(0, Math.ceil(msLeft / 1000));
           countdownEl.textContent = String(sec);
+        };
+
+        const setActive = (idx) => {
+          if (!Number.isFinite(idx)) return;
+          if (!sections.length) return;
+          const next = ((idx % sections.length) + sections.length) % sections.length;
+          if (next === activeIndex && players.length) return;
+          activeIndex = next;
+
+          players.forEach((p, pi) => {
+            if (!p || typeof p.pauseVideo !== "function") return;
+            if (pi === activeIndex) return;
+            try {
+              p.pauseVideo();
+            } catch (e) {}
+          });
+
+          const p = players[activeIndex];
+          if (p && typeof p.playVideo === "function") {
+            try {
+              p.mute();
+              p.playVideo();
+            } catch (e) {}
+          }
         };
 
         let nextAt = 0;
@@ -98,6 +125,7 @@
           timeoutId = window.setTimeout(() => {
             i = (i + 1) % sections.length;
             sections[i].scrollIntoView({ behavior: "smooth", block: "start" });
+            setActive(i);
             scheduleNext();
           }, delay);
 
@@ -114,10 +142,57 @@
               if (countdownEl) countdownEl.textContent = "No videos found";
               return;
             }
+
+            // Pause videos that aren't being viewed (saves mobile data).
+            const io = new IntersectionObserver(
+              (entries) => {
+                let best = null;
+                for (const e of entries) {
+                  if (!e.isIntersecting) continue;
+                  if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+                }
+                if (!best) return;
+                const idx = sections.indexOf(best.target);
+                if (idx >= 0) setActive(idx);
+              },
+              { threshold: [0.6, 0.75, 0.9] }
+            );
+            sections.forEach((s) => io.observe(s));
+
             scheduleNext();
           },
           { once: true }
         );
+
+        window.onYouTubeIframeAPIReady = () => {
+          const iframes = Array.from(document.querySelectorAll("iframe[data-video-id]"));
+          if (!iframes.length) return;
+
+          iframes.forEach((el, idx) => {
+            const id = el.getAttribute("data-video-id");
+            if (!id) return;
+
+            players[idx] = new YT.Player(el, {
+              events: {
+                onReady: (ev) => {
+                  try {
+                    ev.target.mute();
+                  } catch (e) {}
+                  // Play only the active one; pause the rest.
+                  if (idx === activeIndex) {
+                    try {
+                      ev.target.playVideo();
+                    } catch (e) {}
+                  } else {
+                    try {
+                      ev.target.pauseVideo();
+                    } catch (e) {}
+                  }
+                },
+              },
+            });
+          });
+        };
       })();
     </script>
 
@@ -131,7 +206,8 @@
         </p>
         <div class="video">
           <iframe
-            src="https://www.youtube.com/embed/wUVXd2hPrvg?autoplay=1&mute=1&loop=1&playlist=wUVXd2hPrvg&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            data-video-id="wUVXd2hPrvg"
+            src="https://www.youtube.com/embed/wUVXd2hPrvg?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=wUVXd2hPrvg&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
             allow="autoplay; encrypted-media; picture-in-picture"
             allowfullscreen
           ></iframe>
@@ -149,7 +225,8 @@
         </p>
         <div class="video">
           <iframe
-            src="https://www.youtube.com/embed/eorGIZ0Y8RY?autoplay=1&mute=1&loop=1&playlist=eorGIZ0Y8RY&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            data-video-id="eorGIZ0Y8RY"
+            src="https://www.youtube.com/embed/eorGIZ0Y8RY?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=eorGIZ0Y8RY&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
             allow="autoplay; encrypted-media; picture-in-picture"
             allowfullscreen
           ></iframe>
@@ -167,7 +244,8 @@
         </p>
         <div class="video">
           <iframe
-            src="https://www.youtube.com/embed/q0J-H5XzDZ4?autoplay=1&mute=1&loop=1&playlist=q0J-H5XzDZ4&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            data-video-id="q0J-H5XzDZ4"
+            src="https://www.youtube.com/embed/q0J-H5XzDZ4?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=q0J-H5XzDZ4&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
             allow="autoplay; encrypted-media; picture-in-picture"
             allowfullscreen
           ></iframe>
@@ -185,7 +263,8 @@
         </p>
         <div class="video">
           <iframe
-            src="https://www.youtube.com/embed/Su2uUFB7rjs?autoplay=1&mute=1&loop=1&playlist=Su2uUFB7rjs&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            data-video-id="Su2uUFB7rjs"
+            src="https://www.youtube.com/embed/Su2uUFB7rjs?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=Su2uUFB7rjs&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
             allow="autoplay; encrypted-media; picture-in-picture"
             allowfullscreen
           ></iframe>
@@ -203,7 +282,8 @@
         </p>
         <div class="video">
           <iframe
-            src="https://www.youtube.com/embed/QmnSRC0hZTQ?autoplay=1&mute=1&loop=1&playlist=QmnSRC0hZTQ&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            data-video-id="QmnSRC0hZTQ"
+            src="https://www.youtube.com/embed/QmnSRC0hZTQ?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=QmnSRC0hZTQ&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
             allow="autoplay; encrypted-media; picture-in-picture"
             allowfullscreen
           ></iframe>
@@ -221,7 +301,8 @@
         </p>
         <div class="video">
           <iframe
-            src="https://www.youtube.com/embed/AXu27qQMwdI?autoplay=1&mute=1&loop=1&playlist=AXu27qQMwdI&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            data-video-id="AXu27qQMwdI"
+            src="https://www.youtube.com/embed/AXu27qQMwdI?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=AXu27qQMwdI&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
             allow="autoplay; encrypted-media; picture-in-picture"
             allowfullscreen
           ></iframe>
@@ -239,7 +320,8 @@
         </p>
         <div class="video">
           <iframe
-            src="https://www.youtube.com/embed/CeItO4-ARfk?autoplay=1&mute=1&loop=1&playlist=CeItO4-ARfk&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            data-video-id="CeItO4-ARfk"
+            src="https://www.youtube.com/embed/CeItO4-ARfk?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=CeItO4-ARfk&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
             allow="autoplay; encrypted-media; picture-in-picture"
             allowfullscreen
           ></iframe>
