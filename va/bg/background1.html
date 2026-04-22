@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Looping Videos</title>
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+        font-family: system-ui, sans-serif;
+      }
+      .section {
+        padding: 24px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .wrap {
+        width: min(1100px, 92vw);
+        margin: 0 auto;
+      }
+      .title {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+        margin: 0 0 10px;
+      }
+      .title a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .title a:hover {
+        text-decoration: underline;
+      }
+      /* Responsive 16:9 iframe */
+      .video {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        background: #000;
+        overflow: hidden;
+        border-radius: 12px;
+      }
+      .video iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+      #countdown {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        z-index: 9999;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        line-height: 1.2;
+        user-select: none;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="countdown">--</div>
+    <script>
+      (() => {
+        const minMs = 30_000;
+        const maxMs = 60_000;
+        const countdownEl = document.getElementById("countdown");
+        let sections = [];
+
+        let i = 0;
+
+        const nextDelayMs = () => minMs + Math.floor(Math.random() * (maxMs - minMs + 1));
+
+        const setCountdownText = (msLeft) => {
+          if (!countdownEl) return;
+          const sec = Math.max(0, Math.ceil(msLeft / 1000));
+          countdownEl.textContent = String(sec);
+        };
+
+        let nextAt = 0;
+        let timeoutId = 0;
+        let tickerId = 0;
+
+        const scheduleNext = () => {
+          if (timeoutId) window.clearTimeout(timeoutId);
+          timeoutId = 0;
+
+          const delay = nextDelayMs();
+          nextAt = Date.now() + delay;
+          setCountdownText(delay);
+
+          timeoutId = window.setTimeout(() => {
+            i = (i + 1) % sections.length;
+            sections[i].scrollIntoView({ behavior: "smooth", block: "start" });
+            scheduleNext();
+          }, delay);
+
+          if (!tickerId) {
+            tickerId = window.setInterval(() => setCountdownText(nextAt - Date.now()), 100);
+          }
+        };
+
+        window.addEventListener(
+          "load",
+          () => {
+            sections = Array.from(document.querySelectorAll(".section"));
+            if (sections.length === 0) {
+              if (countdownEl) countdownEl.textContent = "No videos found";
+              return;
+            }
+            scheduleNext();
+          },
+          { once: true }
+        );
+      })();
+    </script>
+
+    <!-- Video 1 -->
+    <div class="section">
+      <div class="wrap">
+        <p class="title">
+          <a href="https://www.youtube.com/watch?v=wUVXd2hPrvg" target="_blank" rel="noreferrer">
+            https://www.youtube.com/watch?v=wUVXd2hPrvg
+          </a>
+        </p>
+        <div class="video">
+          <iframe
+            src="https://www.youtube.com/embed/wUVXd2hPrvg?autoplay=1&mute=1&loop=1&playlist=wUVXd2hPrvg&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video 2 -->
+    <div class="section">
+      <div class="wrap">
+        <p class="title">
+          <a href="https://www.youtube.com/watch?v=eorGIZ0Y8RY" target="_blank" rel="noreferrer">
+            https://www.youtube.com/watch?v=eorGIZ0Y8RY
+          </a>
+        </p>
+        <div class="video">
+          <iframe
+            src="https://www.youtube.com/embed/eorGIZ0Y8RY?autoplay=1&mute=1&loop=1&playlist=eorGIZ0Y8RY&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video 3 -->
+    <div class="section">
+      <div class="wrap">
+        <p class="title">
+          <a href="https://www.youtube.com/watch?v=q0J-H5XzDZ4" target="_blank" rel="noreferrer">
+            https://www.youtube.com/watch?v=q0J-H5XzDZ4
+          </a>
+        </p>
+        <div class="video">
+          <iframe
+            src="https://www.youtube.com/embed/q0J-H5XzDZ4?autoplay=1&mute=1&loop=1&playlist=q0J-H5XzDZ4&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video 4 -->
+    <div class="section">
+      <div class="wrap">
+        <p class="title">
+          <a href="https://www.youtube.com/watch?v=Su2uUFB7rjs" target="_blank" rel="noreferrer">
+            https://www.youtube.com/watch?v=Su2uUFB7rjs
+          </a>
+        </p>
+        <div class="video">
+          <iframe
+            src="https://www.youtube.com/embed/Su2uUFB7rjs?autoplay=1&mute=1&loop=1&playlist=Su2uUFB7rjs&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video 5 -->
+    <div class="section">
+      <div class="wrap">
+        <p class="title">
+          <a href="https://www.youtube.com/watch?v=QmnSRC0hZTQ" target="_blank" rel="noreferrer">
+            https://www.youtube.com/watch?v=QmnSRC0hZTQ
+          </a>
+        </p>
+        <div class="video">
+          <iframe
+            src="https://www.youtube.com/embed/QmnSRC0hZTQ?autoplay=1&mute=1&loop=1&playlist=QmnSRC0hZTQ&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video 6 -->
+    <div class="section">
+      <div class="wrap">
+        <p class="title">
+          <a href="https://www.youtube.com/watch?v=AXu27qQMwdI" target="_blank" rel="noreferrer">
+            https://www.youtube.com/watch?v=AXu27qQMwdI
+          </a>
+        </p>
+        <div class="video">
+          <iframe
+            src="https://www.youtube.com/embed/AXu27qQMwdI?autoplay=1&mute=1&loop=1&playlist=AXu27qQMwdI&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
