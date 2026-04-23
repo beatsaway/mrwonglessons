@@ -146,6 +146,19 @@
     .main li {
       margin: 0.4rem 0;
     }
+    .main li.sep {
+      margin: 0.75rem 0;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(30, 58, 95, 0.18);
+    }
+    .main li.group {
+      margin: 0.9rem 0 0.35rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
     .main a {
       color: #1d4ed8;
       text-decoration: none;
@@ -326,19 +339,25 @@
     <div class="main">
       <nav id="panel-va" aria-labelledby="sub-va">
         <ul>
-          <li><a href="hello.html">Hello</a></li>
-          
-          <li><a href="va/bg/background1.html">Background (videos)</a></li>
-          <li><a href="va/ks3/opart/index.html">KS3 Art lessons</a></li>
-          <li><a href="va/ks3/opart/index.html">Op Art — KS3 (quiz, worksheet, PDF)</a></li>
-          <li><a href="va/ks3/1ptp/TextureRenderGuide.pdf" target="_blank" rel="noopener noreferrer">1-point perspective — KS3 (PDF)</a></li>
-          <li><a href="va/scamper/scamper-for-art.html">SCAMPER techniques</a></li>
-          <li><a href="scamper/image-ascii.html">Image → ASCII (glow)</a></li>
-          <li><a href="pdftest/listofmediums.html">List of mediums (scroll)</a></li>
-          <li><a href="sba/letter-trilingual.html">Why workbook?</a></li>
-          <li><a href="sba/general-guide.html">SBA — General Guide</a></li>
-          <li><a href="sba/page-directions.html">SBA — Workbook page directions</a></li>
-          <li><a href="sba/workbook-pages-guide.html">SBA — Workbook design guide</a></li>
+          <li class="group">Start</li>
+          <li><a href="hello.html">👋 Hello</a></li>
+          <li><a href="va/bg/background1.html">🎞️ Background (videos)</a></li>
+
+          <li class="sep group">KS3</li>
+          <li><a href="va/ks3/opart/index.html">🎨 KS3 Art lessons</a></li>
+          <li><a href="va/ks3/opart/index.html">🌀 Op Art — KS3 (quiz, worksheet, PDF)</a></li>
+          <li><a href="va/ks3/1ptp/TextureRenderGuide.pdf" target="_blank" rel="noopener noreferrer">📐 1-point perspective — KS3 (PDF)</a></li>
+
+          <li class="sep group">Tools</li>
+          <li><a href="va/scamper/scamper-for-art.html">💡 SCAMPER techniques</a></li>
+          <li><a href="scamper/image-ascii.html">🖼️ Image → ASCII (glow)</a></li>
+          <li><a href="va/medium/listofmediums.html">📚 List of mediums (scroll)</a></li>
+
+          <li class="sep group">SBA</li>
+          <li><a href="sba/letter-trilingual.html">❓ Why workbook?</a></li>
+          <li><a href="sba/general-guide.html">🧭 SBA — General Guide</a></li>
+          <li><a href="sba/page-directions.html">🧾 SBA — Workbook page directions</a></li>
+          <li><a href="sba/workbook-pages-guide.html">🧩 SBA — Workbook design guide</a></li>
         </ul>
       </nav>
       <nav id="panel-en" hidden aria-labelledby="sub-en">
