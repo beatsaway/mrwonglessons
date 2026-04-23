@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ascii glow (simple)</title>
+  <style>
+    :root {
+      --void: #07070c;
+      --ink: #e8e6f0;
+      --dim: #8a8799;
+      --acc: #b066ff;
+      --acc2: #00e5c8;
+      --glass: rgba(12, 12, 20, 0.72);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--void);
+      color: var(--ink);
+      font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    }
+    body { min-height: 100dvh; }
+
+    .main {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .zone {
+      flex: 1;
+      min-height: 0;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 0.75rem 5.5rem;
+      text-align: center;
+      color: var(--dim);
+    }
+    .zone.has {
+      text-align: left;
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+    .zone.has .out {
+      flex: 1 1 0;
+      min-height: 0;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.35rem, 4.5vw, 2.1rem);
+      font-weight: 800;
+      margin: 0 0 0.35rem;
+      letter-spacing: -0.03em;
+      background: linear-gradient(110deg, #fff, var(--acc) 40%, var(--acc2) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hero p {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .out {
+      width: 100%;
+      overflow: hidden;
+      max-width: 100%;
+    }
+    .out.scroll {
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .out.fit {
+      display: flex;
+      justify-content: center;
+    }
+
+    .ascii {
+      display: block;
+      margin: 0;
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, ui-monospace, monospace;
+      line-height: 1;
+      white-space: pre;
+      user-select: text;
+    }
+    .ascii.genz-ascii--jitter span {
+      display: inline-block;
+      vertical-align: middle;
+      transform-origin: 50% 50%;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    .err {
+      color: #ff6b8a;
+      max-width: 20rem;
+    }
+
+    kbd {
+      display: inline-block;
+      font-size: 0.8em;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 0.05em 0.3em;
+      background: #12121a;
+    }
+
+    .dock {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 100;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem 0.65rem;
+      padding: 0.6rem 0.75rem calc(0.65rem + env(safe-area-inset-bottom, 0));
+      background: var(--glass);
+      backdrop-filter: blur(16px) saturate(130%);
+      -webkit-backdrop-filter: blur(16px) saturate(130%);
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+    }
+    .dock .brand {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .brand span {
+      font-size: 0.72rem;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+    .dock input[type="text"] {
+      flex: 1 1 7rem;
+      min-width: 0;
+      max-width: 12rem;
+      background: #12121c;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 0.4rem 0.55rem;
+      color: var(--ink);
+      font-size: 0.85rem;
+    }
+    .dock select,
+    .dock button {
+      font: inherit;
+      font-size: 0.8rem;
+    }
+    .dock label.field {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: #c4c0d4;
+      font-size: 0.75rem;
+    }
+    .dock input[type="range"] { width: 4.2rem; }
+    .btn {
+      border: 1px solid rgba(176, 102, 255, 0.4);
+      background: linear-gradient(150deg, rgba(176, 102, 255, 0.2), rgba(0, 229, 200, 0.12));
+      color: #fff;
+      border-radius: 10px;
+      padding: 0.45rem 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn:hover {
+      filter: brightness(1.08);
+    }
+    .btn-ghost {
+      background: #16161f;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    #measurer {
+      position: fixed;
+      left: 0;
+      top: 0;
+      visibility: hidden;
+      pointer-events: none;
+      white-space: pre;
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, ui-monospace, monospace;
+    }
+  </style>
+</head>
+<body>
+  <main class="main">
+    <div id="zone" class="zone" tabindex="0" aria-label="Drop image; paste with Ctrl V">
+      <div id="hero" class="hero">
+        <h1>ascii glow</h1>
+        <p>drop, paste, or <button type="button" class="btn" id="pick" style="margin:0.25rem 0">pick a pic</button></p>
+        <p>random characters + loud colours. controls float at the bottom — your art is full screen.</p>
+      </div>
+      <p id="err" class="err" hidden></p>
+      <div id="outParent" class="out" hidden>
+        <pre id="ascii" class="ascii" aria-label="Output"></pre>
+      </div>
+    </div>
+  </main>
+
+  <nav class="dock" aria-label="Quick settings">
+    <div class="brand">
+      <span>quick deck</span>
+    </div>
+    <input type="file" id="file" class="visually-hidden" accept="image/*" />
+    <button type="button" class="btn btn-ghost" id="openFile">+ image</button>
+    <label class="field" title="How the colours feel">
+      <span>vibe</span>
+      <select id="vibe">
+        <option value="vapor">holo drift</option>
+        <option value="candy">cotton candy</option>
+        <option value="photo" selected>photo pop</option>
+        <option value="matrix">matrix</option>
+        <option value="sunset">sunset</option>
+      </select>
+    </label>
+    <label class="field" title="How many character columns (width)">
+      <span>cols</span>
+      <input type="range" id="columns" min="28" max="800" value="48" step="1" />
+      <output id="colOut">48</output>
+    </label>
+    <label class="field" title="How many text rows (height) — image is scaled to this grid">
+      <span>rows</span>
+      <input type="range" id="rows" min="8" max="800" value="32" step="1" />
+      <output id="rowOut">32</output>
+    </label>
+    <label class="field" title="Neon haze on each cell">
+      <span>glow</span>
+      <input type="range" id="glow" min="0" max="10" value="2" step="0.5" />
+      <output id="glowOut">2</output>
+    </label>
+    <label class="field" title="Default: uniform. Rotation: each cell tilts a random amount (±0–180°) and size wiggles ±2px (deterministic from position + re-roll)">
+      <span>chars</span>
+      <select id="charEffect">
+        <option value="default" selected>default</option>
+        <option value="rotation">rotation + size</option>
+      </select>
+    </label>
+    <label class="field">
+      <input type="checkbox" id="fit" checked />
+      <span>fit</span>
+    </label>
+    <input type="text" id="pool" value="·✦o♡" maxlength="24" spellcheck="false" title="Symbol pool" aria-label="Characters to mix" />
+    <button type="button" class="btn" id="shuffle">re-roll</button>
+    <a class="btn btn-ghost" style="text-decoration:none;display:inline-block" href="image-ascii.html" title="All features in the main tool">pro mode</a>
+  </nav>
+
+  <span id="measurer" aria-hidden="true">M</span>
+
+  <script>
+    (function () {
+      "use strict";
+      var zone = document.getElementById("zone");
+      var mainEl = document.querySelector("main");
+      var hero = document.getElementById("hero");
+      var outParent = document.getElementById("outParent");
+      var ascii = document.getElementById("ascii");
+      var err = document.getElementById("err");
+      var file = document.getElementById("file");
+      var pick = document.getElementById("pick");
+      var openFile = document.getElementById("openFile");
+      var col = document.getElementById("columns");
+      var colOut = document.getElementById("colOut");
+      var row = document.getElementById("rows");
+      var rowOut = document.getElementById("rowOut");
+      var glowR = document.getElementById("glow");
+      var glowOut = document.getElementById("glowOut");
+      var fit = document.getElementById("fit");
+      var poolIn = document.getElementById("pool");
+      var vibe = document.getElementById("vibe");
+      var shuffle = document.getElementById("shuffle");
+      var charEffect = document.getElementById("charEffect");
+      var meas = document.getElementById("measurer");
+      var rngSeed = Date.now() & 0x7fffffff;
+      var img = new Image();
+      img.decoding = "async";
+      var cvs = document.createElement("canvas");
+      var ctx = cvs.getContext("2d", { willReadFrequently: true });
+      var resizeTimer;
+      var ro;
+
+      function luma(r, g, b) {
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      }
+
+      function lerp(n1, n2, t) {
+        if (t < 0) t = 0;
+        if (t > 1) t = 1;
+        return n1 + (n2 - n1) * t;
+      }
+
+      function lerp3(r1, g1, b1, r2, g2, b2, t) {
+        return { r: lerp(r1, r2, t), g: lerp(g1, g2, t), b: lerp(b1, b2, t) };
+      }
+
+      function toRgbStr(o) {
+        return "rgb(" + Math.round(o.r) + "," + Math.round(o.g) + "," + Math.round(o.b) + ")";
+      }
+
+      function lerpColorHex2(h1, h2, t) {
+        var a = h1;
+        if (a[0] === "#") {
+          a = a.slice(1);
+        }
+        if (a.length === 3) {
+          a = a[0] + a[0] + a[1] + a[1] + a[2] + a[2];
+        }
+        var b = h2;
+        if (b[0] === "#") b = b.slice(1);
+        if (b.length === 3) b = b[0] + b[0] + b[1] + b[1] + b[2] + b[2];
+        return toRgbStr(
+          lerp3(
+            parseInt(a.slice(0, 2), 16), parseInt(a.slice(2, 4), 16), parseInt(a.slice(4, 6), 16),
+            parseInt(b.slice(0, 2), 16), parseInt(b.slice(2, 4), 16), parseInt(b.slice(4, 6), 16), t
+          )
+        );
+      }
+
+      function hslToRgb(h, s, l) {
+        s /= 100;
+        l /= 100;
+        var a = s * Math.min(l, 1 - l);
+        var f = function (n) {
+          var k = (n + h / 30) % 12;
+          return l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        };
+        return { r: f(0) * 255, g: f(8) * 255, b: f(4) * 255 };
+      }
+      function hslToStr(h, s, l) {
+        var c = hslToRgb(h, s, l);
+        return toRgbStr(c);
+      }
+
+      function getAvail() {
+        if (outParent && !outParent.hidden) {
+          var r = outParent.getBoundingClientRect();
+          if (r.width > 8 && r.height > 6) {
+            return { w: r.width, h: r.height };
+          }
+        }
+        var m = mainEl.getBoundingClientRect();
+        return { w: m.width, h: Math.max(20, m.height) };
+      }
+
+      function measureAt(fs) {
+        meas.textContent = "M";
+        meas.style.fontFamily = 'ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace';
+        meas.style.fontSize = String(fs) + "px";
+        meas.style.fontWeight = "400";
+        meas.style.lineHeight = "1";
+        return { w: Math.max(1, meas.offsetWidth), h: Math.max(1, meas.offsetHeight) };
+      }
+
+      function computeFit() {
+        var a = getAvail();
+        var aw = Math.max(6, a.w - 4);
+        var ah = Math.max(6, a.h - 4);
+        var targetCols = Math.max(4, Math.min(800, parseInt(col && col.value, 10) || 48));
+        var targetRows = Math.max(1, Math.min(800, parseInt(row && row.value, 10) || 32));
+        for (var fss = 22; fss >= 1.5; fss -= 0.2) {
+          var m = measureAt(Math.round(fss * 100) / 100);
+          if (targetCols * m.w <= aw + 0.3 && targetRows * m.h <= ah + 0.3) {
+            return {
+              cols: targetCols,
+              rows: targetRows,
+              fontSize: Math.min(20, Math.max(1.3, fss))
+            };
+          }
+        }
+        return { cols: targetCols, rows: targetRows, fontSize: 1.5 };
+      }
+
+      function cellColor(v, x, y, w, h, L, pxd, idx) {
+        var t = L;
+        var hdeg;
+        var c;
+        switch (v) {
+          case "photo": {
+            var r = pxd[idx];
+            var g = pxd[idx + 1];
+            var b2 = pxd[idx + 2];
+            c = toRgbStr({
+              r: Math.min(255, r * 1.14 + 8),
+              g: Math.min(255, g * 1.1 + 4),
+              b: Math.min(255, b2 * 1.1 + 6)
+            });
+            return c;
+          }
+          case "vapor": {
+            hdeg = (x * 1.1 + y * 1.3 + t * 220 + (x / w) * 80) % 360;
+            return hslToStr(hdeg, 80, 38 + 32 * t);
+          }
+          case "candy":
+            return lerpColorHex2("#ff0f8a", "#6af0ff", t);
+          case "matrix": {
+            c = lerp3(0, 20, 0, 0, 255, 100, t);
+            return toRgbStr(c);
+          }
+          case "sunset": {
+            if (t < 0.5) {
+              return lerpColorHex2("#2a0052", "#ff2d6a", t * 2);
+            }
+            return lerpColorHex2("#ff2d6a", "#ffee88", (t - 0.5) * 2);
+          }
+          default:
+            return hslToStr(280 + 80 * t, 75, 44 + 28 * t);
+        }
+      }
+
+      function getPool() {
+        var s = poolIn.value || "·";
+        return Array.from(s);
+      }
+
+      /** Deterministic 0..1 from grid cell + seed (change seed via “re-roll”). */
+      function u01Cell(ix, iy, salt, seed) {
+        var n = ((ix * 73856093) ^ (iy * 19349663) ^ (salt * 83492791) ^ seed) | 0;
+        n = (Math.imul(n ^ (n >>> 16), 2246822507) ^ Math.imul(n ^ (n >>> 13), 3266489909)) >>> 0;
+        return (n & 0xfffffff) / 0xfffffff;
+      }
+
+      function run() {
+        err.hidden = true;
+        if (!img.complete || !img.naturalWidth) return;
+        colOut.textContent = col.value;
+        if (rowOut && row) {
+          rowOut.textContent = row.value;
+        }
+        if (glowOut) {
+          glowOut.textContent = glowR.value;
+        }
+        var pool = getPool();
+        if (pool.length < 1) {
+          err.textContent = "Type at least one symbol in the bar.";
+          err.hidden = false;
+          return;
+        }
+        var w0;
+        var h0;
+        var useFs = 4.5;
+        if (fit.checked) {
+          var f2 = computeFit();
+          w0 = f2.cols;
+          h0 = f2.rows;
+          useFs = f2.fontSize;
+          if (colOut) {
+            colOut.textContent = String(w0);
+          }
+          if (rowOut) {
+            rowOut.textContent = String(h0);
+          }
+        } else {
+          w0 = Math.max(8, Math.min(800, parseInt(col.value, 10) || 48));
+          h0 = Math.max(1, Math.min(800, parseInt(row && row.value, 10) || 32));
+        }
+        w0 = Math.floor(w0);
+        h0 = Math.max(1, Math.floor(h0));
+        cvs.width = w0;
+        cvs.height = h0;
+        ctx.drawImage(img, 0, 0, w0, h0);
+        var data;
+        try {
+          data = ctx.getImageData(0, 0, w0, h0);
+        } catch (e) {
+          err.textContent = "can’t read this image. try a different file.";
+          err.hidden = false;
+          return;
+        }
+        var pxd = data.data;
+        var vi = vibe.value;
+        var glow = parseFloat(glowR.value) || 0;
+        var wLo = 200;
+        var wHi = 800;
+        var effect = charEffect && charEffect.value ? charEffect.value : "default";
+        var basePx = fit.checked ? useFs : 4.5;
+        ascii.textContent = "";
+        ascii.classList.add("genz-ascii");
+        if (effect === "rotation") {
+          ascii.classList.add("genz-ascii--jitter");
+        } else {
+          ascii.classList.remove("genz-ascii--jitter");
+        }
+        var frag = document.createDocumentFragment();
+        var y;
+        var x;
+        var row;
+        var idx0;
+        var t;
+        var ch;
+        var pl = pool.length;
+        var wgt;
+        for (y = 0; y < h0; y++) {
+          row = y * w0 * 4;
+          for (x = 0; x < w0; x++) {
+            idx0 = row + x * 4;
+            t = luma(pxd[idx0], pxd[idx0 + 1], pxd[idx0 + 2]) / 255;
+            wgt = Math.round(wLo + (wHi - wLo) * t);
+            ch = pool[Math.floor(Math.random() * pl)];
+            var sp = document.createElement("span");
+            sp.textContent = ch;
+            sp.style.color = cellColor(vi, x, y, w0, h0, t, pxd, idx0);
+            sp.style.fontWeight = String(wgt);
+            if (glow > 0) {
+              sp.style.textShadow = "0 0 " + glow + "px currentColor";
+            }
+            if (effect === "rotation") {
+              var nMag = u01Cell(x, y, 0, rngSeed) * 180;
+              var sign = u01Cell(x, y, 3, rngSeed) < 0.5 ? -1 : 1;
+              var deg = sign * nMag;
+              sp.style.transform = "rotate(" + deg + "deg)";
+              var dsz = (u01Cell(x, y, 7, rngSeed) * 4 - 2);
+              sp.style.fontSize = Math.max(0.5, basePx + dsz).toFixed(2) + "px";
+            }
+            frag.appendChild(sp);
+          }
+          if (y < h0 - 1) {
+            frag.appendChild(document.createTextNode("\n"));
+          }
+        }
+        ascii.appendChild(frag);
+        ascii.style.fontSize = basePx + "px";
+        ascii.style.color = "inherit";
+      }
+
+      function schedule() {
+        requestAnimationFrame(function () {
+          run();
+        });
+      }
+
+      function onResize() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          if (fit.checked) schedule();
+        }, 90);
+      }
+
+      function show() {
+        hero.style.display = "none";
+        outParent.hidden = false;
+        outParent.classList.toggle("fit", fit.checked);
+        outParent.classList.toggle("scroll", !fit.checked);
+        zone.classList.add("has");
+        if (!ro && window.ResizeObserver) {
+          ro = new ResizeObserver(function () {
+            if (fit.checked) schedule();
+          });
+          ro.observe(outParent);
+        }
+        schedule();
+      }
+
+      function fromBlob(blob) {
+        if (!blob || blob.type.indexOf("image/") !== 0) {
+          err.textContent = "that’s not an image.";
+          err.hidden = false;
+          return;
+        }
+        var url = URL.createObjectURL(blob);
+        var p = img.src;
+        img.onload = function () {
+          if (p && p.indexOf("blob:") === 0) {
+            URL.revokeObjectURL(p);
+          }
+          show();
+        };
+        img.onerror = function () {
+          URL.revokeObjectURL(url);
+          err.textContent = "couldn’t load that.";
+          err.hidden = false;
+        };
+        img.src = url;
+      }
+
+      pick.addEventListener("click", function () {
+        file.click();
+      });
+      openFile.addEventListener("click", function () {
+        file.click();
+      });
+      file.addEventListener("change", function () {
+        if (file.files[0]) fromBlob(file.files[0]);
+        file.value = "";
+      });
+      [col, row, glowR, poolIn, vibe, fit, charEffect].forEach(function (el) {
+        if (!el) return;
+        el.addEventListener("input", schedule);
+        el.addEventListener("change", schedule);
+      });
+      shuffle.addEventListener("click", function () {
+        rngSeed = (Date.now() ^ (Math.random() * 0x7fffffff)) | 0;
+        if (rngSeed < 0) {
+          rngSeed = -rngSeed;
+        }
+        schedule();
+      });
+      window.addEventListener("resize", onResize);
+      window.addEventListener("paste", function (e) {
+        if (!e.clipboardData) return;
+        var it = e.clipboardData.items;
+        for (var i = 0; i < it.length; i++) {
+          if (it[i].type.indexOf("image/") === 0) {
+            e.preventDefault();
+            var f = it[i].getAsFile();
+            if (f) fromBlob(f);
+            return;
+          }
+        }
+      });
+      ["dragover", "dragenter", "dragleave", "drop"].forEach(function (n) {
+        zone.addEventListener(n, function (e) {
+          e.preventDefault();
+        });
+      });
+      zone.addEventListener("drop", function (e) {
+        e.preventDefault();
+        var f = e.dataTransfer && e.dataTransfer.files[0];
+        if (f) fromBlob(f);
+      });
+
+    })();
+  </script>
+</body>
+</html>

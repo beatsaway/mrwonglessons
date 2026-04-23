@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>List of mediums</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: #0c0c0f;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .top-nav {
+      position: fixed;
+      z-index: 20;
+      left: 0;
+      right: 0;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 0.5rem 1rem;
+      padding-top: calc(0.5rem + env(safe-area-inset-top, 0));
+      background: rgba(12, 12, 15, 0.88);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .top-nav a,
+    .top-nav .arrow {
+      font-size: 1.6rem;
+      line-height: 1;
+      text-decoration: none;
+    }
+    .top-nav a {
+      color: inherit;
+    }
+    .top-nav .arrow {
+      cursor: pointer;
+      user-select: none;
+      color: #e8e6f0;
+    }
+    .top-nav .arrow[aria-disabled="true"] {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+    .top-nav .arrow:active:not([aria-disabled="true"]) {
+      opacity: 0.75;
+    }
+
+    .stack {
+      padding: calc(3.25rem + env(safe-area-inset-top, 0)) 0 calc(1rem + env(safe-area-inset-bottom, 0));
+    }
+    .page {
+      margin: 0 auto;
+      max-width: 56rem;
+      scroll-margin-top: calc(3.1rem + env(safe-area-inset-top, 0));
+    }
+    .page img {
+      display: block;
+      width: 100%;
+      height: auto;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav" aria-label="Navigation">
+    <a href="../index.html" aria-label="Home" title="Home"><span aria-hidden="true">🏠</span></a>
+    <span class="arrow" id="btn-prev" role="button" tabindex="0" title="Previous page" aria-label="Previous page">←</span>
+    <span class="arrow" id="btn-next" role="button" tabindex="0" title="Next page" aria-label="Next page">→</span>
+  </nav>
+
+  <main class="stack" id="stack">
+    <section class="page" id="p1" aria-label="Page 1"><img src="page1.webp" alt="Page 1" width="1200" height="1600" decoding="async" fetchpriority="high" /></section>
+    <section class="page" id="p2" aria-label="Page 2"><img src="page2.webp" alt="Page 2" width="1200" height="1600" decoding="async" loading="lazy" /></section>
+    <section class="page" id="p3" aria-label="Page 3"><img src="page3.webp" alt="Page 3" width="1200" height="1600" decoding="async" loading="lazy" /></section>
+    <section class="page" id="p4" aria-label="Page 4"><img src="page4.webp" alt="Page 4" width="1200" height="1600" decoding="async" loading="lazy" /></section>
+    <section class="page" id="p5" aria-label="Page 5"><img src="page5.webp" alt="Page 5" width="1200" height="1600" decoding="async" loading="lazy" /></section>
+    <section class="page" id="p6" aria-label="Page 6"><img src="page6.webp" alt="Page 6" width="1200" height="1600" decoding="async" loading="lazy" /></section>
+    <section class="page" id="p7" aria-label="Page 7"><img src="page7.webp" alt="Page 7" width="1200" height="1600" decoding="async" loading="lazy" /></section>
+    <section class="page" id="p8" aria-label="Page 8"><img src="page8.webp" alt="Page 8" width="1200" height="1600" decoding="async" loading="lazy" /></section>
+    <section class="page" id="p9" aria-label="Page 9"><img src="page9.webp" alt="Page 9" width="1200" height="1600" decoding="async" loading="lazy" /></section>
+    <section class="page" id="p10" aria-label="Page 10"><img src="page10.webp" alt="Page 10" width="1200" height="1600" decoding="async" loading="lazy" /></section>
+  </main>
+
+  <script>
+    (function () {
+      var PAGE = 10;
+      var i = 0;
+      var elPrev = document.getElementById("btn-prev");
+      var elNext = document.getElementById("btn-next");
+      var sections = [];
+      for (var k = 1; k <= PAGE; k++) {
+        sections.push(document.getElementById("p" + k));
+      }
+
+      function setArrows() {
+        elPrev.setAttribute("aria-disabled", i <= 0 ? "true" : "false");
+        elNext.setAttribute("aria-disabled", i >= PAGE - 1 ? "true" : "false");
+      }
+
+      function goTo(n) {
+        if (n < 0 || n >= PAGE) return;
+        i = n;
+        setArrows();
+        sections[i].scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function goPrev() {
+        if (i > 0) goTo(i - 1);
+      }
+      function goNext() {
+        if (i < PAGE - 1) goTo(i + 1);
+      }
+
+      function bind(el, fn) {
+        el.addEventListener("click", function (e) {
+          e.preventDefault();
+          fn();
+        });
+        el.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            fn();
+          }
+        });
+      }
+      bind(elPrev, goPrev);
+      bind(elNext, goNext);
+
+      var ticking = false;
+      function syncFromScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+          ticking = false;
+          var x = window.innerWidth / 2;
+          var y = window.innerHeight * 0.4;
+          var el = document.elementFromPoint(x, y);
+          if (!el) return;
+          var sec = el.closest && el.closest("section.page");
+          if (!sec) return;
+          var id = sec.id;
+          if (!id || id.charAt(0) !== "p") return;
+          var n = parseInt(id.slice(1), 10) - 1;
+          if (n >= 0 && n < PAGE) {
+            i = n;
+            setArrows();
+          }
+        });
+      }
+      window.addEventListener("scroll", syncFromScroll, { passive: true });
+      window.addEventListener("resize", syncFromScroll, { passive: true });
+      syncFromScroll();
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowUp" || e.key === "PageUp") {
+          e.preventDefault();
+          goPrev();
+        }
+        if (e.key === "ArrowDown" || e.key === "PageDown") {
+          e.preventDefault();
+          goNext();
+        }
+      });
+
+      setArrows();
+    })();
+  </script>
+</body>
+</html>
