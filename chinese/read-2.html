@@ -426,11 +426,22 @@
 
       var WORDS =
         "樂趣、數學、自然科學、卡內基梅隆、語言、記憶、理解、詞彙、考試、創造力、同理心、指示、家庭作業、朋友、書".split("、");
+
+      function shuffleInPlace(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = arr[i];
+          arr[i] = arr[j];
+          arr[j] = t;
+        }
+        return arr;
+      }
+
       var chipsEl = document.getElementById("kw-chips");
       var sheet = document.getElementById("word-sheet");
       var activeBlank = null;
 
-      WORDS.forEach(function (w) {
+      shuffleInPlace(WORDS).forEach(function (w) {
         var t = w.trim();
         if (!t) return;
         var b = document.createElement("button");
