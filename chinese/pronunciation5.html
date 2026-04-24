@@ -36,6 +36,14 @@
     .tabs button:hover { background: #f1f5f9; color: var(--ink); }
     .tabs button[aria-selected="true"] { background: var(--accent); color: #fff; }
     .tab-panel[hidden] { display: none !important; }
+    .mc-quiz { margin: 0.9rem 0 0; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+    .mc-quiz h3 { margin: 0 0 0.6rem; font-size: 0.95rem; color: #1e3a5f; }
+    .mc-quiz fieldset { margin: 0.65rem 0; padding: 0.6rem 0.75rem; border: 1px solid var(--border); border-radius: 10px; }
+    .mc-quiz legend { padding: 0 0.35rem; font-weight: 700; font-size: 0.9rem; color: var(--ink); }
+    .mc-quiz label { display: block; margin: 0.35rem 0; font-size: 0.92rem; color: var(--ink); cursor: pointer; }
+    .mc-quiz input { margin-right: 0.45rem; }
+    .mc-quiz fieldset.ok { border-color: var(--ok-border); background: var(--ok-bg); }
+    .mc-quiz fieldset.bad { border-color: var(--bad-border); background: var(--bad-bg); }
     .article { margin: 0 0 1rem; }
     h2.section { margin: 1.2rem 0 0.5rem; font-size: 1.02rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
     h3.ex-block-title { margin: 1rem 0 0.35rem; font-size: 0.98rem; font-weight: 600; color: #1e3a5f; }
@@ -97,10 +105,10 @@
     </div>
   </header>
   <main class="wrap">
-    <p class="subtitle">相鄰兩子音併讀時，有時聽成另一子音的感覺。用「課文／填空」切換。</p>
-    <div class="tabs" role="tablist" aria-label="課文或填空">
+    <p class="subtitle">相鄰兩子音併讀時，有時聽成另一子音的感覺。用「課文／練習」切換。</p>
+    <div class="tabs" role="tablist" aria-label="課文或練習">
       <button type="button" role="tab" id="tab-read" aria-controls="panel-read" aria-selected="true">課文</button>
-      <button type="button" role="tab" id="tab-fill" aria-controls="panel-fill" aria-selected="false">填空</button>
+      <button type="button" role="tab" id="tab-fill" aria-controls="panel-fill" aria-selected="false">練習</button>
     </div>
     <div class="tab-panel" id="panel-fill" role="tabpanel" aria-labelledby="tab-fill" hidden>
     <div class="fill-examples">
@@ -110,16 +118,25 @@
       <p class="blank-line">
         ⑤
         <span class="blank" tabindex="0" role="button" data-accept="同化" aria-label="空格1"></span>
-        ：
-        <span class="blank" tabindex="0" role="button" data-accept="鄰音" aria-label="空格2"></span>
-        會
-        <span class="blank" tabindex="0" role="button" data-accept="變讀" aria-label="空格3"></span>
-        。用耳跟
-        <span class="blank" tabindex="0" role="button" data-accept="聽" aria-label="空格4"></span>
-        、學
-        <span class="blank" tabindex="0" role="button" data-accept="節拍" aria-label="空格5"></span>
+        ：兩邊子音相鄰時，聽落可能會
+        <span class="blank" tabindex="0" role="button" data-accept="變讀" aria-label="空格2"></span>
+        。重點係用耳跟
+        <span class="blank" tabindex="0" role="button" data-accept="聽" aria-label="空格3"></span>
         。
       </p>
+      <form class="mc-quiz" id="mc-quiz">
+        <h3>小測（選擇題）</h3>
+        <fieldset data-answer="hint">
+          <legend>1) <span lang="en">hot meat</span> 有教材會用 <span lang="en">hop</span> 做咩用途？</legend>
+          <label><input type="radio" name="q1" value="spelling" /> 當成正式拼字</label>
+          <label><input type="radio" name="q1" value="hint" /> 當成聽覺提示（幫你跟節拍）</label>
+        </fieldset>
+        <fieldset data-answer="change">
+          <legend>2) <span lang="en">that kid</span> 連住讀時，較應該點理解？</legend>
+          <label><input type="radio" name="q2" value="nochange" /> 兩個字各自完全唔受影響</label>
+          <label><input type="radio" name="q2" value="change" /> 相鄰音會互相影響，聽落有「變讀」感覺</label>
+        </fieldset>
+      </form>
       <div class="actions">
         <button type="button" class="primary" id="btn-check">對答案</button>
         <button type="button" id="btn-clear">清除對錯</button>
@@ -171,7 +188,7 @@
   <script>
     (function () {
       var GOOGLE_DISCUSSION_FORM_URL = "";
-      var WORDS = "同化、鄰音、變讀、聽、節拍".split("、");
+      var WORDS = "同化、變讀、聽".split("、");
       function shuffleInPlace(arr) {
         for (var i = arr.length - 1; i > 0; i--) {
           var j = Math.floor(Math.random() * (i + 1));
@@ -261,15 +278,31 @@
           if (!v) { empty++; return; }
           if (matchesBlank(inp)) { inp.classList.add("ok"); ok++; } else { inp.classList.add("bad"); bad++; }
         });
-        if (bad === 0 && empty === 0 && ok === blanks.length) {
-          document.getElementById("result").textContent = "全數正確！";
+        var mcOk = 0, mcBad = 0, mcEmpty = 0;
+        var quiz = document.getElementById("mc-quiz");
+        if (quiz) {
+          Array.prototype.slice.call(quiz.querySelectorAll("fieldset[data-answer]")).forEach(function (fs) {
+            fs.classList.remove("ok", "bad");
+            var ans = (fs.getAttribute("data-answer") || "").trim();
+            var picked = fs.querySelector("input[type=radio]:checked");
+            if (!picked) { mcEmpty++; return; }
+            if ((picked.value || "") === ans) { mcOk++; fs.classList.add("ok"); } else { mcBad++; fs.classList.add("bad"); }
+          });
+        }
+        if (bad === 0 && empty === 0 && ok === blanks.length && mcBad === 0 && mcEmpty === 0) {
+          document.getElementById("result").textContent = "全數正確（練習＋小測）！";
           if (discussDlg && discussDlg.showModal) { try { if (discussDlg.open) discussDlg.close(); discussDlg.showModal(); } catch (x) {} }
         } else {
-          document.getElementById("result").textContent = "正確 " + ok + "、要改 " + bad + (empty ? "、空白" + empty : "");
+          var msg = "練習：正確 " + ok + "、要改 " + bad + (empty ? "、空白" + empty : "");
+          if (quiz) msg += "｜小測：正確 " + mcOk + "、要改 " + mcBad + (mcEmpty ? "、未選" + mcEmpty : "");
+          document.getElementById("result").textContent = msg;
         }
       });
       document.getElementById("btn-clear").addEventListener("click", function () {
         blanks.forEach(function (i) { i.classList.remove("ok", "bad"); });
+        var quiz = document.getElementById("mc-quiz");
+        if (quiz && quiz.reset) quiz.reset();
+        if (quiz) Array.prototype.slice.call(quiz.querySelectorAll("fieldset.ok, fieldset.bad")).forEach(function (fs) { fs.classList.remove("ok", "bad"); });
         document.getElementById("result").textContent = "";
         if (discussDlg && discussDlg.open) discussDlg.close();
       });

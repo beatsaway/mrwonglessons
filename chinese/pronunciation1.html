@@ -36,6 +36,14 @@
     .tabs button:hover { background: #f1f5f9; color: var(--ink); }
     .tabs button[aria-selected="true"] { background: var(--accent); color: #fff; }
     .tab-panel[hidden] { display: none !important; }
+    .mc-quiz { margin: 0.9rem 0 0; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+    .mc-quiz h3 { margin: 0 0 0.6rem; font-size: 0.95rem; color: #1e3a5f; }
+    .mc-quiz fieldset { margin: 0.65rem 0; padding: 0.6rem 0.75rem; border: 1px solid var(--border); border-radius: 10px; }
+    .mc-quiz legend { padding: 0 0.35rem; font-weight: 700; font-size: 0.9rem; color: var(--ink); }
+    .mc-quiz label { display: block; margin: 0.35rem 0; font-size: 0.92rem; color: var(--ink); cursor: pointer; }
+    .mc-quiz input { margin-right: 0.45rem; }
+    .mc-quiz fieldset.ok { border-color: var(--ok-border); background: var(--ok-bg); }
+    .mc-quiz fieldset.bad { border-color: var(--bad-border); background: var(--bad-bg); }
     .article { margin: 0 0 1rem; }
     h2.section { margin: 1.2rem 0 0.5rem; font-size: 1.02rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
     h3.ex-block-title { margin: 1rem 0 0.35rem; font-size: 0.98rem; font-weight: 600; color: #1e3a5f; }
@@ -98,10 +106,10 @@
     </div>
   </header>
   <main class="wrap">
-    <p class="subtitle">對照兩個詞分開讀與連讀。可參 <a href="read-4.html" style="color: inherit;">read-4</a>。用「課文／填空」切換。</p>
-    <div class="tabs" role="tablist" aria-label="課文或填空">
+    <p class="subtitle">對照兩個詞分開讀與連讀。可參 <a href="read-4.html" style="color: inherit;">read-4</a>。用「課文／練習」切換。</p>
+    <div class="tabs" role="tablist" aria-label="課文或練習">
       <button type="button" role="tab" id="tab-read" aria-controls="panel-read" aria-selected="true">課文</button>
-      <button type="button" role="tab" id="tab-fill" aria-controls="panel-fill" aria-selected="false">填空</button>
+      <button type="button" role="tab" id="tab-fill" aria-controls="panel-fill" aria-selected="false">練習</button>
     </div>
     <div class="tab-panel" id="panel-fill" role="tabpanel" aria-labelledby="tab-fill" hidden>
     <div class="fill-examples">
@@ -109,20 +117,27 @@
       <p><span lang="en">not at all</span> 一類句子內亦常出現多處子音接母音。照連讀小表第 1 點的關鍵字，把下面填好。</p>
     </div>
       <p class="blank-line">
-        連讀小表第 <strong>1</strong> 點：前字以
+        連讀小表第 <strong>1</strong> 點：前字尾係
         <span class="blank" tabindex="0" role="button" data-accept="輔音" aria-label="空格1"></span>
-        讀到尾、後面隻字用
+        ，後字以
         <span class="blank" tabindex="0" role="button" data-accept="元音" aria-label="空格2"></span>
-        開頭，就要一齊
-        <span class="blank" tabindex="0" role="button" data-accept="拼讀" aria-label="空格3"></span>
-        。重點係聽
-        <span class="blank" tabindex="0" role="button" data-accept="讀音" aria-label="空格4"></span>
-        ，兩邊
-        <span class="blank" tabindex="0" role="button" data-accept="連讀" aria-label="空格5"></span>
-        。在
-        <span class="blank" tabindex="0" role="button" data-accept="口語" aria-label="空格6"></span>
-        中更常出現，宜跟有聲示範。
+        開頭，就要
+        <span class="blank" tabindex="0" role="button" data-accept="連讀" aria-label="空格3"></span>
+        。
       </p>
+      <form class="mc-quiz" id="mc-quiz">
+        <h3>小測（選擇題）</h3>
+        <fieldset data-answer="link">
+          <legend>1) <span lang="en">get on</span> 連讀時，較像以下邊個？</legend>
+          <label><input type="radio" name="q1" value="separate" /> <span lang="en">get · on</span>（分兩段）</label>
+          <label><input type="radio" name="q1" value="link" /> <span lang="en">ge · ton</span>（尾音接過去）</label>
+        </fieldset>
+        <fieldset data-answer="link">
+          <legend>2) <span lang="en">an apple</span> 聽落好多時較似？</legend>
+          <label><input type="radio" name="q2" value="separate" /> <span lang="en">an · apple</span></label>
+          <label><input type="radio" name="q2" value="link" /> <span lang="en">a · napple</span>（聽覺示意）</label>
+        </fieldset>
+      </form>
       <div class="actions">
         <button type="button" class="primary" id="btn-check">對答案</button>
         <button type="button" id="btn-clear">清除對錯</button>
@@ -191,7 +206,7 @@
   <script>
     (function () {
       var GOOGLE_DISCUSSION_FORM_URL = "";
-      var WORDS = "輔音、元音、拼讀、讀音、連讀、口語".split("、");
+      var WORDS = "輔音、元音、連讀".split("、");
       function shuffleInPlace(arr) {
         for (var i = arr.length - 1; i > 0; i--) {
           var j = Math.floor(Math.random() * (i + 1));
@@ -281,15 +296,31 @@
           if (!v) { empty++; return; }
           if (matchesBlank(inp)) { inp.classList.add("ok"); ok++; } else { inp.classList.add("bad"); bad++; }
         });
-        if (bad === 0 && empty === 0 && ok === blanks.length) {
-          document.getElementById("result").textContent = "全數正確！";
+        var mcOk = 0, mcBad = 0, mcEmpty = 0;
+        var quiz = document.getElementById("mc-quiz");
+        if (quiz) {
+          Array.prototype.slice.call(quiz.querySelectorAll("fieldset[data-answer]")).forEach(function (fs) {
+            fs.classList.remove("ok", "bad");
+            var ans = (fs.getAttribute("data-answer") || "").trim();
+            var picked = fs.querySelector("input[type=radio]:checked");
+            if (!picked) { mcEmpty++; return; }
+            if ((picked.value || "") === ans) { mcOk++; fs.classList.add("ok"); } else { mcBad++; fs.classList.add("bad"); }
+          });
+        }
+        if (bad === 0 && empty === 0 && ok === blanks.length && mcBad === 0 && mcEmpty === 0) {
+          document.getElementById("result").textContent = "全數正確（練習＋小測）！";
           if (discussDlg && discussDlg.showModal) { try { if (discussDlg.open) discussDlg.close(); discussDlg.showModal(); } catch (x) {} }
         } else {
-          document.getElementById("result").textContent = "正確 " + ok + "、要改 " + bad + (empty ? "、空白" + empty : "");
+          var msg = "練習：正確 " + ok + "、要改 " + bad + (empty ? "、空白" + empty : "");
+          if (quiz) msg += "｜小測：正確 " + mcOk + "、要改 " + mcBad + (mcEmpty ? "、未選" + mcEmpty : "");
+          document.getElementById("result").textContent = msg;
         }
       });
       document.getElementById("btn-clear").addEventListener("click", function () {
         blanks.forEach(function (i) { i.classList.remove("ok", "bad"); });
+        var quiz = document.getElementById("mc-quiz");
+        if (quiz && quiz.reset) quiz.reset();
+        if (quiz) Array.prototype.slice.call(quiz.querySelectorAll("fieldset.ok, fieldset.bad")).forEach(function (fs) { fs.classList.remove("ok", "bad"); });
         document.getElementById("result").textContent = "";
         if (discussDlg && discussDlg.open) discussDlg.close();
       });
