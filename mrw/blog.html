@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mr Wong Daily Blog</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background: #f7f7f7;
+      color: #222;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.6rem;
+    }
+    article {
+      border-top: 1px solid #e5e5e5;
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+    .date {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .gallery a {
+      display: block;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fafafa;
+      cursor: zoom-in;
+    }
+    .gallery img {
+      display: block;
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+    }
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.82);
+      z-index: 999;
+    }
+    .lightbox.open {
+      display: flex;
+    }
+    .lightbox img {
+      max-width: min(100%, 1100px);
+      max-height: 88vh;
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      background: #111;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Mr Wong - Daily Work Blog</h1>
+    
+
+    <article>
+      <p class="date">24 April 2026</p>
+      <p>
+        Practical exploration of a dip-paint process using acrylic in a sink setup,
+        transferring fluid colour effects onto canvas surfaces.
+      </p>
+      <div class="gallery">
+        <a href="260424/260424a.webp"><img src="260424/260424a.webp" alt="260424 artwork a" loading="lazy" /></a>
+        <a href="260424/260424b.webp"><img src="260424/260424b.webp" alt="260424 artwork b" loading="lazy" /></a>
+        <a href="260424/260424c.webp"><img src="260424/260424c.webp" alt="260424 artwork c" loading="lazy" /></a>
+        <a href="260424/260424d.webp"><img src="260424/260424d.webp" alt="260424 artwork d" loading="lazy" /></a>
+        <a href="260424/260424e.webp"><img src="260424/260424e.webp" alt="260424 artwork e" loading="lazy" /></a>
+        <a href="260424/260424f.webp"><img src="260424/260424f.webp" alt="260424 artwork f" loading="lazy" /></a>
+        <a href="260424/260424g.webp"><img src="260424/260424g.webp" alt="260424 artwork g" loading="lazy" /></a>
+        <a href="260424/260424h.webp"><img src="260424/260424h.webp" alt="260424 artwork h" loading="lazy" /></a>
+        <a href="260424/260424i.webp"><img src="260424/260424i.webp" alt="260424 artwork i" loading="lazy" /></a>
+        <a href="260424/260424j.webp"><img src="260424/260424j.webp" alt="260424 artwork j" loading="lazy" /></a>
+      </div>
+    </article>
+  </main>
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <img id="lightbox-image" src="" alt="" />
+  </div>
+  <script>
+    (function () {
+      var lightbox = document.getElementById("lightbox");
+      var lightboxImage = document.getElementById("lightbox-image");
+      var links = Array.prototype.slice.call(document.querySelectorAll(".gallery a"));
+
+      function closeLightbox() {
+        lightbox.classList.remove("open");
+        lightbox.setAttribute("aria-hidden", "true");
+        lightboxImage.setAttribute("src", "");
+        lightboxImage.setAttribute("alt", "");
+      }
+
+      links.forEach(function (link) {
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          var img = link.querySelector("img");
+          var full = link.getAttribute("href");
+          lightboxImage.setAttribute("src", full);
+          lightboxImage.setAttribute("alt", img ? img.alt : "Artwork");
+          lightbox.classList.add("open");
+          lightbox.setAttribute("aria-hidden", "false");
+        });
+      });
+
+      lightbox.addEventListener("click", function (event) {
+        if (event.target === lightbox) closeLightbox();
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") closeLightbox();
+      });
+    })();
+  </script>
+</body>
+</html>
