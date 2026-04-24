@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>pronunciation1 — ① 輔音接母音</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --border: #e2e8f0;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --ok-bg: #dcfce7;
+      --ok-border: #22c55e;
+      --bad-bg: #fce7f3;
+      --bad-border: #ec4899;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: system-ui, "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    .wrap { max-width: 52rem; margin: 0 auto; padding: 1rem 1.1rem 6rem; }
+    .subtitle { margin: 0 0 0.65rem; font-size: 0.92rem; color: var(--muted); font-weight: 600; line-height: 1.45; }
+    .fill-examples { margin: 0 0 1rem; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; font-size: 0.95rem; line-height: 1.55; color: var(--ink); }
+    .fill-examples p { margin: 0.45rem 0; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 0; margin: 0.65rem 0 1rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; width: fit-content; max-width: 100%; }
+    .tabs button { font: inherit; font-weight: 600; font-size: 0.9rem; padding: 0.45rem 1.1rem; border: none; border-right: 1px solid var(--border); background: #fff; color: var(--muted); cursor: pointer; }
+    .tabs button:last-child { border-right: none; }
+    .tabs button:hover { background: #f1f5f9; color: var(--ink); }
+    .tabs button[aria-selected="true"] { background: var(--accent); color: #fff; }
+    .tab-panel[hidden] { display: none !important; }
+    .article { margin: 0 0 1rem; }
+    h2.section { margin: 1.2rem 0 0.5rem; font-size: 1.02rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
+    h3.ex-block-title { margin: 1rem 0 0.35rem; font-size: 0.98rem; font-weight: 600; color: #1e3a5f; }
+    .fmt-ex { margin: 0.45rem 0 0.75rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: #fff; font-size: 0.92rem; }
+    .fmt-ex .ex-line { margin: 0.2rem 0; line-height: 1.55; }
+    .ex-label { font-weight: 600; color: #1e3a5f; margin-right: 0.25rem; }
+    .blank-line { margin: 0.65rem 0; line-height: 1.75; }
+    span.blank {
+      display: inline-block; vertical-align: baseline; min-width: 3.2em; padding: 0.1rem 0.35rem; margin: 0 0.08rem; font-size: 0.95em;
+      border: 2px dashed #94a3b8; border-radius: 4px; cursor: pointer; text-align: center; line-height: 1.45; background: #fff; user-select: none;
+    }
+    span.blank:empty::before { content: "⋯"; color: #94a3b8; pointer-events: none; }
+    span.blank.is-active { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+    span.blank.ok { border-style: solid; border-color: var(--ok-border); background: var(--ok-bg); }
+    span.blank.bad { border-style: solid; border-color: var(--bad-border); background: var(--bad-bg); }
+    .actions { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .actions button { font: inherit; font-weight: 600; padding: 0.45rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: #fff; cursor: pointer; }
+    .actions button.primary { background: var(--accent); color: #fff; border-color: #1d4ed8; }
+    #result { font-size: 0.9rem; color: var(--muted); }
+    .discuss { margin-top: 2rem; padding: 1rem 1.1rem; border-radius: 10px; border: 1px solid var(--border); background: #fff; }
+    .discuss h2.section { margin-top: 0; font-size: 1rem; }
+    .discuss ol { margin: 0.35rem 0 0; padding-left: 1.35rem; }
+    .discuss .form-p { margin: 1rem 0 0; font-size: 0.92rem; }
+    .discuss .form-p a { font-weight: 600; color: var(--accent); text-decoration: none; }
+    .form-pending { display: block; margin-top: 0.4rem; font-size: 0.88rem; color: var(--muted); }
+    .discuss-dialog { max-width: min(38rem, 94vw); width: 100%; margin: auto; padding: 0; border: none; border-radius: 12px; background: #fff; box-shadow: 0 24px 64px rgba(0,0,0,0.28); }
+    .discuss-dialog::backdrop { background: rgba(15, 23, 42, 0.52); }
+    .discuss-dialog .dlg-banner { margin: 0; padding: 0.75rem 1.1rem; font-size: 0.95rem; font-weight: 600; color: #14532d; background: #dcfce7; border-radius: 12px 12px 0 0; border-bottom: 1px solid #bbf7d0; }
+    .discuss-dialog .discuss { margin: 0; border: none; }
+    .discuss-dialog .dlg-footer { padding: 0.65rem 1rem; border-top: 1px solid var(--border); text-align: right; background: #f8fafc; border-radius: 0 0 12px 12px; }
+    .word-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 100; max-height: min(48vh, 22rem); overflow-y: auto; background: #fff; border-radius: 14px 14px 0 0; border: 1px solid var(--border); box-shadow: 0 -10px 40px rgba(0,0,0,0.14); padding: 0.35rem 1rem calc(0.85rem + env(safe-area-inset-bottom,0)); transform: translateY(105%); transition: transform 0.24s ease; }
+    .word-sheet.is-open { transform: translateY(0); }
+    .word-sheet .sheet-bar { width: 2.5rem; height: 4px; margin: 0.2rem auto 0.5rem; border-radius: 99px; background: #cbd5e1; }
+    .word-sheet h2 { margin: 0 0 0.5rem; font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .chip { font: inherit; font-size: 0.82rem; padding: 0.3rem 0.55rem; border-radius: 6px; border: 1px solid var(--border); background: #f1f5f9; cursor: pointer; }
+    .chip:hover { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
+    .lesson-top { border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.94); }
+    .lesson-top-inner { max-width: 52rem; margin: 0 auto; padding: 0.35rem 1.1rem; min-height: 1.65rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .lesson-top-title { margin: 0; font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 600; color: var(--ink); flex: 1 1 8rem; min-width: 0; }
+    .lesson-home { text-decoration: none; color: var(--ink); border-radius: 6px; padding: 0.12rem 0.4rem; line-height: 1; }
+    .lesson-home:hover { background: #e2e8f0; }
+    .lesson-home-emoji { font-size: 1.12rem; }
+    .syll-demo { margin: 0.65rem 0 1rem; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+    .syll-demo p { margin: 0 0 0.45rem; font-size: 0.9rem; color: var(--muted); }
+    .syll-row, .link-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.35rem 0.4rem; font-family: system-ui, "Segoe UI", "Lucida Sans Unicode", sans-serif; }
+    .syll-bub { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; border: 2px solid #cbd5e1; background: #f8fafc; line-height: 1.2; }
+    /* 對照用方塊，大小一致；重點在比較兩種寫法／讀法，非框線粗幼 */
+    .syll-bub--stress,
+    .syll-bub--weak { min-height: 2.1rem; min-width: 2.1rem; padding: 0.28rem 0.6rem; font-size: 0.95em; font-weight: 600; color: #1e3a5f; border: 2px solid #94a3b8; background: #fff; }
+    .link-join { font-size: 1.15rem; font-weight: 800; color: var(--accent); padding: 0 0.1rem; align-self: center; }
+    .link-note { margin: 0.45rem 0 0; font-size: 0.82rem; color: var(--muted); line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <header class="lesson-top">
+    <div class="lesson-top-inner">
+      <a class="lesson-home" href="read.html" aria-label="回到中文閱讀理解索引"><span class="lesson-home-emoji" aria-hidden="true">🏠</span></a>
+      <h1 class="lesson-top-title">① 輔音接母音（輔＋元）</h1>
+    </div>
+  </header>
+  <main class="wrap">
+    <p class="subtitle">對照兩個詞分開讀與連讀。可參 <a href="read-4.html" style="color: inherit;">read-4</a>。用「課文／填空」切換。</p>
+    <div class="tabs" role="tablist" aria-label="課文或填空">
+      <button type="button" role="tab" id="tab-read" aria-controls="panel-read" aria-selected="true">課文</button>
+      <button type="button" role="tab" id="tab-fill" aria-controls="panel-fill" aria-selected="false">填空</button>
+    </div>
+    <div class="tab-panel" id="panel-fill" role="tabpanel" aria-labelledby="tab-fill" hidden>
+    <div class="fill-examples">
+      <p><strong>示範（不用填）：</strong><span lang="en">turn it on</span>：前詞尾子音接到下一詞的母音；<span lang="en">come in</span>：<span lang="en">m</span> 接到 <span lang="en">in</span> 的開頭母音。</p>
+      <p><span lang="en">not at all</span> 一類句子內亦常出現多處子音接母音。照連讀小表第 1 點的關鍵字，把下面填好。</p>
+    </div>
+      <p class="blank-line">
+        連讀小表第 <strong>1</strong> 點：前字以
+        <span class="blank" tabindex="0" role="button" data-accept="輔音" aria-label="空格1"></span>
+        讀到尾、後面隻字用
+        <span class="blank" tabindex="0" role="button" data-accept="元音" aria-label="空格2"></span>
+        開頭，就要一齊
+        <span class="blank" tabindex="0" role="button" data-accept="拼讀" aria-label="空格3"></span>
+        。重點係聽
+        <span class="blank" tabindex="0" role="button" data-accept="讀音" aria-label="空格4"></span>
+        ，兩邊
+        <span class="blank" tabindex="0" role="button" data-accept="連讀" aria-label="空格5"></span>
+        。在
+        <span class="blank" tabindex="0" role="button" data-accept="口語" aria-label="空格6"></span>
+        中更常出現，宜跟有聲示範。
+      </p>
+      <div class="actions">
+        <button type="button" class="primary" id="btn-check">對答案</button>
+        <button type="button" id="btn-clear">清除對錯</button>
+        <span id="result" aria-live="polite"></span>
+      </div>
+      <div class="fill-bottom-spacer" aria-hidden="true">
+        <br /><br /><br /><br /><br />
+      </div>
+    </div>
+    <div class="tab-panel" id="panel-read" role="tabpanel" aria-labelledby="tab-read">
+      <p class="article">前詞<strong>結尾為子音</strong>、後詞<strong>以母音開頭</strong>時，前詞末子音常接到後詞，<strong>兩詞聽成一段</strong>。實際讀法以有聲教材及教師示範為準。</p>
+      <h3 class="ex-block-title">對照一：<span lang="en">get on</span>（分開讀 vs 連讀寫成 <span lang="en">ge·ton</span>）</h3>
+      <div class="syll-demo">
+        <p>先慢讀、分兩個詞聽</p>
+        <div class="syll-row" aria-label="get on 分開">
+          <span class="syll-bub syll-bub--weak" lang="en">get</span>
+          <span class="syll-bub syll-bub--weak" lang="en">on</span>
+        </div>
+        <p class="link-note">上行對照：兩個詞分開讀，方便對音。</p>
+      </div>
+      <div class="syll-demo">
+        <p>口語常把末字 <span lang="en">t</span> 接到 <span lang="en">on</span>，聽成一段；用字母可寫成 <strong><span lang="en">ge · ton</span></strong></p>
+        <div class="link-row" aria-label="get on 連讀">
+          <span class="syll-bub syll-bub--weak" lang="en">ge</span>
+          <span class="syll-bub syll-bub--stress" title="t 接 on 的開首母音，併成一段" lang="en">ton</span>
+        </div>
+        <p class="link-note">下行對照：連讀時可寫成 <span lang="en">ge · ton</span>，看末子音怎樣接到下一個詞的母音。重音位置仍依 read-4 所學。</p>
+      </div>
+      <h2 class="section">對照二：<span lang="en">an apple</span> vs 聽成 <span lang="en">a · napple</span></h2>
+      <div class="syll-demo">
+        <p>先對照兩個詞的寫法</p>
+        <div class="syll-row" aria-label="an apple 分開">
+          <span class="syll-bub syll-bub--weak" lang="en">an</span>
+          <span class="syll-bub syll-bub--weak" lang="en">apple</span>
+        </div>
+      </div>
+      <div class="syll-demo">
+        <p>再對照一氣讀的聽感，用字母可寫 <strong><span lang="en">a · napple</span></strong>（非唯一寫法）</p>
+        <div class="link-row" aria-label="an apple 連讀">
+          <span class="syll-bub syll-bub--weak" lang="en">a</span>
+          <span class="link-join" aria-hidden="true">+</span>
+          <span class="syll-bub syll-bub--weak" lang="en">napple</span>
+        </div>
+        <p class="link-note">重點在比較「<span lang="en">an / apple</span>」與「<span lang="en">a / napple</span>」兩種分段。實際口音以教師及教材為準。</p>
+      </div>
+    </div>
+  </main>
+  <dialog class="discuss-dialog" id="discuss-success-dialog" aria-labelledby="discuss-dlg-banner">
+    <p class="dlg-banner" id="discuss-dlg-banner">本頁 6 格全數正確。歡迎完成討論一題。</p>
+    <section class="discuss" aria-labelledby="discuss-title">
+      <h2 class="section" id="discuss-title">討論（一題就夠）</h2>
+      <p>用兩三句說明：對照「分開讀」與「連讀」如何幫你理解「末子音接到下一詞的母音」。Google 表單連結由教師公布。</p>
+      <p class="form-p" id="discussion-form-line">
+        <a id="discussion-google-form" href="#" target="_blank" rel="noopener noreferrer">開啟 Google 表單</a>
+      </p>
+    </section>
+    <div class="dlg-footer">
+      <button type="button" id="discuss-dialog-close">關閉</button>
+    </div>
+  </dialog>
+  <div class="word-sheet" id="word-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true">
+    <div class="sheet-bar" aria-hidden="true"></div>
+    <h2 id="sheet-title">關鍵字</h2>
+    <div class="chips" id="kw-chips" role="group" aria-label="可選詞"></div>
+  </div>
+  <script>
+    (function () {
+      var GOOGLE_DISCUSSION_FORM_URL = "";
+      var WORDS = "輔音、元音、拼讀、讀音、連讀、口語".split("、");
+      function shuffleInPlace(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = arr[i];
+          arr[i] = arr[j];
+          arr[j] = t;
+        }
+        return arr;
+      }
+      var chipsEl = document.getElementById("kw-chips");
+      var sheet = document.getElementById("word-sheet");
+      var activeBlank = null;
+      shuffleInPlace(WORDS).forEach(function (w) {
+        if (!w.trim()) return;
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip";
+        b.setAttribute("data-word", w.trim());
+        b.textContent = w.trim();
+        chipsEl.appendChild(b);
+      });
+      function openSheet() { sheet.classList.add("is-open"); sheet.setAttribute("aria-hidden", "false"); }
+      function closeSheet() {
+        sheet.classList.remove("is-open");
+        sheet.setAttribute("aria-hidden", "true");
+        document.querySelectorAll("span.blank.is-active").forEach(function (s) { s.classList.remove("is-active"); });
+        activeBlank = null;
+      }
+      function setActiveBlank(el) {
+        document.querySelectorAll("span.blank.is-active").forEach(function (s) { s.classList.remove("is-active"); });
+        activeBlank = el;
+        if (!el) { closeSheet(); return; }
+        el.classList.add("is-active");
+        openSheet();
+      }
+      function norm(s) { return (s || "").trim().replace(/\s+/g, ""); }
+      function blankValue(el) { return norm(el.textContent); }
+      function matchesBlank(el) {
+        var v = blankValue(el);
+        if (!v) return false;
+        var opts = (el.getAttribute("data-accept") || "").split("|").map(norm).filter(Boolean);
+        return opts.indexOf(v) !== -1;
+      }
+      var blanks = Array.prototype.slice.call(document.querySelectorAll("span.blank"));
+      blanks.forEach(function (el) {
+        el.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); setActiveBlank(el); });
+        el.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); setActiveBlank(el); } });
+      });
+      chipsEl.addEventListener("click", function (e) {
+        var btn = e.target.closest(".chip");
+        if (!btn || !activeBlank) return;
+        activeBlank.textContent = btn.getAttribute("data-word") || btn.textContent;
+        activeBlank.classList.remove("ok", "bad");
+      });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && sheet.classList.contains("is-open")) closeSheet(); });
+      var discussDlg = document.getElementById("discuss-success-dialog");
+      function revealAll() {
+        var pf = document.getElementById("panel-fill");
+        if (!pf || pf.hidden) return;
+        closeSheet();
+        blanks.forEach(function (b) {
+          var d = (b.getAttribute("data-accept") || "").split("|")[0].trim();
+          if (d) b.textContent = d;
+          b.classList.remove("bad");
+          b.classList.add("ok");
+        });
+        var res = document.getElementById("result");
+        if (res) res.textContent = "參考答案已顯示。";
+      }
+      document.addEventListener("keydown", function (e) {
+        if (e.code !== "Space" && e.key !== " ") return;
+        var p = document.getElementById("panel-fill");
+        if (!p || p.hidden) return;
+        if (discussDlg && discussDlg.open) return;
+        var t = e.target;
+        if (t && t.closest && (t.closest("#discuss-success-dialog") || t.closest(".chips") || t.closest("button#btn-check") || t.closest("button#btn-clear"))) return;
+        if (t && t.closest && t.closest(".tabs") && t.tagName === "BUTTON") return;
+        e.preventDefault();
+        revealAll();
+      }, true);
+      document.getElementById("btn-check").addEventListener("click", function () {
+        closeSheet();
+        var ok = 0, bad = 0, empty = 0;
+        blanks.forEach(function (inp) {
+          inp.classList.remove("ok", "bad");
+          var v = blankValue(inp);
+          if (!v) { empty++; return; }
+          if (matchesBlank(inp)) { inp.classList.add("ok"); ok++; } else { inp.classList.add("bad"); bad++; }
+        });
+        if (bad === 0 && empty === 0 && ok === blanks.length) {
+          document.getElementById("result").textContent = "全數正確！";
+          if (discussDlg && discussDlg.showModal) { try { if (discussDlg.open) discussDlg.close(); discussDlg.showModal(); } catch (x) {} }
+        } else {
+          document.getElementById("result").textContent = "正確 " + ok + "、要改 " + bad + (empty ? "、空白" + empty : "");
+        }
+      });
+      document.getElementById("btn-clear").addEventListener("click", function () {
+        blanks.forEach(function (i) { i.classList.remove("ok", "bad"); });
+        document.getElementById("result").textContent = "";
+        if (discussDlg && discussDlg.open) discussDlg.close();
+      });
+      document.getElementById("discuss-dialog-close").addEventListener("click", function () { discussDlg.close(); });
+      var tabRead = document.getElementById("tab-read");
+      var tabFill = document.getElementById("tab-fill");
+      var panelRead = document.getElementById("panel-read");
+      var panelFill = document.getElementById("panel-fill");
+      function setTab(w) {
+        var isRead = w === "read";
+        tabRead.setAttribute("aria-selected", isRead ? "true" : "false");
+        tabFill.setAttribute("aria-selected", isRead ? "false" : "true");
+        panelRead.hidden = !isRead;
+        panelFill.hidden = isRead;
+        if (isRead) closeSheet();
+      }
+      tabRead.addEventListener("click", function () { setTab("read"); });
+      tabFill.addEventListener("click", function () { setTab("fill"); });
+      (function () {
+        var a = document.getElementById("discussion-google-form");
+        var u = (GOOGLE_DISCUSSION_FORM_URL || "").trim();
+        if (a && u && /^https?:\/\//i.test(u)) a.href = u;
+        if (a && !/^https?:\/\//i.test(u)) {
+          a.removeAttribute("href");
+          a.style.pointerEvents = "none";
+          a.style.opacity = "0.6";
+          a.textContent = "Google 表單（聽老師公佈連結）";
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>

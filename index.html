@@ -166,6 +166,41 @@
     .main a:hover {
       text-decoration: underline;
     }
+    .main a.link-with-new {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .main .badge-new {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.22em 0.5em;
+      border-radius: 4px;
+      background: #dc2626;
+      color: #fff;
+      line-height: 1;
+      text-decoration: none;
+      animation: new-badge-blink 1.1s ease-in-out infinite;
+    }
+    @keyframes new-badge-blink {
+      0%,
+      100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.2;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .main .badge-new {
+        animation: none;
+        opacity: 1;
+      }
+    }
     .main nav[hidden] {
       display: none;
     }
@@ -351,7 +386,28 @@
           <li class="sep group">Resources</li>
           <li><a href="va/scamper/scamper-for-art.html">💡 SCAMPER techniques</a></li>
           <li><a href="scamper/image-ascii.html">🖼️ Image → ASCII (glow)</a></li>
-          <li><a href="va/medium/listofmediums.html">📚 List of mediums (scroll)</a></li>
+          <li>
+            <a
+              class="link-with-new"
+              href="va/medium/listofmediums.html"
+              title="List of art mediums (scroll)"
+              aria-label="List of mediums, scroll. New."
+            >
+              <span aria-hidden="true">📚 List of mediums (scroll)</span>
+              <span class="badge-new" aria-hidden="true">New</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="link-with-new"
+              href="va/medium/listofartists/artists-abstract-intro.html"
+              title="Abstract artists — intros and video picks"
+              aria-label="List of artists — intros and videos. New."
+            >
+              <span aria-hidden="true">🎨 List of artists</span>
+              <span class="badge-new" aria-hidden="true">New</span>
+            </a>
+          </li>
 
           <li class="sep group">SBA</li>
           <li><a href="sba/letter-trilingual.html">❓ Why workbook?</a></li>

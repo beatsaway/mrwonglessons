@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abstract Artists — Short intros &amp; video picks</title>
+  <style>
+    :root {
+      --bg: #f6f2ec;
+      --ink: #1a1614;
+      --muted: #5c534c;
+      --card: #fff;
+      --accent: #8b4512;
+      --border: #e0d6cc;
+      --bar-h: 3.4rem;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Noto Serif", serif;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    .app {
+      min-height: 100dvh;
+    }
+    /* —— Top bar: search artists —— */
+    .app-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      position: fixed;
+      z-index: 210;
+      top: 0;
+      left: 0;
+      right: 0;
+      min-height: var(--bar-h);
+      padding: 0.3rem 0.65rem;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      font-family: system-ui, "Segoe UI", sans-serif;
+    }
+    .search-wrap {
+      flex: 1;
+      min-width: 0;
+      max-width: 40rem;
+      margin: 0 auto;
+      position: relative;
+    }
+    .artist-search-input {
+      display: block;
+      width: 100%;
+      height: 2.5rem;
+      padding: 0 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #fff;
+      color: var(--ink);
+    }
+    .artist-search-input::placeholder { color: #8a8078; }
+    .artist-search-input:hover { border-color: #ccc4ba; }
+    .artist-search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(139, 69, 18, 0.2);
+    }
+    .artist-listbox {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 4px);
+      margin: 0;
+      padding: 0.3rem 0;
+      list-style: none;
+      max-height: min(58dvh, 22rem);
+      overflow-y: auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+      z-index: 300;
+      -webkit-overflow-scrolling: touch;
+    }
+    .artist-listbox[hidden] { display: none !important; }
+    .artist-listbox li[role="option"] {
+      margin: 0;
+      padding: 0.5rem 0.8rem;
+      font-size: 0.95rem;
+      line-height: 1.3;
+      cursor: pointer;
+    }
+    .artist-listbox li[role="option"]:hover,
+    .artist-listbox li[role="option"].is-active {
+      background: #f0ebe5;
+    }
+    .artist-listbox li.is-no-match,
+    .artist-listbox li.is-hint {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-style: italic;
+      cursor: default;
+      padding: 0.45rem 0.8rem;
+    }
+    .artist-listbox li.is-hint { font-style: normal; }
+    .artist-listbox li.is-no-match:hover,
+    .artist-listbox li.is-hint:hover { background: transparent; }
+    .artist-listbox li[hidden] { display: none !important; }
+    .search-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      top: 0;
+      z-index: 200;
+      background: transparent;
+    }
+    .search-backdrop.is-on { display: block; }
+    .main-wrap { padding-top: var(--bar-h); }
+    .layout { display: block; width: 100%; }
+    main {
+      flex: 1;
+      min-width: 0;
+      margin: 0;
+      padding: 0.35rem 0.85rem 2.5rem;
+    }
+    @media (min-width: 960px) {
+      main { padding: 0.5rem 1.25rem 2.5rem 0.85rem; }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      scroll-margin-top: calc(var(--bar-h) + 0.35rem);
+    }
+    .card-inner { padding: 1rem 1.15rem 1.1rem; }
+    .name { font-size: 1.15rem; font-weight: 600; margin: 0 0 0.35rem; }
+    .meta { font-size: 0.88rem; color: var(--muted); margin: 0 0 0.6rem; }
+    .blurb { margin: 0; font-size: 0.98rem; }
+    .thumb-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: #111;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .thumb {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+    }
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      vertical-align: middle;
+      display: block;
+    }
+    .thumb-link:hover .thumb img, .thumb-link:focus-visible .thumb img { opacity: 0.92; }
+    .thumb-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    footer {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="search-backdrop" id="search-backdrop" hidden aria-hidden="true"></div>
+    <header class="app-bar" role="banner">
+      <div class="search-wrap">
+        <label for="artist-search" class="visually-hidden">Search artists by name</label>
+        <input
+          type="search"
+          id="artist-search"
+          class="artist-search-input"
+          name="artist-search"
+          placeholder="Search artists…"
+          autocomplete="off"
+          spellcheck="false"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-controls="artist-listbox"
+          aria-expanded="false"
+        />
+        <ul id="artist-listbox" class="artist-listbox" role="listbox" aria-label="Artists" hidden></ul>
+      </div>
+    </header>
+    <div class="main-wrap">
+      <div class="layout">
+        <main id="main" tabindex="-1">
+    <article class="card" id="etel-adnan">
+      <div class="card-inner">
+        <h3 class="name">Etel Adnan</h3>
+        <p class="meta">Lebanese, 1925–2021</p>
+        <p class="blurb">A poet and painter, Adnan made compact pictures that read like stanzas: unprimed or lightly worked surfaces, saturated reds and sun-yellows, and a single broad gesture or arc that can feel like a horizon, a path, or a line of text set free. Formally, she pares painting down to scale, touch, and hue so that nothing is ornamental. The mood is unguarded: joy and grief in the same breath, a Mediterranean light held still, and a politics of closeness to land and place without illustrational storytelling.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=jumpAh0Jezw" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Etel Adnan (opens new tab)">
+        <div class="thumb">
+          <img src="jumpAh0Jezw.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="faris-alshafar">
+      <div class="card-inner">
+        <h3 class="name">Faris Alshafar</h3>
+        <p class="meta">Emirati, b. 1995</p>
+        <p class="blurb">A young, self-taught Emirati painter, Alshafar works from music into heavily layered, gestural canvases where rhythm shows up as tempo in brushwork—staccato marks against longer drags, wet-into-wet color chords, and passages scraped back to let earlier layers chime. Formally the interest is in accumulation and erasure, like a track built from overdubs. The theme is translation across senses: what sound <em>looks</em> like when the body, not a score, is the interpreter, and a contemporary Gulf voice claiming abstraction as a living, popular language.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/shorts/HQlIcMHd-fk" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Faris Alshafar (opens new tab)">
+        <div class="thumb">
+          <img src="HQlIcMHd-fk.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="jaber-alwan">
+      <div class="card-inner">
+        <h3 class="name">Jaber Alwan</h3>
+        <p class="meta">Iraqi, b. 1948</p>
+        <p class="blurb">Iraq-born Alwan fuses memory of ancient Mesopotamia with expressionist flow: long, serpentine ribbons of paint where mountains, rivers, torsos, and ruins are suggested but never fixed. The formal surface is restlessly fluid—impasto, thin veils, and calligraphic curves in earthy ochres, brick reds, and deep greens—so the eye keeps travelling. The feeling is of civilisation as sediment, beauty beside loss; landscape and the human figure are stretched into a single, mournful, hopeful continuum rather than a literal scene.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=nTowAmq7bJ0" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Jaber Alwan (opens new tab)">
+        <div class="thumb">
+          <img src="nTowAmq7bJ0.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="asaad-arabi">
+      <div class="card-inner">
+        <h3 class="name">Asaad Arabi</h3>
+        <p class="meta">Syrian / Lebanese, b. 1941</p>
+        <p class="blurb">Trained as a classical cellist, Arabi thinks in intervals and timbre: vertical stacks and staggered horizontals that behave like chord clusters, and colours that can read as brass, wood, or string tone. He translates urban experience—Damascus, Beirut, the noise and spacing of the street—into abstractions where architecture becomes notation without turning into map-making. The formal play is between grid and jazz-like improvisation; the message is that a city&rsquo;s &ldquo;song&rdquo; is made of light, mass, and interval, and painting can be a kind of non-verbal symphonic sketch.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=nD6ANAwNE_c" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Asaad Arabi (opens new tab)">
+        <div class="thumb">
+          <img src="nD6ANAwNE_c.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="saloua-choucair">
+      <div class="card-inner">
+        <h3 class="name">Saloua Raouda Choucair</h3>
+        <p class="meta">Lebanese, 1916–2017</p>
+        <p class="blurb">A quiet pioneer of modernism in Beirut, Choucair carved and constructed modular wood and stone forms—interlocking pieces, voids, and struts that recall Islamic geometry, modernist construction, and craft tradition at once. Her sculpture is as much about negative space and balance as it is about solid mass, so a small work can feel like an architectural fragment or a line of abstract verse broken into stanzas. The theme is interdependence: parts that need each other to stand, and a view of abstraction as disciplined, poetic, and never merely decorative.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=bB1K4H0vx0g" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Saloua Raouda Choucair (opens new tab)">
+        <div class="thumb">
+          <img src="bB1K4H0vx0g.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="kat-collins">
+      <div class="card-inner">
+        <h3 class="name">Kat Collins</h3>
+        <p class="meta">Contemporary</p>
+        <p class="blurb">Collins works with loose, calligraphic lines and translucent colour fields that pool and breathe—wet edges, feathery transitions, and occasional sharper accents that act like picked notes in a melody. The formal emphasis is on process: letting accident and revision stay visible, so the canvas records hesitation and release. Emotionally the work leans into openness and weather-like mood; the theme is trusting the hand and the present moment, and using abstraction to hold atmosphere rather than narrative.</p>
+      </div>
+      <a class="thumb-link" href="https://youtu.be/YsA3xndXAsQ" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Kat Collins (opens new tab)">
+        <div class="thumb">
+          <img src="YsA3xndXAsQ.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="mary-beth-edelson">
+      <div class="card-inner">
+        <h3 class="name">Mary Beth Edelson</h3>
+        <p class="meta">American, 1933–2021</p>
+        <p class="blurb">A key figure in American feminist art, Edelson used collage, drawing, and photography to build ritual-like, wave- and serpent-rimed compositions. She wove together goddesses, classical Venus imagery, and contemporary women&rsquo;s power—Michelle Obama among them—across jagged, flowing layouts that refuse a single centre. Formally, mixed media and repetition create a tide-like rhythm: images return and transform. The message is matrilineal myth-making and agency: reclaiming &ldquo;Woman&rdquo; as a collective, shifting, political and spiritual subject rather than a pin-up.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=uv9NzXUIUW0" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Mary Beth Edelson (opens new tab)">
+        <div class="thumb">
+          <img src="uv9NzXUIUW0.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="helen-frankenthaler">
+      <div class="card-inner">
+        <h3 class="name">Helen Frankenthaler</h3>
+        <p class="meta">American, 1928–2011</p>
+        <p class="blurb">Frankenthaler opened up Colour Field painting with &ldquo;soak-stain&rdquo;: thinned oil or acrylic poured into unprimed canvas, so colour sinks into the weave and light seems to come from <em>inside</em> the fabric. The formal result is veils, pools, and Rorschach-like symmetry without hard contour—scale can be mural, but the touch stays sensuous and unhurried. The feeling is lyrical, coastal, and vulnerable; the theme is landscape and emotion translated into colour-as-substance, with minimal gesture standing for weather, tide, and inner weather alike.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=4q2FnVa57_Q" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Helen Frankenthaler (opens new tab)">
+        <div class="thumb">
+          <img src="4q2FnVa57_Q.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="majd-abdel-hamid">
+      <div class="card-inner">
+        <h3 class="name">Majd Abdel Hamid</h3>
+        <p class="meta">Palestinian, b. 1988</p>
+        <p class="blurb">Abdel Hamid&rsquo;s work often relies on hand embroidery—white (or near-white) thread on pale cloth—so the image is felt through texture, shadow, and slight tonal shifts as light moves. Lines suggest plans, perimeters, or barricade-like forms without illustrating them; the pace is meditative, labour-intensive, almost whispered. Formally this is a minimalist, tactile abstraction; the emotional register is one of confinement, memory, and resilience, and the &ldquo;message&rdquo; is as much in time spent and body engaged as in the visible pattern.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=SmcRDgc8dNE" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Majd Abdel Hamid (opens new tab)">
+        <div class="thumb">
+          <img src="SmcRDgc8dNE.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="toshimitsu-imai">
+      <div class="card-inner">
+        <h3 class="name">Toshimitsu Imai</h3>
+        <p class="meta">Japanese, 1928–2002</p>
+        <p class="blurb">A bridge between Japanese postwar painting and European Art Informel, Imai built up oil as a physical skin—layered, gouged, and incised with palette knife and brush so the surface quakes with volcanic energy. Colours are often high-contrast and hot; the mark is both aggressive and celebratory, like calligraphy exploded into matter. The formal drama is all touch and weight; the theme is a kind of exalted, sometimes violent natural force—eruption, growth, and release—without a literal landscape frame.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=oaeAUerwZXY" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Toshimitsu Imai (opens new tab)">
+        <div class="thumb">
+          <img src="oaeAUerwZXY.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="bonnie-keane">
+      <div class="card-inner">
+        <h3 class="name">Bonnie Keane</h3>
+        <p class="meta">American, contemporary</p>
+        <p class="blurb">Keane works in a direct, bodily register: quick sweeps, dabs, and scumbled passages where acrylic or mixed media keep the trace of the arm&rsquo;s speed and the brush&rsquo;s turn. Compositions may cluster toward a centre or scatter like notes on a staff, but they avoid tidy illustration. The formal through-line is immediacy; the feeling is unfiltered presence—testing how far spontaneity can carry meaning before language arrives, and letting the viewer read emotion in tempo and pressure alone.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/shorts/MUygDe9F9sE" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Bonnie Keane (opens new tab)">
+        <div class="thumb">
+          <img src="MUygDe9F9sE.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="emily-kngwarreye">
+      <div class="card-inner">
+        <h3 class="name">Emily Kame Kngwarreye</h3>
+        <p class="meta">Aboriginal Australian, c. 1910–1996</p>
+        <p class="blurb">From Australia&rsquo;s Utopia community, Kngwarreye in her last decades unleashed all-over fields of dots, lines, and tangles that also register as <em>country</em>—Alyawarre land, ceremony, and Dreaming paths encoded in a contemporary abstract language. The scale can be vast; the touch shifts from feathery stipple to long, whiplash lines. &ldquo;Whole lot, that&rsquo;s what I paint,&rdquo; she said—formally, totality; thematically, identity, continuity, and an Indigenous cosmology in motion without needing European subject matter.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=8Stoj793vBg" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Emily Kame Kngwarreye (opens new tab)">
+        <div class="thumb">
+          <img src="8Stoj793vBg.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="rachid-koraichi">
+      <div class="card-inner">
+        <h3 class="name">Rachid Kora&iuml;chi</h3>
+        <p class="meta">Algerian, b. 1947</p>
+        <p class="blurb">Koraïchi etches, glazes, and embroiders Arabic calligraphy until letters become pattern, amulet, and body—silk &ldquo;robes&rdquo; of script, steles, and blue-and-white panels where text is both design and incantation. The formal look is Sufi-inflected: repetition, symmetry, and variation like musical modes. The feeling is elegiac, commemorative, and spiritual; the work often remembers absent lives and diaspora, and asks the viewer to slow down and read (or feel) the presence of the word as a visual and ethical force.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=21Xs8xqhSjg" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Rachid Koraïchi (opens new tab)">
+        <div class="thumb">
+          <img src="21Xs8xqhSjg.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="kevin-kowalski">
+      <div class="card-inner">
+        <h3 class="name">Kevin Kowalski</h3>
+        <p class="meta">American, contemporary</p>
+        <p class="blurb">Kowalski treats ceramic surfaces as alchemy: crystalline glazes, cratered textures, and heat-driven colour shifts where chemistry—not brush outline—does much of the composing. Bowls, tiles, and experimental panels become fields of flow, halos, and break-up that sit close to natural geology. Formally the appeal is process visibility; the theme is surrender to material law—order emerging from fire and time—and a contemporary craft conversation with abstract painting&rsquo;s love of chance.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=38_ucOyUyic" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Kevin Kowalski (opens new tab)">
+        <div class="thumb">
+          <img src="38_ucOyUyic.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="morris-louis">
+      <div class="card-inner">
+        <h3 class="name">Morris Louis</h3>
+        <p class="meta">American, 1912–1962</p>
+        <p class="blurb">Louis&rsquo;s &ldquo;unfurled&rdquo; and &ldquo;veil&rdquo; series pour thinned Magna acrylic from the top edge and let it run, fan, and interleave—sometimes masked with folds so ribbon-like bands of pure hue never meet the artist&rsquo;s hand directly. The canvas is raw; colour sits on top in translucent skins. The formal result is a detached, almost cinematic light-show; the mood is hushed, optical, and resolute about medium-specific purity—emotion as chromatic interval rather than as drawn symbol.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=nslr0t97vTY" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Morris Louis (opens new tab)">
+        <div class="thumb">
+          <img src="nslr0t97vTY.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="hussein-madi">
+      <div class="card-inner">
+        <h3 class="name">Hussein Madi</h3>
+        <p class="meta">Lebanese, 1938–2024</p>
+        <p class="blurb">A pillar of Beirut&rsquo;s art scene, Madi drew and painted simplified, avian, leaf-like, and calligraphic glyphs that skitter over an implied grid or patchwork of colour. Line is wiry, playful, and deceptively light; the palette is warm—reds, black ink, and ochre—so the work hovers between drawing and sign-system. The formal link is to Klee&rsquo;s &ldquo;taking a line for a walk&rdquo; and to lyrical Eastern brush tradition; the theme is a resilient joy of marks and a rooted Mediterranean sensibility, never cynical about ornament or spirit.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=ex7pw-yl5OE" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Hussein Madi (opens new tab)">
+        <div class="thumb">
+          <img src="ex7pw-yl5OE.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="cole-newman">
+      <div class="card-inner">
+        <h3 class="name">Cole Newman</h3>
+        <p class="meta">American, contemporary</p>
+        <p class="blurb">Newman&rsquo;s abstractions lean into open, organic shapes and loose, athletic brushwork—washes that bloom, edges that wobble, and an economy of large masses so a few moves carry the whole painting. The formal interest is the snap of a session: what happens when the body decides faster than the mind tidies. The affect is open-hearted and unpretentious; the theme is trusting instinct and the messiness of contact between pigment, water, and surface as a stand-in for lived immediacy.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/shorts/0ihOWXXHlC0" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Cole Newman (opens new tab)">
+        <div class="thumb">
+          <img src="0ihOWXXHlC0.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="georgia-okeeffe">
+      <div class="card-inner">
+        <h3 class="name">Georgia O&rsquo;Keeffe</h3>
+        <p class="meta">American, 1887–1986</p>
+        <p class="blurb">O&rsquo;Keeffe enlarged petals, bones, and desert forms until they function as abstract &ldquo;portraits&rdquo; of light and space—tight focus, clean curves, and surfaces that are smooth, almost design-like at scale. The formal play is between magnification and simplification, soft edges and hard silhouettes, sensuality without cheap glamour. The themes are time, aridity, and a woman&rsquo;s way of looking—claiming beauty and severity on her own terms, and letting nature read as both intimate body and vast landscape.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=4KQeu_mTYTQ" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Georgia O'Keeffe (opens new tab)">
+        <div class="thumb">
+          <img src="4KQeu_mTYTQ.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="park-seo-bo">
+      <div class="card-inner">
+        <h3 class="name">Park Seo-Bo</h3>
+        <p class="meta">Korean, 1931–2023</p>
+        <p class="blurb">Park&rsquo;s <em>écriture</em> series (the name puns on &ldquo;writing&rdquo;) is built from countless pale pencil strokes dragged through still-wet monochrome paint, building up a breathing, trembling skin. From afar the surface is a quiet field; up close, every line is a small act of patience. Formally, repetition becomes presence; the mood is ritual calm after Korea&rsquo;s upheavals, and a Zen-adjacent insistence on process as a form of self-emptying in which the &ldquo;picture&rdquo; is a record of time passing.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=C22h7rUemAY" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Park Seo-Bo (opens new tab)">
+        <div class="thumb">
+          <img src="C22h7rUemAY.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="ibrahim-el-salahi">
+      <div class="card-inner">
+        <h3 class="name">Ibrahim el-Salahi</h3>
+        <p class="meta">Sudanese, b. 1930</p>
+        <p class="blurb">A giant of modern African art, el-Salahi folds calligraphy, &ldquo;tree&rdquo; and mask motifs, and Arabic script into linear, cursive compositions—black ink &ldquo;lines&rdquo; on pale ground, sometimes punctuated with spare colour. The formal hook is a bent, wandering contour that can stand for branch, body, or broken letter. The register is oneiric and meditative, yet politically awake; the work carries exile, recovery, and a syncretic Sudanese-Islamic visual mind where abstraction is a spiritual and narrative reservoir without a single fixed caption.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=jI5LnvjBPjI" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Ibrahim el-Salahi (opens new tab)">
+        <div class="thumb">
+          <img src="jI5LnvjBPjI.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="mishel-schwartz">
+      <div class="card-inner">
+        <h3 class="name">Mishel Schwartz</h3>
+        <p class="meta">Contemporary</p>
+        <p class="blurb">Schwartz&rsquo;s work foregrounds the kinetics of application—dragging, smearing, scraping—so the viewer feels the weight and direction of the tool before naming any &ldquo;thing.&rdquo; Canvases can hold dense, stormy tangles or open, chalky voids, always tuned to the trace of a decision. The formal bet is on embodied mark-making; the theme is the artist&rsquo;s hand as an honest instrument, and the idea that affect lives in the physics of the stroke, not in illustration.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=SRTpIXH-Fe0" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Mishel Schwartz (opens new tab)">
+        <div class="thumb">
+          <img src="SRTpIXH-Fe0.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="morita-shiryu">
+      <div class="card-inner">
+        <h3 class="name">Morita Shiryu</h3>
+        <p class="meta">Japanese, 1912–1998</p>
+        <p class="blurb">Co-founder of the Bokujin-kai group, Morita treated ink not as legible text but as explosive form—giant, splashed, or cursive &ldquo;characters&rdquo; that are half readable, half pure motion. Scale is often mural; paper becomes an arena, black ink a loud event against negative space. Formally, he weds postwar action painting to East Asian brush culture; the feeling is exorcism, shout, and dance, and the message is that tradition survives when the stroke is free enough to leave dictionary meaning behind.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=Efcp0pM9upk" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Morita Shiryu (opens new tab)">
+        <div class="thumb">
+          <img src="Efcp0pM9upk.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="pierre-soulages">
+      <div class="card-inner">
+        <h3 class="name">Pierre Soulages</h3>
+        <p class="meta">French, 1919–2022</p>
+        <p class="blurb">Soulages spent decades pushing black: thick oil laid with combs, rubber, and contraptions so the surface is raked, grooved, and high-gloss or matte in patches—light is reflected or swallowed differently every few centimetres, so &ldquo;outrenoir&rdquo; (beyond black) is really a study in reflected light. Formally the painting is a relief you almost touch; the mood is grave, material, and sublime without sentiment. The theme is painting as a physical fact that can still be infinite within one restricted hue.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=GlgUw5RrOXM" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Pierre Soulages (opens new tab)">
+        <div class="thumb">
+          <img src="GlgUw5RrOXM.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="rover-thomas">
+      <div class="card-inner">
+        <h3 class="name">Rover Thomas</h3>
+        <p class="meta">Aboriginal Australian, c. 1926–1998</p>
+        <p class="blurb">A Kimberley artist and former stockman, Rover Thomas used earth pigments in spare, blocky map-like compositions: broad colour planes and thin ochre lines on dark grounds that chart Country and story without Western perspective. The look is pared to essentials—restraint, gravity, a few strokes doing massive work, recalling the breathing room of great ink painting. The formal language is &ldquo;low data, high power&rdquo;; the theme is land as law, event, and memory, told with ceremonial clarity rather than description.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=Vzh9NZPw6mU" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Rover Thomas (opens new tab)">
+        <div class="thumb">
+          <img src="Vzh9NZPw6mU.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+    <article class="card" id="svetlana-trefilova">
+      <div class="card-inner">
+        <h3 class="name">Svetlana Trefilova</h3>
+        <p class="meta">Contemporary</p>
+        <p class="blurb">Trefilova&rsquo;s &ldquo;watery&rdquo; process lets diluted acrylic or water-media drift, bloom, and re-wet, building veils, halos, and half-hidden shapes that feel like memory half underwater. The formal result is a soft, cinematic depth: edges dissolve, colour layers compete for the front, and a sense of slow weather prevails. The emotional tone is contemplative, slightly melancholic, and open—abstraction as moodscape rather than symbol, and as a way to let meaning stay liquid.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=d7K4Bog5asw" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Svetlana Trefilova (opens new tab)">
+        <div class="thumb">
+          <img src="d7K4Bog5asw.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="emilio-vedova">
+      <div class="card-inner">
+        <h3 class="name">Emilio Vedova</h3>
+        <p class="meta">Italian, 1919–2006</p>
+        <p class="blurb">A militant anti-fascist, Vedova smeared, scumbled, and slashed vehement diagonals and jagged voids in black, white, and blood-red, often at mural scale, so the canvas feels like a city or stage violently deconstructed. Formally it is tenebrist, kinetic, and anti-decorative; you sense collapse, storm, siren. The message is the wound of 20th-century history—Venice, class struggle, the artist&rsquo;s complicity and refusal—channelled into a brutally direct abstract idiom of rupture and protest.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=ei2H4zHIR0c" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Emilio Vedova (opens new tab)">
+        <div class="thumb">
+          <img src="ei2H4zHIR0c.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <article class="card" id="zao-wou-ki">
+      <div class="card-inner">
+        <h3 class="name">Zao Wou-Ki</h3>
+        <p class="meta">Chinese-French, 1920–2013</p>
+        <p class="blurb">Trained in Hangzhou, matured in postwar Paris, Zao wove calligraphic gesture with Colour Field space—sometimes a single vortex, sometimes a luminous, fogged horizon, sometimes flurries of line like weather over water. Oils thinned to washes; centres breathe; colour turns atmospheric rather than object-bound. The formal bridge is between ink tradition and Tachist abstraction. The theme is a Tao-inflected world of flux, empty centre, and cosmic weather—&ldquo;the wind, the void,&rdquo; a painting as a place where the mind can wander without a caption.</p>
+      </div>
+      <a class="thumb-link" href="https://www.youtube.com/watch?v=N4CgsSyx9Dw" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube: Zao Wou-Ki (opens new tab)">
+        <div class="thumb">
+          <img src="N4CgsSyx9Dw.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+      </a>
+    </article>
+
+    <footer>
+      <p>27 artists</p>
+    </footer>
+    </main>
+  </div>
+  </div>
+  </div>
+  <div id="slideshow-ann" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+  <script>
+    (function () {
+      var search = document.getElementById("artist-search");
+      var listbox = document.getElementById("artist-listbox");
+      var searchWrap = search ? search.closest(".search-wrap") : null;
+      var sBackdrop = document.getElementById("search-backdrop");
+      var ann = document.getElementById("slideshow-ann");
+      var mainEl = document.getElementById("main");
+      var cards = mainEl ? mainEl.querySelectorAll("article.card") : [];
+      var cardById = {};
+      var slideIdx = 0;
+      var slideTimer = null;
+      var SLIDE_MS = 5000;
+      var listOpen = false;
+      var blurT = null;
+      var options = [];
+      var activeIdx = -1;
+      var emptyEl = null;
+
+      function buildArtistList() {
+        if (!listbox) { return; }
+        var i;
+        var rows = [];
+        for (i = 0; i < cards.length; i++) {
+          var nm = cards[i].querySelector(".name");
+          if (!nm) { continue; }
+          var label = nm.textContent.trim();
+          if (!label) { continue; }
+          rows.push({ name: label, id: cards[i].id, norm: label.toLowerCase() });
+          cardById[cards[i].id] = cards[i];
+        }
+        rows.sort(function (a, b) { return a.name.localeCompare(b.name); });
+        listbox.textContent = "";
+        emptyEl = document.createElement("li");
+        emptyEl.className = "is-no-match";
+        emptyEl.setAttribute("role", "option");
+        emptyEl.setAttribute("aria-disabled", "true");
+        emptyEl.textContent = "No artists match that search.";
+        emptyEl.hidden = true;
+        listbox.appendChild(emptyEl);
+        options = [];
+        for (i = 0; i < rows.length; i++) {
+          var li = document.createElement("li");
+          li.setAttribute("role", "option");
+          li.setAttribute("id", "artist-opt-" + rows[i].id);
+          li.textContent = rows[i].name;
+          li.dataset.cardId = rows[i].id;
+          li.dataset.norm = rows[i].norm;
+          li.addEventListener("mousedown", function (e) {
+            e.preventDefault();
+          });
+          li.addEventListener("click", function (e) {
+            var id = e.currentTarget.dataset.cardId;
+            goToArtist(id);
+            search.value = e.currentTarget.textContent.trim();
+            closeArtistList();
+            search && search.focus();
+          });
+          listbox.appendChild(li);
+          options.push(li);
+        }
+      }
+
+      function visibleOptionEls() {
+        var v = [];
+        for (var i = 0; i < options.length; i++) {
+          if (!options[i].hidden) { v.push(options[i]); }
+        }
+        return v;
+      }
+
+      function setActiveNav(idx) {
+        var v = visibleOptionEls();
+        for (var i = 0; i < v.length; i++) {
+          v[i].classList.toggle("is-active", i === idx);
+        }
+        activeIdx = idx;
+      }
+
+      function openArtistList() {
+        if (!listbox || !search) { return; }
+        listOpen = true;
+        listbox.hidden = false;
+        search.setAttribute("aria-expanded", "true");
+        if (sBackdrop) {
+          sBackdrop.classList.add("is-on");
+          sBackdrop.removeAttribute("hidden");
+          sBackdrop.setAttribute("aria-hidden", "false");
+        }
+        filterArtists();
+        setActiveNav(-1);
+      }
+
+      function closeArtistList() {
+        if (!listbox || !search) { return; }
+        listOpen = false;
+        listbox.hidden = true;
+        search.setAttribute("aria-expanded", "false");
+        if (sBackdrop) {
+          sBackdrop.classList.remove("is-on");
+          sBackdrop.setAttribute("hidden", "");
+          sBackdrop.setAttribute("aria-hidden", "true");
+        }
+        setActiveNav(-1);
+        for (var i = 0; i < options.length; i++) {
+          options[i].classList.remove("is-active");
+        }
+      }
+
+      function goToArtist(id) {
+        var el = id ? cardById[id] : null;
+        if (!el) { return; }
+        el.scrollIntoView({ block: "start", behavior: "smooth" });
+      }
+
+      function filterArtists() {
+        if (!search) { return; }
+        var q = search.value.trim().toLowerCase();
+        var any = 0;
+        for (var i = 0; i < options.length; i++) {
+          var li = options[i];
+          var ok = !q || li.dataset.norm.indexOf(q) !== -1;
+          li.hidden = !ok;
+          if (ok) { any++; }
+        }
+        if (emptyEl) {
+          emptyEl.hidden = any > 0;
+        }
+        setActiveNav(-1);
+      }
+
+      if (search && listbox) {
+        buildArtistList();
+        search.addEventListener("focus", function () {
+          if (blurT) { clearTimeout(blurT); blurT = null; }
+          openArtistList();
+        });
+        search.addEventListener("input", function () {
+          if (listOpen) { filterArtists(); }
+        });
+        search.addEventListener("blur", function () {
+          blurT = setTimeout(function () {
+            blurT = null;
+            if (searchWrap && !searchWrap.contains(document.activeElement)) {
+              closeArtistList();
+            }
+          }, 200);
+        });
+      }
+
+      if (sBackdrop) {
+        sBackdrop.addEventListener("click", function () {
+          closeArtistList();
+        });
+      }
+
+      function nearestCardIndex() {
+        var n = cards.length;
+        if (!n) { return 0; }
+        var y = window.scrollY + window.innerHeight * 0.18;
+        var i;
+        for (i = 0; i < n; i++) {
+          var r = cards[i].getBoundingClientRect();
+          var elTop = r.top + window.pageYOffset;
+          if (elTop > y) { return Math.max(0, i - 1); }
+        }
+        return n - 1;
+      }
+
+      function stopSlideshow() {
+        if (slideTimer) {
+          clearInterval(slideTimer);
+          slideTimer = null;
+        }
+        if (ann) { ann.textContent = "Slideshow off"; }
+      }
+
+      function startSlideshow() {
+        stopSlideshow();
+        if (!cards.length) { return; }
+        var n = cards.length;
+        slideIdx = (nearestCardIndex() + 1) % n;
+        cards[slideIdx].scrollIntoView({ block: "start", behavior: "smooth" });
+        if (ann) { ann.textContent = "Slideshow on, next every 5 seconds."; }
+        slideTimer = setInterval(function () {
+          slideIdx = (slideIdx + 1) % n;
+          cards[slideIdx].scrollIntoView({ block: "start", behavior: "smooth" });
+        }, SLIDE_MS);
+      }
+
+      function toggleSlideshow() {
+        if (slideTimer) { stopSlideshow(); } else { startSlideshow(); }
+      }
+
+      function spaceForSlideshow(e) {
+        if (e.key !== " " && e.code !== "Space") { return; }
+        var t = e.target;
+        if (t.isContentEditable) { return; }
+        if (t.closest("input, textarea, select, option, label")) { return; }
+        if (t.closest("button, [role=button]")) { return; }
+        if (t.closest("a[href]")) { return; }
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSlideshow();
+      }
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          if (listOpen) {
+            e.preventDefault();
+            closeArtistList();
+            return;
+          }
+          if (slideTimer) {
+            e.preventDefault();
+            stopSlideshow();
+            return;
+          }
+        }
+        if (listOpen && e.target === search && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+          e.preventDefault();
+          var v = visibleOptionEls();
+          if (!v.length) { return; }
+          var next;
+          if (e.key === "ArrowDown") {
+            if (activeIdx < 0) { next = 0; }
+            else { next = activeIdx >= v.length - 1 ? 0 : activeIdx + 1; }
+          } else {
+            if (activeIdx < 0) { next = v.length - 1; }
+            else { next = activeIdx <= 0 ? v.length - 1 : activeIdx - 1; }
+          }
+          setActiveNav(next);
+        }
+        if (listOpen && (e.key === "Enter" || e.key === "NumpadEnter")) {
+          if (e.target === search) {
+            var v2 = visibleOptionEls();
+            if (v2.length === 1) {
+              e.preventDefault();
+              v2[0].click();
+              return;
+            }
+            if (activeIdx >= 0 && activeIdx < v2.length) {
+              e.preventDefault();
+              v2[activeIdx].click();
+              return;
+            }
+          }
+        }
+        spaceForSlideshow(e);
+      });
+    })();
+  </script>
+</body>
+</html>

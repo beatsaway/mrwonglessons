@@ -37,7 +37,17 @@
       text-decoration: none;
     }
     .top-nav a {
-      color: inherit;
+      color: #e8e6f0;
+    }
+    .top-nav a.nav-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.25;
+      max-width: 14rem;
+      text-align: center;
+    }
+    @media (min-width: 400px) {
+      .top-nav a.nav-text { font-size: 1.2rem; max-width: none; }
     }
     .top-nav .arrow {
       cursor: pointer;
@@ -74,6 +84,7 @@
 <body>
   <nav class="top-nav" aria-label="Navigation">
     <a href="../index.html" aria-label="Home" title="Home"><span aria-hidden="true">🏠</span></a>
+    <a href="listofartists/artists-abstract-intro.html" class="nav-text" title="Abstract artist intros and video picks">See List of Artists</a>
     <span class="arrow" id="btn-prev" role="button" tabindex="0" title="Previous page" aria-label="Previous page">←</span>
     <span class="arrow" id="btn-next" role="button" tabindex="0" title="Next page" aria-label="Next page">→</span>
   </nav>
