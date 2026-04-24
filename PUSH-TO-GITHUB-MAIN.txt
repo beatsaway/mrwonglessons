@@ -1,0 +1,104 @@
+How to push changes to GitHub (main branch)
+=============================================
+
+This repository: https://github.com/beatsaway/mrwonglessons
+Default branch: main
+Remote name: origin (typical; verify with: git remote -v)
+
+
+1. What you need
+----------------
+- Git installed on your computer: https://git-scm.com
+- A GitHub account and permission to push to this repository (the owner must add you
+  as a collaborator, or you push via a fork and pull request—this file describes
+  pushing directly to main when you have access).
+- Authentication to GitHub:
+  - HTTPS: a Personal Access Token (PAT) when Git asks for a password, or
+    GitHub CLI (`gh auth login`); or
+  - SSH: an SSH key added to your GitHub account (remote URL like
+    git@github.com:beatsaway/mrwonglessons.git).
+
+
+2. First time: get the project
+------------------------------
+In a folder where you keep code, run:
+
+  git clone https://github.com/beatsaway/mrwonglessons.git
+  cd mrwonglessons
+
+Confirm you are on main and tracking the remote:
+
+  git branch
+  git status
+
+You should see: On branch main ... (and usually "up to date with 'origin/main'").
+
+
+3. Usual workflow: save work and push to main
+---------------------------------------------
+(Work inside the project folder. Pull before you push if others also commit.)
+
+A. See what changed:
+
+  git status
+
+B. Put your changes in the next commit:
+
+  git add -A
+  (or add specific files: git add path/to/file)
+
+C. Commit with a short, clear message:
+
+  git commit -m "Short description of what you changed"
+
+D. Get latest from GitHub (avoids many “push rejected” issues):
+
+  git pull origin main
+
+E. If pull merged remote changes, you may have no new commit to push, or you may
+   need to fix conflicts, then:
+
+  git add -A
+  git commit -m "Merge or finish resolving conflicts"
+
+F. Send your commit(s) to GitHub main:
+
+  git push origin main
+
+If you already set upstream (clone usually does for main), this also works:
+
+  git push
+
+
+4. Windows / PowerShell tip
+---------------------------
+In older PowerShell, "&&" between commands can fail. Run commands one at a time,
+or chain with a semicolon, for example:
+
+  cd mrwonglessons; git status
+
+
+5. If push is rejected
+----------------------
+Someone else may have pushed first. Do:
+
+  git pull origin main
+
+Resolve any merge conflicts in the files Git lists, then:
+
+  git add -A
+  git commit -m "Merge remote main"
+  git push origin main
+
+Using rebase instead of merge (optional, team preference):
+
+  git pull --rebase origin main
+  (fix conflicts if any, then: git rebase --continue)
+  git push origin main
+
+
+6. Check the result
+-------------------
+- On GitHub: open the repository page and confirm your latest commit appears on
+  the main branch.
+- Locally: git log -1 --oneline   (shows the newest commit)
