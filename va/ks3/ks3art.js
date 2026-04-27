@@ -13,7 +13,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 1 節",
     title: "視覺主修：線條",
     map: "方向 · 粗幼 · 快慢 · 情緒",
-    image: "img/l1.png",
+    image: "img/l1.webp",
     imageAlt: "第1節參考圖：線條三例",
     vocabBank: "線條粗幼、線條方向、速度感、激動／平靜、有機線、幾何線、線條疏密、工具感（尺規／手繪）",
     checkQuestions: [
@@ -47,7 +47,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 2 節",
     title: "視覺主修：形狀與圖地關係",
     map: "正負形 · 剪影 · 歧義",
-    image: "img/l2.png",
+    image: "img/l2.webp",
     imageAlt: "第2節參考圖：圖地與剪影三例",
     vocabBank: "正形／負形、圖地關係、剪影、幾何形／自由形、歧義、高對比",
     checkQuestions: [
@@ -81,7 +81,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 3 節",
     title: "視覺主修：色彩（一）色相與色調",
     map: "暖色調 · 冷色調 · 互補色",
-    image: "img/l3.png",
+    image: "img/l3.webp",
     imageAlt: "第3節：暖色室內、冷色山湖、紅綠對比",
     vocabBank: "色相、暖色調、冷色調、鄰近色（類似色）、互補色、整體氣氛、焦點",
     checkQuestions: [
@@ -115,7 +115,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 4 節",
     title: "視覺主修：色彩（二）明度與彩度",
     map: "明度階 · 彩度 · 空氣感 · 立體",
-    image: "img/l4.png",
+    image: "img/l4.webp",
     imageAlt: "第4節：灰階山景、霓虹街景、聚光蘋果",
     vocabBank: "明度、明度層次、彩度（飽和度）、灰階、高光／暗部、焦點、立體感",
     checkQuestions: [
@@ -149,7 +149,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 5 節",
     title: "視覺主修：質感",
     map: "視覺質感 · 觸覺聯想 · 厚塗",
-    image: "img/l5.png",
+    image: "img/l5.webp",
     imageAlt: "第5節：鐵鏽門、絲與石、厚塗",
     vocabBank: "視覺質感、觸覺聯想、粗糙／光滑、鏽蝕、高光、厚塗（impasto）、真實質感／描繪質感",
     checkQuestions: [
@@ -183,7 +183,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 6 節",
     title: "視覺主修：空間（前後與層次）",
     map: "透視 · 空氣透視 · 重疊",
-    image: "img/l6.png",
+    image: "img/l6.webp",
     imageAlt: "第6節：道路透視、林後遠山、浮世繪層次",
     vocabBank: "線性透視、消失點、地平線、空氣透視（遠淡遠灰）、重疊、垂直位置、觀者視點",
     checkQuestions: [
@@ -217,7 +217,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 7 節",
     title: "組織原理：對比",
     map: "色 · 形 · 質感",
-    image: "img/l7.png",
+    image: "img/l7.webp",
     imageAlt: "第7節：白傘、象與鼠、鉻球與煤",
     vocabBank: "對比類型、色彩對比、大小對比、質感對比、焦點、強對比／弱對比",
     checkQuestions: [
@@ -251,7 +251,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 8 節",
     title: "組織原理：節奏與重複",
     map: "規律 · 漸變 · 打破重複",
-    image: "img/l8.png",
+    image: "img/l8.webp",
     imageAlt: "第8節：紋樣、漸變緞帶、破窗",
     vocabBank: "重複單元、規律節奏、漸變節奏（漸快／漸慢）、間距、打破重複、驚喜、視線動線",
     checkQuestions: [
@@ -285,7 +285,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 9 節",
     title: "組織原理：統一與變化",
     map: "系列感 · 母題 · 技法",
-    image: "img/l9.png",
+    image: "img/l9.webp",
     imageAlt: "第9節：茶壺系列、品牌物件、點描花束",
     vocabBank: "統一（色彩／圖形／技法）、變化（造型／內容）、系列感、母題、單調",
     checkQuestions: [
@@ -319,7 +319,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 10 節",
     title: "組織原理：平衡（對稱與均衡）",
     map: "對稱 · 非對稱均衡 · 視覺重量",
-    image: "img/l10.png",
+    image: "img/l10.webp",
     imageAlt: "第10節：對稱建築、枯山水、偏重型構圖",
     vocabBank: "對稱、軸線、非對稱均衡、視覺重量、明暗與面積、穩定／不穩定",
     checkQuestions: [
@@ -353,7 +353,7 @@ window.LESSONS_V2_DATA = [
     badge: "第 11–12 節",
     title: "統整與歷程（探究／工作簿）",
     map: "草稿與完稿 · 紀錄方式 · 微型創作",
-    image: "img/l11and12.png",
+    image: "img/l11and12.webp",
     imageAlt: "第11-12節：草圖與完稿、工作簿、微型創作",
     vocabBank: "草稿／完稿、試錯、修改痕跡、研究工作簿、視覺紀錄、綜合（多元素併用）、評賞步驟（描述→分析→詮釋→判斷）",
     checkQuestions: [
