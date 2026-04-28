@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>達里閱讀理解</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --border: #e5e7eb;
+      --highlight: rgba(196, 181, 253, 0.2);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: linear-gradient(180deg, #eef2ff 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.58;
+      font-size: 1.08rem;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 14px;
+      margin-bottom: 0;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      line-height: 1.35;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+    }
+
+    p { margin: 0 0 8px; }
+
+    .passage p {
+      border-radius: 8px;
+      padding: 2px 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .passage p.active {
+      background: var(--highlight);
+    }
+
+    .key-term {
+      font-weight: 700;
+      color: #6d28d9;
+    }
+
+    .progress {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .lang-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .lang-row select {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font: inherit;
+      background: #fff;
+      color: var(--text);
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 78px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+      resize: vertical;
+      background: #fff;
+    }
+
+    textarea:focus {
+      outline: 2px solid #bfdbfe;
+      border-color: var(--primary);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .ghost {
+      background: #eef2ff;
+      border-color: #dbeafe;
+      color: #111827;
+    }
+
+    textarea.model-visible {
+      background: #f5f3ff;
+      border-color: #c4b5fd;
+      color: #4c1d95;
+    }
+
+    .answer-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid #d8b4fe;
+      background: #faf5ff;
+      color: #7c3aed;
+      font-size: 1.2rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .answer-toggle:hover {
+      background: #f3e8ff;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+      grid-template-areas: "passage question";
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    .question-panel {
+      grid-area: question;
+      border-left: 1px solid var(--border);
+      background: #f8faff;
+    }
+
+    .question-panel .card {
+      position: sticky;
+      top: 0;
+      min-height: 100vh;
+      overflow: auto;
+      padding: 16px 12px;
+    }
+
+    .passage-panel {
+      grid-area: passage;
+      background: #fff;
+    }
+
+    .passage-panel .card {
+      min-height: 100vh;
+      overflow: auto;
+      padding: 16px 20px;
+    }
+
+    @media (max-width: 980px) {
+      .split {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "question"
+          "passage";
+      }
+
+      .question-panel {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .question-panel .card,
+      .passage-panel .card {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="split">
+      <section class="question-panel">
+        <div class="card">
+          <div class="lang-row">
+            <label for="langSelect" id="langLabel">語言</label>
+            <select id="langSelect" aria-label="語言選擇">
+              <option value="zh">中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <p class="progress" id="progress"></p>
+          <label id="questionText" for="answerInput"></label>
+          <textarea id="answerInput" placeholder="在這裡作答..."></textarea>
+
+          <div class="actions">
+            <span
+              class="answer-toggle"
+              id="answerToggle"
+              role="button"
+              tabindex="0"
+              aria-label="顯示或隱藏參考答案"
+            >💡</span>
+            <button class="primary" type="button" id="nextBtn">下一題</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="passage-panel">
+        <div class="card passage" id="passage"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var locale = "zh";
+      var passageOrder = ["p1", "p3", "p4", "p5", "p6", "p7"];
+      var uiText = {
+        zh: {
+          languageLabel: "語言",
+          languageAria: "語言選擇",
+          progress: "第 {current} / {total} 題",
+          placeholder: "在這裡作答...",
+          next: "下一題",
+          finish: "完成",
+          doneAlert: "已完成全部題目。",
+          answerToggleAria: "顯示或隱藏參考答案"
+        },
+        en: {
+          languageLabel: "Language",
+          languageAria: "Language selector",
+          progress: "Question {current} / {total}",
+          placeholder: "Type your answer here...",
+          next: "Next",
+          finish: "Finish",
+          doneAlert: "You have completed all questions.",
+          answerToggleAria: "Show or hide model answer"
+        }
+      };
+
+      var passageText = {
+        zh: {
+          p1: "達里說：「畢加索是西班牙人，我也是。畢加索是天才，我也是。畢加索舉世聞名，我也是。」這位生長於西班牙馬德里的畫家，自小便是一個愛製造惡作劇的頑童。有一次，他向母親表示已在家中的某個角落大便，但卻不肯說出確實的地點，令家人忙於四處尋找他的「傑作」。",
+          p3: "他的父親是一位愛好藝術的人，無形中給他營造了有利的啟蒙環境。達里愛上繪畫，是緣於他看到父親的朋友皮茲的油畫時開始。1917年，他在格拉巴多市立學校學習繪畫，其間他學到了素描、水彩及油畫等技巧。",
+          p4: "1921年，他報考美術學校的入學試而獲得取錄，評審教授的評語是：「雖然他的畫並沒有按照規定的格式去畫，但卻是那麼完美。」可惜，他後來兩度被學校開除。離校後他勤奮自修，並研習印象派、未來派及立體派等不同的畫派。",
+          p5: "1925年，他舉辦了第一次個人畫展。1926年，他第一次拜訪畢加索，並尊稱畢加索為天才。1928年，他在巴黎會晤超現實畫派畫家和詩人們，翌年舉行了一次個人畫展，結果獲好評。",
+          p6: "當達里專注於超現實主義後，曾嘗試將「偏執狂批判法」應用到畫面上，這種方法是指在清醒而有意識的情況下，運用狂想的方法來理解這個世界。故此他以寫實及精確的技法，將現實世界中的物象進行變形，並創造出多重角色交織變化的造型。",
+          p7: "此外，達里也是一個自我吹噓及熱衷名利的人，他曾說：「我並不擅長謙虛。」於是他很快便成為繪畫創作、演講、寫劇本、拍電影及舞台設計等各方面的名人。他於1989年去世，享年八十五歲。"
+        },
+        en: {
+          p1: "Dali said, “Picasso is Spanish, so am I. Picasso is a genius, so am I. Picasso is world-famous, so am I.” This painter, born in Madrid, was a mischievous child. Once he told his mother he had left his “masterpiece” in a corner of the house but refused to tell her where, and the family had to search for it.",
+          p3: "His father loved art, which gave him a helpful early environment. Dali became interested in painting after seeing an oil painting by Pichot, his father's friend. In 1917 he studied at the Municipal Drawing School and learned skills such as sketching, watercolor, and oil painting.",
+          p4: "In 1921 he passed the entrance exam for an art school. A professor commented that although his work did not follow the required format, it was still perfect. Unfortunately, he was expelled twice. After leaving school, he studied hard on his own and researched Impressionism, Futurism, Cubism, and other styles.",
+          p5: "In 1925 he held his first solo exhibition. In 1926 he visited Picasso for the first time and called him a genius. In 1928 he met Surrealist painters and poets in Paris, and the following year his solo exhibition received good reviews.",
+          p6: "After focusing on Surrealism, Dali tried applying the “paranoiac-critical method.” This means using deliberate imaginative thinking while still conscious and clear-minded to interpret the world. He used realistic and precise technique to distort real objects and create forms with multiple overlapping identities.",
+          p7: "Dali was also self-promoting and fame-driven. He once said, “I am not good at humility.” He quickly became well known not only for painting but also for speeches, script writing, filmmaking, and stage design. He died in 1989 at the age of 85."
+        }
+      };
+
+      var questions = [
+        {
+          question: {
+            zh: "達里是甚麼派別的畫家？",
+            en: "What style of painter was Dali?"
+          },
+          modelAnswer: {
+            zh: "達里是超現實主義畫家，文中提到他在1930年代初期成為備受觸目的超現實主義畫家。",
+            en: "Dali was a Surrealist painter. The passage says he became a highly noticed Surrealist painter in the early 1930s."
+          },
+          highlights: ["p5", "p6"],
+          keywords: {
+            zh: ["超現實主義", "超現實畫派"],
+            en: ["Surrealist", "Surrealism"]
+          }
+        },
+        {
+          question: {
+            zh: "他家庭背景如何有利其藝術發展？",
+            en: "How did his family background help his artistic development?"
+          },
+          modelAnswer: {
+            zh: "他的父親愛好藝術，營造啟蒙環境；他又受到父親朋友皮茲油畫影響，並接受正規繪畫訓練。",
+            en: "His father loved art and created a supportive early environment. He was also influenced by his father's friend Pichot's oil painting and got formal painting training."
+          },
+          highlights: ["p3"],
+          keywords: {
+            zh: ["父親", "愛好藝術", "皮茲", "油畫", "學習繪畫"],
+            en: ["father", "art", "Pichot", "oil painting", "studied"]
+          }
+        },
+        {
+          question: {
+            zh: "從哪些事件可見達里是個不守規矩的人？",
+            en: "What events show that Dali was unruly?"
+          },
+          modelAnswer: {
+            zh: "他童年愛惡作劇，且在美術學校時作品不按規定格式，後來更兩度被學校開除。",
+            en: "He was mischievous as a child, did not follow required formats in art school, and was expelled twice."
+          },
+          highlights: ["p1", "p4"],
+          keywords: {
+            zh: ["惡作劇", "不肯說出", "沒有按照規定", "兩度被學校開除"],
+            en: ["mischievous", "refused", "did not follow", "expelled twice"]
+          }
+        },
+        {
+          question: {
+            zh: "甚麼是「偏執狂批判法」？",
+            en: "What is the “paranoiac-critical method”?"
+          },
+          modelAnswer: {
+            zh: "是在清醒且有意識下，用狂想方式理解世界，再把現實物象變形，創造多重形象。",
+            en: "It is a method of consciously using imaginative thinking to interpret the world, then distorting real objects into multiple layered forms."
+          },
+          highlights: ["p6"],
+          keywords: {
+            zh: ["偏執狂批判法", "清醒而有意識", "狂想", "變形", "多重"],
+            en: ["paranoiac-critical", "conscious", "imaginative", "distorting", "multiple"]
+          }
+        },
+        {
+          question: {
+            zh: "達里是不是只專注於繪畫創作呢？",
+            en: "Did Dali only focus on painting?"
+          },
+          modelAnswer: {
+            zh: "不是。他也從事演講、寫劇本、拍電影、舞台設計等，發展相當多元。",
+            en: "No. He was also active in speeches, script writing, filmmaking, and stage design."
+          },
+          highlights: ["p7"],
+          keywords: {
+            zh: ["繪畫創作", "演講", "寫劇本", "拍電影", "舞台設計"],
+            en: ["painting", "speeches", "script writing", "filmmaking", "stage design"]
+          }
+        },
+        {
+          question: {
+            zh: "挑戰題：你會如何評論他的個性？",
+            en: "Challenge: How would you describe his personality?"
+          },
+          modelAnswer: {
+            zh: "可說他自信甚至自負、愛出風頭，也有強烈創造力與表現欲，是爭議和才華並存的人物。",
+            en: "He seems highly confident, even arrogant, and loves attention, but he is also very creative and expressive."
+          },
+          highlights: ["p1", "p7"],
+          keywords: {
+            zh: ["我也是", "惡作劇", "自我吹噓", "不擅長謙虛", "熱衷名利"],
+            en: ["so am I", "mischievous", "self-promoting", "not good at humility", "fame-driven"]
+          }
+        },
+        {
+          question: {
+            zh: "挑戰題：達里的畫作寫實嗎？為什麼？",
+            en: "Challenge: Are Dali's works realistic? Why?"
+          },
+          modelAnswer: {
+            zh: "技法上寫實而精確，但內容常把現實物象變形與重組，因此呈現超現實效果。",
+            en: "His technique is realistic and precise, but his content distorts and recombines real objects, creating surreal effects."
+          },
+          highlights: ["p6"],
+          keywords: {
+            zh: ["寫實及精確", "變形", "超現實"],
+            en: ["realistic and precise", "distorts", "surreal"]
+          }
+        }
+      ];
+
+      var current = 0;
+      var answers = new Array(questions.length).fill("");
+
+      var langLabelEl = document.getElementById("langLabel");
+      var langSelectEl = document.getElementById("langSelect");
+      var progressEl = document.getElementById("progress");
+      var questionTextEl = document.getElementById("questionText");
+      var answerInputEl = document.getElementById("answerInput");
+      var answerToggleEl = document.getElementById("answerToggle");
+      var nextBtn = document.getElementById("nextBtn");
+      var passageEl = document.getElementById("passage");
+      var showingModelAnswer = false;
+      var savedDraftBeforeModel = "";
+
+      function formatText(template, values) {
+        return template
+          .replace("{current}", values.current)
+          .replace("{total}", values.total);
+      }
+
+      function renderPassage() {
+        passageEl.innerHTML = "";
+        passageOrder.forEach(function (key) {
+          var p = document.createElement("p");
+          p.setAttribute("data-p", key);
+          p.textContent = passageText[locale][key];
+          p.setAttribute("data-original-html", p.innerHTML);
+          passageEl.appendChild(p);
+        });
+      }
+
+      function applyLocaleText() {
+        var text = uiText[locale];
+        langLabelEl.textContent = text.languageLabel;
+        langSelectEl.setAttribute("aria-label", text.languageAria);
+        answerToggleEl.setAttribute("aria-label", text.answerToggleAria);
+        answerInputEl.placeholder = text.placeholder;
+        document.documentElement.lang = locale === "zh" ? "zh-Hant" : "en";
+      }
+
+      function clearHighlights() {
+        var nodes = passageEl.querySelectorAll("p[data-p]");
+        nodes.forEach(function (node) {
+          node.classList.remove("active");
+          var originalHtml = node.getAttribute("data-original-html");
+          if (originalHtml) {
+            node.innerHTML = originalHtml;
+          }
+        });
+      }
+
+      function escapeRegExp(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      }
+
+      function emphasizeKeywords(node, keywords) {
+        if (!keywords || !keywords.length) return;
+        var html = node.innerHTML;
+        keywords.forEach(function (word) {
+          var re = new RegExp(escapeRegExp(word), "g");
+          html = html.replace(re, '<span class="key-term">' + word + "</span>");
+        });
+        node.innerHTML = html;
+      }
+
+      function applyHighlights(keys, keywords) {
+        clearHighlights();
+        keys.forEach(function (key) {
+          var target = passageEl.querySelector('p[data-p="' + key + '"]');
+          if (target) {
+            target.classList.add("active");
+            emphasizeKeywords(target, keywords);
+          }
+        });
+      }
+
+      function renderQuestion() {
+        var q = questions[current];
+        progressEl.textContent = formatText(uiText[locale].progress, {
+          current: current + 1,
+          total: questions.length
+        });
+        questionTextEl.textContent = q.question[locale];
+        answerInputEl.value = answers[current];
+        answerInputEl.readOnly = false;
+        answerInputEl.classList.remove("model-visible");
+        showingModelAnswer = false;
+        savedDraftBeforeModel = "";
+        clearHighlights();
+        nextBtn.textContent = current === questions.length - 1 ? uiText[locale].finish : uiText[locale].next;
+        autoResizeAnswer();
+      }
+
+      function autoResizeAnswer() {
+        answerInputEl.style.height = "auto";
+        answerInputEl.style.height = answerInputEl.scrollHeight + "px";
+      }
+
+      function toggleAnswer() {
+        var q = questions[current];
+        if (showingModelAnswer) {
+          answerInputEl.value = savedDraftBeforeModel;
+          answerInputEl.readOnly = false;
+          answerInputEl.classList.remove("model-visible");
+          showingModelAnswer = false;
+          clearHighlights();
+          autoResizeAnswer();
+          return;
+        }
+        savedDraftBeforeModel = answerInputEl.value;
+        answerInputEl.value = q.modelAnswer[locale];
+        answerInputEl.readOnly = true;
+        answerInputEl.classList.add("model-visible");
+        showingModelAnswer = true;
+        applyHighlights(q.highlights, q.keywords[locale] || []);
+        autoResizeAnswer();
+      }
+
+      answerToggleEl.addEventListener("click", toggleAnswer);
+      answerToggleEl.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleAnswer();
+        }
+      });
+
+      nextBtn.addEventListener("click", function () {
+        answers[current] = answerInputEl.value;
+        if (current === questions.length - 1) {
+          alert(uiText[locale].doneAlert);
+          return;
+        }
+        current += 1;
+        renderQuestion();
+      });
+
+      answerInputEl.addEventListener("input", autoResizeAnswer);
+      langSelectEl.addEventListener("change", function () {
+        locale = langSelectEl.value === "en" ? "en" : "zh";
+        applyLocaleText();
+        renderPassage();
+        renderQuestion();
+      });
+
+      applyLocaleText();
+      renderPassage();
+      renderQuestion();
+    })();
+  </script>
+</body>
+</html>

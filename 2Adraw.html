@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2A Lucky Draw</title>
+  <style>
+    :root {
+      --panel-bg: rgba(15, 23, 42, 0.84);
+      --panel-border: rgba(148, 163, 184, 0.35);
+      --text: #e2e8f0;
+      --accent: #22d3ee;
+      --warn: #facc15;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: #0b1020;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .hud {
+      position: fixed;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 20;
+      min-width: 21rem;
+      max-width: min(30rem, calc(100vw - 1.5rem));
+      color: var(--text);
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 0.75rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .hud h1 {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.3;
+      color: #f8fafc;
+    }
+
+    .hud p {
+      margin: 0.35rem 0 0;
+      font-size: 0.92rem;
+      color: #cbd5e1;
+    }
+
+    .toolbar {
+      margin-top: 0.65rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    button {
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 8px;
+      padding: 0.45rem 0.75rem;
+      background: rgba(30, 41, 59, 0.95);
+      color: #f8fafc;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: rgba(51, 65, 85, 0.98);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .name-label {
+      position: fixed;
+      color: #ffffff;
+      font-weight: 700;
+      text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10;
+      user-select: none;
+    }
+
+    .countdown {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      pointer-events: none;
+      color: #ffffff;
+      text-align: center;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+      font-size: clamp(1.4rem, 4vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+
+    .ufo {
+      position: fixed;
+      display: none;
+      z-index: 40;
+      font-size: clamp(3rem, 8vw, 5.25rem);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      user-select: none;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+    }
+  </style>
+</head>
+<body>
+  <div class="hud">
+    <h1>2A Lucky Draw</h1>
+    <div class="toolbar">
+      <button id="pickBtn">🔮 Pick Random</button>
+      <button id="resetBtn">↩️ Move Everyone Back</button>
+    </div>
+  </div>
+  <div id="countdown" class="countdown"></div>
+  <div id="ufo" class="ufo">🛸</div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.183.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.183.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    const studentNames = [
+      "1 陳政延", "2 陳錦賢", "3 陳思涵", "4 莊曼妮", "5 封采", "6 郭君鵬",
+      "7 何天恩", "8 黃嘉樂", "9 黃詩茹", "10 蔣少涵", "11 簡愷佑", "12 梁柏宇",
+      "13 李狄達", "14 李一航", "15 李一鳴", "16 呂錦峰", "17 蘇紫瑜",
+      "19 王復生", "20 吳國豪", "21 吴浣瑩", "22 肖辰臻", "23 許繼耿",
+      "24 許學臻", "25 楊星睿", "26 姚銘", "27 易容妃", "28 余嘉浠", "29 曾嘉欣",
+      "30 張梓萱", "31 鄭敬熹", "33 和仟惠", "34 林煜翔", "35 蔡子萱",
+      "36 方紫瑜", "37 邱若曦"
+    ];
+
+    const drawState = {
+      isDrawing: false,
+      selected: null,
+      countdownTimer: null
+    };
+
+    const LEFT_ZONE = { centerX: -13, centerZ: 0, width: 18, depth: 22 };
+    const RIGHT_ZONE = { centerX: 13, centerZ: 0, width: 18, depth: 22 };
+
+    const pickBtn = document.getElementById("pickBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const countdownEl = document.getElementById("countdown");
+    const ufoEl = document.getElementById("ufo");
+
+    function randomBrightColor() {
+      return new THREE.Color(Math.random(), Math.random(), Math.random());
+    }
+
+    function colorDistance(a, b) {
+      const dr = a.r - b.r;
+      const dg = a.g - b.g;
+      const db = a.b - b.b;
+      return Math.sqrt(dr * dr + dg * dg + db * db);
+    }
+
+    function randomDistinctColor(baseColor, minDistance = 0.45) {
+      let next = randomBrightColor();
+      let tries = 0;
+      while (colorDistance(next, baseColor) < minDistance && tries < 20) {
+        next = randomBrightColor();
+        tries += 1;
+      }
+      return next;
+    }
+
+    function randomHeading() {
+      let x = 0;
+      let y = 0;
+      while (Math.abs(x) + Math.abs(y) < 0.0001) {
+        x = Math.random() - 0.5;
+        y = Math.random() - 0.5;
+      }
+      return new THREE.Vector2(x, y).normalize();
+    }
+
+    function lerpAngle(current, target, alpha) {
+      let delta = target - current;
+      if (delta > Math.PI) delta -= Math.PI * 2;
+      if (delta < -Math.PI) delta += Math.PI * 2;
+      return current + delta * alpha;
+    }
+
+    const scene = new THREE.Scene();
+    const skyColor = randomBrightColor();
+    scene.background = skyColor;
+    scene.fog = new THREE.Fog(skyColor, 45, 110);
+
+    const particleCount = 260;
+    const particleArea = { width: 88, depth: 64, minY: 2.5, maxY: 30 };
+    const particlePositions = new Float32Array(particleCount * 3);
+    const particleSpeeds = new Float32Array(particleCount);
+    for (let i = 0; i < particleCount; i += 1) {
+      const base = i * 3;
+      particlePositions[base] = (Math.random() - 0.5) * particleArea.width;
+      particlePositions[base + 1] =
+        particleArea.minY + Math.random() * (particleArea.maxY - particleArea.minY);
+      particlePositions[base + 2] = (Math.random() - 0.5) * particleArea.depth;
+      particleSpeeds[i] = 0.015 + Math.random() * 0.05;
+    }
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
+    const particleMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.18,
+      transparent: true,
+      opacity: 0.7,
+      sizeAttenuation: true
+    });
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particles);
+
+    const camera = new THREE.PerspectiveCamera(
+      48,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      200
+    );
+    camera.position.set(0, 19, 33);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 1.2, 0);
+    controls.maxDistance = 70;
+    controls.minDistance = 8;
+
+    const leftCourtColor = randomDistinctColor(skyColor, 0.45);
+    const rightCourtColor = randomDistinctColor(leftCourtColor, 0.35);
+    const singleCourtSize = 22;
+    const COURT_Y = -0.97;
+
+    const leftCourt = new THREE.Mesh(
+      new THREE.PlaneGeometry(singleCourtSize, singleCourtSize),
+      new THREE.MeshBasicMaterial({ color: leftCourtColor })
+    );
+    leftCourt.rotation.x = -Math.PI / 2;
+    leftCourt.position.set(LEFT_ZONE.centerX, COURT_Y, LEFT_ZONE.centerZ);
+    scene.add(leftCourt);
+
+    const rightCourt = new THREE.Mesh(
+      new THREE.PlaneGeometry(singleCourtSize, singleCourtSize),
+      new THREE.MeshBasicMaterial({ color: rightCourtColor })
+    );
+    rightCourt.rotation.x = -Math.PI / 2;
+    rightCourt.position.set(RIGHT_ZONE.centerX, COURT_Y, RIGHT_ZONE.centerZ);
+    scene.add(rightCourt);
+
+    // School building body under the rooftop courts (3 floors).
+    const buildingWidth = 52;
+    const buildingDepth = 26;
+    const floorHeight = 6.3;
+    const floorGap = 0.05;
+    const buildingTopY = -1.02;
+    const windowFloorCount = 6;
+    const floorColors = Array.from({ length: windowFloorCount }, (_, i) => {
+      if (i === 0) return randomDistinctColor(skyColor, 0.35);
+      if (i === 1) return randomDistinctColor(leftCourtColor, 0.35);
+      if (i === 2) return randomDistinctColor(rightCourtColor, 0.35);
+      return randomBrightColor();
+    });
+    let currentTopY = buildingTopY;
+    for (let i = 0; i < windowFloorCount; i += 1) {
+      const floorMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(buildingWidth, floorHeight, buildingDepth),
+        new THREE.MeshBasicMaterial({ color: floorColors[i] })
+      );
+      floorMesh.position.set(0, currentTopY - floorHeight / 2, 0);
+      scene.add(floorMesh);
+      currentTopY -= floorHeight + floorGap;
+    }
+
+    const groundFloorHeight = floorHeight;
+    const groundFloor = new THREE.Mesh(
+      new THREE.BoxGeometry(buildingWidth, groundFloorHeight, buildingDepth),
+      new THREE.MeshBasicMaterial({ color: randomDistinctColor(skyColor, 0.3) })
+    );
+    groundFloor.position.set(0, currentTopY - groundFloorHeight / 2, 0);
+    scene.add(groundFloor);
+
+    const frontDoor = new THREE.Mesh(
+      new THREE.PlaneGeometry(3.8, 5.4),
+      new THREE.MeshBasicMaterial({ color: 0xf59e0b })
+    );
+    frontDoor.position.set(0, currentTopY - groundFloorHeight / 2 - 0.1, buildingDepth / 2 + 0.05);
+    scene.add(frontDoor);
+
+    const roofTrim = new THREE.Mesh(
+      new THREE.BoxGeometry(buildingWidth + 0.8, 0.22, buildingDepth + 0.8),
+      new THREE.MeshBasicMaterial({ color: 0xe5e7eb })
+    );
+    roofTrim.position.set(0, buildingTopY - 0.35, 0);
+    scene.add(roofTrim);
+
+    const windowMaterial = new THREE.MeshBasicMaterial({
+      color: 0x93c5fd,
+      transparent: true,
+      opacity: 0.85
+    });
+    const windowW = 1.45;
+    const windowH = 2.4;
+    const windowGapX = 3.9;
+    const sideWindowGap = 3.9;
+    const rowY = Array.from(
+      { length: windowFloorCount },
+      (_, i) => buildingTopY - i * (floorHeight + floorGap) - floorHeight * 0.28
+    );
+
+    for (const y of rowY) {
+      for (let x = -21; x <= 21; x += windowGapX) {
+        const frontWindow = new THREE.Mesh(
+          new THREE.PlaneGeometry(windowW, windowH),
+          windowMaterial
+        );
+        frontWindow.position.set(x, y, buildingDepth / 2 + 0.03);
+        scene.add(frontWindow);
+
+        const backWindow = new THREE.Mesh(
+          new THREE.PlaneGeometry(windowW, windowH),
+          windowMaterial
+        );
+        backWindow.position.set(x, y, -buildingDepth / 2 - 0.03);
+        backWindow.rotation.y = Math.PI;
+        scene.add(backWindow);
+      }
+      for (let z = -9.5; z <= 9.5; z += sideWindowGap) {
+        const rightWindow = new THREE.Mesh(
+          new THREE.PlaneGeometry(windowW, windowH),
+          windowMaterial
+        );
+        rightWindow.position.set(buildingWidth / 2 + 0.03, y, z);
+        rightWindow.rotation.y = -Math.PI / 2;
+        scene.add(rightWindow);
+
+        const leftWindow = new THREE.Mesh(
+          new THREE.PlaneGeometry(windowW, windowH),
+          windowMaterial
+        );
+        leftWindow.position.set(-buildingWidth / 2 - 0.03, y, z);
+        leftWindow.rotation.y = Math.PI / 2;
+        scene.add(leftWindow);
+      }
+    }
+
+    const glassMaterial = new THREE.MeshBasicMaterial({
+      color: 0xdbeafe,
+      transparent: true,
+      opacity: 0.25
+    });
+    const wallHeight = 6;
+    const wallThickness = 0.22;
+    const courtWidth = 50;
+    const courtDepth = 24;
+    const wallY = COURT_Y + wallHeight / 2;
+
+    const northWall = new THREE.Mesh(
+      new THREE.BoxGeometry(courtWidth, wallHeight, wallThickness),
+      glassMaterial
+    );
+    northWall.position.set(0, wallY, courtDepth / 2);
+    scene.add(northWall);
+
+    const southWall = new THREE.Mesh(
+      new THREE.BoxGeometry(courtWidth, wallHeight, wallThickness),
+      glassMaterial
+    );
+    southWall.position.set(0, wallY, -courtDepth / 2);
+    scene.add(southWall);
+
+    const eastWall = new THREE.Mesh(
+      new THREE.BoxGeometry(wallThickness, wallHeight, courtDepth),
+      glassMaterial
+    );
+    eastWall.position.set(courtWidth / 2, wallY, 0);
+    scene.add(eastWall);
+
+    const westWall = new THREE.Mesh(
+      new THREE.BoxGeometry(wallThickness, wallHeight, courtDepth),
+      glassMaterial
+    );
+    westWall.position.set(-courtWidth / 2, wallY, 0);
+    scene.add(westWall);
+
+    const wallEdgeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+    [northWall, southWall, eastWall, westWall].forEach((wall) => {
+      const edges = new THREE.EdgesGeometry(wall.geometry);
+      const wire = new THREE.LineSegments(edges, wallEdgeMaterial);
+      wall.add(wire);
+    });
+
+    function randomAvatarColor() {
+      return randomBrightColor();
+    }
+
+    function createAvatar() {
+      const group = new THREE.Group();
+
+      const skin = randomAvatarColor();
+      const outfit = randomAvatarColor();
+      const pants = outfit.clone().multiplyScalar(0.7);
+
+      const head = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshBasicMaterial({ color: skin })
+      );
+      head.position.y = 0.95;
+      group.add(head);
+
+      const body = new THREE.Mesh(
+        new THREE.BoxGeometry(0.86, 0.95, 0.56),
+        new THREE.MeshBasicMaterial({ color: outfit })
+      );
+      body.position.y = 0.1;
+      group.add(body);
+
+      const armGeom = new THREE.BoxGeometry(0.26, 0.92, 0.28);
+      const leftArm = new THREE.Mesh(armGeom, body.material);
+      const rightArm = new THREE.Mesh(armGeom, body.material);
+      leftArm.position.set(-0.58, 0.06, 0);
+      rightArm.position.set(0.58, 0.06, 0);
+      group.add(leftArm, rightArm);
+
+      const legGeom = new THREE.BoxGeometry(0.3, 0.56, 0.3);
+      const leftLeg = new THREE.Mesh(
+        legGeom,
+        new THREE.MeshBasicMaterial({ color: pants })
+      );
+      const rightLeg = new THREE.Mesh(legGeom, leftLeg.material);
+      leftLeg.position.set(-0.2, -0.72, 0);
+      rightLeg.position.set(0.2, -0.72, 0);
+      group.add(leftLeg, rightLeg);
+
+      group.userData.leftArm = leftArm;
+      group.userData.rightArm = rightArm;
+      group.userData.leftLeg = leftLeg;
+      group.userData.rightLeg = rightLeg;
+      return group;
+    }
+
+    function randomPosInZone(zone) {
+      return {
+        x: zone.centerX + (Math.random() - 0.5) * (zone.width - 1.2),
+        z: zone.centerZ + (Math.random() - 0.5) * (zone.depth - 1.2)
+      };
+    }
+
+    function clampToZone(avatarObj, zone) {
+      const minX = zone.centerX - zone.width / 2 + 0.5;
+      const maxX = zone.centerX + zone.width / 2 - 0.5;
+      const minZ = zone.centerZ - zone.depth / 2 + 0.5;
+      const maxZ = zone.centerZ + zone.depth / 2 - 0.5;
+      avatarObj.mesh.position.x = THREE.MathUtils.clamp(avatarObj.mesh.position.x, minX, maxX);
+      avatarObj.mesh.position.z = THREE.MathUtils.clamp(avatarObj.mesh.position.z, minZ, maxZ);
+    }
+
+    const avatars = studentNames.map((name, idx) => {
+      const mesh = createAvatar();
+      const p = randomPosInZone(LEFT_ZONE);
+      mesh.position.set(p.x, 0, p.z);
+      scene.add(mesh);
+
+      const label = document.createElement("div");
+      label.className = "name-label";
+      label.textContent = name;
+      document.body.appendChild(label);
+
+      const dir2 = randomHeading();
+      return {
+        id: idx,
+        name,
+        mesh,
+        label,
+        zone: "left",
+        speed: 0.009 + Math.random() * 0.014,
+        heading: dir2,
+        nextTurnAt: performance.now() + 600 + Math.random() * 2800
+      };
+    });
+
+    function counts() {
+      const left = avatars.filter((a) => a.zone === "left").length;
+      return { left, right: avatars.length - left };
+    }
+
+    function updateCounts() {
+      const c = counts();
+      pickBtn.disabled = drawState.isDrawing || c.left === 0;
+    }
+
+    function showCountdown(text) {
+      countdownEl.style.display = "flex";
+      countdownEl.textContent = text;
+    }
+
+    function hideCountdown() {
+      countdownEl.style.display = "none";
+      countdownEl.textContent = "";
+    }
+
+    function updateUfoPosition(avatarObj) {
+      const screenPos = avatarObj.mesh.position.clone();
+      screenPos.y += 4.4;
+      screenPos.project(camera);
+      const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+      const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
+      const visible = screenPos.z > -1 && screenPos.z < 1;
+      ufoEl.style.display = visible ? "block" : "none";
+      if (visible) {
+        ufoEl.style.left = `${x}px`;
+        ufoEl.style.top = `${y}px`;
+      }
+    }
+
+    function hideUfo() {
+      ufoEl.style.display = "none";
+    }
+
+    function randomLeftAvatar() {
+      const candidates = avatars.filter((a) => a.zone === "left");
+      if (candidates.length === 0) {
+        return null;
+      }
+      return candidates[Math.floor(Math.random() * candidates.length)];
+    }
+
+    function animateLiftAndTransfer(avatarObj) {
+      drawState.isDrawing = true;
+      drawState.selected = avatarObj;
+      updateCounts();
+
+      const baseY = avatarObj.mesh.position.y;
+      const liftY = 10.5;
+      const spin = 0.22 + Math.random() * 0.2;
+      const liftMs = 3600;
+      const moveMs = 1500;
+      const start = performance.now();
+      ufoEl.style.display = "block";
+
+      let dotCount = 1;
+      showCountdown(`🎯 ${avatarObj.name}\n${"•".repeat(dotCount)}`);
+      clearInterval(drawState.countdownTimer);
+      drawState.countdownTimer = setInterval(() => {
+        dotCount = (dotCount % 4) + 1;
+        showCountdown(`🎯 ${avatarObj.name}\n${"•".repeat(dotCount)}`);
+      }, 320);
+
+      function doLift(now) {
+        const t = Math.min((now - start) / liftMs, 1);
+        avatarObj.mesh.position.y = THREE.MathUtils.lerp(baseY, liftY, t);
+        avatarObj.mesh.rotation.y += spin;
+        updateUfoPosition(avatarObj);
+        if (t < 1) {
+          requestAnimationFrame(doLift);
+          return;
+        }
+        clearInterval(drawState.countdownTimer);
+        transferToRight();
+      }
+
+      function transferToRight() {
+        avatarObj.zone = "right";
+        const to = randomPosInZone(RIGHT_ZONE);
+        const from = avatarObj.mesh.position.clone();
+        const target = new THREE.Vector3(to.x, 0, to.z);
+        const moveStart = performance.now();
+
+        function doMove(now) {
+          const t = Math.min((now - moveStart) / moveMs, 1);
+          const eased = t * t * (3 - 2 * t);
+          avatarObj.mesh.position.lerpVectors(from, target, eased);
+          avatarObj.mesh.rotation.y += spin * 0.4;
+          updateUfoPosition(avatarObj);
+          if (t < 1) {
+            requestAnimationFrame(doMove);
+            return;
+          }
+          avatarObj.mesh.position.y = 0;
+          avatarObj.mesh.rotation.y = 0;
+          avatarObj.heading.copy(randomHeading());
+          avatarObj.nextTurnAt = performance.now() + 700 + Math.random() * 1200;
+          hideCountdown();
+          hideUfo();
+          drawState.isDrawing = false;
+          drawState.selected = null;
+          updateCounts();
+        }
+
+        requestAnimationFrame(doMove);
+      }
+
+      requestAnimationFrame(doLift);
+    }
+
+    function walkAvatar(avatarObj, now) {
+      if (drawState.isDrawing && drawState.selected === avatarObj) {
+        return;
+      }
+
+      avatarObj.mesh.position.x += avatarObj.heading.x * avatarObj.speed;
+      avatarObj.mesh.position.z += avatarObj.heading.y * avatarObj.speed;
+
+      const zone = avatarObj.zone === "left" ? LEFT_ZONE : RIGHT_ZONE;
+      const minX = zone.centerX - zone.width / 2 + 0.6;
+      const maxX = zone.centerX + zone.width / 2 - 0.6;
+      const minZ = zone.centerZ - zone.depth / 2 + 0.6;
+      const maxZ = zone.centerZ + zone.depth / 2 - 0.6;
+      const outOfBounds =
+        avatarObj.mesh.position.x < minX ||
+        avatarObj.mesh.position.x > maxX ||
+        avatarObj.mesh.position.z < minZ ||
+        avatarObj.mesh.position.z > maxZ;
+
+      if (outOfBounds || now >= avatarObj.nextTurnAt) {
+        avatarObj.heading.copy(randomHeading());
+        avatarObj.nextTurnAt = now + 500 + Math.random() * 2600;
+      }
+
+      clampToZone(avatarObj, zone);
+
+      const phase = now * 0.0065 * (avatarObj.speed * 80);
+      const legSwing = Math.sin(phase) * 0.5;
+      const armSwing = -legSwing * 0.7;
+      avatarObj.mesh.userData.leftLeg.rotation.x = legSwing;
+      avatarObj.mesh.userData.rightLeg.rotation.x = -legSwing;
+      avatarObj.mesh.userData.leftArm.rotation.x = armSwing;
+      avatarObj.mesh.userData.rightArm.rotation.x = -armSwing;
+      const targetYaw = Math.atan2(avatarObj.heading.x, avatarObj.heading.y);
+      if (Number.isFinite(targetYaw)) {
+        avatarObj.mesh.rotation.y = lerpAngle(avatarObj.mesh.rotation.y, targetYaw, 0.18);
+      }
+    }
+
+    function updateLabel(avatarObj) {
+      const pos = avatarObj.mesh.position.clone();
+      pos.y += 2.1;
+      pos.project(camera);
+
+      const isBehind = pos.z > 1;
+      if (isBehind) {
+        avatarObj.label.style.display = "none";
+        return;
+      }
+
+      avatarObj.label.style.display = "block";
+      avatarObj.label.style.left = `${(pos.x * 0.5 + 0.5) * window.innerWidth}px`;
+      avatarObj.label.style.top = `${(-pos.y * 0.5 + 0.5) * window.innerHeight}px`;
+
+      const distance = camera.position.distanceTo(avatarObj.mesh.position);
+      const size = THREE.MathUtils.clamp(200 / distance, 11, 26);
+      avatarObj.label.style.fontSize = `${size}px`;
+      avatarObj.label.style.opacity = avatarObj.zone === "right" ? "0.95" : "0.85";
+    }
+
+    function resetAllToLeft() {
+      if (drawState.isDrawing) {
+        return;
+      }
+      avatars.forEach((a) => {
+        a.zone = "left";
+        const p = randomPosInZone(LEFT_ZONE);
+        a.mesh.position.set(p.x, 0, p.z);
+        a.mesh.rotation.set(0, 0, 0);
+        a.heading.copy(randomHeading());
+        a.nextTurnAt = performance.now() + 600 + Math.random() * 900;
+      });
+      updateCounts();
+      hideUfo();
+    }
+
+    pickBtn.addEventListener("click", () => {
+      if (drawState.isDrawing) {
+        return;
+      }
+      const chosen = randomLeftAvatar();
+      if (!chosen) {
+        updateCounts();
+        return;
+      }
+      animateLiftAndTransfer(chosen);
+    });
+
+    resetBtn.addEventListener("click", resetAllToLeft);
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    function tick(now) {
+      controls.update();
+      const positions = particleGeometry.attributes.position.array;
+      for (let i = 0; i < particleCount; i += 1) {
+        const base = i * 3;
+        positions[base + 1] += particleSpeeds[i];
+        positions[base] += Math.sin(now * 0.00035 + i) * 0.002;
+        if (positions[base + 1] > particleArea.maxY) {
+          positions[base + 1] = particleArea.minY;
+          positions[base] = (Math.random() - 0.5) * particleArea.width;
+          positions[base + 2] = (Math.random() - 0.5) * particleArea.depth;
+        }
+      }
+      particleGeometry.attributes.position.needsUpdate = true;
+      for (const avatar of avatars) {
+        walkAvatar(avatar, now);
+        updateLabel(avatar);
+      }
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+
+    updateCounts();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>
