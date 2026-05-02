@@ -276,6 +276,21 @@
           });
         }
 
+        /** Seek back to `startSec` when playback passes `endSec` (video timeline seconds). Add data-loop-end-sec (+ optional data-loop-start-sec) on the iframe. */
+        const attachEarlyLoop = (player, endSec, startSec = 0) => {
+          if (!player || typeof player.getCurrentTime !== "function") return;
+          const end = Number(endSec);
+          const start = Number(startSec);
+          if (!Number.isFinite(end) || end <= 0) return;
+          const s = Number.isFinite(start) && start >= 0 ? start : 0;
+          window.setInterval(() => {
+            try {
+              if (player.getPlayerState() !== 1) return;
+              if (player.getCurrentTime() >= end) player.seekTo(s, true);
+            } catch (e) {}
+          }, 150);
+        };
+
         window.onYouTubeIframeAPIReady = () => {
           const iframes = Array.from(document.querySelectorAll("iframe[data-video-id]"));
           if (!iframes.length) return;
@@ -283,6 +298,9 @@
           iframes.forEach((el, idx) => {
             const id = el.getAttribute("data-video-id");
             if (!id) return;
+
+            const loopEndSec = el.getAttribute("data-loop-end-sec");
+            const loopStartSec = el.getAttribute("data-loop-start-sec");
 
             players[idx] = new YT.Player(el, {
               events: {
@@ -299,6 +317,13 @@
                     try {
                       ev.target.pauseVideo();
                     } catch (e) {}
+                  }
+
+                  if (loopEndSec != null && loopEndSec !== "") {
+                    const end = parseFloat(loopEndSec);
+                    const start =
+                      loopStartSec != null && loopStartSec !== "" ? parseFloat(loopStartSec) : 0;
+                    attachEarlyLoop(ev.target, end, start);
                   }
                 },
               },

@@ -276,6 +276,21 @@
           });
         }
 
+        /** Seek back to `startSec` when playback passes `endSec` (video timeline seconds). Add data-loop-end-sec (+ optional data-loop-start-sec) on the iframe. */
+        const attachEarlyLoop = (player, endSec, startSec = 0) => {
+          if (!player || typeof player.getCurrentTime !== "function") return;
+          const end = Number(endSec);
+          const start = Number(startSec);
+          if (!Number.isFinite(end) || end <= 0) return;
+          const s = Number.isFinite(start) && start >= 0 ? start : 0;
+          window.setInterval(() => {
+            try {
+              if (player.getPlayerState() !== 1) return;
+              if (player.getCurrentTime() >= end) player.seekTo(s, true);
+            } catch (e) {}
+          }, 150);
+        };
+
         window.onYouTubeIframeAPIReady = () => {
           const iframes = Array.from(document.querySelectorAll("iframe[data-video-id]"));
           if (!iframes.length) return;
@@ -308,15 +323,7 @@
                     const end = parseFloat(loopEndSec);
                     const start =
                       loopStartSec != null && loopStartSec !== "" ? parseFloat(loopStartSec) : 0;
-                    if (Number.isFinite(end) && end > 0) {
-                      window.setInterval(() => {
-                        try {
-                          const p = ev.target;
-                          if (p.getPlayerState() !== 1) return;
-                          if (p.getCurrentTime() >= end) p.seekTo(start, true);
-                        } catch (e) {}
-                      }, 150);
-                    }
+                    attachEarlyLoop(ev.target, end, start);
                   }
                 },
               },
@@ -488,7 +495,9 @@
         <div class="video">
           <iframe
             data-video-id="2aDZAI30WCU"
-            src="https://www.youtube.com/embed/2aDZAI30WCU?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=2aDZAI30WCU&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
+            data-loop-end-sec="100"
+            data-loop-start-sec="56"
+            src="https://www.youtube.com/embed/2aDZAI30WCU?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=2aDZAI30WCU&start=56&controls=0&modestbranding=1&playsinline=1&rel=0"
             allow="autoplay; encrypted-media; picture-in-picture"
             allowfullscreen
           ></iframe>
