@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Background videos</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 1rem;
+        line-height: 1.45;
+        color: #0f172a;
+        background: #f1f5f9;
+      }
+      .wrap {
+        width: min(22rem, 92vw);
+        margin: 0 auto;
+        padding: clamp(1.5rem, 4vw, 2.5rem) 1rem;
+      }
+      h1 {
+        margin: 0 0 1.25rem;
+        font-size: 1.25rem;
+        font-weight: 650;
+        color: #1e3a5f;
+        letter-spacing: -0.02em;
+      }
+      .links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        margin: 0 0 1.5rem;
+      }
+      .links a {
+        display: block;
+        padding: 0.85rem 1rem;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #1e3a5f;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .links a:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.07);
+      }
+      .back a {
+        color: #3b6d9e;
+        font-size: 0.9rem;
+        text-decoration: none;
+      }
+      .back a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Background videos</h1>
+      <div class="links">
+        <a href="background1.html">Background 1</a>
+        <a href="background2.html" title="Surrealism">Background 2</a>
+      </div>
+      <p class="back"><a href="../../index.html">← Back to lessons</a></p>
+    </div>
+  </body>
+</html>
