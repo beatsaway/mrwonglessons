@@ -284,6 +284,9 @@
             const id = el.getAttribute("data-video-id");
             if (!id) return;
 
+            const loopEndSec = el.getAttribute("data-loop-end-sec");
+            const loopStartSec = el.getAttribute("data-loop-start-sec");
+
             players[idx] = new YT.Player(el, {
               events: {
                 onReady: (ev) => {
@@ -299,6 +302,21 @@
                     try {
                       ev.target.pauseVideo();
                     } catch (e) {}
+                  }
+
+                  if (loopEndSec != null && loopEndSec !== "") {
+                    const end = parseFloat(loopEndSec);
+                    const start =
+                      loopStartSec != null && loopStartSec !== "" ? parseFloat(loopStartSec) : 0;
+                    if (Number.isFinite(end) && end > 0) {
+                      window.setInterval(() => {
+                        try {
+                          const p = ev.target;
+                          if (p.getPlayerState() !== 1) return;
+                          if (p.getCurrentTime() >= end) p.seekTo(start, true);
+                        } catch (e) {}
+                      }, 150);
+                    }
                   }
                 },
               },
@@ -426,6 +444,8 @@
         <div class="video">
           <iframe
             data-video-id="pcgl8hEZfzU"
+            data-loop-end-sec="216"
+            data-loop-start-sec="60"
             src="https://www.youtube.com/embed/pcgl8hEZfzU?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=pcgl8hEZfzU&start=60&controls=0&modestbranding=1&playsinline=1&rel=0"
             allow="autoplay; encrypted-media; picture-in-picture"
             allowfullscreen
