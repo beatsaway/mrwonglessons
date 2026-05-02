@@ -62,21 +62,110 @@
         backdrop-filter: blur(6px);
         -webkit-backdrop-filter: blur(6px);
       }
+      .timing-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+      }
+      .timing-overlay[hidden] {
+        display: none;
+      }
+      .timing-overlay__box {
+        width: min(22rem, 100%);
+        padding: 1rem 1.15rem 1.1rem;
+        border-radius: 14px;
+        background: rgba(22, 22, 26, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+      }
+      .timing-overlay__box label {
+        display: block;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 13px;
+        margin-bottom: 0.45rem;
+      }
+      .timing-overlay__box input[type="range"] {
+        width: 100%;
+        margin: 0 0 0.35rem;
+      }
+      #gap-readout {
+        display: block;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 12px;
+      }
     </style>
   </head>
   <body>
     <div id="countdown">--</div>
+    <div id="timing-panel" class="timing-overlay" hidden>
+      <div class="timing-overlay__box">
+        <label for="gap-slider">Time between clips</label>
+        <input id="gap-slider" type="range" min="15" max="90" step="5" value="45" />
+        <span id="gap-readout">30–60 s</span>
+      </div>
+    </div>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
       (() => {
-        const minMs = 30_000;
-        const maxMs = 60_000;
+        let minMs = 30_000;
+        let maxMs = 60_000;
+        const SPREAD_SEC = 15;
         const countdownEl = document.getElementById("countdown");
+        const timingPanel = document.getElementById("timing-panel");
+        const gapSlider = document.getElementById("gap-slider");
+        const gapReadout = document.getElementById("gap-readout");
         let sections = [];
 
-        let i = 0;
+        const applyGapFromSlider = () => {
+          const avg = Number(gapSlider?.value ?? 45);
+          let lo = (avg - SPREAD_SEC) * 1000;
+          let hi = (avg + SPREAD_SEC) * 1000;
+          lo = Math.max(3000, lo);
+          hi = Math.min(180000, hi);
+          if (hi <= lo) hi = lo + 1000;
+          minMs = lo;
+          maxMs = hi;
+          if (gapReadout) {
+            gapReadout.textContent = `${Math.round(minMs / 1000)}–${Math.round(maxMs / 1000)} s`;
+          }
+        };
+
+        applyGapFromSlider();
+
         let activeIndex = 0;
         const players = [];
+        let unvisited = new Set();
+
+        const refillUnvisited = () => {
+          unvisited = new Set(sections.map((_, idx) => idx));
+        };
+
+        /** Random clip each time; each round visits every clip once, then the deck resets. */
+        const pickNextIndex = () => {
+          const n = sections.length;
+          if (n <= 1) return 0;
+
+          if (unvisited.size === 0) {
+            refillUnvisited();
+            unvisited.delete(activeIndex);
+          }
+
+          let pool = [...unvisited];
+          if (pool.length > 1) {
+            const skipCur = pool.filter((idx) => idx !== activeIndex);
+            if (skipCur.length) pool = skipCur;
+          }
+          const j = pool[Math.floor(Math.random() * pool.length)];
+          unvisited.delete(j);
+          return j;
+        };
 
         const nextDelayMs = () => minMs + Math.floor(Math.random() * (maxMs - minMs + 1));
 
@@ -123,9 +212,9 @@
           setCountdownText(delay);
 
           timeoutId = window.setTimeout(() => {
-            i = (i + 1) % sections.length;
-            sections[i].scrollIntoView({ behavior: "smooth", block: "start" });
-            setActive(i);
+            const nextIdx = pickNextIndex();
+            sections[nextIdx].scrollIntoView({ behavior: "smooth", block: "start" });
+            setActive(nextIdx);
             scheduleNext();
           }, delay);
 
@@ -159,10 +248,45 @@
             );
             sections.forEach((s) => io.observe(s));
 
+            queueMicrotask(() => {
+              refillUnvisited();
+              if (sections.length > 1) unvisited.delete(activeIndex);
+            });
+
             scheduleNext();
           },
           { once: true }
         );
+
+        if (gapSlider) {
+          gapSlider.addEventListener("input", () => {
+            applyGapFromSlider();
+            if (sections.length) scheduleNext();
+          });
+        }
+
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "m" || e.key === "M") {
+            if (!timingPanel) return;
+            if (timingPanel.hidden) {
+              const t = e.target;
+              const tag = t && t.tagName;
+              if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+            }
+            e.preventDefault();
+            timingPanel.hidden = !timingPanel.hidden;
+          }
+          if (e.key === "Escape" && timingPanel && !timingPanel.hidden) {
+            timingPanel.hidden = true;
+            e.preventDefault();
+          }
+        });
+
+        if (timingPanel) {
+          timingPanel.addEventListener("click", (e) => {
+            if (e.target === timingPanel) timingPanel.hidden = true;
+          });
+        }
 
         window.onYouTubeIframeAPIReady = () => {
           const iframes = Array.from(document.querySelectorAll("iframe[data-video-id]"));
