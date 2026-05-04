@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Five pencil grips for drawing — EN/中文."
+    />
+    <title>Pencil grips for drawing | KS3</title>
+    <style>
+      :root {
+        --bg: #fafbfc;
+        --text: #1a1a1a;
+        --muted: #4a5568;
+        --accent: #2c5282;
+        --border: #e2e8f0;
+        --card: #ffffff;
+        --core: #1a365d;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-size: 1.02rem;
+        line-height: 1.55;
+      }
+      html[data-lang="zh"] body {
+        font-family: "PingFang HK", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", system-ui,
+          sans-serif;
+      }
+      a {
+        color: var(--accent);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+      }
+      a:hover {
+        text-decoration-thickness: 2px;
+      }
+      .wrap {
+        max-width: min(72rem, 100%);
+        margin: 0 auto;
+        padding: 1rem max(1rem, env(safe-area-inset-right)) 2.5rem max(1rem, env(safe-area-inset-left));
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 1rem;
+        margin-bottom: 1.25rem;
+        padding: 0.65rem 0.85rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      .toolbar label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--core);
+      }
+      .toolbar select {
+        font: inherit;
+        padding: 0.35rem 0.5rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: #fff;
+        color: var(--text);
+        min-width: 9rem;
+      }
+      html[data-lang="en"] .i18n-zh {
+        display: none !important;
+      }
+      html[data-lang="zh"] .i18n-en {
+        display: none !important;
+      }
+      .nav-row {
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+      }
+      .nav-row a {
+        display: inline-block;
+        font-size: 1.55rem;
+        line-height: 1;
+        text-decoration: none;
+        padding: 0.15rem;
+        border-radius: 8px;
+      }
+      .nav-row a:hover {
+        background: rgba(44, 82, 130, 0.08);
+      }
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(1.15rem, 3.5vw, 1.35rem);
+        font-weight: 700;
+        color: var(--core);
+        line-height: 1.3;
+      }
+      .byline {
+        margin: 0 0 1rem;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+      .byline a {
+        font-weight: 500;
+      }
+      .intro-box {
+        margin: 0 0 1.75rem;
+        padding: 1rem 1.1rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        border-left: 4px solid var(--accent);
+      }
+      .intro-box h2 {
+        margin: 0 0 0.65rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--core);
+      }
+      .intro-box ul {
+        margin: 0;
+        padding-left: 0.15rem;
+        list-style: none;
+      }
+      .intro-box li {
+        margin-bottom: 0.45rem;
+      }
+      .intro-box li:last-child {
+        margin-bottom: 0;
+      }
+      .gestures-panel {
+        margin: 0 0 1.75rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+      }
+      .gestures-panel .gestures-hero {
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .gestures-hero img {
+        width: 100%;
+        height: auto;
+        display: block;
+        vertical-align: middle;
+      }
+      .grips-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.35rem 0.45rem;
+        padding: 0.45rem 0.4rem 0.55rem;
+        align-items: start;
+      }
+      @media (min-width: 36rem) {
+        .grips-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (min-width: 52rem) {
+        .grips-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+      @media (min-width: 70rem) {
+        .grips-grid {
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 0.25rem 0.35rem;
+          padding: 0.4rem 0.35rem 0.5rem;
+        }
+      }
+      article.grip {
+        margin: 0;
+        padding: 0.35rem 0.3rem;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+        min-width: 0;
+      }
+      article.grip h2 {
+        margin: 0 0 0.4rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--core);
+        line-height: 1.25;
+        letter-spacing: -0.01em;
+      }
+      article.grip ul {
+        margin: 0;
+        padding-left: 0.1rem;
+        list-style: none;
+        font-size: 0.76rem;
+        line-height: 1.38;
+        color: var(--text);
+      }
+      article.grip li {
+        margin-bottom: 0.28rem;
+      }
+      article.grip li:last-child {
+        margin-bottom: 0;
+      }
+      .badge {
+        display: inline-block;
+        margin-left: 0.35rem;
+        padding: 0.12rem 0.45rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #744210;
+        background: #fef3c7;
+        border-radius: 6px;
+        vertical-align: middle;
+      }
+      html[data-lang="zh"] .badge {
+        font-size: 0.68rem;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <p class="nav-row">
+        <a href="../../index.html" aria-label="Home · 主頁"><span aria-hidden="true">🏠</span></a>
+      </p>
+
+      <div class="toolbar">
+        <label for="lang-select" class="i18n-en">Language</label>
+        <label for="lang-select" class="i18n-zh">語言</label>
+        <select id="lang-select" aria-label="Display language">
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+
+      <h1>
+        <span class="i18n-en">Five pencil grips for drawing</span>
+        <span class="i18n-zh">繪畫的五種鉛筆握法</span>
+      </h1>
+      <p class="byline">
+        <span class="i18n-en"
+          ><a href="https://thevirtualinstructor.com/blog/how-to-hold-a-pencil-for-drawing-grips"
+            >by Matt Fussell</a
+          ></span
+        >
+        <span class="i18n-zh"
+          ><a href="https://thevirtualinstructor.com/blog/how-to-hold-a-pencil-for-drawing-grips"
+            >Matt Fussell</a
+          ></span
+        >
+      </p>
+
+      <section class="intro-box" aria-labelledby="intro-heading">
+        <h2 id="intro-heading">
+          <span class="i18n-en">Why change how you hold the pencil?</span>
+          <span class="i18n-zh">為什麼要換握法？</span>
+        </h2>
+        <ul>
+          <li>
+            <span class="i18n-en"
+              >✏️ The grip changes the marks you make; using one grip for everything limits your
+              mark-making.</span
+            >
+            <span class="i18n-zh">✏️ 握法會改變線條與筆觸；只用一種握法會限制表現方式。</span>
+          </li>
+          <li>
+            <span class="i18n-en"
+              >✨ <strong>Variety</strong> (a principle of art) keeps drawings interesting; different
+              grips add variety quickly.</span
+            >
+            <span class="i18n-zh"
+              >✨ <strong>多樣性</strong>（藝術原則之一）讓畫面更有趣味；換握法能很快增加筆觸變化。</span
+            >
+          </li>
+          <li>
+            <span class="i18n-en"
+              >🚀 Trying new holds expands how you can move the pencil and what kinds of lines you can
+              produce.</span
+            >
+            <span class="i18n-zh">🚀 多試幾種握法，能擴大運筆方式與線條的可能性。</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="gestures-panel" aria-label="Five pencil grips">
+        <figure class="gestures-hero">
+          <img
+            src="allgestures.webp"
+            width="888"
+            height="213"
+            loading="lazy"
+            decoding="async"
+            alt=""
+            aria-describedby="gestures-photo-desc"
+          />
+          <figcaption id="gestures-photo-desc" class="sr-only">
+            <span class="i18n-en"
+              >One row of photos: traditional, drumstick, paint brush, tip-heavy overhand, and inverted
+              pencil grips.</span
+            >
+            <span class="i18n-zh"
+              >一列照片：傳統、鼓槌式、畫筆式、前重反手式、反向式，五種握法。</span
+            >
+          </figcaption>
+        </figure>
+        <div class="grips-grid">
+        <article class="grip">
+            <h2>
+              <span class="i18n-en">1. Traditional grip</span>
+              <span class="i18n-zh">1. 傳統握法（寫字式）</span>
+            </h2>
+            <ul>
+              <li>
+                <span class="i18n-en">✍️ Same hold most people learn for writing; often the only grip used for drawing.</span>
+                <span class="i18n-zh">✍️ 多數人學寫字時的握法；不少人畫畫也只會用這一種。</span>
+              </li>
+              <li>
+                <span class="i18n-en">🫶 Natural “first choice” when you start a drawing.</span>
+                <span class="i18n-zh">🫶 開始畫時往往最順手、最先想到。</span>
+              </li>
+              <li>
+                <span class="i18n-en">🔍 The <strong>tip</strong> touches the paper; strong control — good for detail.</span>
+                <span class="i18n-zh">🔍 以<strong>筆尖</strong>接觸紙面，控制力高，適合細節。</span>
+              </li>
+              <li>
+                <span class="i18n-en">🧱 Relying on it alone limits what you can do with line and tone.</span>
+                <span class="i18n-zh">🧱 若只用這種握法，線條與明暗的變化會受限。</span>
+              </li>
+            </ul>
+        </article>
+
+        <article class="grip">
+            <h2>
+              <span class="i18n-en">2. Drumstick grip <span class="badge">Author’s favourite</span></span>
+              <span class="i18n-zh">2. 鼓槌式握法 <span class="badge">作者最推薦</span></span>
+            </h2>
+            <ul>
+              <li>
+                <span class="i18n-en"
+                  >🥁 Pencil rests loosely between <strong>thumb and index finger</strong>; other fingers
+                  steady it (similar to holding a drumstick).</span
+                >
+                <span class="i18n-zh"
+                  >🥁 鉛筆鬆鬆地夾在<strong>拇指與食指</strong>之間，其餘手指輔助穩定（像握鼓槌）。</span
+                >
+              </li>
+              <li>
+                <span class="i18n-en"
+                  >📐 Marks can come from the <strong>side</strong> of the graphite, not only the point.</span
+                >
+                <span class="i18n-zh">📐 筆觸可來自筆芯的<strong>側面</strong>，不只靠尖端。</span>
+              </li>
+              <li>
+                <span class="i18n-en"
+                  >💪 Encourages drawing from the <strong>shoulder</strong>, not just the wrist — helps you
+                  loosen up and often improves drawing.</span
+                >
+                <span class="i18n-zh"
+                  >💪 較容易用<strong>肩與手臂</strong>帶動，而不只動手腕；有助放鬆，畫面常更好。</span
+                >
+              </li>
+              <li>
+                <span class="i18n-en"
+                  >🖼️ Great for loose marks, laying out a picture, and drawing <strong>large</strong>; very
+                  wide range of marks.</span
+                >
+                <span class="i18n-zh"
+                  >🖼️ 適合鬆動的線、起稿構圖、<strong>大幅</strong>畫面；筆觸變化幅度大。</span
+                >
+              </li>
+            </ul>
+        </article>
+
+        <article class="grip">
+            <h2>
+              <span class="i18n-en">3. Paint brush grip</span>
+              <span class="i18n-zh">3. 畫筆式握法</span>
+            </h2>
+            <ul>
+              <li>
+                <span class="i18n-en">🖌️ Hold the pencil more like a <strong>paint brush</strong>, fairly upright.</span>
+                <span class="i18n-zh">🖌️ 像握<strong>畫筆</strong>一樣，筆身較直立。</span>
+              </li>
+              <li>
+                <span class="i18n-en"
+                  >🤲 The back of the pencil rests on the crease between the index finger and the base of
+                  the thumb.</span
+                >
+                <span class="i18n-zh">🤲 筆桿後端靠在食指與虎口之間的凹位。</span>
+              </li>
+              <li>
+                <span class="i18n-en"
+                  >🌸 Suited to <strong>light, delicate</strong> marks, checking proportions on the page, and
+                  planning composition.</span
+                >
+                <span class="i18n-zh"
+                  >🌸 適合<strong>輕、細</strong>的線條、在畫面上比較比例，以及構圖起稿。</span
+                >
+              </li>
+              <li>
+                <span class="i18n-en">✏️ Usually the <strong>tip</strong> still contacts the paper.</span>
+                <span class="i18n-zh">✏️ 一般仍以<strong>筆尖</strong>接觸紙面。</span>
+              </li>
+            </ul>
+        </article>
+
+        <article class="grip">
+            <h2>
+              <span class="i18n-en">4. Tip-heavy overhand grip</span>
+              <span class="i18n-zh">4. 前重／反手加壓式握法</span>
+            </h2>
+            <ul>
+              <li>
+                <span class="i18n-en"
+                  >💥 For <strong>forceful</strong> marks: middle of the pencil between
+                  <strong>middle finger and thumb</strong>, pressure into the tip.</span
+                >
+                <span class="i18n-zh"
+                  >💥 需要<strong>用力</strong>時：以<strong>中指與拇指</strong>夾住筆桿中段，並向筆尖施壓。</span
+                >
+              </li>
+              <li>
+                <span class="i18n-en"
+                  >📏 Pencil lies almost <strong>parallel</strong> to the paper; the <strong>side of the tip</strong>
+                  meets the surface.</span
+                >
+                <span class="i18n-zh"
+                  >📏 筆身幾乎<strong>貼近、平行於紙面</strong>；以<strong>筆尖側邊</strong>磨擦著紙。</span
+                >
+              </li>
+              <li>
+                <span class="i18n-en"
+                  >⚡ Produces strong marks with possible <strong>width variation</strong>; good for covering
+                  big areas quickly.</span
+                >
+                <span class="i18n-zh"
+                  >⚡ 線條較有力，寬窄可變；適合<strong>快速</strong>塗滿大面積。</span
+                >
+              </li>
+              <li>
+                <span class="i18n-en">🏋️ Also brings the <strong>shoulder</strong> into the movement.</span>
+                <span class="i18n-zh">🏋️ 同樣會動用到<strong>肩與手臂</strong>。</span>
+              </li>
+            </ul>
+        </article>
+
+        <article class="grip">
+            <h2>
+              <span class="i18n-en">5. Inverted grip</span>
+              <span class="i18n-zh">5. 反向握法</span>
+            </h2>
+            <ul>
+              <li>
+                <span class="i18n-en"
+                  >☝️ Pencil on the <strong>forefinger</strong>, steadied by thumb and lower fingers.</span
+                >
+                <span class="i18n-zh">☝️ 鉛筆擱在<strong>食指</strong>上，拇指與下方手指穩住筆桿。</span>
+              </li>
+              <li>
+                <span class="i18n-en"
+                  >↩️ The pencil points <strong>back toward you</strong> (not toward the bottom of the
+                  page).</span
+                >
+                <span class="i18n-zh">↩️ 筆尖方向<strong>朝向自己</strong>（與一般寫字方向相反）。</span>
+              </li>
+              <li>
+                <span class="i18n-en"
+                  >🔄 You can mark with the tip and the <strong>back of the tip</strong> area.</span
+                >
+                <span class="i18n-zh">🔄 可用筆尖及筆尖<strong>靠後的一側</strong>來畫。</span>
+              </li>
+              <li>
+                <span class="i18n-en"
+                  >👀 Hand and fingers stay out of the way so you can <strong>see the marks</strong> as you
+                  make them.</span
+                >
+                <span class="i18n-zh">👀 手不擋視線，畫的時候能<strong>清楚看見筆觸</strong>。</span>
+              </li>
+            </ul>
+        </article>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        var select = document.getElementById("lang-select");
+        var root = document.documentElement;
+        function applyLang(code) {
+          var lang = code === "zh" ? "zh" : "en";
+          root.setAttribute("data-lang", lang);
+          root.setAttribute("lang", lang === "zh" ? "zh-HK" : "en");
+          try {
+            localStorage.setItem("ks3-grips-lang", lang);
+          } catch (e) {}
+          if (select) select.value = lang;
+        }
+        try {
+          var saved = localStorage.getItem("ks3-grips-lang");
+          if (saved === "zh" || saved === "en") applyLang(saved);
+        } catch (e) {}
+        if (select) {
+          select.addEventListener("change", function () {
+            applyLang(select.value);
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
