@@ -66,25 +66,43 @@
       color: #6d28d9;
     }
 
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: nowrap;
+    }
+
     .progress {
       color: var(--muted);
       font-size: 0.95rem;
-      margin-bottom: 6px;
+      margin: 0;
+      white-space: nowrap;
     }
 
     .lang-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 6px;
+      margin-bottom: 4px;
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.86rem;
+    }
+
+    .lang-row label {
+      margin: 0;
+      font-size: 0.86rem;
+      font-weight: 500;
     }
 
     .lang-row select {
       border: 1px solid #d1d5db;
-      border-radius: 8px;
-      padding: 4px 8px;
+      border-radius: 6px;
+      padding: 1px 6px;
+      line-height: 1.2;
+      font-size: 0.85rem;
       font: inherit;
       background: #fff;
       color: var(--text);
@@ -114,10 +132,12 @@
     }
 
     .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 0 auto;
+      flex-wrap: nowrap;
+      white-space: nowrap;
     }
 
     button {
@@ -143,19 +163,30 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 999px;
-      border: 1px solid #d8b4fe;
-      background: #faf5ff;
+      width: auto;
+      height: auto;
+      border-radius: 0;
+      border: 0;
+      background: transparent;
       color: #7c3aed;
-      font-size: 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0 1px;
+      line-height: 1.1;
       cursor: pointer;
       user-select: none;
     }
 
-    .answer-toggle:hover {
-      background: #f3e8ff;
+    .next-toggle {
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      padding: 0;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.1;
+      cursor: pointer;
+      user-select: none;
     }
 
     .split {
@@ -223,20 +254,27 @@
               <option value="en">English</option>
             </select>
           </div>
-          <p class="progress" id="progress"></p>
+          <div class="progress-row">
+            <p class="progress" id="progress"></p>
+            <div class="actions">
+              <span
+                class="answer-toggle"
+                id="answerToggle"
+                role="button"
+                tabindex="0"
+                aria-label="顯示或隱藏參考答案"
+              >💡</span>
+              <span
+                class="next-toggle"
+                id="nextBtn"
+                role="button"
+                tabindex="0"
+                aria-label="下一題"
+              >下一題</span>
+            </div>
+          </div>
           <label id="questionText" for="answerInput"></label>
           <textarea id="answerInput" placeholder="在這裡作答..."></textarea>
-
-          <div class="actions">
-            <span
-              class="answer-toggle"
-              id="answerToggle"
-              role="button"
-              tabindex="0"
-              aria-label="顯示或隱藏參考答案"
-            >💡</span>
-            <button class="primary" type="button" id="nextBtn">下一題</button>
-          </div>
         </div>
       </section>
 
@@ -523,6 +561,12 @@
         }
         current += 1;
         renderQuestion();
+      });
+      nextBtn.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          nextBtn.click();
+        }
       });
 
       answerInputEl.addEventListener("input", autoResizeAnswer);

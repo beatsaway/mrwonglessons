@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>立體主義閱讀理解（二）</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --border: #e5e7eb;
+      --highlight: rgba(196, 181, 253, 0.2);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: linear-gradient(180deg, #eef2ff 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.58;
+      font-size: 1.05rem;
+      overflow-x: hidden;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+      grid-template-areas: "passage question";
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    .passage-panel { grid-area: passage; background: #fff; }
+    .question-panel { grid-area: question; border-left: 1px solid var(--border); background: #f8faff; }
+
+    .card {
+      min-height: 100vh;
+      padding: 16px 18px;
+      overflow: auto;
+      background: var(--card);
+    }
+
+    .question-panel .card {
+      position: sticky;
+      top: 0;
+      padding: 16px 12px;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+      line-height: 1.35;
+    }
+
+    h3 {
+      margin: 14px 0 6px;
+      font-size: 1.04rem;
+    }
+
+    p { margin: 0 0 8px; }
+
+    ul {
+      margin: 0 0 10px 18px;
+      padding: 0;
+    }
+
+    li { margin-bottom: 4px; }
+
+    .passage p,
+    .passage li {
+      border-radius: 8px;
+      padding: 2px 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .passage .active { background: var(--highlight); }
+
+    .key-term {
+      color: inherit;
+      font-weight: inherit;
+    }
+
+    .passage .active .key-term {
+      color: #6d28d9;
+      font-weight: 700;
+    }
+
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: nowrap;
+    }
+
+    .progress {
+      color: var(--muted);
+      font-size: 0.94rem;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 1.05rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+      resize: vertical;
+      background: #fff;
+    }
+
+    textarea:focus {
+      outline: 2px solid #bfdbfe;
+      border-color: var(--primary);
+    }
+
+    textarea.model-visible {
+      background: #f5f3ff;
+      border-color: #c4b5fd;
+      color: #4c1d95;
+    }
+
+    .actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 0 auto;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    .answer-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      height: auto;
+      border-radius: 0;
+      border: 0;
+      background: transparent;
+      color: #7c3aed;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0 1px;
+      line-height: 1.1;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .next-toggle {
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      padding: 0;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.1;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font: inherit;
+      cursor: pointer;
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 980px) {
+      .split {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "question"
+          "passage";
+      }
+
+      .question-panel {
+        border-left: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .card,
+      .question-panel .card {
+        min-height: auto;
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="split">
+    <section class="passage-panel">
+      <div class="card passage" id="passage">
+        <h3>一、立體主義的特色</h3>
+        <p data-k="p1">許多學者指出，立體主義的視覺語言與<span class="key-term">非洲藝術</span>有密切關係，特別是在造形的簡化與重組方面。</p>
+        <p data-k="p2">立體主義畫家不滿足於單一視角，他們希望在同一畫面中同時表達物體的<span class="key-term">長、闊、高、深</span>，讓觀者感到空間被重新建構。</p>
+        <p data-k="p3">因此，原本連續的自然外形常被<span class="key-term">分割</span>，再整理成大小不一的<span class="key-term">面塊／形狀</span>，形成具節奏感的結構。</p>
+        <p data-k="p4">由於物體本身包含不同方向的面，例如<span class="key-term">頂面、側面、底面</span>與斜邊，藝術家便嘗試把這些資訊<span class="key-term">綜合</span>在同一張作品中。</p>
+
+        <h3>二、作品資料</h3>
+        <p data-k="p5">在早期立體主義代表作中，<span class="key-term">《亞維農少女》</span>（Les Demoiselles d'Avignon）是常被討論的重要作品。</p>
+        <p data-k="p6">這幅作品出自<span class="key-term">畢加索</span>（Pablo Picasso）之手。</p>
+        <p data-k="p7">創作時間約為<span class="key-term">1906-1907年</span>，使用媒材為<span class="key-term">布上油彩</span>。</p>
+        <p data-k="p8">作品尺寸相當大，約<span class="key-term">245 × 236 厘米</span>。</p>
+
+        <p data-k="p9">另一件與立體主義發展密切相關的作品是<span class="key-term">《小提琴和調色板》</span>（Violin and Palette）。</p>
+        <p data-k="p10">其作者為<span class="key-term">布拉克</span>（Georges Braque）。</p>
+        <p data-k="p11">此作完成於<span class="key-term">1909-1910年</span>，媒材同樣是<span class="key-term">布上油彩</span>。</p>
+      </div>
+    </section>
+
+    <section class="question-panel">
+      <div class="card">
+        <div class="progress-row">
+          <p class="progress" id="progress"></p>
+          <div class="actions">
+            <span
+              class="answer-toggle"
+              id="answerToggle"
+              role="button"
+              tabindex="0"
+              aria-label="顯示或隱藏參考答案"
+            >💡</span>
+            <span
+              class="next-toggle"
+              id="nextBtn"
+              role="button"
+              tabindex="0"
+              aria-label="下一題"
+            >下一題</span>
+          </div>
+        </div>
+        <label id="questionText" for="answerInput"></label>
+        <textarea id="answerInput" placeholder="在這裡作答..."></textarea>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var questions = [
+        {
+          question: "填充題：立體主義受________藝術影響。",
+          answer: "非洲",
+          highlights: ["p1"]
+        },
+        {
+          question: "填充題：在平面上表現出____、____、____、____。",
+          answer: "長、闊、高、深",
+          highlights: ["p2"]
+        },
+        {
+          question: "填充題：將自然形態________成大小不同的________。",
+          answer: "分割；面塊／形狀",
+          highlights: ["p3"]
+        },
+        {
+          question: "填充題：任何物體都有不同的____、____、____等，所以可把繪畫對像的面________畫出。",
+          answer: "頂面、側面、底面；綜合",
+          highlights: ["p4"]
+        },
+        {
+          question: "填充題：《亞維農少女》作者是________（Pablo Picasso）。",
+          answer: "畢加索",
+          highlights: ["p5", "p6"]
+        },
+        {
+          question: "填充題：《亞維農少女》年份：________；媒材：________；尺寸：________。",
+          answer: "1906-1907年；布上油彩；245 × 236 厘米",
+          highlights: ["p7", "p8"]
+        },
+        {
+          question: "填充題：《小提琴和調色板》作者是________（Georges Braque）。",
+          answer: "布拉克",
+          highlights: ["p9", "p10"]
+        },
+        {
+          question: "填充題：《小提琴和調色板》年份：________；媒材：________。",
+          answer: "1909-1910年；布上油彩",
+          highlights: ["p11"]
+        }
+      ];
+
+      var current = 0;
+      var answers = new Array(questions.length).fill("");
+      var showingModelAnswer = false;
+      var savedDraftBeforeModel = "";
+
+      var progressEl = document.getElementById("progress");
+      var questionTextEl = document.getElementById("questionText");
+      var answerInputEl = document.getElementById("answerInput");
+      var answerToggleEl = document.getElementById("answerToggle");
+      var nextBtn = document.getElementById("nextBtn");
+      var passageEl = document.getElementById("passage");
+
+      function clearHighlights() {
+        var nodes = passageEl.querySelectorAll("[data-k]");
+        nodes.forEach(function (node) {
+          node.classList.remove("active");
+        });
+      }
+
+      function applyHighlights(keys) {
+        clearHighlights();
+        keys.forEach(function (key) {
+          var node = passageEl.querySelector('[data-k="' + key + '"]');
+          if (node) node.classList.add("active");
+        });
+      }
+
+      function autoResize() {
+        answerInputEl.style.height = "auto";
+        answerInputEl.style.height = answerInputEl.scrollHeight + "px";
+      }
+
+      function renderQuestion() {
+        var q = questions[current];
+        progressEl.textContent = "第 " + (current + 1) + " / " + questions.length + " 題";
+        questionTextEl.textContent = q.question;
+        answerInputEl.value = answers[current];
+        answerInputEl.readOnly = false;
+        answerInputEl.classList.remove("model-visible");
+        showingModelAnswer = false;
+        savedDraftBeforeModel = "";
+        nextBtn.textContent = current === questions.length - 1 ? "完成" : "下一題";
+        clearHighlights();
+        autoResize();
+      }
+
+      function toggleAnswer() {
+        var q = questions[current];
+        if (showingModelAnswer) {
+          answerInputEl.value = savedDraftBeforeModel;
+          answerInputEl.readOnly = false;
+          answerInputEl.classList.remove("model-visible");
+          showingModelAnswer = false;
+          clearHighlights();
+          autoResize();
+          return;
+        }
+
+        savedDraftBeforeModel = answerInputEl.value;
+        answerInputEl.value = q.answer;
+        answerInputEl.readOnly = true;
+        answerInputEl.classList.add("model-visible");
+        showingModelAnswer = true;
+        applyHighlights(q.highlights);
+        autoResize();
+      }
+
+      answerToggleEl.addEventListener("click", toggleAnswer);
+      answerToggleEl.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleAnswer();
+        }
+      });
+
+      nextBtn.addEventListener("click", function () {
+        answers[current] = answerInputEl.value;
+        if (current === questions.length - 1) {
+          alert("已完成全部題目。");
+          return;
+        }
+        current += 1;
+        renderQuestion();
+      });
+      nextBtn.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          nextBtn.click();
+        }
+      });
+
+      answerInputEl.addEventListener("input", autoResize);
+      renderQuestion();
+    })();
+  </script>
+</body>
+</html>
