@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>畢加索與立體派閱讀理解</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --border: #e5e7eb;
+      --highlight: rgba(196, 181, 253, 0.2);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: linear-gradient(180deg, #eef2ff 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.58;
+      font-size: 1.08rem;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 14px;
+      margin-bottom: 0;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      line-height: 1.35;
+      font-size: 1.2rem;
+    }
+
+    p { margin: 0 0 8px; }
+
+    .passage p {
+      border-radius: 8px;
+      padding: 2px 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .passage p.active {
+      background: var(--highlight);
+    }
+
+    .key-term {
+      font-weight: 700;
+      color: #6d28d9;
+    }
+
+    .progress {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .lang-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .lang-row select {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font: inherit;
+      background: #fff;
+      color: var(--text);
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 78px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+      resize: vertical;
+      background: #fff;
+    }
+
+    textarea:focus {
+      outline: 2px solid #bfdbfe;
+      border-color: var(--primary);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    textarea.model-visible {
+      background: #f5f3ff;
+      border-color: #c4b5fd;
+      color: #4c1d95;
+    }
+
+    .answer-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid #d8b4fe;
+      background: #faf5ff;
+      color: #7c3aed;
+      font-size: 1.2rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .answer-toggle:hover {
+      background: #f3e8ff;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+      grid-template-areas: "passage question";
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    .question-panel {
+      grid-area: question;
+      border-left: 1px solid var(--border);
+      background: #f8faff;
+    }
+
+    .question-panel .card {
+      position: sticky;
+      top: 0;
+      min-height: 100vh;
+      overflow: auto;
+      padding: 16px 12px;
+    }
+
+    .passage-panel {
+      grid-area: passage;
+      background: #fff;
+    }
+
+    .passage-panel .card {
+      min-height: 100vh;
+      overflow: auto;
+      padding: 16px 20px;
+    }
+
+    @media (max-width: 980px) {
+      .split {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "question"
+          "passage";
+      }
+
+      .question-panel {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .question-panel .card,
+      .passage-panel .card {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="split">
+      <section class="question-panel">
+        <div class="card">
+          <div class="lang-row">
+            <label for="langSelect" id="langLabel">語言</label>
+            <select id="langSelect" aria-label="語言選擇">
+              <option value="zh">中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <p class="progress" id="progress"></p>
+          <label id="questionText" for="answerInput"></label>
+          <textarea id="answerInput" placeholder="在這裡作答..."></textarea>
+
+          <div class="actions">
+            <span
+              class="answer-toggle"
+              id="answerToggle"
+              role="button"
+              tabindex="0"
+              aria-label="顯示或隱藏參考答案"
+            >💡</span>
+            <button class="primary" type="button" id="nextBtn">下一題</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="passage-panel">
+        <div class="card passage" id="passage"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var locale = "zh";
+      var passageOrder = ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"];
+      var uiText = {
+        zh: {
+          languageLabel: "語言",
+          languageAria: "語言選擇",
+          progress: "第 {current} / {total} 題",
+          placeholder: "在這裡作答...",
+          next: "下一題",
+          finish: "完成",
+          doneAlert: "已完成全部題目。",
+          answerToggleAria: "顯示或隱藏參考答案"
+        },
+        en: {
+          languageLabel: "Language",
+          languageAria: "Language selector",
+          progress: "Question {current} / {total}",
+          placeholder: "Type your answer here...",
+          next: "Next",
+          finish: "Finish",
+          doneAlert: "You have completed all questions.",
+          answerToggleAria: "Show or hide model answer"
+        }
+      };
+
+      var passageText = {
+        zh: {
+          p1: "畢加索（Pablo Picasso, 1881-1973）回顧作品時說：「事情真奇怪，我從不畫那些孩子氣的畫，即使我還在孩童時代也如是。」他生於西班牙，是對現代藝術最有影響力的大師之一。",
+          p2: "他小時候已被稱為「繪畫神童」。還未學會說話時，已懂得用圖像表達想法，例如畫螺旋狀物體來表示油炸糖餡餅；四歲時更懂得用紙剪出花草與動物造形。",
+          p3: "畢加索約二十歲來到巴黎，對立體派發展作出巨大貢獻。他以立體派手法描繪《亞維農少女》，震撼當時藝術界。他創作非常多元，包括油畫、版畫、不透明水彩、水墨畫、剪貼與雕塑等。",
+          p4: "他的作品中，表現愛較少，表現絕望與憤怒較多。其繪畫創作大致分為四個階段：藍色時期、小丑時期、立體主義時期與變形時期。",
+          p5: "藍色時期（1901-1904）：他剛到巴黎，尚未成名，常在貧窮的蒙馬特區出入，畫中多是憂鬱沮喪的人，喜歡把人體裸體化、拉長，置於陰沉暗藍色調中，代表作是《人生》。",
+          p6: "小丑時期（1905-1906）：他喜歡描繪馬戲班藝人，畫面由藍色轉為玫瑰色調，但人物滿不在乎的表情仍流露淡淡病態美，呈現「娛人不能自娛」的寂寞心情。",
+          p7: "立體主義時期（1900-1914）：他常把自然物象簡化，並分割成一個個獨立小立方體。變形時期（1914-1924）：他把人物正面與側面合併在同一畫面，形成繞行觀看之感，並在二度空間表現四度空間。",
+          p8: "畢加索風格千變萬化，晚年曾與年輕模特兒結婚，1973年離世。閱讀後可整理分析：四個時期的年份、主題與特色，並思考：你欣賞畢加索嗎？為甚麼？"
+        },
+        en: {
+          p1: "Pablo Picasso (1881-1973) once said that he never made childish drawings, even when he was a child. Born in Spain, he became one of the most influential masters of modern art.",
+          p2: "He was known as a child prodigy. Before he could speak fluently, he already used drawings to express ideas. At age four, he could cut paper into shapes of plants and animals.",
+          p3: "Around age twenty, Picasso moved to Paris and made major contributions to Cubism. His Cubist work Les Demoiselles d'Avignon shocked the art world. He worked across many media such as oil painting, printmaking, gouache, ink painting, collage, and sculpture.",
+          p4: "His works often showed less love and more despair and anger. His artistic development can be grouped into four periods: Blue Period, Rose (Clown) Period, Cubist Period, and Transformation Period.",
+          p5: "Blue Period (1901-1904): newly in Paris and not yet famous, he painted depressed figures, often with elongated or nude bodies, in dark blue tones. A representative work is Life.",
+          p6: "Rose (Clown) Period (1905-1906): he painted circus performers. Tones shifted from blue to rose, but the figures still carried loneliness, expressing entertainers who amuse others but not themselves.",
+          p7: "Cubist Period (1900-1914): he simplified natural objects and broke them into small independent cubes. Transformation Period (1914-1924): he merged frontal and side views in one image, suggesting movement and expressing four-dimensional feeling on a two-dimensional surface.",
+          p8: "Picasso's style changed greatly over time. He died in 1973. After reading, complete the table of period, years, themes, and features, then answer: Do you admire Picasso, and why?"
+        }
+      };
+
+      var questions = [
+        {
+          question: {
+            zh: "畢加索在現代藝術中最重要的貢獻是甚麼？",
+            en: "What was Picasso's key contribution to modern art?"
+          },
+          modelAnswer: {
+            zh: "他對立體派的發展作出巨大貢獻，並以立體派作品《亞維農少女》震撼藝術界。",
+            en: "He made major contributions to Cubism, and Les Demoiselles d'Avignon shocked the art world."
+          },
+          highlights: ["p3"],
+          keywords: {
+            zh: ["立體派", "巨大貢獻", "亞維農少女", "震撼"],
+            en: ["Cubism", "major contributions", "Les Demoiselles d'Avignon", "shocked"]
+          }
+        },
+        {
+          question: {
+            zh: "藍色時期的主題與特色是甚麼？",
+            en: "What are the theme and features of the Blue Period?"
+          },
+          modelAnswer: {
+            zh: "主題是憂鬱及沮喪的人；特色是把人體裸體化、拉長，並放在陰沉暗藍色調中。",
+            en: "Its theme is depressed figures; features include elongated or nude bodies in dark blue tones."
+          },
+          highlights: ["p5"],
+          keywords: {
+            zh: ["藍色時期", "憂鬱", "沮喪", "裸體化", "拉長", "暗藍色調"],
+            en: ["Blue Period", "depressed", "elongated", "nude", "dark blue"]
+          }
+        },
+        {
+          question: {
+            zh: "小丑時期的色調與情感有何轉變？",
+            en: "How did tone and emotion change in the Rose (Clown) Period?"
+          },
+          modelAnswer: {
+            zh: "色調由藍色轉為玫瑰色；情感上仍有寂寞與病態美，呈現「娛人不能自娛」。",
+            en: "The color tone shifted from blue to rose, but the works still expressed loneliness and uneasy beauty."
+          },
+          highlights: ["p6"],
+          keywords: {
+            zh: ["小丑時期", "玫瑰色調", "寂寞", "娛人不能自娛"],
+            en: ["Rose", "clown", "rose tone", "loneliness"]
+          }
+        },
+        {
+          question: {
+            zh: "立體主義時期與變形時期分別有何特色？",
+            en: "What are the distinct features of the Cubist and Transformation periods?"
+          },
+          modelAnswer: {
+            zh: "立體主義時期把自然物象簡化並分割成小立方體；變形時期把正面和側面合併，在二度空間呈現四度空間感。",
+            en: "Cubism simplified and split objects into small cubes; the Transformation period merged front and side views to suggest a four-dimensional sense on a flat surface."
+          },
+          highlights: ["p7"],
+          keywords: {
+            zh: ["立體主義", "小立方體", "變形時期", "正面", "側面", "二度空間", "四度空間"],
+            en: ["Cubist", "cubes", "Transformation", "front", "side", "two-dimensional", "four-dimensional"]
+          }
+        },
+        {
+          question: {
+            zh: "請填寫分析表（四個時期的年份、主題、特色）。",
+            en: "Complete the analysis table for years, themes, and features of the four periods."
+          },
+          modelAnswer: {
+            zh: "1 藍色時期（1901-1904）：憂鬱沮喪的人；暗藍調、裸體化與拉長。2 小丑時期（1905-1906）：馬戲班藝人；玫瑰色調與寂寞感。3 立體主義時期（1900-1914）：自然物象；簡化並分割成小立方體。4 變形時期（1914-1924）：人物；合併正面側面，二度空間表現四度空間。",
+            en: "1 Blue (1901-1904): depressed figures; dark blue, elongated forms. 2 Rose (1905-1906): circus performers; rose tones, loneliness. 3 Cubist (1900-1914): natural objects; simplified and fragmented cubes. 4 Transformation (1914-1924): figures; merged views, 4D feeling on 2D surface."
+          },
+          highlights: ["p5", "p6", "p7", "p8"],
+          keywords: {
+            zh: ["藍色時期", "小丑時期", "立體主義時期", "變形時期", "年份", "主題", "特色"],
+            en: ["Blue", "Rose", "Cubist", "Transformation", "years", "themes", "features"]
+          }
+        },
+        {
+          question: {
+            zh: "挑戰題：你欣賞畢加索嗎？為甚麼？",
+            en: "Challenge: Do you admire Picasso? Why or why not?"
+          },
+          modelAnswer: {
+            zh: "可欣賞他勇於創新、風格多變，並重新定義觀看方式；即使作品常帶絕望與憤怒，也反映了深刻的人性與時代感。",
+            en: "Yes, because he kept reinventing art and changed how people see forms and space. Even his darker emotions reveal deep human and historical insight."
+          },
+          highlights: ["p3", "p4", "p7", "p8"],
+          keywords: {
+            zh: ["勇於創新", "風格千變萬化", "絕望", "憤怒", "你欣賞畢加索嗎"],
+            en: ["innovative", "changing style", "despair", "anger", "admire Picasso"]
+          }
+        }
+      ];
+
+      var current = 0;
+      var answers = new Array(questions.length).fill("");
+
+      var langLabelEl = document.getElementById("langLabel");
+      var langSelectEl = document.getElementById("langSelect");
+      var progressEl = document.getElementById("progress");
+      var questionTextEl = document.getElementById("questionText");
+      var answerInputEl = document.getElementById("answerInput");
+      var answerToggleEl = document.getElementById("answerToggle");
+      var nextBtn = document.getElementById("nextBtn");
+      var passageEl = document.getElementById("passage");
+      var showingModelAnswer = false;
+      var savedDraftBeforeModel = "";
+
+      function formatText(template, values) {
+        return template
+          .replace("{current}", values.current)
+          .replace("{total}", values.total);
+      }
+
+      function renderPassage() {
+        passageEl.innerHTML = "";
+        passageOrder.forEach(function (key) {
+          var p = document.createElement("p");
+          p.setAttribute("data-p", key);
+          p.textContent = passageText[locale][key];
+          p.setAttribute("data-original-html", p.innerHTML);
+          passageEl.appendChild(p);
+        });
+      }
+
+      function applyLocaleText() {
+        var text = uiText[locale];
+        langLabelEl.textContent = text.languageLabel;
+        langSelectEl.setAttribute("aria-label", text.languageAria);
+        answerToggleEl.setAttribute("aria-label", text.answerToggleAria);
+        answerInputEl.placeholder = text.placeholder;
+        document.documentElement.lang = locale === "zh" ? "zh-Hant" : "en";
+      }
+
+      function clearHighlights() {
+        var nodes = passageEl.querySelectorAll("p[data-p]");
+        nodes.forEach(function (node) {
+          node.classList.remove("active");
+          var originalHtml = node.getAttribute("data-original-html");
+          if (originalHtml) {
+            node.innerHTML = originalHtml;
+          }
+        });
+      }
+
+      function escapeRegExp(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      }
+
+      function emphasizeKeywords(node, keywords) {
+        if (!keywords || !keywords.length) return;
+        var html = node.innerHTML;
+        keywords.forEach(function (word) {
+          var re = new RegExp(escapeRegExp(word), "g");
+          html = html.replace(re, '<span class="key-term">' + word + "</span>");
+        });
+        node.innerHTML = html;
+      }
+
+      function applyHighlights(keys, keywords) {
+        clearHighlights();
+        keys.forEach(function (key) {
+          var target = passageEl.querySelector('p[data-p="' + key + '"]');
+          if (target) {
+            target.classList.add("active");
+            emphasizeKeywords(target, keywords);
+          }
+        });
+      }
+
+      function renderQuestion() {
+        var q = questions[current];
+        progressEl.textContent = formatText(uiText[locale].progress, {
+          current: current + 1,
+          total: questions.length
+        });
+        questionTextEl.textContent = q.question[locale];
+        answerInputEl.value = answers[current];
+        answerInputEl.readOnly = false;
+        answerInputEl.classList.remove("model-visible");
+        showingModelAnswer = false;
+        savedDraftBeforeModel = "";
+        clearHighlights();
+        nextBtn.textContent = current === questions.length - 1 ? uiText[locale].finish : uiText[locale].next;
+        autoResizeAnswer();
+      }
+
+      function autoResizeAnswer() {
+        answerInputEl.style.height = "auto";
+        answerInputEl.style.height = answerInputEl.scrollHeight + "px";
+      }
+
+      function toggleAnswer() {
+        var q = questions[current];
+        if (showingModelAnswer) {
+          answerInputEl.value = savedDraftBeforeModel;
+          answerInputEl.readOnly = false;
+          answerInputEl.classList.remove("model-visible");
+          showingModelAnswer = false;
+          clearHighlights();
+          autoResizeAnswer();
+          return;
+        }
+        savedDraftBeforeModel = answerInputEl.value;
+        answerInputEl.value = q.modelAnswer[locale];
+        answerInputEl.readOnly = true;
+        answerInputEl.classList.add("model-visible");
+        showingModelAnswer = true;
+        applyHighlights(q.highlights, q.keywords[locale] || []);
+        autoResizeAnswer();
+      }
+
+      answerToggleEl.addEventListener("click", toggleAnswer);
+      answerToggleEl.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleAnswer();
+        }
+      });
+
+      nextBtn.addEventListener("click", function () {
+        answers[current] = answerInputEl.value;
+        if (current === questions.length - 1) {
+          alert(uiText[locale].doneAlert);
+          return;
+        }
+        current += 1;
+        renderQuestion();
+      });
+
+      answerInputEl.addEventListener("input", autoResizeAnswer);
+      langSelectEl.addEventListener("change", function () {
+        locale = langSelectEl.value === "en" ? "en" : "zh";
+        applyLocaleText();
+        renderPassage();
+        renderQuestion();
+      });
+
+      applyLocaleText();
+      renderPassage();
+      renderQuestion();
+    })();
+  </script>
+</body>
+</html>
