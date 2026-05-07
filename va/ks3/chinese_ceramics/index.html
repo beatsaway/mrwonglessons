@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>陶瓷 | Tang Ceramics</title>
+  <style>
+    :root {
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --bg: #ffffff;
+      --soft: #f9fafb;
+      --accent: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.95);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(4px);
+    }
+
+    .topbar-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 4px 16px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-title {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .period-nav {
+      display: inline-flex;
+      gap: 8px;
+      margin-left: 6px;
+    }
+
+    .period-nav a {
+      font-size: 12px;
+      text-decoration: none;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .period-nav a:hover {
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .period-nav a.p-intro {
+      color: #0f766e;
+    }
+
+    .period-nav a.p-tang {
+      color: #b45309;
+    }
+
+    .period-nav a.p-songyuan {
+      color: #1d4ed8;
+    }
+
+    .period-nav a.p-mingqing {
+      color: #9333ea;
+    }
+
+    .period-nav a.active {
+      background: #f3f4f6;
+      box-shadow: inset 0 -2px 0 currentColor;
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+      margin-left: auto;
+    }
+
+    .lang-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .lang-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 20px 80px;
+    }
+
+    h1 {
+      font-size: 34px;
+      margin: 0 0 8px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      margin: 34px 0 10px;
+      font-size: 22px;
+      line-height: 1.35;
+    }
+
+    .period-intro h2,
+    .period-intro h3 {
+      color: #0f766e;
+    }
+
+    .period-tang h2,
+    .period-tang h3 {
+      color: #b45309;
+    }
+
+    .period-songyuan h2,
+    .period-songyuan h3 {
+      color: #1d4ed8;
+    }
+
+    .period-mingqing h2,
+    .period-mingqing h3 {
+      color: #9333ea;
+    }
+
+    h3 {
+      margin: 24px 0 8px;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    ul {
+      margin: 0 0 10px 18px;
+      padding: 0;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    .lead {
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    section {
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      margin-top: 18px;
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    figure {
+      margin: 0;
+      border: none;
+      border-radius: 0;
+      overflow: visible;
+      background: #fff;
+      display: grid;
+      grid-template-columns: minmax(240px, 340px) 1fr;
+      align-items: stretch;
+    }
+
+    figure img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #fff;
+      min-height: 220px;
+      max-height: 320px;
+      object-fit: contain;
+      padding: 12px;
+      border-right: none;
+    }
+
+    figcaption {
+      padding: 14px 16px;
+      font-size: 16px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .cap-title {
+      display: block;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .cap-note {
+      display: block;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .en {
+      display: none;
+    }
+
+    body.lang-en .zh {
+      display: none;
+    }
+
+    body.lang-en .en {
+      display: block;
+    }
+
+    .links a {
+      color: #2563eb;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 720px) {
+      figure {
+        grid-template-columns: 1fr;
+      }
+
+      figure img {
+        max-height: 420px;
+        border-right: none;
+        border-bottom: none;
+      }
+
+      .period-nav {
+        width: 100%;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-title zh">中國陶瓷</div>
+      <div class="topbar-title en">Chinese Ceramics</div>
+      <nav class="period-nav zh" aria-label="章節導覽">
+        <a class="p-intro" href="#zh-intro">導言</a>
+        <a class="p-tang" href="#zh-tang">唐</a>
+        <a class="p-songyuan" href="#zh-songyuan">宋元</a>
+        <a class="p-mingqing" href="#zh-mingqing">明清</a>
+      </nav>
+      <nav class="period-nav en" aria-label="Period Navigation">
+        <a class="p-intro" href="#en-intro">Intro</a>
+        <a class="p-tang" href="#en-tang">Tang</a>
+        <a class="p-songyuan" href="#en-songyuan">Song-Yuan</a>
+        <a class="p-mingqing" href="#en-mingqing">Ming-Qing</a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language Switch">
+        <button class="lang-btn active" id="btn-zh" type="button">中文</button>
+        <button class="lang-btn" id="btn-en" type="button">English</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="zh">
+      <h1>陶瓷</h1>
+      <p class="lead">本頁整理唐代至清代陶瓷發展重點，配合圖像作簡潔學習。</p>
+
+      <section>
+        <h2>學習目標</h2>
+        <ul>
+          <li>了解唐代至清代陶瓷工藝的發展。</li>
+          <li>認識中國陶瓷工藝的特色。</li>
+          <li>掌握彩瓷的發展過程。</li>
+        </ul>
+      </section>
+
+      <section id="zh-intro" class="period-intro">
+        <h2>導言</h2>
+        <p>陶瓷其實是陶器和瓷器的總稱。</p>
+        <p><strong>陶器</strong>是用黏土製成的器皿，胎質疏鬆粗糙，可在較低溫燒成。</p>
+        <p><strong>瓷器</strong>以瓷土為原料，堅硬、細緻而潔白，須在高溫下燒成。</p>
+      </section>
+
+      <section id="zh-tang" class="period-tang">
+        <h2>唐三彩</h2>
+        <p>唐代出現色彩豐富的唐三彩陶器，常見綠、黃、白、藍、褐等釉色。</p>
+        <p>釉燒溫度約攝氏八百度，形成斑駁而活潑的表面效果。</p>
+        <div class="grid">
+          <figure>
+            <img src="./img/仕女俑.png" alt="仕女俑" />
+            <figcaption>
+              <span class="cap-title">仕女俑</span>
+              <span class="cap-note">唐三彩代表作品之一，展現人物造型與多彩釉色效果。</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/載樂舞隊駝俑.png" alt="載樂舞隊駝俑" />
+            <figcaption>
+              <span class="cap-title">載樂舞隊駝俑</span>
+              <span class="cap-note">以駱駝與樂舞人物組合，反映唐代社會與文化交流。</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="period-songyuan">
+        <h2>單色瓷的發展</h2>
+        <p>宋代瓷器以單色為主，釉色雅淡含蓄，氣質如文人。</p>
+        <p>元代雖仍偏向單色，但加入繪畫裝飾，風格更豐富。</p>
+      </section>
+
+      <section id="zh-songyuan" class="period-songyuan">
+        <h2>宋、元名窯</h2>
+        <p>窯是燒製瓷器的地方。宋代瓷窯分為官窯與民窯兩類。</p>
+        <h3>官窯</h3>
+        <p>由朝廷直接管轄，專門燒製皇室用品。</p>
+        <h3>民窯</h3>
+        <p>由民間主理，不受官方管制，多燒製日常用品。</p>
+      </section>
+
+      <section class="period-songyuan">
+        <h2>景德鎮</h2>
+        <p>景德鎮位於江西省，有「中國瓷都」之稱。</p>
+        <p>北宋中期曾燒製青白瓷；明清時期設御窯廠，專供宮廷瓷器。</p>
+      </section>
+
+      <section class="period-songyuan">
+        <h2>宋、元瓷器圖像</h2>
+        <div class="grid">
+          <figure>
+            <img src="./img/青瓷三足樽.png" alt="青瓷三足樽" />
+            <figcaption>
+              <span class="cap-title">青瓷三足樽</span>
+              <span class="cap-note">宋代官窯汝窯代表作。高 12.9 厘米，北京故宮博物院藏。</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/定窯孩兒枕.png" alt="定窯孩兒枕" />
+            <figcaption>
+              <span class="cap-title">定窯孩兒枕</span>
+              <span class="cap-note">尺寸 30 × 11.8 × 18.3 厘米，北京故宮博物院藏。</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/褐花瓷鏡盒.png" alt="褐花瓷鏡盒" />
+            <figcaption>
+              <span class="cap-title">褐花瓷鏡盒</span>
+              <span class="cap-note">磁州窯為宋代北方主要民窯，以黑褐與白色裝飾，採釉下彩燒成。</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/青花釉裏紅花卉蓋罐.png" alt="青花釉裏紅花卉蓋罐" />
+            <figcaption>
+              <span class="cap-title">青花釉裏紅花卉蓋罐</span>
+              <span class="cap-note">結合青花與釉裏紅，器身花紋具鏤空浮雕感，為前代少見裝飾法。</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="zh-mingqing" class="period-mingqing">
+        <h2>明、清彩瓷</h2>
+        <p>清初西方輸入陶瓷彩料，裝飾燒製更華麗、色彩更豐富，彩瓷工藝高度發展。</p>
+        <div class="grid">
+          <figure>
+            <img src="./img/鬥彩蓮紋瓷蓋罐.png" alt="鬥彩蓮紋瓷蓋罐" />
+            <figcaption>
+              <span class="cap-title">鬥彩蓮紋瓷蓋罐</span>
+              <span class="cap-note">明朝成化。高 12.7 厘米，口徑 6.2 厘米，北京故宮博物院藏。</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/五彩鏤空雲鳳紋瓷瓶.png" alt="五彩鏤空雲鳳紋瓷瓶" />
+            <figcaption>
+              <span class="cap-title">五彩鏤空雲鳳紋瓷瓶</span>
+              <span class="cap-note">以五彩裝飾並結合鏤空技法，呈現繁麗華美風格。</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/粉彩福壽雙全碟.png" alt="粉彩福壽雙全碟" />
+            <figcaption>
+              <span class="cap-title">粉彩福壽雙全碟</span>
+              <span class="cap-note">蝙蝠與桃實寓意福壽，粉彩色調柔和細膩。</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/琺瑯彩碗.png" alt="琺瑯彩碗" />
+            <figcaption>
+              <span class="cap-title">琺瑯彩碗</span>
+              <span class="cap-note">琺瑯彩工藝精細，色彩層次豐富，是清代彩瓷重要類型。</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="links">
+        <h2>相關網頁</h2>
+        <p>瓷器藏品 1：<a href="http://www.npm.gov.tw/dstore/db.htm" target="_blank" rel="noreferrer">http://www.npm.gov.tw/dstore/db.htm</a></p>
+        <p>瓷器藏品 2：<a href="http://www.nga.gov/collection/gallery/eastcer/eastcer-main1.html" target="_blank" rel="noreferrer">http://www.nga.gov/collection/gallery/eastcer/eastcer-main1.html</a></p>
+        <p>香港藝術館藏品：<a href="http://www.usd.gov.hk/hkma/chinese/collections/collection.htm" target="_blank" rel="noreferrer">http://www.usd.gov.hk/hkma/chinese/collections/collection.htm</a></p>
+        <p><strong>此章完</strong></p>
+      </section>
+    </div>
+
+    <div class="en">
+      <h1>Ceramics</h1>
+      <p class="lead">A clean learning page on ceramic development from the Tang to Qing dynasties.</p>
+
+      <section>
+        <h2>Learning Objectives</h2>
+        <ul>
+          <li>Understand the development of ceramic craft from Tang to Qing.</li>
+          <li>Identify key characteristics of Chinese ceramics.</li>
+          <li>Trace the evolution of polychrome porcelain.</li>
+        </ul>
+      </section>
+
+      <section id="en-intro" class="period-intro">
+        <h2>Introduction</h2>
+        <p>“Ceramics” is a general term covering both pottery and porcelain.</p>
+        <p><strong>Pottery</strong> is made from clay with a looser, rougher body and is fired at lower temperatures.</p>
+        <p><strong>Porcelain</strong> is made from porcelain stone/clay, harder and whiter, and requires high-temperature firing.</p>
+      </section>
+
+      <section id="en-tang" class="period-tang">
+        <h2>Tang Sancai</h2>
+        <p>Tang Sancai (three-colour glazed ware) is known for rich glaze colours such as green, yellow, white, blue and brown.</p>
+        <p>Glazes were commonly fired at around 800°C, creating lively variegated surfaces.</p>
+        <div class="grid">
+          <figure>
+            <img src="./img/仕女俑.png" alt="Three-colour Figurine of a Woman" />
+            <figcaption>
+              <span class="cap-title">Three-colour Figurine of a Woman</span>
+              <span class="cap-note">A representative Tang sancai figure with vivid multi-glaze treatment.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/載樂舞隊駝俑.png" alt="Three-colour Camel with Musicians" />
+            <figcaption>
+              <span class="cap-title">Three-colour Camel with Musicians</span>
+              <span class="cap-note">A lively composite form reflecting Tang-era social and cultural exchange.</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="period-songyuan">
+        <h2>Development of Monochrome Porcelain</h2>
+        <p>Song wares are mostly monochrome, with elegant and restrained glaze tones.</p>
+        <p>Yuan ceramics remained largely monochrome but introduced painted decoration.</p>
+      </section>
+
+      <section id="en-songyuan" class="period-songyuan">
+        <h2>Famous Song and Yuan Kilns</h2>
+        <p>Kilns are sites where ceramics are fired. Song kilns are commonly grouped into official and private kilns.</p>
+        <h3>Official Kilns</h3>
+        <p>Supervised by the court and producing wares for imperial use.</p>
+        <h3>Private Kilns</h3>
+        <p>Operated by common artisans, mainly making everyday wares.</p>
+      </section>
+
+      <section class="period-songyuan">
+        <h2>Jingdezhen</h2>
+        <p>Jingdezhen in Jiangxi is known as China’s “Porcelain Capital”.</p>
+        <p>It produced Qingbai porcelain in the Northern Song and hosted imperial kilns in the Ming and Qing periods.</p>
+      </section>
+
+      <section class="period-songyuan">
+        <h2>Song and Yuan Works</h2>
+        <div class="grid">
+          <figure>
+            <img src="./img/青瓷三足樽.png" alt="Celadon-Glazed Zun with Three Feet" />
+            <figcaption>
+              <span class="cap-title">Celadon-Glazed Zun with Three Feet</span>
+              <span class="cap-note">A notable Song official-kiln Ru ware. Height: 12.9 cm. Palace Museum, Beijing.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/定窯孩兒枕.png" alt="White Porcelain Pillow in the Form of a Boy" />
+            <figcaption>
+              <span class="cap-title">White Porcelain Pillow in the Form of a Boy</span>
+              <span class="cap-note">Dimensions: 30 x 11.8 x 18.3 cm. Palace Museum, Beijing.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/褐花瓷鏡盒.png" alt="Brown Porcelain Floral Mirror Box" />
+            <figcaption>
+              <span class="cap-title">Brown Porcelain Floral Mirror Box</span>
+              <span class="cap-note">From Cizhou kiln, a major northern private kiln using black-brown and white underglaze decoration.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/青花釉裏紅花卉蓋罐.png" alt="Jar with Openwork Design in Blue and Red Underglaze" />
+            <figcaption>
+              <span class="cap-title">Jar with Openwork Design in Blue and Red Underglaze</span>
+              <span class="cap-note">Combines blue-and-white and underglaze red with a carved openwork-like relief effect.</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="en-mingqing" class="period-mingqing">
+        <h2>Ming and Qing Polychrome Porcelain</h2>
+        <p>Imported pigments in the early Qing enriched firing techniques, making decorative porcelain more brilliant and technically advanced.</p>
+        <div class="grid">
+          <figure>
+            <img src="./img/鬥彩蓮紋瓷蓋罐.png" alt="Covered Jar with Lotus Medallion in Contrasting Colours" />
+            <figcaption>
+              <span class="cap-title">Covered Jar with Lotus Medallion in Contrasting Colours</span>
+              <span class="cap-note">Chenghua reign, Ming dynasty. Height: 12.7 cm; mouth diameter: 6.2 cm. Palace Museum, Beijing.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/五彩鏤空雲鳳紋瓷瓶.png" alt="Wucai Vase with Cloud and Phoenix Designs" />
+            <figcaption>
+              <span class="cap-title">Wucai Vase with Cloud and Phoenix Designs</span>
+              <span class="cap-note">A decorative piece combining wucai enamels with elaborate openwork motifs.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/粉彩福壽雙全碟.png" alt="Fencai Dish Decorated with Bats and Peaches" />
+            <figcaption>
+              <span class="cap-title">Fencai Dish Decorated with Bats and Peaches</span>
+              <span class="cap-note">Bat and peach motifs symbolize blessings and longevity in Chinese visual language.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="./img/琺瑯彩碗.png" alt="Enamelled Bowl" />
+            <figcaption>
+              <span class="cap-title">Enamelled Bowl</span>
+              <span class="cap-note">Finely painted enamel decoration with rich color layering, typical of Qing polychrome craft.</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="links">
+        <h2>Related Websites</h2>
+        <p>Ceramic Collection 1: <a href="http://www.npm.gov.tw/dstore/db.htm" target="_blank" rel="noreferrer">http://www.npm.gov.tw/dstore/db.htm</a></p>
+        <p>Ceramic Collection 2: <a href="http://www.nga.gov/collection/gallery/eastcer/eastcer-main1.html" target="_blank" rel="noreferrer">http://www.nga.gov/collection/gallery/eastcer/eastcer-main1.html</a></p>
+        <p>Hong Kong Museum of Art: <a href="http://www.usd.gov.hk/hkma/chinese/collections/collection.htm" target="_blank" rel="noreferrer">http://www.usd.gov.hk/hkma/chinese/collections/collection.htm</a></p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const btnZh = document.getElementById("btn-zh");
+    const btnEn = document.getElementById("btn-en");
+    const periodLinks = Array.from(document.querySelectorAll(".period-nav a"));
+    const periodSections = Array.from(document.querySelectorAll("section[id^='zh-'], section[id^='en-']"));
+
+    function setLang(lang) {
+      const isEn = lang === "en";
+      document.body.classList.toggle("lang-en", isEn);
+      btnZh.classList.toggle("active", !isEn);
+      btnEn.classList.toggle("active", isEn);
+      document.documentElement.lang = isEn ? "en" : "zh-Hant";
+      refreshActiveLink();
+    }
+
+    function setActiveLink(sectionId) {
+      if (!sectionId) return;
+      const langPrefix = sectionId.startsWith("en-") ? "en-" : "zh-";
+      const targetHref = `#${sectionId}`;
+      periodLinks.forEach((link) => {
+        const href = link.getAttribute("href") || "";
+        const sameLang = href.startsWith(`#${langPrefix}`);
+        link.classList.toggle("active", sameLang && href === targetHref);
+      });
+    }
+
+    function refreshActiveLink() {
+      const isEn = document.body.classList.contains("lang-en");
+      const prefix = isEn ? "en-" : "zh-";
+      const current = periodSections
+        .filter((section) => section.id.startsWith(prefix))
+        .find((section) => {
+          const rect = section.getBoundingClientRect();
+          return rect.top <= 140 && rect.bottom >= 140;
+        });
+      if (current) {
+        setActiveLink(current.id);
+      } else {
+        setActiveLink(`${prefix}intro`);
+      }
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible.length > 0) {
+          setActiveLink(visible[0].target.id);
+        }
+      },
+      {
+        root: null,
+        rootMargin: "-20% 0px -65% 0px",
+        threshold: [0.2, 0.4, 0.6]
+      }
+    );
+
+    periodSections.forEach((section) => observer.observe(section));
+    periodLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        const href = link.getAttribute("href");
+        if (href && href.startsWith("#")) {
+          setActiveLink(href.slice(1));
+        }
+      });
+    });
+
+    btnZh.addEventListener("click", () => setLang("zh"));
+    btnEn.addEventListener("click", () => setLang("en"));
+    refreshActiveLink();
+  </script>
+</body>
+</html>

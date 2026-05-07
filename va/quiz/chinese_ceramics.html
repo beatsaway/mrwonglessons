@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>中國陶瓷閱讀理解</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --border: #e5e7eb;
+      --highlight: rgba(196, 181, 253, 0.2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: linear-gradient(180deg, #eef2ff 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 1.06rem;
+      overflow-x: hidden;
+    }
+    .container { width: 100%; min-height: 100vh; }
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+      grid-template-areas: "passage question";
+      min-height: 100vh;
+      width: 100%;
+    }
+    .card { background: var(--card); padding: 14px; }
+    .question-panel { grid-area: question; border-left: 1px solid var(--border); background: #f8faff; }
+    .question-panel .card { position: sticky; top: 0; min-height: 100vh; overflow: auto; padding: 16px 12px; }
+    .passage-panel { grid-area: passage; background: #fff; }
+    .passage-panel .card { min-height: 100vh; overflow: auto; padding: 16px 20px; }
+
+    h2 { margin: 0 0 12px; font-size: 1.2rem; line-height: 1.35; }
+    p { margin: 0 0 8px; }
+    .passage p { border-radius: 8px; padding: 2px 6px; transition: background-color 0.2s ease; }
+    .passage p.active { background: var(--highlight); }
+    .key-term { color: inherit; font-weight: inherit; }
+    .passage p.active .key-term { color: #6d28d9; font-weight: 700; }
+
+    .lang-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+    .lang-row label { font-size: 0.86rem; font-weight: 500; }
+    .lang-row select {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 1px 6px;
+      font: inherit;
+      font-size: 0.85rem;
+      background: #fff;
+      color: var(--text);
+    }
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: nowrap;
+    }
+    .progress { color: var(--muted); font-size: 0.95rem; margin: 0; white-space: nowrap; }
+    .actions { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 0 auto; white-space: nowrap; }
+    label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 1.08rem; }
+    textarea {
+      width: 100%;
+      min-height: 82px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+      resize: vertical;
+      background: #fff;
+    }
+    textarea:focus { outline: 2px solid #bfdbfe; border-color: var(--primary); }
+    .model-visible { background: #f5f3ff; border-color: #c4b5fd; color: #4c1d95; }
+    .answer-toggle {
+      border: 0; background: transparent; color: #7c3aed; font-size: 0.9rem;
+      font-weight: 600; padding: 0 1px; line-height: 1.1; cursor: pointer; user-select: none;
+    }
+    .next-toggle {
+      border: 0; background: transparent; color: var(--primary); padding: 0;
+      font-weight: 600; font-size: 0.9rem; line-height: 1.1; cursor: pointer; user-select: none;
+    }
+    @media (max-width: 980px) {
+      .split { grid-template-columns: 1fr; grid-template-areas: "question" "passage"; }
+      .question-panel { border-left: 0; border-bottom: 1px solid var(--border); }
+      .question-panel .card, .passage-panel .card { min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="split">
+      <section class="question-panel">
+        <div class="card">
+          <div class="lang-row">
+            <label for="langSelect" id="langLabel">語言</label>
+            <select id="langSelect" aria-label="語言選擇">
+              <option value="zh">中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div class="progress-row">
+            <p class="progress" id="progress"></p>
+            <div class="actions">
+              <span class="answer-toggle" id="answerToggle" role="button" tabindex="0" aria-label="顯示或隱藏參考答案">💡</span>
+              <span class="next-toggle" id="nextBtn" role="button" tabindex="0" aria-label="下一題">下一題</span>
+            </div>
+          </div>
+          <label id="questionText" for="answerInput"></label>
+          <textarea id="answerInput" placeholder="在這裡作答..."></textarea>
+        </div>
+      </section>
+      <section class="passage-panel">
+        <div class="card passage" id="passage"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var locale = "zh";
+      var passageOrder = ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9"];
+      var uiText = {
+        zh: {
+          languageLabel: "語言",
+          languageAria: "語言選擇",
+          progress: "第 {current} / {total} 題",
+          placeholder: "在這裡作答...",
+          next: "下一題",
+          finish: "完成",
+          doneAlert: "已完成全部題目。",
+          answerToggleAria: "顯示或隱藏參考答案"
+        },
+        en: {
+          languageLabel: "Language",
+          languageAria: "Language selector",
+          progress: "Question {current} / {total}",
+          placeholder: "Type your answer here...",
+          next: "Next",
+          finish: "Finish",
+          doneAlert: "You have completed all questions.",
+          answerToggleAria: "Show or hide model answer"
+        }
+      };
+
+      var passageText = {
+        zh: {
+          p1: "陶瓷其實是陶器和瓷器的總稱。陶器是用黏土製成的器皿，胎質疏鬆粗糙，可在低溫燒成；瓷器以瓷土為原料，堅硬、細緻而潔白，須在高溫下燒成。",
+          p2: "唐時文化與西域貫通，形成絢麗繁華的大唐文化。在這個背景下，絲綢、壁畫、金銀器與唐三彩等藝術高度發展。",
+          p3: "所謂唐三彩，是唐代鉛釉彩陶的總稱，舉世聞名。唐三彩多見於各種器皿，也有墓俑及馬、駝等動物，是雕塑藝術與陶瓷技術相結合的產物。",
+          p4: "唐三彩是一種多彩鉛釉陶器，釉料含銅、鐵、鈷、錳等元素，燒成後可見深綠、淺綠、翠綠及黃、白、褐、藍等色彩。",
+          p5: "它打破了單色釉局限，但通常不會同時出現太多顏色，多用三色，也有兩色或一色。釉上彩陶筆點施釉，釉彩自然下漫，形成流動之美。",
+          p6: "三彩器起源於唐代，並在唐代風靡。唐高宗朝為萌芽期，當時製作尚未成熟，數量不多，品種較少，用色也較單一。",
+          p7: "到了開元，三彩達鼎盛，墓葬出土最多，造型最豐富，色彩絢麗，製作精細，品質很高。安史之亂後，三彩製作數量減少，逐漸衰落。",
+          p8: "唐代三彩在長安、洛陽、揚州、山西、甘肅等地均有發現。主要用途包括：作明器供王公貴族殉葬、出口外銷、以及作為生活器皿。",
+          p9: "其後陶瓷發展中，宋代以單色瓷為主，分官窯與民窯；元代仍以單色為主但加入繪畫裝飾；明代彩瓷興盛，以景德鎮為中心並設御窯廠；清代粉彩與琺瑯彩技術更成熟。"
+        },
+        en: {
+          p1: "Ceramics is a general term for both pottery and porcelain. Pottery is made of clay and fired at lower temperatures; porcelain uses porcelain clay, is harder and finer, and needs high-temperature firing.",
+          p2: "In the Tang period, cultural exchange with the Western Regions flourished, creating a brilliant cultural environment in which silk, murals, gold and silverware, and Tang sancai developed strongly.",
+          p3: "Tang sancai refers to Tang lead-glazed polychrome pottery. It is world-famous and includes vessels, tomb figurines, and animals such as horses and camels. It combines sculptural art with ceramic technology.",
+          p4: "Its glazes contain elements such as copper, iron, cobalt, and manganese. After firing, colors include dark green, light green, emerald green, yellow, white, brown, and blue.",
+          p5: "Tang sancai broke the limit of single-color glaze. Most pieces use three colors, while some use two or one. Glaze applied by brush can flow naturally and create lively visual effects.",
+          p6: "It originated and became popular in the Tang dynasty. In the early phase under Emperor Gaozong, production was still limited in number, variety, and color complexity.",
+          p7: "By the Kaiyuan era, sancai reached its peak in quantity, form, craftsmanship, and color richness. After the An Lushan Rebellion, production declined gradually.",
+          p8: "Tang sancai has been found in Chang'an, Luoyang, Yangzhou, Shanxi, and Gansu. Main uses were burial objects for elites, export trade, and daily utensils.",
+          p9: "Later, Song porcelain focused on monochrome wares and was divided into official and private kilns. Yuan wares remained largely monochrome but added painting. Ming polychrome porcelain centered in Jingdezhen. Qing techniques advanced with fencai and enamel wares."
+        }
+      };
+
+      var questions = [
+        {
+          question: { zh: "1) 唐三彩是哪兩種藝術相結合的產物？", en: "1) Tang sancai combines which two arts?" },
+          modelAnswer: { zh: "雕塑藝術與陶瓷技術。", en: "Sculptural art and ceramic technology." },
+          highlights: ["p3"],
+          keywords: { zh: ["雕塑藝術", "陶瓷技術"], en: ["sculptural art", "ceramic technology"] }
+        },
+        {
+          question: { zh: "2) 唐三彩燒成後，常見哪些釉色？", en: "2) What glaze colors are common after firing?" },
+          modelAnswer: { zh: "黃、白、綠。", en: "Dark green, light green, emerald green, plus yellow, white, brown, and blue." },
+          highlights: ["p4"],
+          keywords: { zh: ["深綠", "淺綠", "翠綠", "黃", "白", "褐", "藍"], en: ["green", "yellow", "white", "brown", "blue"] }
+        },
+        {
+          question: { zh: "3) 唐三彩除外銷外，還有哪兩種主要用途？", en: "3) Besides export, what are the other two main uses?" },
+          modelAnswer: { zh: "陪葬、生活器皿。", en: "Burial objects and daily utensils." },
+          highlights: ["p8"],
+          keywords: { zh: ["明器", "殉葬", "生活器皿"], en: ["burial", "daily utensils"] }
+        },
+        {
+          question: { zh: "4) 填空：宋代瓷器以＿＿為主。", en: "4) Fill in the blank: Song porcelain mainly used ____." },
+          modelAnswer: { zh: "單色。", en: "monochrome." },
+          highlights: ["p9"],
+          keywords: { zh: ["宋代", "單色"], en: ["Song", "monochrome"] }
+        },
+        {
+          question: { zh: "5) 填空：＿＿窯由朝廷直接管轄，專門燒製皇室用品。", en: "5) Fill in the blank: ____ kilns were directly managed by the court." },
+          modelAnswer: { zh: "官窯。", en: "Official kilns." },
+          highlights: ["p9"],
+          keywords: { zh: ["官窯", "朝廷"], en: ["official kilns", "court"] }
+        },
+        {
+          question: { zh: "6) 填空：元代瓷器仍以＿＿為主，但加入＿＿作裝飾。", en: "6) Fill in the blank: Yuan porcelain stayed mainly ____ but added ____ decoration." },
+          modelAnswer: { zh: "單色；繪畫。", en: "monochrome; painting." },
+          highlights: ["p9"],
+          keywords: { zh: ["元代", "單色", "繪畫"], en: ["Yuan", "monochrome", "painting"] }
+        },
+        {
+          question: { zh: "7) 填空：明代有各＿＿瓷燒造，以江西省＿＿鎮為燒瓷中心。", en: "7) Fill in the blank: Ming had many ____ porcelains, centered in ____." },
+          modelAnswer: { zh: "彩；景德。", en: "polychrome; Jingde (Jingdezhen)." },
+          highlights: ["p9"],
+          keywords: { zh: ["明代", "彩瓷", "景德鎮"], en: ["Ming", "polychrome", "Jingdezhen"] }
+        },
+        {
+          question: { zh: "8) 清代彩瓷燒造技術更高，兩種代表是甚麼？", en: "8) Name two representative Qing polychrome techniques." },
+          modelAnswer: { zh: "粉彩、琺瑯彩。", en: "Fencai and enamel ware." },
+          highlights: ["p9"],
+          keywords: { zh: ["清代", "粉彩", "琺瑯彩"], en: ["Qing", "fencai", "enamel"] }
+        },
+        {
+          question: { zh: "9) 唐三彩在唐代的興衰大致如何？（萌芽、鼎盛、衰落）", en: "9) Briefly describe its rise and decline in Tang." },
+          modelAnswer: { zh: "萌芽於唐高宗，開元鼎盛，安史之亂後衰落。", en: "Early phase under Gaozong, peak in Kaiyuan, then decline after the An Lushan Rebellion." },
+          highlights: ["p6", "p7"],
+          keywords: { zh: ["萌芽期", "開元", "鼎盛", "安史之亂", "衰落"], en: ["Gaozong", "Kaiyuan", "peak", "An Lushan", "decline"] }
+        }
+      ];
+
+      var current = 0;
+      var answers = new Array(questions.length).fill("");
+      var langLabelEl = document.getElementById("langLabel");
+      var langSelectEl = document.getElementById("langSelect");
+      var progressEl = document.getElementById("progress");
+      var questionTextEl = document.getElementById("questionText");
+      var answerInputEl = document.getElementById("answerInput");
+      var answerToggleEl = document.getElementById("answerToggle");
+      var nextBtn = document.getElementById("nextBtn");
+      var passageEl = document.getElementById("passage");
+      var showingModelAnswer = false;
+      var savedDraftBeforeModel = "";
+
+      function formatText(template, values) {
+        return template.replace("{current}", values.current).replace("{total}", values.total);
+      }
+      function applyLocaleText() {
+        var text = uiText[locale];
+        langLabelEl.textContent = text.languageLabel;
+        langSelectEl.setAttribute("aria-label", text.languageAria);
+        answerToggleEl.setAttribute("aria-label", text.answerToggleAria);
+        answerInputEl.placeholder = text.placeholder;
+        document.documentElement.lang = locale === "zh" ? "zh-Hant" : "en";
+      }
+      function renderPassage() {
+        passageEl.innerHTML = "";
+        passageOrder.forEach(function (key) {
+          var p = document.createElement("p");
+          p.setAttribute("data-p", key);
+          p.textContent = passageText[locale][key];
+          p.setAttribute("data-original-html", p.innerHTML);
+          passageEl.appendChild(p);
+        });
+      }
+      function clearHighlights() {
+        var nodes = passageEl.querySelectorAll("p[data-p]");
+        nodes.forEach(function (node) {
+          node.classList.remove("active");
+          var originalHtml = node.getAttribute("data-original-html");
+          if (originalHtml) node.innerHTML = originalHtml;
+        });
+      }
+      function escapeRegExp(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      }
+      function emphasizeKeywords(node, keywords) {
+        if (!keywords || !keywords.length) return;
+        var html = node.innerHTML;
+        keywords.forEach(function (word) {
+          var re = new RegExp(escapeRegExp(word), "g");
+          html = html.replace(re, '<span class="key-term">' + word + "</span>");
+        });
+        node.innerHTML = html;
+      }
+      function applyHighlights(keys, keywords) {
+        clearHighlights();
+        keys.forEach(function (key) {
+          var target = passageEl.querySelector('p[data-p="' + key + '"]');
+          if (target) {
+            target.classList.add("active");
+            emphasizeKeywords(target, keywords);
+          }
+        });
+      }
+      function autoResizeAnswer() {
+        answerInputEl.style.height = "auto";
+        answerInputEl.style.height = answerInputEl.scrollHeight + "px";
+      }
+      function renderQuestion() {
+        var q = questions[current];
+        progressEl.textContent = formatText(uiText[locale].progress, { current: current + 1, total: questions.length });
+        questionTextEl.textContent = q.question[locale];
+        answerInputEl.value = answers[current];
+        answerInputEl.readOnly = false;
+        answerInputEl.classList.remove("model-visible");
+        showingModelAnswer = false;
+        savedDraftBeforeModel = "";
+        clearHighlights();
+        nextBtn.textContent = current === questions.length - 1 ? uiText[locale].finish : uiText[locale].next;
+        autoResizeAnswer();
+      }
+      function toggleAnswer() {
+        var q = questions[current];
+        if (showingModelAnswer) {
+          answerInputEl.value = savedDraftBeforeModel;
+          answerInputEl.readOnly = false;
+          answerInputEl.classList.remove("model-visible");
+          showingModelAnswer = false;
+          clearHighlights();
+          autoResizeAnswer();
+          return;
+        }
+        savedDraftBeforeModel = answerInputEl.value;
+        answerInputEl.value = q.modelAnswer[locale];
+        answerInputEl.readOnly = true;
+        answerInputEl.classList.add("model-visible");
+        showingModelAnswer = true;
+        applyHighlights(q.highlights, q.keywords[locale] || []);
+        autoResizeAnswer();
+      }
+
+      answerToggleEl.addEventListener("click", toggleAnswer);
+      answerToggleEl.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleAnswer(); }
+      });
+      nextBtn.addEventListener("click", function () {
+        answers[current] = answerInputEl.value;
+        if (current === questions.length - 1) {
+          alert(uiText[locale].doneAlert);
+          return;
+        }
+        current += 1;
+        renderQuestion();
+      });
+      nextBtn.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); nextBtn.click(); }
+      });
+      answerInputEl.addEventListener("input", autoResizeAnswer);
+      langSelectEl.addEventListener("change", function () {
+        locale = langSelectEl.value === "en" ? "en" : "zh";
+        applyLocaleText();
+        renderPassage();
+        renderQuestion();
+      });
+
+      applyLocaleText();
+      renderPassage();
+      renderQuestion();
+    })();
+  </script>
+</body>
+</html>
