@@ -1,0 +1,42 @@
+/* Artwork/Critical Studies rubric cells (p3c.b01–p3c.b36). Rebuild: node tools/assemble-part3c-tbody.mjs */
+(function () {
+  if (!window.SBA_i18n) return;
+  window.SBA_i18n.mergeStrings({
+    "p3c.b01": { en: "<strong data-mini-guide=\"rubric.l5.p3c_b01_excellence\">Demonstrates excellence</strong> in manipulating media, skills and techniques / writing skills", ne: "माध्यम, सीप र लेखनमा <strong data-mini-guide=\"rubric.l5.p3c_b01_excellence\">उत्कृष्ट नियन्त्रण</strong> देखाउँछ", ur: "میڈیا، مہارتوں اور تحریر میں <strong data-mini-guide=\"rubric.l5.p3c_b01_excellence\">بہترین قابو</strong> دکھاتا ہے" },
+    "p3c.b02": { en: "Demonstrates proficiency in manipulating media and techniques / writing skills", ne: "माध्यम, सीप र लेखनमा दक्षता देखाउँछ", ur: "میڈیا، مہارتوں اور تحریر میں مہارت دکھاتا ہے" },
+    "p3c.b03": { en: "Demonstrates average competence in manipulating media and techniques / writing skills", ne: "माध्यम, सीप र लेखनमा औसत सक्षमता देखाउँछ", ur: "میڈیا، مہارتوں اور تحریر میں اوسط کارکردگی دکھاتا ہے" },
+    "p3c.b04": { en: "Demonstrates limited skills in manipulating media and techniques / writing", ne: "माध्यम, सीप र लेखनमा सीमित सीप देखाउँछ", ur: "میڈیا، مہارتوں اور تحریر میں محدود مہارت دکھاتا ہے" },
+    "p3c.b05": { en: "Demonstrates minimal skills in manipulating media and techniques / writing", ne: "माध्यम, सीप र लेखनमा न्यूनतम सीप देखाउँछ", ur: "میڈیا، مہارتوں اور تحریر میں کم از کم مہارت دکھاتا ہے" },
+    "p3c.b06": { en: "Demonstrates no skills in manipulating media and techniques, / writing", ne: "माध्यम, सीप वा लेखनमा कुनै सीप देखाउँदैन", ur: "میڈیا، مہارتوں یا تحریر میں کوئی مہارت نہیں دکھاتا" },
+    "p3c.b07": { en: "<strong data-mini-guide=\"rubric.l5.p3c_b07_exceptional\">Demonstrates an exceptional use / analysis</strong> of visual elements and principles of organisation relevant to the theme", ne: "विषयसँग सान्दर्भिक दृश्य तत्व र संगठनका सिद्धान्तको <strong data-mini-guide=\"rubric.l5.p3c_b07_exceptional\">अपवादात्मक प्रयोग / विश्लेषण</strong> देखाउँछ", ur: "موضوع سے متعلق بصری عناصر اور تنظیم کے اصولوں کا <strong data-mini-guide=\"rubric.l5.p3c_b07_exceptional\">غیر معمولی استعمال / تجزیہ</strong> دکھاتا ہے" },
+    "p3c.b08": { en: "Demonstrates an effective use / analysis of visual elements and principles of organisation relevant to the theme", ne: "प्रभावकारी प्रयोग / विश्लेषण देखाउँछ", ur: "موثر استعمال / تجزیہ دکھاتا ہے" },
+    "p3c.b09": { en: "Demonstrates an appropriate use / analysis of visual elements and principles of organisation relevant to the theme", ne: "उपयुक्त प्रयोग / विश्लेषण देखाउँछ", ur: "مناسب استعمال / تجزیہ دکھاتا ہے" },
+    "p3c.b10": { en: "Demonstrates a limited use / analysis of visual elements or principles of organisation relevant to the theme", ne: "सीमित प्रयोग / विश्लेषण देखाउँछ", ur: "محدود استعمال / تجزیہ دکھاتا ہے" },
+    "p3c.b11": { en: "Demonstrates an unselective use / analysis of visual elements and principles of organisation", ne: "अनियन्त्रित प्रयोग / विश्लेषण देखाउँछ", ur: "غیر منتخب استعمال / تجزیہ دکھاتا ہے" },
+    "p3c.b12": { en: "Demonstrates a lack of awareness of the use / analysis of visual elements and principles of organisation", ne: "दृश्य तत्व र संगठनको प्रयोग / विश्लेषणप्रति जागरूकता अभाव", ur: "بصری عناصر اور تنظیم کے استعمال / تجزیہ سے بے خبری" },
+    "p3c.b13": { en: "Indicates <strong data-mini-guide=\"rubric.l5.p3c_b13_deep\">deep knowledge</strong> of personal, aesthetic or cultural context(s) in relation to the theme", ne: "विषयसँग सम्बन्धमा व्यक्तिगत, सौन्दर्य वा सांस्कृतिक सन्दर्भको <strong data-mini-guide=\"rubric.l5.p3c_b13_deep\">गहिरो ज्ञान</strong> देखाउँछ", ur: "موضوع سے متعلق ذاتی، جمالیاتی یا ثقافتی سیاق کا <strong data-mini-guide=\"rubric.l5.p3c_b13_deep\">گہرا علم</strong> ظاہر کرتا ہے" },
+    "p3c.b14": { en: "Indicates adequate knowledge of personal, aesthetic or cultural context(s) in relation to the theme", ne: "पर्याप्त ज्ञान देखाउँछ", ur: "کافی علم ظاہر کرتا ہے" },
+    "p3c.b15": { en: "Indicates some knowledge of personal, aesthetic or cultural contexts in relation to the theme", ne: "केही ज्ञान देखाउँछ", ur: "کچھ علم ظاہر کرتا ہے" },
+    "p3c.b16": { en: "Indicates limited knowledge of personal, aesthetic or cultural contexts in relation to the theme", ne: "सीमित ज्ञान देखाउँछ", ur: "محدود علم ظاہر کرتا ہے" },
+    "p3c.b17": { en: "Indicates superficial knowledge of personal, aesthetic or cultural contexts in relation to the theme", ne: "सतही ज्ञान देखाउँछ", ur: "سطحی علم ظاہر کرتا ہے" },
+    "p3c.b18": { en: "Indicates a lack of contextual knowledge", ne: "सन्दर्भिक ज्ञानको अभाव", ur: "سیاقی علم کی کمی" },
+    "p3c.b19": { en: "Demonstrates <strong data-mini-guide=\"rubric.l5.p3c_b19_imagination\">imagination, creative and complete ideas</strong> / Expresses <strong data-mini-guide=\"rubric.l5.p3c_b19_informed_views\">informed personal view(s)</strong> with evidence support or insight", ne: "<strong data-mini-guide=\"rubric.l5.p3c_b19_imagination\">कल्पना, सिर्जनशील पूर्ण विचार</strong> / प्रमाण वा अन्तर्दृष्टिसहित <strong data-mini-guide=\"rubric.l5.p3c_b19_informed_views\">सूचित व्यक्तिगत दृष्टिकोण</strong>", ur: "<strong data-mini-guide=\"rubric.l5.p3c_b19_imagination\">تخیل، تخلیقی مکمل خیالات</strong> / ثبوت یا بصیرت کے ساتھ <strong data-mini-guide=\"rubric.l5.p3c_b19_informed_views\">باخبر ذاتی رائے</strong>" },
+    "p3c.b20": { en: "Demonstrates creative ideas and imagination / Expresses justified personal view(s)", ne: "सिर्जनशील विचार / औचित्यसहित व्यक्तिगत दृष्टिकोण", ur: "تخلیقی خیالات / جواز والی ذاتی رائے" },
+    "p3c.b21": { en: "Demonstrates ordinary ideas / Expresses personal view(s) with some supports", ne: "साधारण विचार / केही सहारासहित व्यक्तिगत दृष्टिकोण", ur: "عام خیالات / کچھ سہارے والی ذاتی رائے" },
+    "p3c.b22": { en: "Demonstrates incomplete ideas / Expresses personal view(s) without support", ne: "अपूर्ण विचार / सहारा बिना व्यक्तिगत दृष्टिकोण", ur: "نامکمل خیالات / بغیر سہارے ذاتی رائے" },
+    "p3c.b23": { en: "Idea(s) are imitated from others / Expresses no personal views", ne: "अरूबाट नकल गरिएका विचार / व्यक्तिगत दृष्टिकोण छैन", ur: "دوسروں سے نقل شدہ خیالات / کوئی ذاتی رائے نہیں" },
+    "p3c.b24": { en: "Demonstrates no ideas / views", ne: "कुनै विचार / दृष्टिकोण छैन", ur: "کوئی خیالات / رائے نہیں" },
+    "p3c.b25": { en: "Communicates the theme or message in an <strong data-mini-guide=\"rubric.l5.p3c_b25_innovative\">innovative way</strong> with a coherent and complete presentation", ne: "समग्र प्रस्तुतिसहित <strong data-mini-guide=\"rubric.l5.p3c_b25_innovative\">नवप्रवर्तक तरिकाले</strong> विषय वा सन्देश सञ्चार", ur: "مکمل متسق پیشکش کے ساتھ <strong data-mini-guide=\"rubric.l5.p3c_b25_innovative\">نئے انداز میں</strong> موضوع یا پیغام پہنچاتا ہے" },
+    "p3c.b26": { en: "Communicates the theme or message effectively with a coherent presentation", ne: "समग्र प्रस्तुतिसहित प्रभावकारी सञ्चार", ur: "متسق پیشکش کے ساتھ مؤثر طور پر پہنچاتا ہے" },
+    "p3c.b27": { en: "Communicates the theme or message clearly with a complete presentation", ne: "पूर्ण प्रस्तुतिसहित स्पष्ट सञ्चार", ur: "مکمل پیشکش کے ساتھ واضح طور پر پہنچاتا ہے" },
+    "p3c.b28": { en: "Communication of the theme or message is incomplete", ne: "विषय वा सन्देश सञ्चार अपूर्ण", ur: "موضوع یا پیغام کی ترسیل نامکمل" },
+    "p3c.b29": { en: "Communication of the theme or message is inadequate", ne: "सञ्चार अपर्याप्त", ur: "ترسیل ناکافی" },
+    "p3c.b30": { en: "Fails to communicate the theme or message", ne: "विषय वा सन्देश सञ्चार असफल", ur: "موضوع یا پیغام پہنچانے میں ناکام" },
+    "p3c.b31": { en: "Shows <strong data-mini-guide=\"rubric.l5.p3c_b31_progression\">substantial progression</strong>", ne: "<strong data-mini-guide=\"rubric.l5.p3c_b31_progression\">ठूलो प्रगति</strong> देखाउँछ", ur: "<strong data-mini-guide=\"rubric.l5.p3c_b31_progression\">بنیادی پیش رفت</strong> دکھاتا ہے" },
+    "p3c.b32": { en: "Shows adequate progression", ne: "पर्याप्त प्रगति देखाउँछ", ur: "مناسب پیش رفت دکھاتا ہے" },
+    "p3c.b33": { en: "Shows some progression", ne: "केही प्रगति देखाउँछ", ur: "کچھ پیش رفت دکھاتا ہے" },
+    "p3c.b34": { en: "Show limited progression", ne: "सीमित प्रगति देखाउँछ", ur: "محدود پیش رفت دکھاتا ہے" },
+    "p3c.b35": { en: "Shows little progression", ne: "थोरै प्रगति देखाउँछ", ur: "بہت کم پیش رفت دکھاتا ہے" },
+    "p3c.b36": { en: "Shows no progression", ne: "कुनै प्रगति देखाउँदैन", ur: "کوئی پیش رفت نہیں دکھاتا" }
+  });
+})();

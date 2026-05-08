@@ -1,0 +1,22 @@
+/* Auto-generated: EN/NE/UR strings for part7.html — run node tools/emit-page-bundles.mjs to refresh */
+(function () {
+  if (!window.SBA_i18n) return;
+  window.SBA_i18n.mergeStrings({
+    "doc.title.part7": { en: "Part 7 · Malpractice & appendices — VA SBA", ne: "भाग ७ · दुराचार र परिशिष्ट — VA SBA", ur: "حصہ ۷ · بدعنوانی اور ضمائم — VA SBA" },
+    "p7.ap1": { en: "<strong>A–B</strong> — Roles of HKEAA, EDB, schools, students; supervisors, district and school coordinators.", ne: "<strong>A–B</strong> — HKEAA, EDB, विद्यालय, विद्यार्थी; पर्यवेक्षक र समन्वयकर्ता।", ur: "<strong>A–B</strong> — HKEAA، EDB، اسکول، طلباء؛ نگران اور رابطہ کار۔" },
+    "p7.ap2": { en: "<strong>C–D</strong> — Calendar of events; communication channels.", ne: "<strong>C–D</strong> — घटना पात्रो; सम्पर्क माध्यम।", ur: "<strong>C–D</strong> — واقعات کا کیلنڈر؛ رابطے کے ذرائع۔" },
+    "p7.ap3": { en: "<strong>E–F</strong> — SBA portfolio assessment sheets (whole portfolio / individual work).", ne: "<strong>E–F</strong> — पोर्टफोलियो मूल्याङ्कन पाना (समग्र / व्यक्तिगत)।", ur: "<strong>E–F</strong> — پورٹ فولیو جائزہ شیٹس (مجموعی / انفرادی)۔" },
+    "p7.ap4": { en: "<strong>G</strong> — Student declaration form.", ne: "<strong>G</strong> — विद्यार्थी घोषणा फाराम।", ur: "<strong>G</strong> — طالب علم کا اعلامیہ فارم۔" },
+    "p7.ap5": { en: "<strong>H</strong> — Plagiarism report template.", ne: "<strong>H</strong> — साहित्यिक चोरी प्रतिवेदन नमूना।", ur: "<strong>H</strong> — سارقانہ ادب رپورٹ کا سانچہ۔" },
+    "p7.h1": { en: "Part 7 · Malpractice &amp; appendices", ne: "भाग ७ · दुराचार र परिशिष्ट", ur: "حصہ ۷ · بدعنوانی اور ضمائم" },
+    "p7.h61": { en: "What counts as malpractice (Chapter 6)", ne: "दुराचार के हो (अध्याय ६)", ur: "بدعنوانی کیا ہے (باب ۶)" },
+    "p7.h611": { en: "Handling malpractice (6.1)", ne: "दुराचार व्यवस्थापन (६.१)", ur: "بدعنوانی کا انتظام (۶.۱)" },
+    "p7.h62": { en: "Prevention (6.2)", ne: "रोकथाम (६.२)", ur: "روک تھام (۶.۲)" },
+    "p7.h_app": { en: "Appendices (overview)", ne: "परिशिष्ट (सारांश)", ur: "ضمائم (خلاصہ)" },
+    "p7.lead": { en: "Chapter 6 plus Appendices A–H — academic honesty, handling plagiarism, and reference forms / roles / calendar.", ne: "अध्याय ६ र परिशिष्ट A–H — शैक्षिक इमान्दारी, साहित्यिक चोरी, फाराम / भूमिका / पात्रो।", ur: "باب ۶ اور ضمیمہ A–H — علمی دیانتداری، سارقانہ ادب، فارم / کردار / کیلنڈر۔" },
+    "p7.note": { en: "<strong>Source.</strong> Content is aligned to the Visual Arts SBA Teachers’ Handbook; always use the latest official PDF from the HKEAA for authoritative wording.", ne: "<strong>स्रोत।</strong> सामग्री VA SBA शिक्षक पुस्तिकासँग मेल खान्छ; आधिकारिक शब्दका लागि HKEAA को नवीनतम PDF प्रयोग गर्नुहोस्।", ur: "<strong>ماخذ۔</strong> مواد VA SBA استاد کے کتابچے سے مماثل ہے؛ سرکاری الفاظ کے لیے HKEAA کی تازہ ترین PDF استعمال کریں۔" },
+    "p7.p61": { en: "Includes passing off others’ work (including AI-generated work) as one’s own, and copying without proper acknowledgement — broadly <strong>plagiarism</strong>. Teachers monitor work closely to detect problems.", ne: "अरूको काम (AI उत्पादन समेत) आफ्नो भनी पेश गर्ने वा उचित उल्लेख बिना प्रतिलिपि — व्यापक अर्थमा <strong>साहित्यिक चोरी</strong>। शिक्षकले निगरानी गर्छन्।", ur: "دوسروں کا کام (بشمول AI) اپنا کہنا یا مناسب حوالے کے بغیر نقل — وسیع معنی میں <strong>سارقانہ ادب</strong>۔ اساتذہ نگرانی کرتے ہیں۔" },
+    "p7.p611": { en: "Schools should have procedures to investigate suspected cases. Students may need to show process evidence, answer questions, do supervised follow-up tasks, or attend interviews. Serious plagiarism (“P cases” — near-total copying with little student contribution) is forwarded to the HKEAA per handbook rules; other categories have prescribed handling.", ne: "विद्यालयले अनुसन्धान प्रक्रिया राख्नुपर्छ। विद्यार्थीले प्रक्रिया प्रमाण, प्रश्न उत्तर, पर्यवेक्षित अतिरिक्त कार्य वा अन्तर्वार्ता गर्न सक्छन्। गम्भीर साहित्यिक चोरी HKEAA नियमअनुसार अगाडि बढ्छ।", ur: "اسکولوں میں تحقیقی عمل ہونا چاہیے۔ طلباء عمل کا ثبوت، سوال جواب، نگرانی میں اضافی کام یا انٹرویو کر سکتے ہیں۔ شدید سارقانہ ادب HKEAA قواعد کے مطابق آگے بڑھتا ہے۔" },
+    "p7.p62": { en: "Clear instructions, modelling good citation, monitoring drafts, and using plagiarism detection where appropriate — see handbook and Appendix H (Plagiarism Report).", ne: "स्पष्ट निर्देशन, उद्धरण नमूना, मस्यौदा निगरानी, आवश्यक भए प्लेजियरिज्म उपकरण — परिशिष्ट H (प्रतिवेदन)।", ur: "واضح ہدایات، حوالے کی مثالیں، مسودوں کی نگرانی، ضرورت پر پلیجرزم ٹولز — ضمیمہ H (رپورٹ)۔" }
+  });
+})();

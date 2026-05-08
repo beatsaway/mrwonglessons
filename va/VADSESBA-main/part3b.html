@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Research Workbook rubric — VA SBA</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Wide rubric page: use horizontal space so score columns wrap less */
+    main.main--rubric-matrix {
+      max-width: none;
+      margin-left: var(--sidebar-width);
+      padding: 1rem 0.85rem 2.25rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    main.main--rubric-matrix h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0 0 0.35rem;
+      color: var(--heading, #0d0d0d);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    main.main--rubric-matrix .sub {
+      display: inline-block;
+      margin-bottom: 0.65rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--muted, #5c5c5c);
+    }
+
+    .rubric-panel {
+      padding: 0.35rem 0 0.5rem;
+    }
+
+    .rubric-table-wrap {
+      overflow-x: auto;
+    }
+
+    .rubric-table {
+      width: 100%;
+      min-width: 1180px;
+      table-layout: fixed;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      border: 1px solid #ccc;
+    }
+
+    .rubric-table th {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.4rem 0.5rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--text, #1a1a1a);
+      vertical-align: bottom;
+      line-height: 1.25;
+    }
+
+    .rubric-table td {
+      border: 1px solid #ccc;
+      padding: 0.38rem 0.5rem;
+      vertical-align: top;
+      line-height: 1.32;
+      background: #fff;
+    }
+
+    .rubric-table .criteria-cell {
+      font-weight: 700;
+      background: #fff;
+      width: 13%;
+      color: var(--text, #1a1a1a);
+      font-size: 0.8rem;
+    }
+
+    .rubric-table .score-col {
+      width: 14.5%;
+    }
+
+    .rubric-table ul {
+      margin: 0;
+      padding-left: 0.95rem;
+    }
+
+    .rubric-table li {
+      margin: 0.12rem 0;
+      line-height: 1.32;
+    }
+
+    .rubric-table li:first-child {
+      margin-top: 0;
+    }
+
+    .rubric-table li:last-child {
+      margin-bottom: 0;
+    }
+
+    .score-header {
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      background: #fff;
+    }
+
+    .score-header small {
+      display: block;
+      font-weight: 500;
+      font-size: 0.65rem;
+      margin-top: 0.1rem;
+      color: var(--muted, #5c5c5c);
+      line-height: 1.2;
+    }
+
+    .rubric-footer {
+      margin-top: 0.65rem;
+      padding: 0 0.75rem;
+      font-size: 0.7rem;
+      color: var(--muted, #5c5c5c);
+      text-align: right;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 767px) {
+      main.main--rubric-matrix {
+        margin-left: 0;
+        padding: 0.65rem 0.5rem 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="site-nav-root" class="site-nav-root"></div>
+  <main class="main--rubric-matrix" data-page="part3b">
+    <h1 data-i18n="p3b.h1"></h1>
+    <span class="sub" data-i18n="p3b.sub"></span>
+    <div class="rubric-panel">
+      <div class="rubric-table-wrap">
+        <table class="rubric-table">
+          <colgroup>
+            <col style="width: 13%" />
+            <col style="width: 14.5%" />
+            <col style="width: 14.5%" />
+            <col style="width: 14.5%" />
+            <col style="width: 14.5%" />
+            <col style="width: 14.5%" />
+            <col style="width: 14.5%" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th data-i18n="p3b.th_crit"></th>
+              <th class="score-header" data-i18n="p3b.th5"></th>
+              <th class="score-header" data-i18n="p3b.th4"></th>
+              <th class="score-header" data-i18n="p3b.th3"></th>
+              <th class="score-header" data-i18n="p3b.th2"></th>
+              <th class="score-header" data-i18n="p3b.th1"></th>
+              <th class="score-header" data-i18n="p3b.th0"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="criteria-cell" data-i18n="p3b.c1"></td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b01">Uses materials from <strong>diverse sources</strong></li>
+                  <li data-i18n="p3b.b02">Selects, <strong>transforms and integrates</strong> the materials in development of theme or ideas</li>
+                  <li data-i18n="p3b.b03"><strong>Substantially investigates</strong> and inputs materials to produce <strong>original ideas</strong></li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b04">Uses materials from <strong>variety of sources</strong></li>
+                  <li data-i18n="p3b.b05">Selects, <strong>organises and integrates</strong> the materials in development of theme or ideas</li>
+                  <li data-i18n="p3b.b06">Input materials to produce <strong>personal ideas</strong></li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b07">Uses materials from <strong>some sources</strong></li>
+                  <li data-i18n="p3b.b08">Selects, organises and <strong>applies</strong> the materials in development of theme or ideas</li>
+                  <li data-i18n="p3b.b09">Occasionally inputs materials to produce <strong>satisfactory ideas</strong></li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b10">Uses materials from <strong>limited sources</strong></li>
+                  <li data-i18n="p3b.b11">Selects and <strong>uses</strong> the materials for developing theme or ideas</li>
+                  <li data-i18n="p3b.b12">Randomly inputs materials for idea development</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b13">Uses materials from a <strong>single source</strong></li>
+                  <li data-i18n="p3b.b14">Uses the materials for developing theme or ideas <strong>in a limited way</strong></li>
+                  <li data-i18n="p3b.b15">Rarely input materials for idea development</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b16">Shows <strong>no, or irrelevant</strong>, exploration or development of theme or ideas</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td class="criteria-cell" data-i18n="p3b.c2"></td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b17">Recognises <strong>multiple contexts</strong> and formal qualities of the artwork</li>
+                  <li data-i18n="p3b.b18">Expresses informed personal view(s) with support of <strong>evidence and/or insight</strong></li>
+                  <li data-i18n="p3b.b19"><strong>Articulates or translates</strong> contextual and formal knowledge to artwork / critical studies</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b20">Recognises <strong>one or two contexts</strong> and some of the formal qualities</li>
+                  <li data-i18n="p3b.b21">Expresses and <strong>justifies personal view(s)</strong></li>
+                  <li data-i18n="p3b.b22"><strong>Relates</strong> contextual and formal knowledge to artwork / critical studies</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b23">Recognises <strong>one or two contexts, OR</strong> some formal qualities</li>
+                  <li data-i18n="p3b.b24">Expresses personal view(s) with <strong>some support</strong></li>
+                  <li data-i18n="p3b.b25"><strong>Applies</strong> contextual knowledge to artwork / critical studies</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b26">Recognises <strong>limited</strong> contextual materials or formal qualities</li>
+                  <li data-i18n="p3b.b27">Expresses <strong>personal view(s)</strong> (without justification)</li>
+                  <li data-i18n="p3b.b28">Applies <strong>limited</strong> contextual or formal knowledge</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b29">States limited and <strong>basic</strong> contextual materials or formal qualities</li>
+                  <li data-i18n="p3b.b30">Expresses <strong>no personal view</strong></li>
+                  <li data-i18n="p3b.b31"><strong>Unselectively uses</strong> contextual or formal knowledge</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b32">Shows <strong>no evidence of research</strong> or presents only one or two isolated facts about the artwork</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td class="criteria-cell" data-i18n="p3b.c3"></td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b33">Demonstrates <strong>abundant and thorough experiments</strong> of media and skills</li>
+                  <li data-i18n="p3b.b34">Demonstrates <strong>abundant and thorough exploration</strong> of ways of expression</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b35">Demonstrates <strong>abundant experiments</strong> of media and skills</li>
+                  <li data-i18n="p3b.b36">Demonstrates <strong>abundant exploration</strong> of ways of expression</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b37">Demonstrates <strong>some experiments</strong> of media and skills</li>
+                  <li data-i18n="p3b.b38">Demonstrates <strong>some exploration</strong> of ways of expression</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b39">Demonstrates <strong>a few experiments</strong> of media and skills</li>
+                  <li data-i18n="p3b.b40">Demonstrates <strong>limited exploration</strong> of ways of expression</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b41">Demonstrates <strong>few experiments</strong> of media and skills</li>
+                  <li data-i18n="p3b.b42">Demonstrates <strong>few exploration</strong> of ways of expression</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b43">Demonstrates <strong>no, or unrelated</strong>, experiments with media or skills, and exploration of ways of expression</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td class="criteria-cell" data-i18n="p3b.c4"></td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b44"><strong>Continuously and thoroughly</strong> reflects on the portfolio from diverse perspectives</li>
+                  <li data-i18n="p3b.b45">Shows <strong>substantial progression</strong> in learning</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b46"><strong>Frequently</strong> reflects on the portfolio from various perspectives</li>
+                  <li data-i18n="p3b.b47">Shows <strong>adequate progression</strong> in learning</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b48"><strong>Occasionally</strong> reflects on the portfolio from some perspectives</li>
+                  <li data-i18n="p3b.b49">Shows <strong>some progression</strong> in learning</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b50"><strong>Barely</strong> reflects on the portfolio</li>
+                  <li data-i18n="p3b.b51">Shows <strong>limited progression</strong> in learning</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b52"><strong>Rarely</strong> reflects on the portfolio</li>
+                  <li data-i18n="p3b.b53">Shows <strong>little progression</strong> in learning</li>
+                </ul>
+              </td>
+              <td class="score-col">
+                <ul>
+                  <li data-i18n="p3b.b54">Shows <strong>no reflection and progression</strong> in learning</li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="rubric-footer" data-i18n="p3b.foot"></p>
+    </div>
+  </main>
+  <script src="i18n-core.js"></script>
+  <script src="chrome.js"></script>
+  <script src="pages/part3b.js"></script>
+  <script src="pages/part3b-tbody.js"></script>
+  <script src="pages/rubric-level5-guides-content.js"></script>
+  <script src="pages/rubric-level5-guides.js"></script>
+  <script src="header.js"></script>
+</body>
+</html>

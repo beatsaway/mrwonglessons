@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Artwork / Critical Studies rubric — VA SBA</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    main.main--rubric-matrix {
+      max-width: none;
+      margin-left: var(--sidebar-width);
+      padding: 1rem 0.85rem 2.25rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    main.main--rubric-matrix h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0 0 0.35rem;
+      color: var(--heading, #0d0d0d);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    main.main--rubric-matrix .sub {
+      display: block;
+      margin-bottom: 0.65rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--muted, #5c5c5c);
+      line-height: 1.45;
+      max-width: 52rem;
+    }
+
+    .rubric-panel {
+      padding: 0.35rem 0 0.5rem;
+    }
+
+    .rubric-table-wrap {
+      overflow-x: auto;
+    }
+
+    .rubric-table {
+      width: 100%;
+      min-width: 1220px;
+      table-layout: fixed;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      border: 1px solid #ccc;
+    }
+
+    .rubric-table th {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.4rem 0.5rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--text, #1a1a1a);
+      vertical-align: middle;
+      line-height: 1.25;
+    }
+
+    .rubric-table th.rubric-marks-banner {
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.8125rem;
+    }
+
+    .rubric-table td {
+      border: 1px solid #ccc;
+      padding: 0.38rem 0.5rem;
+      vertical-align: top;
+      line-height: 1.32;
+      background: #fff;
+    }
+
+    .rubric-table .criteria-cell {
+      font-weight: 700;
+      width: 13%;
+      font-size: 0.8rem;
+    }
+
+    .rubric-table .score-col {
+      width: 14.5%;
+    }
+
+    .rubric-table .cell-text {
+      margin: 0;
+    }
+
+    .score-header {
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .rubric-footer {
+      margin-top: 0.65rem;
+      padding: 0 0.75rem;
+      font-size: 0.7rem;
+      color: var(--muted, #5c5c5c);
+      text-align: right;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 767px) {
+      main.main--rubric-matrix {
+        margin-left: 0;
+        padding: 0.65rem 0.5rem 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="site-nav-root" class="site-nav-root"></div>
+  <main class="main--rubric-matrix" data-page="part3c">
+    <h1 data-i18n="p3c.h1"></h1>
+    <span class="sub" data-i18n="p3c.sub"></span>
+    <div class="rubric-panel">
+      <div class="rubric-table-wrap">
+        <table class="rubric-table">
+          <colgroup>
+            <col style="width: 13%" />
+            <col style="width: 14.5%" />
+            <col style="width: 14.5%" />
+            <col style="width: 14.5%" />
+            <col style="width: 14.5%" />
+            <col style="width: 14.5%" />
+            <col style="width: 14.5%" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th rowspan="2" data-i18n="p3c.th_crit"></th>
+              <th colspan="6" class="rubric-marks-banner" data-i18n="p3c.th_marks"></th>
+            </tr>
+            <tr>
+              <th class="score-header">5</th>
+              <th class="score-header">4</th>
+              <th class="score-header">3</th>
+              <th class="score-header">2</th>
+              <th class="score-header">1</th>
+              <th class="score-header">0</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="criteria-cell" data-i18n="p3c.c1"></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b01">Demonstrates excellence in manipulating media, skills and techniques / writing skills</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b02">Demonstrates proficiency in manipulating media and techniques / writing skills</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b03">Demonstrates average competence in manipulating media and techniques / writing skills</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b04">Demonstrates limited skills in manipulating media and techniques / writing</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b05">Demonstrates minimal skills in manipulating media and techniques / writing</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b06">Demonstrates no skills in manipulating media and techniques, / writing</p></td>
+            </tr>
+            <tr>
+              <td class="criteria-cell" data-i18n="p3c.c2"></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b07">Demonstrates an exceptional use / analysis of visual elements and principles of organisation relevant to the theme</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b08">Demonstrates an effective use / analysis of visual elements and principles of organisation relevant to the theme</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b09">Demonstrates an appropriate use / analysis of visual elements and principles of organisation relevant to the theme</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b10">Demonstrates a limited use / analysis of visual elements or principles of organisation relevant to the theme</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b11">Demonstrates an unselective use / analysis of visual elements and principles of organisation</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b12">Demonstrates a lack of awareness of the use / analysis of visual elements and principles of organisation</p></td>
+            </tr>
+            <tr>
+              <td class="criteria-cell" data-i18n="p3c.c3"></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b13">Indicates deep knowledge of personal, aesthetic or cultural context(s) in relation to the theme</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b14">Indicates adequate knowledge of personal, aesthetic or cultural context(s) in relation to the theme</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b15">Indicates some knowledge of personal, aesthetic or cultural contexts in relation to the theme</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b16">Indicates limited knowledge of personal, aesthetic or cultural contexts in relation to the theme</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b17">Indicates superficial knowledge of personal, aesthetic or cultural contexts in relation to the theme</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b18">Indicates a lack of contextual knowledge</p></td>
+            </tr>
+            <tr>
+              <td class="criteria-cell" data-i18n="p3c.c4"></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b19">Demonstrates imagination, creative and complete ideas / Expresses informed personal view(s) with evidence support or insight</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b20">Demonstrates creative ideas and imagination / Expresses justified personal view(s)</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b21">Demonstrates ordinary ideas / Expresses personal view(s) with some supports</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b22">Demonstrates incomplete ideas / Expresses personal view(s) without support</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b23">Idea(s) are imitated from others / Expresses no personal views</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b24">Demonstrates no ideas / views</p></td>
+            </tr>
+            <tr>
+              <td class="criteria-cell" data-i18n="p3c.c5"></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b25">Communicates the theme or message in an innovative way with a coherent and complete presentation</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b26">Communicates the theme or message effectively with a coherent presentation</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b27">Communicates the theme or message clearly with a complete presentation</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b28">Communication of the theme or message is incomplete</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b29">Communication of the theme or message is inadequate</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b30">Fails to communicate the theme or message</p></td>
+            </tr>
+            <tr>
+              <td class="criteria-cell" data-i18n="p3c.c6"></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b31">Shows substantial progression</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b32">Shows adequate progression</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b33">Shows some progression</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b34">Show limited progression</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b35">Shows little progression</p></td>
+              <td class="score-col"><p class="cell-text" data-i18n="p3c.b36">Shows no progression</p></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="rubric-footer" data-i18n="p3c.foot"></p>
+    </div>
+  </main>
+  <script src="i18n-core.js"></script>
+  <script src="chrome.js"></script>
+  <script src="pages/part3c.js"></script>
+  <script src="pages/part3c-tbody.js"></script>
+  <script src="pages/rubric-level5-guides-content.js"></script>
+  <script src="pages/rubric-level5-guides.js"></script>
+  <script src="header.js"></script>
+</body>
+</html>
