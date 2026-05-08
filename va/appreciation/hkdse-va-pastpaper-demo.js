@@ -1,9 +1,17 @@
 // Past paper demo data for HKDSE VA Appreciation Guide.
 // Loaded as a global so it works under file:// without module imports.
 (function () {
-  function chips(list) {
-    return `<p><span class="chips">${list.map((w) => `<span>${w}</span>`).join("")}</span></p>`;
-  }
+  const EXTRA_KEYWORDS = {
+    en: [
+      "composition", "pictorial", "symbolic", "narrative", "cultural",
+      "psychological", "spatial", "atmosphere", "material", "identity",
+      "rhythm", "contrast", "balance", "emphasis", "coherence", "evaluation"
+    ],
+    zh: [
+      "構圖", "空間", "線條", "色彩", "明暗", "形體", "質感",
+      "對比", "平衡", "重點", "節奏", "統一", "變化", "象徵", "文化", "評價"
+    ]
+  };
 
   function plateMetaFromCaption(caption) {
     const text = String(caption || "");
@@ -18,8 +26,9 @@
       <div class="pastpaper-gallery">
         ${images.map((img) => {
           const meta = plateMetaFromCaption(img.caption);
+          const wide = img.wide ? " is-wide" : "";
           return `
-          <figure class="pastpaper-figure" data-plate-base="${meta.base}" data-plate-detail="${meta.isDetail ? "1" : "0"}">
+          <figure class="pastpaper-figure${wide}" data-plate-base="${meta.base}" data-plate-detail="${meta.isDetail ? "1" : "0"}">
             <img src="${img.src}" alt="${img.alt}" loading="lazy" />
             <figcaption>${img.caption || ""}</figcaption>
           </figure>
@@ -33,47 +42,149 @@
     return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
-  function emphasizeKeywords(text, tags) {
-    let out = String(text || "");
-    const unique = Array.from(new Set((tags || []).map((t) => String(t).trim()).filter(Boolean)));
-    unique.sort((a, b) => b.length - a.length);
-    unique.forEach((tag) => {
-      const pattern = new RegExp(`(^|[^A-Za-z0-9_>])(${escapeRegex(tag)})(?=[^A-Za-z0-9_<]|$)`, "gi");
-      out = out.replace(pattern, (_, p1, p2) => `${p1}<strong>${p2}</strong>`);
+  function escapeHtml(text) {
+    return String(text || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function escapeAttr(text) {
+    return escapeHtml(text).replace(/"/g, "&quot;");
+  }
+
+  function normalizeWord(text) {
+    return String(text || "").trim().toLowerCase().replace(/\s+/g, " ");
+  }
+
+  function hintEmojiForAnswer(answer, stepId, lang) {
+    const key = normalizeWord(answer);
+    const map = {
+      // description/media/style
+      "media": "🖌️", "medium": "🖌️", "subject matter": "🖼️", "composition": "🧩",
+      "line": "〰️", "color": "🎨", "space": "📐", "form": "🧱", "shape": "🔷", "texture": "🪵", "value": "🌗",
+      "媒介": "🖌️", "題材": "🖼️", "構圖": "🧩", "線條": "〰️", "色彩": "🎨", "空間": "📐", "形體": "🧱", "形狀": "🔷", "質感": "🪵", "明暗": "🌗",
+
+      // analysis/principles
+      "balance": "⚖️", "contrast": "🔳", "emphasis": "📍", "movement": "➡️", "rhythm": "🥁", "pattern": "🟦", "repetition": "🔁", "unity/variety": "🧠",
+      "平衡": "⚖️", "對比": "🔳", "重點": "📍", "動勢": "➡️", "節奏": "🥁", "圖案": "🟦", "重複": "🔁", "統一/變化": "🧠",
+
+      // interpretation/judgement
+      "identity": "🪪", "memory": "🧠", "community": "👥", "symbolic meaning": "💭", "symbolic reading": "💭", "social context": "🏙️", "cultural context": "🏮",
+      "有效性": "✅", "effectiveness": "✅", "coherence": "🧷", "criteria-based judgement": "📏",
+      "身份": "🪪", "記憶": "🧠", "社群": "👥", "象徵意義": "💭", "象徵閱讀": "💭", "社會脈絡": "🏙️", "文化脈絡": "🏮", "準則評價": "📏"
+    };
+    if (map[key]) return map[key];
+
+    if (stepId === "d") return lang === "zh" ? "🧾" : "🧾";
+    if (stepId === "a") return lang === "zh" ? "🔍" : "🔍";
+    if (stepId === "i") return lang === "zh" ? "💡" : "💡";
+    if (stepId === "j") return lang === "zh" ? "⚖️" : "⚖️";
+    return "✍️";
+  }
+
+  function keywordRegex(keyword, lang) {
+    if (lang === "zh" || /[\u3400-\u9fff]/.test(keyword)) {
+      return new RegExp(escapeRegex(keyword));
+    }
+    return new RegExp(`\\b${escapeRegex(keyword)}\\b`, "i");
+  }
+
+  function pickStepKeywords(text, tags, lang) {
+    const source = String(text || "");
+    const pool = [...(tags || []), ...(EXTRA_KEYWORDS[lang] || [])]
+      .map((w) => String(w).trim())
+      .filter(Boolean);
+
+    const picked = [];
+    const seen = new Set();
+    pool.forEach((kw) => {
+      const key = normalizeWord(kw);
+      if (seen.has(key)) return;
+      if (!keywordRegex(kw, lang).test(source)) return;
+      seen.add(key);
+      picked.push(kw);
     });
+    // Slightly more blanks than before
+    return picked.slice(0, 5);
+  }
+
+  function shuffle(arr) {
+    const out = [...arr];
+    for (let i = out.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
     return out;
   }
 
+  function buildFillBlock(text, tags, lang, qid, stepId) {
+    let working = String(text || "");
+    const picked = pickStepKeywords(working, tags, lang);
+    const blanks = [];
+
+    picked.forEach((kw) => {
+      const re = keywordRegex(kw, lang);
+      const match = working.match(re);
+      if (!match) return;
+      const token = `__BLANK_${qid}_${stepId}_${blanks.length}__`;
+      working = working.replace(re, token);
+      blanks.push({
+        answer: match[0],
+        norm: normalizeWord(match[0]),
+        emoji: hintEmojiForAnswer(match[0], stepId, lang),
+        token
+      });
+    });
+
+    let html = escapeHtml(working);
+    blanks.forEach((b, idx) => {
+      const blankHtml = `<span class="pp-blank-wrap"><span class="pp-blank-icon" aria-hidden="true">${escapeHtml(b.emoji || "✍️")}</span><span class="pp-blank" data-answer="${escapeAttr(b.answer)}" data-answer-norm="${escapeAttr(b.norm)}" data-filled="0" tabindex="0" aria-label="Blank ${idx + 1}"></span></span>`;
+      html = html.split(b.token).join(blankHtml);
+    });
+
+    const bankWords = shuffle(blanks.map((b) => b.answer));
+    const bankHtml = bankWords.length
+      ? `<div class="pp-bank" data-step="${stepId}">
+          ${bankWords.map((w, i) => `<button type="button" class="pp-keyword" data-word="${escapeAttr(w)}" data-word-norm="${escapeAttr(normalizeWord(w))}" aria-label="Keyword ${i + 1}: ${escapeAttr(w)}">${escapeHtml(w)}</button>`).join("")}
+        </div>`
+      : "";
+
+    return { sentenceHtml: html, bankHtml };
+  }
+
+  function renderStep(label, text, tags, lang, qid, stepId, colon) {
+    const fill = buildFillBlock(text, tags, lang, qid, stepId);
+    return `
+      <p><strong>${label}${colon}</strong> ${fill.sentenceHtml}</p>
+      ${fill.bankHtml}
+    `;
+  }
+
   function buildArticle(model) {
+    const qid = model.id;
     return `
       <article class="example pastpaper-answer">
         ${model.reference ? `<p><strong>${model.refLabel}</strong> ${model.reference}</p>` : ""}
         ${renderImages(model.images)}
-        <p><strong>Description:</strong> ${emphasizeKeywords(model.description, model.tags1)}</p>
-        ${chips(model.tags1)}
-        <p><strong>Analysis:</strong> ${emphasizeKeywords(model.analysis, model.tags2)}</p>
-        ${chips(model.tags2)}
-        <p><strong>Interpretation:</strong> ${emphasizeKeywords(model.interpretation, model.tags3)}</p>
-        ${chips(model.tags3)}
-        <p><strong>Judgement:</strong> ${emphasizeKeywords(model.judgement, model.tags4)}</p>
-        ${chips(model.tags4)}
+        ${renderStep("Description", model.description, model.tags1, "en", qid, "d", ":")}
+        ${renderStep("Analysis", model.analysis, model.tags2, "en", qid, "a", ":")}
+        ${renderStep("Interpretation", model.interpretation, model.tags3, "en", qid, "i", ":")}
+        ${renderStep("Judgement", model.judgement, model.tags4, "en", qid, "j", ":")}
       </article>
     `;
   }
 
   function buildArticleZh(model) {
+    const qid = model.id;
     return `
       <article class="example pastpaper-answer">
         ${model.reference ? `<p><strong>${model.refLabel}</strong> ${model.reference}</p>` : ""}
         ${renderImages(model.images)}
-        <p><strong>Description：</strong> ${emphasizeKeywords(model.description, model.tags1)}</p>
-        ${chips(model.tags1)}
-        <p><strong>Analysis：</strong> ${emphasizeKeywords(model.analysis, model.tags2)}</p>
-        ${chips(model.tags2)}
-        <p><strong>Interpretation：</strong> ${emphasizeKeywords(model.interpretation, model.tags3)}</p>
-        ${chips(model.tags3)}
-        <p><strong>Judgement：</strong> ${emphasizeKeywords(model.judgement, model.tags4)}</p>
-        ${chips(model.tags4)}
+        ${renderStep("Description", model.description, model.tags1, "zh", qid, "d", "：")}
+        ${renderStep("Analysis", model.analysis, model.tags2, "zh", qid, "a", "：")}
+        ${renderStep("Interpretation", model.interpretation, model.tags3, "zh", qid, "i", "：")}
+        ${renderStep("Judgement", model.judgement, model.tags4, "zh", qid, "j", "：")}
       </article>
     `;
   }
@@ -413,7 +524,7 @@
     ],
     "2025A_Q2": [
       { src: "./pp/2025A_Q2a.webp", alt: "2025A Q2 Plate 2a", caption: "Plate (2a) Inges Idee, Anticipation, 2018. Stainless steel circular bend pipes, wood, plastic composites, sandblast ground, LED light, 273 x 1148 x 850 cm." },
-      { src: "./pp/2025A_Q2a12.webp", alt: "2025A Q2 Plate 2a side and top view", caption: "Plate (2a.1) Side View; Plate (2a.2) Top View." },
+      { src: "./pp/2025A_Q2a12.webp", alt: "2025A Q2 Plate 2a side and top view", caption: "Plate (2a.1) Side View; Plate (2a.2) Top View.", wide: true },
       { src: "./pp/2025A_Q2b.webp", alt: "2025A Q2 Plate 2b", caption: "Plate (2b) Bruno Catalano, The Travellers J4, 2022. Bronze, 310 x 120 x 110 cm." },
       { src: "./pp/2025A_Q2b1.webp", alt: "2025A Q2 Plate 2b side view", caption: "Plate (2b.1) Side View." },
       { src: "./pp/2025A_Q2b2.webp", alt: "2025A Q2 Plate 2b back view", caption: "Plate (2b.2) Back View." }
