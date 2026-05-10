@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2A Classroom</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: #0b1020;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .name-label {
+      position: fixed;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 11px;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.85);
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10;
+      user-select: none;
+    }
+
+  </style>
+</head>
+<body>
+<script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.183.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.183.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    const DEFAULT_SEATING = [
+      ["6 郭君鵬", "", "14 李一航", "11 簡愷佑", "", "35 蔡子萱", "7 何天恩", "", "36 方紫瑜", "30 張梓萱"],
+      ["33 和仟惠", "", "9 黃詩茹", "4 莊曼妮", "", "15 李一鳴", "10 蔣少涵", "", "21 吴浣瑩", "28 余嘉浠"],
+      ["12 梁柏宇", "", "22 肖辰臻", "29 曾嘉欣", "", "24 許學臻", "23 許繼耿", "", "5 封采", "37 邱若曦"],
+      ["19 王復生", "", "17 蘇紫瑜", "27 易容妃", "", "26 姚銘", "16 呂錦峰", "", "1 陳政延", "31 鄭敬熹"],
+      ["8 黃嘉樂", "", "3 陳思涵", "20 吳國豪", "", "2 陳錦賢", "13 李狄達", "", "34 林煜翔", "25 楊星睿"]
+    ];
+
+    const DESK_COLS = 10;
+    const DESK_ROWS = 5;
+    const SEAT_COUNT = DESK_COLS * DESK_ROWS;
+    const studentNames = DEFAULT_SEATING.flat().map((s) => (s ?? "").trim());
+
+    /** 0 = hide name tags (default), 1 = short labels, 2 = full names. Cycle with N. */
+    let nameTagMode = 0;
+
+    function rosterShortName(fullName) {
+      const t = fullName.trim();
+      const m = t.match(/^(\d+)\s+(.*)$/);
+      if (!m) return t;
+      const num = m[1];
+      const after = m[2].replace(/\s/g, "");
+      const han = after.match(/[\u4e00-\u9fff]/u);
+      const surname = han ? han[0] : "";
+      return surname ? `${num}${surname}同學` : `${num}同學`;
+    }
+
+    function rosterDisplayLabel(fullName) {
+      const t = fullName.trim();
+      if (!t) return "";
+      if (nameTagMode === 0) return "";
+      if (nameTagMode === 2) return t;
+      return rosterShortName(t);
+    }
+
+    const tableColours = [
+      "#b38653", "#ff8080", "#ffff80", "#ffc080", "#80ff80", "#8080ff", "#2b64f9"
+    ];
+
+    const SEAT_SPACING = { x: 1.51, z: 1.22 };
+    const FRONT_ROW_Z = -0.5;
+    const SEATING_Z_PUSH = 0.92;
+    const avatarRelDesk = { x: 0, y: 0.07, z: 0.4 };
+
+    const SELECT_HIGHLIGHT = 0xfde047;
+
+    function randomBrightColor() {
+      return new THREE.Color(Math.random(), Math.random(), Math.random());
+    }
+
+    function colorDistance(a, b) {
+      const dr = a.r - b.r;
+      const dg = a.g - b.g;
+      const db = a.b - b.b;
+      return Math.sqrt(dr * dr + dg * dg + db * db);
+    }
+
+    function randomDistinctColor(baseColor, minDistance = 0.45) {
+      let next = randomBrightColor();
+      let tries = 0;
+      while (colorDistance(next, baseColor) < minDistance && tries < 20) {
+        next = randomBrightColor();
+        tries += 1;
+      }
+      return next;
+    }
+
+    function createDeskAndChair(colourHex) {
+      const root = new THREE.Group();
+      const wood = new THREE.MeshLambertMaterial({
+        color: new THREE.Color(colourHex)
+      });
+      const darkWood = new THREE.MeshLambertMaterial({ color: 0x5c4033 });
+
+      const top = new THREE.Mesh(
+        new THREE.BoxGeometry(1.15, 0.09, 0.62),
+        wood
+      );
+      top.position.y = 0.72;
+      top.castShadow = true;
+      root.add(top);
+
+      const legGeom = new THREE.BoxGeometry(0.07, 0.62, 0.07);
+      const legPositions = [
+        { x: -0.5, z: 0.26 },
+        { x: -0.5, z: -0.26 },
+        { x: 0.5, z: 0.26 },
+        { x: 0.5, z: -0.26 }
+      ];
+      for (const pos of legPositions) {
+        const leg = new THREE.Mesh(legGeom, darkWood);
+        leg.position.set(pos.x, 0.36, pos.z);
+        leg.castShadow = true;
+        root.add(leg);
+      }
+
+      const chairSeat = new THREE.Mesh(
+        new THREE.BoxGeometry(0.52, 0.08, 0.48),
+        wood
+      );
+      chairSeat.position.set(0, 0.42, 0.52);
+      chairSeat.castShadow = true;
+      root.add(chairSeat);
+
+      const chairBack = new THREE.Mesh(
+        new THREE.BoxGeometry(0.52, 0.55, 0.07),
+        wood
+      );
+      chairBack.position.set(0, 0.72, 0.78);
+      chairBack.castShadow = true;
+      root.add(chairBack);
+
+      const cLegGeom = new THREE.BoxGeometry(0.06, 0.38, 0.06);
+      const cLegPos = [
+        { x: -0.2, z: 0.35 },
+        { x: 0.2, z: 0.35 },
+        { x: -0.2, z: 0.68 },
+        { x: 0.2, z: 0.68 }
+      ];
+      for (const pos of cLegPos) {
+        const cl = new THREE.Mesh(cLegGeom, darkWood);
+        cl.position.set(pos.x, 0.21, pos.z);
+        cl.castShadow = true;
+        root.add(cl);
+      }
+
+      return root;
+    }
+
+    function addOpenBookOnDesk(furnitureRoot) {
+      const t = 0.014;
+      const y = 0.72 + 0.09 / 2 + t / 2;
+      const paper = new THREE.MeshLambertMaterial({ color: 0xfff8f0 });
+      const spineMat = new THREE.MeshLambertMaterial({ color: 0x4a3728 });
+      const pageW = 0.44;
+      const pageD = 0.56;
+      const g = 0.018;
+
+      const book = new THREE.Group();
+      book.position.set(0, y, -0.06);
+
+      const L = new THREE.Mesh(new THREE.BoxGeometry(pageW, t, pageD), paper);
+      L.position.set(-pageW / 2 - g / 2, 0, 0);
+      const R = new THREE.Mesh(new THREE.BoxGeometry(pageW, t, pageD), paper);
+      R.position.set(pageW / 2 + g / 2, 0, 0);
+      const mid = new THREE.Mesh(
+        new THREE.BoxGeometry(g + 0.02, t * 1.15, pageD * 0.96),
+        spineMat
+      );
+
+      book.add(L, R, mid);
+      furnitureRoot.add(book);
+    }
+
+    function createSeatedAvatar() {
+      const group = new THREE.Group();
+      const skin = randomBrightColor();
+      const outfit = randomBrightColor();
+      const pants = outfit.clone().multiplyScalar(0.72);
+
+      const head = new THREE.Mesh(
+        new THREE.BoxGeometry(0.72, 0.72, 0.72),
+        new THREE.MeshLambertMaterial({ color: skin })
+      );
+      head.position.set(0, 1.14, -0.1);
+      head.castShadow = true;
+      head.userData.baseColorHex = head.material.color.getHex();
+      group.add(head);
+
+      const body = new THREE.Mesh(
+        new THREE.BoxGeometry(0.62, 0.52, 0.42),
+        new THREE.MeshLambertMaterial({ color: outfit })
+      );
+      body.position.set(0, 0.72, -0.04);
+      body.rotation.x = THREE.MathUtils.degToRad(-16);
+      body.castShadow = true;
+      group.add(body);
+
+      const armGeom = new THREE.BoxGeometry(0.2, 0.4, 0.22);
+      const armMat = body.material;
+      const armPitch = THREE.MathUtils.degToRad(-128);
+
+      function addArm(side) {
+        const armGroup = new THREE.Group();
+        armGroup.position.set(side * 0.42, 0.66, 0.08);
+        armGroup.rotation.x = armPitch;
+
+        const arm = new THREE.Mesh(armGeom, armMat);
+        arm.position.set(0, -0.2, 0);
+        arm.castShadow = true;
+        armGroup.add(arm);
+
+        group.add(armGroup);
+      }
+
+      addArm(-1);
+      addArm(1);
+
+      const legGeom = new THREE.BoxGeometry(0.26, 0.36, 0.26);
+      const legMat = new THREE.MeshLambertMaterial({ color: pants });
+      const leftLeg = new THREE.Mesh(legGeom, legMat);
+      const rightLeg = new THREE.Mesh(legGeom, legMat);
+      leftLeg.position.set(-0.18, 0.44, 0.4);
+      rightLeg.position.set(0.18, 0.44, 0.4);
+      leftLeg.rotation.x = THREE.MathUtils.degToRad(-92);
+      rightLeg.rotation.x = THREE.MathUtils.degToRad(-92);
+      leftLeg.castShadow = true;
+      rightLeg.castShadow = true;
+      group.add(leftLeg, rightLeg);
+
+      group.rotation.y = Math.PI;
+      group.position.set(0, 0.04, 0.14);
+      group.scale.setScalar(0.88);
+
+      return { group, head };
+    }
+
+    const scene = new THREE.Scene();
+    const skyColor = new THREE.Color(0x87a8c9);
+    scene.background = skyColor;
+    scene.fog = new THREE.Fog(skyColor, 12, 42);
+
+    const camera = new THREE.PerspectiveCamera(
+      48,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      200
+    );
+    camera.position.set(0, 16.4, 28.5);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    const animClock = new THREE.Clock();
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 1.15, 4.15);
+    controls.maxDistance = 42;
+    controls.minDistance = 5;
+
+    const floorColor = randomDistinctColor(skyColor, 0.35);
+    const wallColor = randomDistinctColor(floorColor, 0.25);
+    const wallMat = new THREE.MeshLambertMaterial({ color: wallColor });
+    const wallH = 12.4;
+    const wallT = 0.2;
+    const floorFrontExtension = 6.2;
+
+    const boardHalfW = 19.4 / 2;
+    const shelfHalfW = 2.48 / 2;
+    const boardShelfGap = 0.1;
+    const shelfCenterX = -(boardHalfW + boardShelfGap + shelfHalfW);
+
+    const seatSpanX = (DESK_COLS - 1) * SEAT_SPACING.x;
+    const seatSpanZ = (DESK_ROWS - 1) * SEAT_SPACING.z;
+    const seatMinX = -seatSpanX / 2 - 0.75;
+    const seatMaxX = seatSpanX / 2 + 0.75;
+    const seatMinZ = FRONT_ROW_Z + SEATING_Z_PUSH - 0.55;
+    const seatMaxZ = FRONT_ROW_Z + seatSpanZ + SEATING_Z_PUSH + 0.95;
+
+    const roomMinX = Math.min(seatMinX, shelfCenterX - shelfHalfW - 0.35) - 0.15;
+    const roomMaxX = Math.max(seatMaxX, boardHalfW + 0.45);
+    const roomMinZ = FRONT_ROW_Z - 3.62;
+    const roomMaxZ = seatMaxZ + 0.85 + floorFrontExtension;
+
+    const roomW = roomMaxX - roomMinX;
+    const roomD = roomMaxZ - roomMinZ;
+    const roomCx = (roomMinX + roomMaxX) / 2;
+    const roomCz = (roomMinZ + roomMaxZ) / 2;
+
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(roomW, roomD),
+      new THREE.MeshLambertMaterial({ color: floorColor })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.set(roomCx, 0, roomCz);
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    const boardEndWall = new THREE.Mesh(
+      new THREE.BoxGeometry(roomW + wallT * 2, wallH, wallT),
+      wallMat
+    );
+    boardEndWall.position.set(roomCx, wallH / 2, roomMinZ - wallT / 2);
+    boardEndWall.receiveShadow = true;
+    scene.add(boardEndWall);
+
+    const sideWallL = new THREE.Mesh(
+      new THREE.BoxGeometry(wallT, wallH, roomD + wallT * 2),
+      wallMat
+    );
+    sideWallL.position.set(roomMinX - wallT / 2, wallH / 2, roomCz);
+    sideWallL.receiveShadow = true;
+    scene.add(sideWallL);
+
+    const sideWallR = new THREE.Mesh(
+      new THREE.BoxGeometry(wallT, wallH, roomD + wallT * 2),
+      wallMat
+    );
+    sideWallR.position.set(roomMaxX + wallT / 2, wallH / 2, roomCz);
+    sideWallR.receiveShadow = true;
+    scene.add(sideWallR);
+
+    (function addDoorAndWindowsRightWall() {
+      const doorScale = 1.3;
+      const doorW = 1.12 * doorScale;
+      const doorH = 2.48 * doorScale;
+      const zC = roomMinZ + 2.15;
+      const innerX = roomMaxX - 0.02;
+      const doorY = doorH / 2 + 0.06 * doorScale;
+      const frameD = 0.14 * doorScale;
+      const trim = new THREE.MeshLambertMaterial({ color: 0x7a6550 });
+      const glassMat = new THREE.MeshLambertMaterial({
+        color: 0xb8d4f0,
+        emissive: 0x2a3d50,
+        emissiveIntensity: 0.22,
+        transparent: true,
+        opacity: 0.88
+      });
+
+      const recess = new THREE.Mesh(
+        new THREE.BoxGeometry(0.22 * doorScale, doorH + 0.06 * doorScale, doorW + 0.04 * doorScale),
+        new THREE.MeshLambertMaterial({ color: 0x0c0a09 })
+      );
+      recess.position.set(innerX - 0.14 * doorScale, doorY, zC);
+      recess.castShadow = true;
+      scene.add(recess);
+
+      const lintel = new THREE.Mesh(
+        new THREE.BoxGeometry(frameD, 0.2 * doorScale, doorW + 0.36 * doorScale),
+        trim
+      );
+      lintel.position.set(innerX - frameD / 2, doorH + 0.16 * doorScale, zC);
+      lintel.castShadow = true;
+      scene.add(lintel);
+
+      const jambGeom = new THREE.BoxGeometry(frameD, doorH + 0.12 * doorScale, 0.16 * doorScale);
+      const jambL = new THREE.Mesh(jambGeom, trim);
+      jambL.position.set(innerX - frameD / 2, doorY, zC - doorW / 2 - 0.08 * doorScale);
+      const jambR = new THREE.Mesh(jambGeom, trim);
+      jambR.position.set(innerX - frameD / 2, doorY, zC + doorW / 2 + 0.08 * doorScale);
+      jambL.castShadow = true;
+      jambR.castShadow = true;
+      scene.add(jambL, jambR);
+
+      const pivot = new THREE.Group();
+      pivot.position.set(innerX, doorY, zC - doorW * 0.48);
+      const leaf = new THREE.Mesh(
+        new THREE.BoxGeometry(0.09 * doorScale, doorH * 0.93, doorW * 0.94),
+        new THREE.MeshLambertMaterial({ color: 0x5a4328 })
+      );
+      leaf.position.set(-0.045 * doorScale, 0, doorW * 0.47);
+      leaf.castShadow = true;
+      pivot.add(leaf);
+      pivot.rotation.y = THREE.MathUtils.degToRad(24);
+      scene.add(pivot);
+
+      const winDepth = 0.045;
+      const paneW = 0.48 * doorScale;
+      const paneH = 1.35 * doorScale;
+      const mullionZ = 0.07 * doorScale;
+      const sillY = 1.05 * doorScale;
+      const spacing = 0.28 * doorScale;
+
+      function addFakeWindowPair(zCenter) {
+        const yMid = sillY + paneH / 2;
+        const xGlass = innerX - winDepth / 2;
+
+        const leftPane = new THREE.Mesh(
+          new THREE.BoxGeometry(winDepth, paneH, paneW),
+          glassMat
+        );
+        leftPane.position.set(xGlass, yMid, zCenter - paneW / 2 - mullionZ / 2);
+        const rightPane = new THREE.Mesh(
+          new THREE.BoxGeometry(winDepth, paneH, paneW),
+          glassMat
+        );
+        rightPane.position.set(xGlass, yMid, zCenter + paneW / 2 + mullionZ / 2);
+
+        const mullion = new THREE.Mesh(
+          new THREE.BoxGeometry(winDepth * 1.1, paneH * 1.02, mullionZ),
+          trim
+        );
+        mullion.position.set(xGlass, yMid, zCenter);
+
+        const head = new THREE.Mesh(
+          new THREE.BoxGeometry(frameD * 0.85, 0.12 * doorScale, paneW * 2 + mullionZ + 0.16 * doorScale),
+          trim
+        );
+        head.position.set(innerX - frameD / 2, sillY + paneH + 0.06 * doorScale, zCenter);
+        const sill = new THREE.Mesh(
+          new THREE.BoxGeometry(frameD * 0.85, 0.1 * doorScale, paneW * 2 + mullionZ + 0.16 * doorScale),
+          trim
+        );
+        sill.position.set(innerX - frameD / 2, sillY - 0.05 * doorScale, zCenter);
+
+        for (const m of [leftPane, rightPane, mullion, head, sill]) {
+          m.castShadow = true;
+          scene.add(m);
+        }
+      }
+
+      let zWin = zC + doorW / 2 + 0.18 * doorScale + paneW + mullionZ / 2;
+      addFakeWindowPair(zWin);
+      zWin += paneW * 2 + mullionZ + spacing;
+      addFakeWindowPair(zWin);
+      zWin += paneW * 2 + mullionZ + spacing;
+      addFakeWindowPair(zWin);
+    })();
+
+    const boardGroup = new THREE.Group();
+    const boardFrameDepth = 0.12;
+    const boardFrameBackLocalZ = -0.04 - boardFrameDepth / 2;
+    boardGroup.position.set(0, 3.75, roomMinZ - boardFrameBackLocalZ);
+
+    const boardFrame = new THREE.Mesh(
+      new THREE.BoxGeometry(19.4, 4.55, boardFrameDepth),
+      new THREE.MeshLambertMaterial({ color: 0x94a3b8 })
+    );
+    boardFrame.position.z = -0.04;
+    boardFrame.castShadow = true;
+    boardGroup.add(boardFrame);
+
+    function createWhiteboardTexture() {
+      const canvas = document.createElement("canvas");
+      const planeW = 18.9;
+      const planeH = 4.2;
+      const aspect = planeW / planeH;
+      canvas.height = 640;
+      canvas.width = Math.round(canvas.height * aspect);
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#f8fafc";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#1e293b";
+      ctx.font =
+        'bold 132px "Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("靜心悅讀 收起平板", canvas.width / 2, canvas.height * 0.4);
+      ctx.fillText("顧及他人 請勿喧嘩", canvas.width / 2, canvas.height * 0.6);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    const boardTexture = createWhiteboardTexture();
+    const boardSurface = new THREE.Mesh(
+      new THREE.PlaneGeometry(18.9, 4.2),
+      new THREE.MeshLambertMaterial({ map: boardTexture })
+    );
+    boardSurface.position.z = 0.03;
+    boardSurface.receiveShadow = true;
+    boardGroup.add(boardSurface);
+
+    scene.add(boardGroup);
+
+    function buildBookshelfWithSign() {
+      const group = new THREE.Group();
+      const W = 2.48;
+      const D = 0.78;
+      const H = 3.48;
+      const thick = 0.055;
+      const wood = new THREE.MeshLambertMaterial({ color: 0x5c4033 });
+      const woodDark = new THREE.MeshLambertMaterial({ color: 0x3d2814 });
+
+      const leftSide = new THREE.Mesh(
+        new THREE.BoxGeometry(thick, H, D),
+        wood
+      );
+      leftSide.position.set(-W / 2 + thick / 2, H / 2, 0);
+      leftSide.castShadow = true;
+      const rightSide = new THREE.Mesh(
+        new THREE.BoxGeometry(thick, H, D),
+        wood
+      );
+      rightSide.position.set(W / 2 - thick / 2, H / 2, 0);
+      rightSide.castShadow = true;
+      const backPanel = new THREE.Mesh(
+        new THREE.BoxGeometry(W, H, thick),
+        woodDark
+      );
+      backPanel.position.set(0, H / 2, -D / 2 + thick / 2);
+      backPanel.castShadow = true;
+      group.add(leftSide, rightSide, backPanel);
+
+      const shelfLevels = 5;
+      const shelfGeom = new THREE.BoxGeometry(W - thick * 2.2, thick, D - 0.05);
+      for (let i = 0; i < shelfLevels; i += 1) {
+        const y = ((i + 1) / (shelfLevels + 1)) * H;
+        const shelf = new THREE.Mesh(shelfGeom, wood);
+        shelf.position.set(0, y, 0);
+        shelf.castShadow = true;
+        group.add(shelf);
+      }
+
+      const paperMat = new THREE.MeshLambertMaterial({ color: 0xede8dc });
+      const paperEdgeMat = new THREE.MeshLambertMaterial({ color: 0xd4ccc0 });
+
+      function createRealisticBook(baseHex, thickX, h, depthZ) {
+        const book = new THREE.Group();
+        const base = new THREE.Color(baseHex);
+        base.offsetHSL(
+          (Math.random() - 0.5) * 0.14,
+          (Math.random() - 0.5) * 0.18,
+          (Math.random() - 0.5) * 0.1
+        );
+        const colSpine = base.clone().multiplyScalar(0.85 + Math.random() * 0.12);
+        const colCoverA = base.clone();
+        colCoverA.offsetHSL(0, 0.06, 0.04);
+        const colCoverB = base.clone().multiplyScalar(0.78 + Math.random() * 0.12);
+        colCoverB.offsetHSL((Math.random() - 0.5) * 0.04, 0, -0.05);
+
+        const spineMat = new THREE.MeshLambertMaterial({ color: colSpine });
+        const coverMatA = new THREE.MeshLambertMaterial({ color: colCoverA });
+        const coverMatB = new THREE.MeshLambertMaterial({ color: colCoverB });
+
+        const coverThick = 0.022;
+        const spineDepth = 0.02;
+
+        const pageBlock = new THREE.Mesh(
+          new THREE.BoxGeometry(thickX * 0.52, h * 0.84, depthZ * 0.66),
+          paperMat
+        );
+        pageBlock.position.set(0, 0, -depthZ * 0.04);
+        pageBlock.castShadow = true;
+
+        const spine = new THREE.Mesh(
+          new THREE.BoxGeometry(thickX * 0.96, h * 0.99, spineDepth),
+          spineMat
+        );
+        spine.position.set(0, 0, depthZ / 2 - spineDepth / 2);
+        spine.castShadow = true;
+
+        const leftCover = new THREE.Mesh(
+          new THREE.BoxGeometry(coverThick, h * 0.98, depthZ * 0.94),
+          coverMatA
+        );
+        leftCover.position.set(-thickX / 2 + coverThick / 2, 0, 0);
+        leftCover.castShadow = true;
+
+        const rightCover = new THREE.Mesh(
+          new THREE.BoxGeometry(coverThick, h * 0.98, depthZ * 0.94),
+          coverMatB
+        );
+        rightCover.position.set(thickX / 2 - coverThick / 2, 0, 0);
+        rightCover.castShadow = true;
+
+        const topSheets = new THREE.Mesh(
+          new THREE.BoxGeometry(thickX * 0.48, 0.024, depthZ * 0.58),
+          paperEdgeMat
+        );
+        topSheets.position.set(0, h * 0.47, -depthZ * 0.04);
+        topSheets.castShadow = true;
+
+        book.add(pageBlock, spine, leftCover, rightCover, topSheets);
+        return book;
+      }
+
+      const bookCols = [
+        0x1e40af, 0x166534, 0x9a3412, 0x6b21a8, 0xb45309, 0x0f766e, 0x991b1b,
+        0x0e7490, 0x4c1d95, 0x115e59, 0x7c2d12
+      ];
+      const booksPerRow = 12;
+      const startX = -W / 2 + 0.18;
+      const maxX = W / 2 - 0.14;
+      for (let row = 0; row < shelfLevels; row += 1) {
+        const shelfY = ((row + 1) / (shelfLevels + 1)) * H;
+        let xCursor = startX;
+        for (let k = 0; k < booksPerRow; k += 1) {
+          const thickX = 0.038 + Math.random() * 0.032;
+          const h = 0.27 + Math.random() * 0.16;
+          const depthZ = 0.24 + Math.random() * 0.11;
+          if (xCursor + thickX > maxX) break;
+
+          const palette = bookCols[Math.floor(Math.random() * bookCols.length)];
+          const book = createRealisticBook(palette, thickX, h, depthZ);
+          book.position.set(
+            xCursor + thickX / 2,
+            shelfY + thick / 2 + h / 2,
+            0.1
+          );
+          book.rotation.y = (Math.random() - 0.5) * 0.18;
+          book.rotation.z = (Math.random() - 0.5) * 0.06;
+          book.rotation.x = (Math.random() - 0.5) * 0.04;
+          group.add(book);
+
+          xCursor += thickX + 0.008 + Math.random() * 0.01;
+        }
+      }
+
+      const signCanvas = document.createElement("canvas");
+      signCanvas.width = 3200;
+      signCanvas.height = 900;
+      const sctx = signCanvas.getContext("2d");
+      sctx.fillStyle = "#fffbeb";
+      sctx.fillRect(0, 0, signCanvas.width, signCanvas.height);
+      sctx.strokeStyle = "#a16207";
+      sctx.lineWidth = 10;
+      sctx.strokeRect(6, 6, signCanvas.width - 12, signCanvas.height - 12);
+
+      const signLine = "自助借閱圖書";
+      const pad = 32;
+      const innerW = signCanvas.width - pad * 2;
+      const innerH = signCanvas.height - pad * 2;
+      const fontStack = '"Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif';
+      sctx.textAlign = "center";
+      sctx.textBaseline = "middle";
+
+      function textFits(px) {
+        sctx.font = `bold ${px}px ${fontStack}`;
+        const m = sctx.measureText(signLine);
+        const tw = m.width;
+        const asc = m.actualBoundingBoxAscent ?? px * 0.55;
+        const desc = m.actualBoundingBoxDescent ?? px * 0.45;
+        return tw <= innerW && asc + desc <= innerH;
+      }
+
+      let lo = 64;
+      let hi = Math.min(1600, innerH, Math.floor(innerW * 0.35));
+      let fontPx = lo;
+      while (lo <= hi) {
+        const mid = Math.floor((lo + hi) / 2);
+        if (textFits(mid)) {
+          fontPx = mid;
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
+      }
+      sctx.font = `bold ${fontPx}px ${fontStack}`;
+      sctx.fillStyle = "#422006";
+      sctx.fillText(signLine, signCanvas.width / 2, signCanvas.height / 2);
+
+      const signTex = new THREE.CanvasTexture(signCanvas);
+      signTex.colorSpace = THREE.SRGBColorSpace;
+
+      const sign = new THREE.Mesh(
+        new THREE.PlaneGeometry(5.15, 1.45),
+        new THREE.MeshLambertMaterial({ map: signTex })
+      );
+      sign.scale.set(0.62, 0.62, 1);
+      sign.position.set(0, H + 0.58, D / 2 + 0.08);
+      sign.rotation.x = THREE.MathUtils.degToRad(-16);
+      group.add(sign);
+
+      return group;
+    }
+
+    const bookshelfGroup = buildBookshelfWithSign();
+    bookshelfGroup.position.set(shelfCenterX, 0, roomMinZ + 0.68);
+    bookshelfGroup.rotation.y = THREE.MathUtils.degToRad(42);
+    scene.add(bookshelfGroup);
+
+    const amb = new THREE.AmbientLight(0xffffff, 0.52);
+    scene.add(amb);
+    const hemi = new THREE.HemisphereLight(0xdbeafe, 0x44403a, 0.45);
+    scene.add(hemi);
+    const sun = new THREE.DirectionalLight(0xffffff, 1.05);
+    sun.position.set(8, 22, 12);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.near = 2;
+    sun.shadow.camera.far = 60;
+    sun.shadow.camera.left = -40;
+    sun.shadow.camera.right = 40;
+    sun.shadow.camera.top = 22;
+    sun.shadow.camera.bottom = -22;
+    scene.add(sun);
+
+    function seatWorldXZ(col, row) {
+      const cx = (col - (DESK_COLS - 1) / 2) * SEAT_SPACING.x;
+      const cz = FRONT_ROW_Z + row * SEAT_SPACING.z + SEATING_Z_PUSH;
+      return { x: cx, z: cz };
+    }
+
+    const avatars = [];
+
+    const seatPickSharedGeom = new THREE.BoxGeometry(1.85, 2.25, 1.25);
+    const seatPickSharedMat = new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: 0,
+      depthWrite: false
+    });
+
+    for (let row = 0; row < DESK_ROWS; row += 1) {
+      for (let col = 0; col < DESK_COLS; col += 1) {
+        const idx = row * DESK_COLS + col;
+        const name = (studentNames[idx] ?? "").trim();
+        const { x, z } = seatWorldXZ(col, row);
+        const occupied = name.length > 0;
+        const colourHex = occupied
+          ? tableColours[idx % tableColours.length]
+          : "#b0b0ae";
+
+        const furnitureRoot = new THREE.Group();
+        furnitureRoot.position.set(x, 0, z);
+        furnitureRoot.add(createDeskAndChair(colourHex));
+        if (occupied) addOpenBookOnDesk(furnitureRoot);
+        scene.add(furnitureRoot);
+
+        const avatarRoot = new THREE.Group();
+        avatarRoot.position.set(
+          x + avatarRelDesk.x,
+          avatarRelDesk.y,
+          z + avatarRelDesk.z
+        );
+        avatarRoot.userData.slotIndex = idx;
+
+        let avatarMesh = null;
+        let headMesh = null;
+        if (occupied) {
+          const seated = createSeatedAvatar();
+          avatarMesh = seated.group;
+          headMesh = seated.head;
+          avatarRoot.add(avatarMesh);
+        }
+        scene.add(avatarRoot);
+
+        furnitureRoot.visible = occupied;
+
+        const seatPick = new THREE.Mesh(seatPickSharedGeom, seatPickSharedMat);
+        seatPick.position.y = 1.05;
+        seatPick.userData.slotIndex = idx;
+        avatarRoot.add(seatPick);
+
+        const label = document.createElement("div");
+        label.className = "name-label";
+        label.textContent = rosterDisplayLabel(name);
+        label.style.display = occupied && nameTagMode !== 0 ? "block" : "none";
+        document.body.appendChild(label);
+
+        avatars.push({
+          id: idx,
+          col,
+          row,
+          name,
+          furnitureRoot,
+          avatarRoot,
+          avatarMesh,
+          headMesh,
+          label,
+          seatPick,
+          home: { x, y: 0, z, rotationY: 0 }
+        });
+      }
+    }
+
+    const pickMeshes = avatars.map((a) => a.seatPick);
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const selectedSlots = [];
+
+    function slotFromObject3D(obj) {
+      let o = obj;
+      while (o) {
+        if (typeof o.userData?.slotIndex === "number") {
+          return avatars[o.userData.slotIndex];
+        }
+        o = o.parent;
+      }
+      return null;
+    }
+
+    function setHeadHighlight(slot, on) {
+      if (!slot?.headMesh?.material?.color) return;
+      const hex = on
+        ? SELECT_HIGHLIGHT
+        : slot.headMesh.userData.baseColorHex ?? slot.headMesh.material.color.getHex();
+      slot.headMesh.material.color.setHex(hex);
+    }
+
+    function setSlotSelectVisual(slot, on) {
+      if (!slot) return;
+      if (slot.headMesh) {
+        setHeadHighlight(slot, on);
+      } else {
+        const s = on ? 1.07 : 1;
+        slot.seatPick.scale.setScalar(s);
+      }
+    }
+
+    function syncSlotOccupancyVisual(slot) {
+      const occ = slot.name.trim().length > 0;
+      slot.furnitureRoot.visible = occ;
+    }
+
+    function syncSlotLabel(slot) {
+      const occupied = slot.name.trim().length > 0;
+      slot.label.textContent = occupied ? rosterDisplayLabel(slot.name) : "";
+      slot.label.style.display = occupied && nameTagMode !== 0 ? "block" : "none";
+    }
+
+    function toggleOrCommitSelection(slot) {
+      if (!slot) {
+        return;
+      }
+
+      const i = selectedSlots.indexOf(slot);
+      if (i !== -1) {
+        setSlotSelectVisual(slot, false);
+        selectedSlots.splice(i, 1);
+        return;
+      }
+
+      selectedSlots.push(slot);
+      setSlotSelectVisual(slot, true);
+
+      if (selectedSlots.length === 2) {
+        const a = selectedSlots[0];
+        const b = selectedSlots[1];
+        setSlotSelectVisual(a, false);
+        setSlotSelectVisual(b, false);
+        selectedSlots.length = 0;
+        swapSeats(a, b);
+      }
+    }
+
+    function swapSeats(slotA, slotB) {
+      if (!slotA || !slotB || slotA === slotB) return;
+
+      const tName = slotA.name;
+      slotA.name = slotB.name;
+      slotB.name = tName;
+
+      const meshA = slotA.avatarMesh;
+      const meshB = slotB.avatarMesh;
+
+      if (meshA) slotA.avatarRoot.remove(meshA);
+      if (meshB) slotB.avatarRoot.remove(meshB);
+      if (meshB) slotA.avatarRoot.add(meshB);
+      if (meshA) slotB.avatarRoot.add(meshA);
+
+      const headA = slotA.headMesh;
+      const headB = slotB.headMesh;
+
+      slotA.avatarMesh = meshB;
+      slotB.avatarMesh = meshA;
+      slotA.headMesh = headB;
+      slotB.headMesh = headA;
+
+      if (slotA.avatarMesh) slotA.avatarMesh.rotation.y = Math.PI;
+      if (slotB.avatarMesh) slotB.avatarMesh.rotation.y = Math.PI;
+
+      syncSlotLabel(slotA);
+      syncSlotLabel(slotB);
+      syncSlotOccupancyVisual(slotA);
+      syncSlotOccupancyVisual(slotB);
+    }
+
+    function roundSeat(n) {
+      return Math.round(n * 1000) / 1000;
+    }
+
+    function logAvatarSeating() {
+      const rows = avatars.map((a) => ({
+        id: a.id,
+        col: a.col,
+        row: a.row,
+        name: a.name.trim() || "(empty)",
+        x: roundSeat(a.avatarRoot.position.x),
+        y: roundSeat(a.avatarRoot.position.y),
+        z: roundSeat(a.avatarRoot.position.z)
+      }));
+      console.table(rows);
+      console.log("avatar seating (JSON)", rows);
+    }
+
+    function onCanvasClick(event) {
+      if (event.button !== undefined && event.button !== 0) return;
+
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+
+      const hits = raycaster.intersectObjects(pickMeshes, false);
+      if (hits.length === 0) {
+        return;
+      }
+
+      const slot = slotFromObject3D(hits[0].object);
+      if (slot) {
+        toggleOrCommitSelection(slot);
+      }
+    }
+
+    renderer.domElement.addEventListener("click", onCanvasClick);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.target.closest("input, textarea, select")) return;
+      if (event.key === "c" || event.key === "C") {
+        logAvatarSeating();
+      }
+      if (event.key === "n" || event.key === "N") {
+        nameTagMode = (nameTagMode + 1) % 3;
+        for (const a of avatars) {
+          syncSlotLabel(a);
+        }
+      }
+    });
+
+    function updateLabel(avatarObj) {
+      if (nameTagMode === 0 || !avatarObj.name.trim()) {
+        avatarObj.label.style.display = "none";
+        return;
+      }
+
+      const root = avatarObj.avatarRoot;
+      const pos = new THREE.Vector3(root.position.x, root.position.y + 1.48, root.position.z);
+      pos.project(camera);
+
+      if (pos.z > 1) {
+        avatarObj.label.style.display = "none";
+        return;
+      }
+
+      avatarObj.label.style.display = "block";
+      avatarObj.label.style.left = `${(pos.x * 0.5 + 0.5) * window.innerWidth}px`;
+      avatarObj.label.style.top = `${(-pos.y * 0.5 + 0.5) * window.innerHeight}px`;
+
+      const distance = camera.position.distanceTo(root.position);
+      const size = THREE.MathUtils.clamp(120 / distance, 6, 14);
+      avatarObj.label.style.fontSize = `${size}px`;
+      avatarObj.label.style.opacity = "0.88";
+    }
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    function updateHeadIdle(slot, dt, elapsed) {
+      if (!slot.headMesh) return;
+      const h = slot.headMesh;
+      let s = h.userData.nodState;
+      if (!s) {
+        s = {
+          swayPhase: Math.random() * Math.PI * 2,
+          swayHz: 0.07 + Math.random() * 0.07,
+          nextNodAt: elapsed + 2 + Math.random() * 8,
+          nodT: 0,
+          nodDur: 0,
+          nodAmp: 0,
+          inNod: false
+        };
+        h.userData.nodState = s;
+      }
+
+      let rx = Math.sin(elapsed * s.swayHz + s.swayPhase) * 0.03;
+      if (!s.inNod) {
+        if (elapsed >= s.nextNodAt) {
+          s.inNod = true;
+          s.nodT = 0;
+          s.nodDur = 0.32 + Math.random() * 0.38;
+          s.nodAmp = THREE.MathUtils.degToRad(5 + Math.random() * 9);
+        }
+      } else {
+        s.nodT += dt;
+        const u = Math.min(1, s.nodT / s.nodDur);
+        rx += Math.sin(u * Math.PI) * s.nodAmp;
+        if (u >= 1) {
+          s.inNod = false;
+          s.nextNodAt = elapsed + 3 + Math.random() * 14;
+        }
+      }
+      h.rotation.x = rx;
+    }
+
+    function tick() {
+      const dt = animClock.getDelta();
+      const elapsed = animClock.elapsedTime;
+      controls.update();
+      for (const a of avatars) {
+        updateLabel(a);
+        updateHeadIdle(a, dt, elapsed);
+      }
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>
