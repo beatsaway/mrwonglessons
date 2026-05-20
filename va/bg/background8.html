@@ -110,9 +110,13 @@
         </p>
       </div>
     </div>
-    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+      window.__BG_ROTATOR_EXTERNAL__ = true;
+    </script>
+    <script src="background-rotator.js"></script>
     <script>
       (() => {
+        if (window.__BG_ROTATOR_EXTERNAL__) return;
         let minMs = 30_000;
         let maxMs = 60_000;
         const SPREAD_SEC = 15;
