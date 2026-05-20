@@ -26,6 +26,24 @@
     return el;
   })();
 
+  (() => {
+    const style = document.createElement("style");
+    style.textContent = `
+      .section.bg-active {
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+      }
+      .section.bg-active .wrap {
+        width: min(96vw, calc(96svh * 16 / 9)) !important;
+      }
+      .section.bg-active .video {
+        padding-top: 0 !important;
+        height: min(96svh, calc(96vw * 9 / 16)) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  })();
+
   const panel = (() => {
     const overlay = document.createElement("div");
     overlay.id = "bg-range-panel";
@@ -202,11 +220,19 @@
     return lo + Math.floor(Math.random() * (hi - lo + 1));
   };
 
+  const applyActiveVisualFocus = () => {
+    sections.forEach((section, idx) => {
+      if (!section || !section.classList) return;
+      section.classList.toggle("bg-active", idx === activeIndex);
+    });
+  };
+
   const setActive = (idx) => {
     if (!Number.isFinite(idx) || !sections.length) return;
     const next = ((idx % sections.length) + sections.length) % sections.length;
     if (next === activeIndex && players.length) return;
     activeIndex = next;
+    applyActiveVisualFocus();
 
     players.forEach((p, pi) => {
       if (!p || typeof p.pauseVideo !== "function") return;
@@ -247,7 +273,7 @@
 
     if (!sections.length) return;
     const nextIdx = pickNextIndex();
-    sections[nextIdx].scrollIntoView({ behavior: "smooth", block: "start" });
+    sections[nextIdx].scrollIntoView({ behavior: "smooth", block: "center" });
     setActive(nextIdx);
     scheduleNext();
   };
@@ -364,6 +390,7 @@
       queueMicrotask(() => {
         refillUnvisited();
         if (sections.length > 1) unvisited.delete(activeIndex);
+        applyActiveVisualFocus();
       });
 
       ensureYouTubeApi();
