@@ -1,0 +1,808 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Looping Videos 9 - shorts</title>
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+        font-family: system-ui, sans-serif;
+      }
+      .section {
+        padding: 24px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .wrap {
+        width: min(1100px, 92vw);
+        margin: 0 auto;
+      }
+      .video {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        background: #000;
+        overflow: hidden;
+        border-radius: 12px;
+      }
+      .video iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+      #countdown {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        z-index: 9999;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        line-height: 1.2;
+        user-select: none;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+      .timing-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+      }
+      .timing-overlay[hidden] {
+        display: none;
+      }
+      .timing-overlay__box {
+        width: min(22rem, 100%);
+        padding: 1rem 1.15rem 1.1rem;
+        border-radius: 14px;
+        background: rgba(22, 22, 26, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+      }
+      .timing-overlay__box label {
+        display: block;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 13px;
+        margin-bottom: 0.45rem;
+      }
+      .timing-overlay__box input[type="range"] {
+        width: 100%;
+        margin: 0 0 0.35rem;
+      }
+      #gap-readout {
+        display: block;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 12px;
+      }
+      .timing-overlay__hint {
+        margin: 0.65rem 0 0;
+        font-size: 11px;
+        line-height: 1.35;
+        color: rgba(255, 255, 255, 0.42);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="countdown">--</div>
+    <div id="timing-panel" class="timing-overlay" hidden>
+      <div class="timing-overlay__box">
+        <label for="gap-slider">Time between clips (default)</label>
+        <input id="gap-slider" type="range" min="15" max="90" step="5" value="45" />
+        <span id="gap-readout">30-60 s</span>
+        <p class="timing-overlay__hint">
+          Any <code style="color: rgba(255, 255, 255, 0.55)">.section</code> with
+          <code style="color: rgba(255, 255, 255, 0.55)">data-gap-min-sec</code> and
+          <code style="color: rgba(255, 255, 255, 0.55)">data-gap-max-sec</code> uses its own
+          random dwell time instead of this range.
+        </p>
+      </div>
+    </div>
+    <script>
+      window.__BG_ROTATOR_EXTERNAL__ = true;
+    </script>
+    <script src="background-rotator.js"></script>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="lVjYdeuA14k"
+            src="https://www.youtube.com/embed/lVjYdeuA14k?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=lVjYdeuA14k&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="TwFOyrB3-ts"
+            src="https://www.youtube.com/embed/TwFOyrB3-ts?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=TwFOyrB3-ts&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="r6A41H9o1Vo"
+            src="https://www.youtube.com/embed/r6A41H9o1Vo?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=r6A41H9o1Vo&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="krhe4vHNS5k"
+            src="https://www.youtube.com/embed/krhe4vHNS5k?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=krhe4vHNS5k&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="ytzOS62Axzc"
+            src="https://www.youtube.com/embed/ytzOS62Axzc?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=ytzOS62Axzc&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="e4i3DrVMnBM"
+            src="https://www.youtube.com/embed/e4i3DrVMnBM?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=e4i3DrVMnBM&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="-cjivYp33ZY"
+            src="https://www.youtube.com/embed/-cjivYp33ZY?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=-cjivYp33ZY&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="q_2R7tY4wQw"
+            src="https://www.youtube.com/embed/q_2R7tY4wQw?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=q_2R7tY4wQw&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="Q2XSu-JsgqE"
+            src="https://www.youtube.com/embed/Q2XSu-JsgqE?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=Q2XSu-JsgqE&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="YYMPE-ZAKWg"
+            src="https://www.youtube.com/embed/YYMPE-ZAKWg?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=YYMPE-ZAKWg&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="g2efIZGNjc4"
+            src="https://www.youtube.com/embed/g2efIZGNjc4?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=g2efIZGNjc4&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="KXBbA0M6NXg"
+            src="https://www.youtube.com/embed/KXBbA0M6NXg?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=KXBbA0M6NXg&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="0ixjHexhSKg"
+            src="https://www.youtube.com/embed/0ixjHexhSKg?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=0ixjHexhSKg&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="lEaENohKZi8"
+            src="https://www.youtube.com/embed/lEaENohKZi8?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=lEaENohKZi8&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="_vALoDyKgQ0"
+            src="https://www.youtube.com/embed/_vALoDyKgQ0?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=_vALoDyKgQ0&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="zs11sZPsP9I"
+            src="https://www.youtube.com/embed/zs11sZPsP9I?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=zs11sZPsP9I&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="cU75lhKITCo"
+            src="https://www.youtube.com/embed/cU75lhKITCo?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=cU75lhKITCo&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="-CxIjxOg4eA"
+            src="https://www.youtube.com/embed/-CxIjxOg4eA?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=-CxIjxOg4eA&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="d56xc2ywt8k"
+            src="https://www.youtube.com/embed/d56xc2ywt8k?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=d56xc2ywt8k&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="cv8nRFljy88"
+            src="https://www.youtube.com/embed/cv8nRFljy88?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=cv8nRFljy88&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="4WjU52rgiZA"
+            src="https://www.youtube.com/embed/4WjU52rgiZA?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=4WjU52rgiZA&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="qyE7v_Uyiaw"
+            src="https://www.youtube.com/embed/qyE7v_Uyiaw?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=qyE7v_Uyiaw&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="0TWJ2pznc84"
+            src="https://www.youtube.com/embed/0TWJ2pznc84?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=0TWJ2pznc84&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="N7awXaa2n1Y"
+            src="https://www.youtube.com/embed/N7awXaa2n1Y?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=N7awXaa2n1Y&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="Gso_cAZ2_vA"
+            src="https://www.youtube.com/embed/Gso_cAZ2_vA?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=Gso_cAZ2_vA&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="aJ-p8hN4Cso"
+            src="https://www.youtube.com/embed/aJ-p8hN4Cso?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=aJ-p8hN4Cso&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="tkpsldJJJLI"
+            src="https://www.youtube.com/embed/tkpsldJJJLI?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=tkpsldJJJLI&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="0RzzChiWsO0"
+            src="https://www.youtube.com/embed/0RzzChiWsO0?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=0RzzChiWsO0&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="cSYtvayiTAI"
+            src="https://www.youtube.com/embed/cSYtvayiTAI?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=cSYtvayiTAI&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="uQ1Tq0wt3SE"
+            src="https://www.youtube.com/embed/uQ1Tq0wt3SE?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=uQ1Tq0wt3SE&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="mxJMeh_BFd4"
+            src="https://www.youtube.com/embed/mxJMeh_BFd4?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=mxJMeh_BFd4&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="OFCRN3Wyfr4"
+            src="https://www.youtube.com/embed/OFCRN3Wyfr4?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=OFCRN3Wyfr4&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="8rh2vFg4-Vo"
+            src="https://www.youtube.com/embed/8rh2vFg4-Vo?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=8rh2vFg4-Vo&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="M63FmnoNcG4"
+            src="https://www.youtube.com/embed/M63FmnoNcG4?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=M63FmnoNcG4&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="noNzEE3a7L4"
+            src="https://www.youtube.com/embed/noNzEE3a7L4?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=noNzEE3a7L4&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="ZVnld9-iNL8"
+            src="https://www.youtube.com/embed/ZVnld9-iNL8?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=ZVnld9-iNL8&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="8YgyQ2z7MCw"
+            src="https://www.youtube.com/embed/8YgyQ2z7MCw?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=8YgyQ2z7MCw&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="dpFoDDUuPPA"
+            src="https://www.youtube.com/embed/dpFoDDUuPPA?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=dpFoDDUuPPA&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="JiiLZ5h6KeQ"
+            src="https://www.youtube.com/embed/JiiLZ5h6KeQ?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=JiiLZ5h6KeQ&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="bpkUvN3Qo5o"
+            src="https://www.youtube.com/embed/bpkUvN3Qo5o?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=bpkUvN3Qo5o&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="hBVRkXK4AeE"
+            src="https://www.youtube.com/embed/hBVRkXK4AeE?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=hBVRkXK4AeE&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="NzasChDyNR8"
+            src="https://www.youtube.com/embed/NzasChDyNR8?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=NzasChDyNR8&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="TDLRyjlCICA"
+            src="https://www.youtube.com/embed/TDLRyjlCICA?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=TDLRyjlCICA&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="MDaJyiqFvhA"
+            src="https://www.youtube.com/embed/MDaJyiqFvhA?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=MDaJyiqFvhA&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="xVzabzQauk0"
+            src="https://www.youtube.com/embed/xVzabzQauk0?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=xVzabzQauk0&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="Cq_tC5iRn4Q"
+            src="https://www.youtube.com/embed/Cq_tC5iRn4Q?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=Cq_tC5iRn4Q&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="jPqloAyiMbI"
+            src="https://www.youtube.com/embed/jPqloAyiMbI?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=jPqloAyiMbI&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="smfI5wU5ZQY"
+            src="https://www.youtube.com/embed/smfI5wU5ZQY?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=smfI5wU5ZQY&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="zW4FjL1JQ8c"
+            src="https://www.youtube.com/embed/zW4FjL1JQ8c?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=zW4FjL1JQ8c&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="2xgHajbQdro"
+            src="https://www.youtube.com/embed/2xgHajbQdro?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=2xgHajbQdro&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="gqvH3h0UekY"
+            src="https://www.youtube.com/embed/gqvH3h0UekY?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=gqvH3h0UekY&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="JYyI6caoVzs"
+            src="https://www.youtube.com/embed/JYyI6caoVzs?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=JYyI6caoVzs&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="n_MY7NksPqo"
+            src="https://www.youtube.com/embed/n_MY7NksPqo?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=n_MY7NksPqo&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>

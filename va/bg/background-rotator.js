@@ -13,6 +13,7 @@
   let tickerId = 0;
   let lastAdvanceAt = 0;
   let playersReady = false;
+  let lastPlaybackTime = 0;
 
   const clampMs = (ms) => Math.min(180_000, Math.max(3_000, ms));
 
@@ -232,6 +233,7 @@
     const next = ((idx % sections.length) + sections.length) % sections.length;
     if (next === activeIndex && players.length) return;
     activeIndex = next;
+    lastPlaybackTime = 0;
     applyActiveVisualFocus();
 
     players.forEach((p, pi) => {
@@ -271,11 +273,38 @@
     if (now - lastAdvanceAt < 250) return;
     lastAdvanceAt = now;
 
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+      timeoutId = 0;
+    }
+
     if (!sections.length) return;
     const nextIdx = pickNextIndex();
     sections[nextIdx].scrollIntoView({ behavior: "smooth", block: "center" });
     setActive(nextIdx);
     scheduleNext();
+  };
+
+  /** When embed uses loop=1, ENDED never fires; detect wrap-back near start. */
+  const watchPlaybackEnd = () => {
+    window.setInterval(() => {
+      if (!playersReady || !sections.length) return;
+      const p = players[activeIndex];
+      const iframes = document.querySelectorAll("iframe[data-video-id]");
+      const iframe = iframes[activeIndex];
+      if (!p || !iframe || iframe.getAttribute("data-loop-end-sec")) return;
+
+      try {
+        if (!window.YT || p.getPlayerState() !== window.YT.PlayerState.PLAYING) return;
+        const dur = p.getDuration();
+        const cur = p.getCurrentTime();
+        if (dur > 3 && lastPlaybackTime >= dur - 1.5 && cur < 2.5) {
+          advanceNow("ended");
+          return;
+        }
+        lastPlaybackTime = cur;
+      } catch (e) {}
+    }, 300);
   };
 
   const attachEarlyLoop = (player, endSec, startSec = 0) => {
@@ -394,6 +423,7 @@
       });
 
       ensureYouTubeApi();
+      watchPlaybackEnd();
       scheduleNext();
     },
     { once: true }
