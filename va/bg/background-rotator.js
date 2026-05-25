@@ -221,6 +221,13 @@
     return lo + Math.floor(Math.random() * (hi - lo + 1));
   };
 
+  const iframeAt = (idx) => document.querySelectorAll("iframe[data-video-id]")[idx];
+
+  const isShortAt = (idx) => {
+    const el = iframeAt(idx);
+    return el != null && el.hasAttribute("data-short");
+  };
+
   const applyActiveVisualFocus = () => {
     sections.forEach((section, idx) => {
       if (!section || !section.classList) return;
@@ -257,6 +264,12 @@
     if (timeoutId) window.clearTimeout(timeoutId);
     timeoutId = 0;
 
+    if (isShortAt(activeIndex)) {
+      nextAt = 0;
+      if (countdownEl) countdownEl.textContent = "short";
+      return;
+    }
+
     const delay = nextDelayMs();
     nextAt = Date.now() + delay;
     setCountdownText(delay);
@@ -268,9 +281,10 @@
     }
   };
 
-  const advanceNow = (_reason) => {
+  const advanceNow = (reason) => {
     const now = Date.now();
     if (now - lastAdvanceAt < 250) return;
+    if (reason === "timer" && isShortAt(activeIndex)) return;
     lastAdvanceAt = now;
 
     if (timeoutId) {
@@ -290,9 +304,9 @@
     window.setInterval(() => {
       if (!playersReady || !sections.length) return;
       const p = players[activeIndex];
-      const iframes = document.querySelectorAll("iframe[data-video-id]");
-      const iframe = iframes[activeIndex];
+      const iframe = iframeAt(activeIndex);
       if (!p || !iframe || iframe.getAttribute("data-loop-end-sec")) return;
+      if (!isShortAt(activeIndex)) return;
 
       try {
         if (!window.YT || p.getPlayerState() !== window.YT.PlayerState.PLAYING) return;
