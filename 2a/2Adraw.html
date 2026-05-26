@@ -58,14 +58,13 @@
       font-size: 0.92rem;
       line-height: 1.2;
       cursor: pointer;
-      user-select: none;
+      user-select: text;
       text-decoration: none;
       opacity: 0.95;
     }
 
     .control:hover {
       opacity: 1;
-      text-decoration: underline;
     }
 
     .control:focus-visible {
@@ -124,7 +123,7 @@
   <div class="hud">
     <h1>2A Lucky Draw</h1>
     <span id="pickBtn" class="control" role="button" tabindex="0">🔮 Pick Random</span>
-    <span id="resetBtn" class="control" role="button" tabindex="0">↩️ Move Everyone Back</span>
+    <span id="resetBtn" class="control" role="button" tabindex="0" title="Move Everyone Back">↩️</span>
     <span id="savePosBtn" class="control" role="button" tabindex="0" title="Save sides JSON">💾</span>
     <span id="loadPosBtn" class="control" role="button" tabindex="0" title="Load sides JSON">📂</span>
     <input id="loadPosInput" type="file" accept=".json,application/json" hidden />
@@ -153,6 +152,16 @@
       "30 張梓萱", "31 鄭敬熹", "33 和仟惠", "34 林煜翔", "35 蔡子萱",
       "36 方紫瑜", "37 邱若曦"
     ];
+
+    const defaultRightNameSet = new Set([
+      "莊曼妮",
+      "簡愷佑",
+      "梁柏宇",
+      "李一航",
+      "李狄達",
+      "方紫瑜",
+      "曾嘉欣"
+    ]);
 
     const drawState = {
       isDrawing: false,
@@ -489,7 +498,10 @@
 
     const avatars = studentNames.map((name, idx) => {
       const mesh = createAvatar();
-      const p = randomPosInZone(LEFT_ZONE);
+      const cleanName = name.replace(/^\d+\s*/, "");
+      const initialZone = defaultRightNameSet.has(cleanName) ? "right" : "left";
+      const startZone = initialZone === "right" ? RIGHT_ZONE : LEFT_ZONE;
+      const p = randomPosInZone(startZone);
       mesh.position.set(p.x, 0, p.z);
       scene.add(mesh);
 
@@ -504,8 +516,8 @@
         name,
         mesh,
         label,
-        zone: "left",
-        speed: 0.007 + Math.random() * 0.033,
+        zone: initialZone,
+        speed: 0.003 + Math.random() * 0.017,
         heading: dir2,
         nextTurnAt: performance.now() + 600 + Math.random() * 2800
       };
