@@ -157,7 +157,9 @@
     const drawState = {
       isDrawing: false,
       selected: null,
-      countdownTimer: null
+      countdownTimer: null,
+      phase: "idle",
+      fastForwardLift: null
     };
 
     const LEFT_ZONE = { centerX: -13, centerZ: 0, width: 18, depth: 22 };
@@ -503,7 +505,7 @@
         mesh,
         label,
         zone: "left",
-        speed: 0.009 + Math.random() * 0.014,
+        speed: 0.007 + Math.random() * 0.033,
         heading: dir2,
         nextTurnAt: performance.now() + 600 + Math.random() * 2800
       };
@@ -615,6 +617,8 @@
     function animateLiftAndTransfer(avatarObj) {
       drawState.isDrawing = true;
       drawState.selected = avatarObj;
+      drawState.phase = "lifting";
+      drawState.fastForwardLift = null;
       updateCounts();
 
       const baseY = avatarObj.mesh.position.y;
@@ -633,7 +637,24 @@
         showCountdown(`🎯 ${avatarObj.name}\n${"•".repeat(dotCount)}`);
       }, 320);
 
+      function finishDraw() {
+        avatarObj.mesh.position.y = 0;
+        avatarObj.mesh.rotation.y = 0;
+        avatarObj.heading.copy(randomHeading());
+        avatarObj.nextTurnAt = performance.now() + 700 + Math.random() * 1200;
+        hideCountdown();
+        hideUfo();
+        drawState.isDrawing = false;
+        drawState.selected = null;
+        drawState.phase = "idle";
+        drawState.fastForwardLift = null;
+        updateCounts();
+      }
+
       function doLift(now) {
+        if (drawState.phase !== "lifting" || drawState.selected !== avatarObj) {
+          return;
+        }
         const t = Math.min((now - start) / liftMs, 1);
         avatarObj.mesh.position.y = THREE.MathUtils.lerp(baseY, liftY, t);
         avatarObj.mesh.rotation.y += spin;
@@ -643,14 +664,22 @@
           return;
         }
         clearInterval(drawState.countdownTimer);
+        drawState.phase = "moving";
         transferToRight();
       }
 
-      function transferToRight() {
+      function transferToRight(immediate = false) {
         avatarObj.zone = "right";
         const to = randomPosInZone(RIGHT_ZONE);
         const from = avatarObj.mesh.position.clone();
         const target = new THREE.Vector3(to.x, 0, to.z);
+
+        if (immediate) {
+          avatarObj.mesh.position.copy(target);
+          finishDraw();
+          return;
+        }
+
         const moveStart = performance.now();
 
         function doMove(now) {
@@ -663,19 +692,23 @@
             requestAnimationFrame(doMove);
             return;
           }
-          avatarObj.mesh.position.y = 0;
-          avatarObj.mesh.rotation.y = 0;
-          avatarObj.heading.copy(randomHeading());
-          avatarObj.nextTurnAt = performance.now() + 700 + Math.random() * 1200;
-          hideCountdown();
-          hideUfo();
-          drawState.isDrawing = false;
-          drawState.selected = null;
-          updateCounts();
+          finishDraw();
         }
 
         requestAnimationFrame(doMove);
       }
+
+      drawState.fastForwardLift = () => {
+        if (
+          drawState.isDrawing &&
+          drawState.phase === "lifting" &&
+          drawState.selected === avatarObj
+        ) {
+          clearInterval(drawState.countdownTimer);
+          drawState.phase = "moving";
+          transferToRight(true);
+        }
+      };
 
       requestAnimationFrame(doLift);
     }
@@ -758,6 +791,9 @@
 
     function handlePick() {
       if (drawState.isDrawing) {
+        if (drawState.phase === "lifting" && typeof drawState.fastForwardLift === "function") {
+          drawState.fastForwardLift();
+        }
         return;
       }
       if (pickBtn.getAttribute("aria-disabled") === "true") {
