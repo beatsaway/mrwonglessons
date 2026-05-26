@@ -50,48 +50,33 @@
       color: #f8fafc;
     }
 
-    button {
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      border-radius: 8px;
-      padding: 0.32rem 0.62rem;
-      background: rgba(15, 23, 42, 0.55);
-      color: #f8fafc;
-      font: inherit;
-      font-size: 0.88rem;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: rgba(51, 65, 85, 0.98);
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .icon-btn {
+    .control {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 1.8rem;
-      height: 1.8rem;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      border-radius: 8px;
-      background: rgba(15, 23, 42, 0.55);
+      color: #f8fafc;
+      font-size: 0.92rem;
+      line-height: 1.2;
       cursor: pointer;
       user-select: none;
-      font-size: 1rem;
-      line-height: 1;
+      text-decoration: none;
+      opacity: 0.95;
     }
 
-    .icon-btn:hover {
-      background: rgba(30, 41, 59, 0.8);
+    .control:hover {
+      opacity: 1;
+      text-decoration: underline;
     }
 
-    .icon-btn:focus-visible {
+    .control:focus-visible {
       outline: 2px solid rgba(34, 211, 238, 0.85);
       outline-offset: 1px;
+    }
+
+    .control.is-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      text-decoration: none;
     }
 
     .name-label {
@@ -138,10 +123,10 @@
 <body>
   <div class="hud">
     <h1>2A Lucky Draw</h1>
-    <button id="pickBtn">🔮 Pick Random</button>
-    <button id="resetBtn">↩️ Move Everyone Back</button>
-    <span id="savePosBtn" class="icon-btn" role="button" tabindex="0" title="Save sides JSON">💾</span>
-    <span id="loadPosBtn" class="icon-btn" role="button" tabindex="0" title="Load sides JSON">📂</span>
+    <span id="pickBtn" class="control" role="button" tabindex="0">🔮 Pick Random</span>
+    <span id="resetBtn" class="control" role="button" tabindex="0">↩️ Move Everyone Back</span>
+    <span id="savePosBtn" class="control" role="button" tabindex="0" title="Save sides JSON">💾</span>
+    <span id="loadPosBtn" class="control" role="button" tabindex="0" title="Load sides JSON">📂</span>
     <input id="loadPosInput" type="file" accept=".json,application/json" hidden />
   </div>
   <div id="countdown" class="countdown"></div>
@@ -531,7 +516,9 @@
 
     function updateCounts() {
       const c = counts();
-      pickBtn.disabled = drawState.isDrawing || c.left === 0;
+      const pickDisabled = drawState.isDrawing || c.left === 0;
+      pickBtn.classList.toggle("is-disabled", pickDisabled);
+      pickBtn.setAttribute("aria-disabled", pickDisabled ? "true" : "false");
     }
 
     function avatarZonesPayload() {
@@ -769,8 +756,11 @@
       hideUfo();
     }
 
-    pickBtn.addEventListener("click", () => {
+    function handlePick() {
       if (drawState.isDrawing) {
+        return;
+      }
+      if (pickBtn.getAttribute("aria-disabled") === "true") {
         return;
       }
       const chosen = randomLeftAvatar();
@@ -779,9 +769,15 @@
         return;
       }
       animateLiftAndTransfer(chosen);
-    });
+    }
 
-    resetBtn.addEventListener("click", resetAllToLeft);
+    function handleReset() {
+      if (drawState.isDrawing) return;
+      resetAllToLeft();
+    }
+
+    pickBtn.addEventListener("click", handlePick);
+    resetBtn.addEventListener("click", handleReset);
 
     savePosBtn.addEventListener("click", () => {
       if (drawState.isDrawing) return;
@@ -794,7 +790,7 @@
       loadPosInput.click();
     });
 
-    function bindIconKey(el, handler) {
+    function bindControlKey(el, handler) {
       el.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -803,12 +799,15 @@
       });
     }
 
-    bindIconKey(savePosBtn, () => {
+    bindControlKey(pickBtn, handlePick);
+    bindControlKey(resetBtn, handleReset);
+
+    bindControlKey(savePosBtn, () => {
       if (drawState.isDrawing) return;
       saveAvatarZonesToJson();
     });
 
-    bindIconKey(loadPosBtn, () => {
+    bindControlKey(loadPosBtn, () => {
       if (drawState.isDrawing) return;
       loadPosInput.value = "";
       loadPosInput.click();
