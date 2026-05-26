@@ -6,8 +6,6 @@
   <title>2A Lucky Draw</title>
   <style>
     :root {
-      --panel-bg: rgba(15, 23, 42, 0.84);
-      --panel-border: rgba(148, 163, 184, 0.35);
       --text: #e2e8f0;
       --accent: #22d3ee;
       --warn: #facc15;
@@ -36,43 +34,30 @@
       top: 0.75rem;
       left: 0.75rem;
       z-index: 20;
-      min-width: 21rem;
-      max-width: min(30rem, calc(100vw - 1.5rem));
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      max-width: calc(100vw - 1.5rem);
       color: var(--text);
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 0.75rem;
-      backdrop-filter: blur(4px);
     }
 
     .hud h1 {
       margin: 0;
-      font-size: 1.05rem;
+      margin-right: 0.25rem;
+      font-size: 0.95rem;
       line-height: 1.3;
       color: #f8fafc;
-    }
-
-    .hud p {
-      margin: 0.35rem 0 0;
-      font-size: 0.92rem;
-      color: #cbd5e1;
-    }
-
-    .toolbar {
-      margin-top: 0.65rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
     }
 
     button {
       border: 1px solid rgba(148, 163, 184, 0.35);
       border-radius: 8px;
-      padding: 0.45rem 0.75rem;
-      background: rgba(30, 41, 59, 0.95);
+      padding: 0.32rem 0.62rem;
+      background: rgba(15, 23, 42, 0.55);
       color: #f8fafc;
       font: inherit;
+      font-size: 0.88rem;
       cursor: pointer;
     }
 
@@ -83,6 +68,30 @@
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.8rem;
+      height: 1.8rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.55);
+      cursor: pointer;
+      user-select: none;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .icon-btn:hover {
+      background: rgba(30, 41, 59, 0.8);
+    }
+
+    .icon-btn:focus-visible {
+      outline: 2px solid rgba(34, 211, 238, 0.85);
+      outline-offset: 1px;
     }
 
     .name-label {
@@ -129,10 +138,11 @@
 <body>
   <div class="hud">
     <h1>2A Lucky Draw</h1>
-    <div class="toolbar">
-      <button id="pickBtn">🔮 Pick Random</button>
-      <button id="resetBtn">↩️ Move Everyone Back</button>
-    </div>
+    <button id="pickBtn">🔮 Pick Random</button>
+    <button id="resetBtn">↩️ Move Everyone Back</button>
+    <span id="savePosBtn" class="icon-btn" role="button" tabindex="0" title="Save sides JSON">💾</span>
+    <span id="loadPosBtn" class="icon-btn" role="button" tabindex="0" title="Load sides JSON">📂</span>
+    <input id="loadPosInput" type="file" accept=".json,application/json" hidden />
   </div>
   <div id="countdown" class="countdown"></div>
   <div id="ufo" class="ufo">🛸</div>
@@ -170,6 +180,9 @@
 
     const pickBtn = document.getElementById("pickBtn");
     const resetBtn = document.getElementById("resetBtn");
+    const savePosBtn = document.getElementById("savePosBtn");
+    const loadPosBtn = document.getElementById("loadPosBtn");
+    const loadPosInput = document.getElementById("loadPosInput");
     const countdownEl = document.getElementById("countdown");
     const ufoEl = document.getElementById("ufo");
 
@@ -521,6 +534,61 @@
       pickBtn.disabled = drawState.isDrawing || c.left === 0;
     }
 
+    function avatarZonesPayload() {
+      return {
+        type: "2A-avatar-zones",
+        version: 1,
+        savedAt: new Date().toISOString(),
+        students: avatars.map((a) => ({
+          id: a.id,
+          name: a.name,
+          zone: a.zone === "right" ? "right" : "left"
+        }))
+      };
+    }
+
+    function saveAvatarZonesToJson() {
+      const payload = avatarZonesPayload();
+      const json = JSON.stringify(payload, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "2a-avatar-zones.json";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function applyAvatarZones(payload) {
+      if (!payload || !Array.isArray(payload.students)) {
+        throw new Error("Invalid JSON format.");
+      }
+      const byId = new Map();
+      const byName = new Map();
+      for (const row of payload.students) {
+        if (!row) continue;
+        if (Number.isInteger(row.id)) byId.set(row.id, row.zone);
+        if (typeof row.name === "string") byName.set(row.name, row.zone);
+      }
+      avatars.forEach((avatar) => {
+        let zone = byId.get(avatar.id);
+        if (zone == null) zone = byName.get(avatar.name);
+        zone = zone === "right" ? "right" : "left";
+        avatar.zone = zone;
+        const targetZone = zone === "right" ? RIGHT_ZONE : LEFT_ZONE;
+        const p = randomPosInZone(targetZone);
+        avatar.mesh.position.set(p.x, 0, p.z);
+        avatar.mesh.rotation.set(0, 0, 0);
+        avatar.heading.copy(randomHeading());
+        avatar.nextTurnAt = performance.now() + 500 + Math.random() * 1600;
+      });
+      updateCounts();
+      hideCountdown();
+      hideUfo();
+    }
+
     function showCountdown(text) {
       countdownEl.style.display = "flex";
       countdownEl.textContent = text;
@@ -714,6 +782,50 @@
     });
 
     resetBtn.addEventListener("click", resetAllToLeft);
+
+    savePosBtn.addEventListener("click", () => {
+      if (drawState.isDrawing) return;
+      saveAvatarZonesToJson();
+    });
+
+    loadPosBtn.addEventListener("click", () => {
+      if (drawState.isDrawing) return;
+      loadPosInput.value = "";
+      loadPosInput.click();
+    });
+
+    function bindIconKey(el, handler) {
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handler();
+        }
+      });
+    }
+
+    bindIconKey(savePosBtn, () => {
+      if (drawState.isDrawing) return;
+      saveAvatarZonesToJson();
+    });
+
+    bindIconKey(loadPosBtn, () => {
+      if (drawState.isDrawing) return;
+      loadPosInput.value = "";
+      loadPosInput.click();
+    });
+
+    loadPosInput.addEventListener("change", async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const payload = JSON.parse(text);
+        if (drawState.isDrawing) return;
+        applyAvatarZones(payload);
+      } catch (err) {
+        alert("Could not load JSON file.");
+      }
+    });
 
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;
