@@ -680,7 +680,8 @@
         transferToRight();
       }
 
-      function transferToRight(immediate = false) {
+      function transferToRight(options = {}) {
+        const { immediate = false, fastMs = null } = options;
         avatarObj.zone = "right";
         const to = randomPosInZone(RIGHT_ZONE);
         const from = avatarObj.mesh.position.clone();
@@ -693,12 +694,14 @@
         }
 
         const moveStart = performance.now();
+        const duration = Number.isFinite(fastMs) && fastMs > 0 ? fastMs : moveMs;
+        const spinFactor = duration < moveMs ? 0.8 : 0.4;
 
         function doMove(now) {
-          const t = Math.min((now - moveStart) / moveMs, 1);
+          const t = Math.min((now - moveStart) / duration, 1);
           const eased = t * t * (3 - 2 * t);
           avatarObj.mesh.position.lerpVectors(from, target, eased);
-          avatarObj.mesh.rotation.y += spin * 0.4;
+          avatarObj.mesh.rotation.y += spin * spinFactor;
           updateUfoPosition(avatarObj);
           if (t < 1) {
             requestAnimationFrame(doMove);
@@ -718,7 +721,7 @@
         ) {
           clearInterval(drawState.countdownTimer);
           drawState.phase = "moving";
-          transferToRight(true);
+          transferToRight({ fastMs: 320 });
         }
       };
 
@@ -744,9 +747,9 @@
         avatarObj.mesh.position.z < minZ ||
         avatarObj.mesh.position.z > maxZ;
 
-      if (outOfBounds || now >= avatarObj.nextTurnAt) {
+      // Only turn when reaching the zone edge (no random mid-walk turning).
+      if (outOfBounds) {
         avatarObj.heading.copy(randomHeading());
-        avatarObj.nextTurnAt = now + 500 + Math.random() * 2600;
       }
 
       clampToZone(avatarObj, zone);
