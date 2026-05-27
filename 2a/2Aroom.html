@@ -31,14 +31,113 @@
       text-shadow: 0 0 5px rgba(0, 0, 0, 0.85);
       white-space: nowrap;
       transform: translate(-50%, -50%);
-      pointer-events: none;
+      pointer-events: auto;
       z-index: 10;
       user-select: none;
+      cursor: pointer;
+    }
+
+    .star-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 25;
+      width: 100vw;
+      max-height: 38vh;
+      overflow: auto;
+      padding: 8px 10px 10px;
+      color: #f8fafc;
+      background: rgba(2, 6, 23, 0.72);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+      backdrop-filter: blur(2px);
+    }
+
+    .star-panel[hidden] {
+      display: none;
+    }
+
+    .star-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      align-items: center;
+    }
+
+    .star-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      min-height: 20px;
+      font-size: 17px;
+      line-height: 1.3;
+      white-space: nowrap;
+      padding: 1px 0;
+    }
+
+    .star-name {
+      cursor: default;
+      user-select: text;
+      opacity: 0.95;
+      font: inherit;
+      line-height: inherit;
+    }
+
+    .star-name:hover {
+      opacity: 0.95;
+    }
+
+    .star-bucket {
+      display: inline;
+      min-height: auto;
+    }
+
+    .star {
+      cursor: pointer;
+      user-select: text;
+      line-height: inherit;
+      display: inline;
+      vertical-align: baseline;
+      color: inherit;
+      font: inherit;
+    }
+
+    .emoji-picker {
+      position: fixed;
+      z-index: 40;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-width: min(92vw, 420px);
+      padding: 6px;
+      background: rgba(2, 6, 23, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 8px;
+    }
+
+    .emoji-picker[hidden] {
+      display: none;
+    }
+
+    .emoji-option {
+      cursor: pointer;
+      user-select: none;
+      font-size: 16px;
+      line-height: 1;
+      padding: 3px 4px;
+      border-radius: 6px;
+    }
+
+    .emoji-option:hover {
+      background: rgba(51, 65, 85, 0.95);
     }
 
   </style>
 </head>
 <body>
+<div id="starPanel" class="star-panel" hidden>
+  <div id="starGrid" class="star-grid"></div>
+</div>
+<div id="emojiPicker" class="emoji-picker" hidden></div>
 <script type="importmap">
     {
       "imports": {
@@ -86,6 +185,13 @@
       return rosterShortName(t);
     }
 
+    function panelDisplayLabel(fullName) {
+      const shown = rosterDisplayLabel(fullName);
+      if (shown) return shown;
+      // Keep panel readable even when name labels are hidden (mode 0).
+      return rosterShortName(fullName) || fullName.trim();
+    }
+
     const tableColours = [
       "#b38653", "#ff8080", "#ffff80", "#ffc080", "#80ff80", "#8080ff", "#2b64f9"
     ];
@@ -95,6 +201,9 @@
     const SEATING_Z_PUSH = 0.92;
     const avatarRelDesk = { x: 0, y: 0.07, z: 0.4 };
 
+    const rosterNames = studentNames.filter((s) => s.trim().length > 0);
+    const emojiOptions = ["⭐", "🔴", "🟢", "💬", "🤳", "👄", "🔇", "🚻", "⚠", "📵", "🚫", "❓", "🔰"];
+    const emojiMarks = new Map(rosterNames.map((name) => [name, []]));
     const SELECT_HIGHLIGHT = 0xfde047;
 
     function randomBrightColor() {
@@ -279,7 +388,7 @@
       0.1,
       200
     );
-    camera.position.set(0, 16.4, 28.5);
+    camera.position.set(2.99, 2.643, 6.463);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -291,7 +400,7 @@
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.target.set(0, 1.15, 4.15);
+    controls.target.set(1.218, 2.615, 1.788);
     controls.maxDistance = 42;
     controls.minDistance = 5;
 
@@ -489,11 +598,11 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "#1e293b";
       ctx.font =
-        'bold 132px "Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif';
+        'bold 152px "Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif';
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("靜心悅讀 收起平板", canvas.width / 2, canvas.height * 0.4);
-      ctx.fillText("顧及他人 請勿喧嘩", canvas.width / 2, canvas.height * 0.6);
+      ctx.fillText("靜心悅讀 收起平板", canvas.width / 2, canvas.height * 0.35);
+      ctx.fillText("顧及他人 請勿喧嘩", canvas.width / 2, canvas.height * 0.68);
       const tex = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.needsUpdate = true;
@@ -655,7 +764,7 @@
       sctx.lineWidth = 10;
       sctx.strokeRect(6, 6, signCanvas.width - 12, signCanvas.height - 12);
 
-      const signLine = "自助借閱圖書";
+      const signLine = "自助借還書";
       const pad = 32;
       const innerW = signCanvas.width - pad * 2;
       const innerH = signCanvas.height - pad * 2;
@@ -696,7 +805,7 @@
         new THREE.MeshLambertMaterial({ map: signTex })
       );
       sign.scale.set(0.62, 0.62, 1);
-      sign.position.set(0, H + 0.58, D / 2 + 0.08);
+      sign.position.set(-0.28, H + 0.58, D / 2 + 0.08);
       sign.rotation.x = THREE.MathUtils.degToRad(-16);
       group.add(sign);
 
@@ -783,7 +892,15 @@
         const label = document.createElement("div");
         label.className = "name-label";
         label.textContent = rosterDisplayLabel(name);
+        label.title = occupied ? "Click to choose emoji" : "";
         label.style.display = occupied && nameTagMode !== 0 ? "block" : "none";
+        label.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const slot = avatars[idx];
+          const currentName = (slot?.name ?? "").trim();
+          if (!currentName) return;
+          showEmojiPicker(currentName, label);
+        });
         document.body.appendChild(label);
 
         avatars.push({
@@ -807,6 +924,52 @@
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
     const selectedSlots = [];
+    const starPanel = document.getElementById("starPanel");
+    const starGrid = document.getElementById("starGrid");
+    const emojiPicker = document.getElementById("emojiPicker");
+    let starPanelVisible = false;
+    let pickerTargetName = "";
+
+    function hideEmojiPicker() {
+      pickerTargetName = "";
+      if (emojiPicker) emojiPicker.hidden = true;
+    }
+
+    function ensureEmojiPickerContent() {
+      if (!emojiPicker || emojiPicker.childElementCount > 0) return;
+      for (const emoji of emojiOptions) {
+        const option = document.createElement("span");
+        option.className = "emoji-option";
+        option.textContent = emoji;
+        option.title = `Add ${emoji}`;
+        option.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (!pickerTargetName) return;
+          const marks = emojiMarks.get(pickerTargetName) || [];
+          marks.push(emoji);
+          emojiMarks.set(pickerTargetName, marks);
+          renderStarPanel();
+          hideEmojiPicker();
+        });
+        emojiPicker.appendChild(option);
+      }
+    }
+
+    function showEmojiPicker(name, anchorEl) {
+      if (!emojiPicker || !anchorEl) return;
+      pickerTargetName = name;
+      ensureEmojiPickerContent();
+      emojiPicker.hidden = false;
+      const rect = anchorEl.getBoundingClientRect();
+      const pickerW = Math.min(window.innerWidth - 12, 420);
+      let left = rect.left;
+      let top = rect.bottom + 6;
+      if (left + pickerW > window.innerWidth - 8) left = window.innerWidth - pickerW - 8;
+      if (left < 8) left = 8;
+      if (top > window.innerHeight - 48) top = Math.max(8, rect.top - 54);
+      emojiPicker.style.left = `${Math.round(left)}px`;
+      emojiPicker.style.top = `${Math.round(top)}px`;
+    }
 
     function slotFromObject3D(obj) {
       let o = obj;
@@ -819,22 +982,76 @@
       return null;
     }
 
-    function setHeadHighlight(slot, on) {
-      if (!slot?.headMesh?.material?.color) return;
-      const hex = on
-        ? SELECT_HIGHLIGHT
-        : slot.headMesh.userData.baseColorHex ?? slot.headMesh.material.color.getHex();
-      slot.headMesh.material.color.setHex(hex);
+    function setAvatarSelectTint(slot, on) {
+      if (!slot?.avatarMesh) return;
+      slot.avatarMesh.traverse((node) => {
+        if (!node.isMesh || !node.material) return;
+        const mats = Array.isArray(node.material) ? node.material : [node.material];
+        for (const mat of mats) {
+          if (!mat || !mat.color || typeof mat.color.getHex !== "function") continue;
+          mat.userData = mat.userData || {};
+          if (mat.userData.baseColorHex === undefined) {
+            mat.userData.baseColorHex = mat.color.getHex();
+          }
+          mat.color.setHex(on ? SELECT_HIGHLIGHT : mat.userData.baseColorHex);
+        }
+      });
     }
 
     function setSlotSelectVisual(slot, on) {
       if (!slot) return;
-      if (slot.headMesh) {
-        setHeadHighlight(slot, on);
+      if (slot.avatarMesh) {
+        setAvatarSelectTint(slot, on);
       } else {
         const s = on ? 1.07 : 1;
         slot.seatPick.scale.setScalar(s);
       }
+    }
+
+    function renderStarPanel() {
+      if (!starGrid) return;
+      starGrid.replaceChildren();
+      const taggedNames = rosterNames.filter((name) => (emojiMarks.get(name) || []).length > 0);
+      for (const name of taggedNames) {
+        const chip = document.createElement("span");
+        chip.className = "star-chip";
+
+        const nameEl = document.createElement("span");
+        nameEl.className = "star-name";
+        nameEl.textContent = panelDisplayLabel(name);
+
+        const bucket = document.createElement("span");
+        bucket.className = "star-bucket";
+        bucket.title = "Click an emoji to remove it";
+        const marks = emojiMarks.get(name) || [];
+        marks.forEach((emoji, idx) => {
+          const star = document.createElement("span");
+          star.className = "star";
+          star.textContent = emoji;
+          star.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const next = (emojiMarks.get(name) || []).slice();
+            next.splice(idx, 1);
+            emojiMarks.set(name, next);
+            renderStarPanel();
+          });
+          bucket.appendChild(star);
+        });
+
+        chip.append(nameEl, bucket);
+        starGrid.appendChild(chip);
+      }
+    }
+
+    function setStarPanelVisible(show) {
+      starPanelVisible = show;
+      if (starPanel) {
+        starPanel.hidden = !show;
+      }
+      if (!show) {
+        hideEmojiPicker();
+      }
+      if (show) renderStarPanel();
     }
 
     function syncSlotOccupancyVisual(slot) {
@@ -905,6 +1122,45 @@
       syncSlotOccupancyVisual(slotB);
     }
 
+    function resetSeatsToDefault() {
+      for (const s of selectedSlots) {
+        setSlotSelectVisual(s, false);
+      }
+      selectedSlots.length = 0;
+
+      const byName = new Map();
+      for (const slot of avatars) {
+        const name = slot.name.trim();
+        if (name && slot.avatarMesh) {
+          byName.set(name, { mesh: slot.avatarMesh, head: slot.headMesh });
+          slot.avatarRoot.remove(slot.avatarMesh);
+        }
+        slot.avatarMesh = null;
+        slot.headMesh = null;
+      }
+
+      for (let idx = 0; idx < avatars.length; idx += 1) {
+        const slot = avatars[idx];
+        const defaultName = (studentNames[idx] ?? "").trim();
+        slot.name = defaultName;
+
+        if (defaultName) {
+          let pair = byName.get(defaultName);
+          if (!pair) {
+            const seated = createSeatedAvatar();
+            pair = { mesh: seated.group, head: seated.head };
+          }
+          slot.avatarMesh = pair.mesh;
+          slot.headMesh = pair.head;
+          slot.avatarRoot.add(slot.avatarMesh);
+          slot.avatarMesh.rotation.y = Math.PI;
+        }
+
+        syncSlotLabel(slot);
+        syncSlotOccupancyVisual(slot);
+      }
+    }
+
     function roundSeat(n) {
       return Math.round(n * 1000) / 1000;
     }
@@ -921,6 +1177,28 @@
       }));
       console.table(rows);
       console.log("avatar seating (JSON)", rows);
+    }
+
+    function logCameraSettings() {
+      const p = camera.position;
+      const t = controls.target;
+      const snapshot = {
+        position: {
+          x: roundSeat(p.x),
+          y: roundSeat(p.y),
+          z: roundSeat(p.z)
+        },
+        target: {
+          x: roundSeat(t.x),
+          y: roundSeat(t.y),
+          z: roundSeat(t.z)
+        },
+        fov: roundSeat(camera.fov),
+        near: roundSeat(camera.near),
+        far: roundSeat(camera.far)
+      };
+      console.log("camera settings", snapshot);
+      return snapshot;
     }
 
     function onCanvasClick(event) {
@@ -948,12 +1226,38 @@
       if (event.target.closest("input, textarea, select")) return;
       if (event.key === "c" || event.key === "C") {
         logAvatarSeating();
+        logCameraSettings();
       }
       if (event.key === "n" || event.key === "N") {
         nameTagMode = (nameTagMode + 1) % 3;
         for (const a of avatars) {
           syncSlotLabel(a);
         }
+        if (starPanelVisible) {
+          renderStarPanel();
+        }
+      }
+      if (event.key === "t" || event.key === "T") {
+        setStarPanelVisible(!starPanelVisible);
+      }
+      if (event.key === "r" || event.key === "R") {
+        resetSeatsToDefault();
+      }
+      if (event.key === "Escape") {
+        hideEmojiPicker();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!target) return;
+      if (
+        emojiPicker &&
+        !emojiPicker.hidden &&
+        target !== emojiPicker &&
+        !emojiPicker.contains(target)
+      ) {
+        hideEmojiPicker();
       }
     });
 
@@ -979,7 +1283,7 @@
       const distance = camera.position.distanceTo(root.position);
       const size = THREE.MathUtils.clamp(120 / distance, 6, 14);
       avatarObj.label.style.fontSize = `${size}px`;
-      avatarObj.label.style.opacity = "0.88";
+      avatarObj.label.style.opacity = "0.6";
     }
 
     window.addEventListener("resize", () => {
