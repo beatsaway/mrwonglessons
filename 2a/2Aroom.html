@@ -256,6 +256,10 @@
     <input id="charRotateToggle" type="checkbox" checked />
   </div>
   <div class="row" style="margin-top:10px;">
+    <span>連續旋轉動畫</span>
+    <input id="rotateAnimToggle" type="checkbox" checked />
+  </div>
+  <div class="row" style="margin-top:10px;">
     <span>顯示牆上標語</span>
     <input id="sloganToggle" type="checkbox" checked />
   </div>
@@ -337,6 +341,7 @@
     let holdDurationMs = 15000;
     let languageOrderMode = "en-first";
     let enableCharRotate = true;
+    let enableRotateAnimation = true;
     const DEFAULT_DAILY_READ_TITLE = "你知道嗎？";
     const DEFAULT_DAILY_READ_TITLE_EN = "Did You Know?";
     const availableDailyReadSets =
@@ -924,6 +929,8 @@
         options = {}
       ) {
         const hueByChar = !!options.hueByChar;
+        const dynamicRotate = !!options.dynamicRotate && enableRotateAnimation;
+        const rotateRateMs = Math.max(1, Number(options.rotateRateMs) || 90);
         if (!enableCharRotate && !hueByChar) {
           ctx.fillText(text, x, y);
           return;
@@ -931,6 +938,7 @@
 
         const fontPx = currentFontPx();
         const pivotY = fontPx * 0.52;
+        const timeBucket = dynamicRotate ? Math.floor(performance.now() / rotateRateMs) : 0;
         let cursorX = x;
         for (let i = 0; i < text.length; i += 1) {
           const ch = text[i];
@@ -940,12 +948,15 @@
             continue;
           }
           const absoluteIndex = startIndex + i;
-          const r = random01FromSeed(sourceHash + absoluteIndex * 2654435761);
-          const deg = -4 + r * 8;
+          const staticSeed = sourceHash + absoluteIndex * 2654435761;
+          const animatedSeed = staticSeed + timeBucket * 1013904223;
+          const rRotate = random01FromSeed(animatedSeed);
+          const deg = -4 + rRotate * 8;
           const rad = (deg * Math.PI) / 180;
           const baseFill = ctx.fillStyle;
           if (hueByChar) {
-            const hue = Math.round(r * 360);
+            const rHue = random01FromSeed(staticSeed);
+            const hue = Math.round(rHue * 360);
             // Keep saturation/lightness fixed so brightness stays consistent.
             ctx.fillStyle = `hsla(${hue}, 95%, 30%, 0.92)`;
           }
@@ -1020,7 +1031,7 @@
                 titleY,
                 titleEnHash,
                 0,
-                { hueByChar: true }
+                { hueByChar: true, dynamicRotate: true }
               );
             }
             ctx.fillStyle = "hsla(220, 95%, 30%, 0.92)";
@@ -1032,7 +1043,7 @@
                 titleY + 82,
                 titleHash,
                 0,
-                { hueByChar: true }
+                { hueByChar: true, dynamicRotate: true, rotateRateMs: 180 }
               );
             }
           } else {
@@ -1045,7 +1056,7 @@
                 titleY,
                 titleHash,
                 0,
-                { hueByChar: true }
+                { hueByChar: true, dynamicRotate: true, rotateRateMs: 180 }
               );
             }
             ctx.fillStyle = "hsla(220, 95%, 30%, 0.92)";
@@ -1057,7 +1068,7 @@
                 titleY + 102,
                 titleEnHash,
                 0,
-                { hueByChar: true }
+                { hueByChar: true, dynamicRotate: true }
               );
             }
           }
@@ -1075,7 +1086,14 @@
               ctx.font = '500 48px "Noto Serif", "Segoe UI", "Inter", "Arial", serif';
               for (const line of enLines) {
                 if (y + lineHEn > maxY) break;
-                drawTextLineWithOptionalRotation(line.text, x, y, factEnHash, line.start);
+                drawTextLineWithOptionalRotation(
+                  line.text,
+                  x,
+                  y,
+                  factEnHash,
+                  line.start,
+                  { dynamicRotate: true, rotateRateMs: 90 }
+                );
                 y += lineHEn;
               }
               y += 10;
@@ -1084,13 +1102,27 @@
             ctx.font = '600 58px "Noto Serif TC", "Microsoft JhengHei", "PingFang TC", "Segoe UI", serif';
             for (const line of zhLines) {
               if (y + lineHZh > maxY) break;
-              drawTextLineWithOptionalRotation(line.text, x, y, factZhHash, line.start);
+              drawTextLineWithOptionalRotation(
+                line.text,
+                x,
+                y,
+                factZhHash,
+                line.start,
+                { dynamicRotate: true, rotateRateMs: 180 }
+              );
               y += lineHZh;
             }
           } else {
             for (const line of zhLines) {
               if (y + lineHZh > maxY) break;
-              drawTextLineWithOptionalRotation(line.text, x, y, factZhHash, line.start);
+              drawTextLineWithOptionalRotation(
+                line.text,
+                x,
+                y,
+                factZhHash,
+                line.start,
+                { dynamicRotate: true, rotateRateMs: 180 }
+              );
               y += lineHZh;
             }
             if (enLines.length) {
@@ -1099,7 +1131,14 @@
               ctx.font = '500 48px "Noto Serif", "Segoe UI", "Inter", "Arial", serif';
               for (const line of enLines) {
                 if (y + lineHEn > maxY) break;
-                drawTextLineWithOptionalRotation(line.text, x, y, factEnHash, line.start);
+                drawTextLineWithOptionalRotation(
+                  line.text,
+                  x,
+                  y,
+                  factEnHash,
+                  line.start,
+                  { dynamicRotate: true, rotateRateMs: 90 }
+                );
                 y += lineHEn;
               }
             }
@@ -1684,6 +1723,7 @@
     const holdSlider = document.getElementById("holdSlider");
     const holdValue = document.getElementById("holdValue");
     const charRotateToggle = document.getElementById("charRotateToggle");
+    const rotateAnimToggle = document.getElementById("rotateAnimToggle");
     const sloganToggle = document.getElementById("sloganToggle");
     const langOrderSelect = document.getElementById("langOrderSelect");
     let starPanelVisible = false;
@@ -1716,6 +1756,13 @@
       enableCharRotate = !!enabled;
       if (charRotateToggle) {
         charRotateToggle.checked = enableCharRotate;
+      }
+    }
+
+    function setRotateAnimationEnabled(enabled) {
+      enableRotateAnimation = !!enabled;
+      if (rotateAnimToggle) {
+        rotateAnimToggle.checked = enableRotateAnimation;
       }
     }
 
@@ -1789,6 +1836,11 @@
         setCharRotateEnabled(event.target.checked);
       });
     }
+    if (rotateAnimToggle) {
+      rotateAnimToggle.addEventListener("change", (event) => {
+        setRotateAnimationEnabled(event.target.checked);
+      });
+    }
     if (langOrderSelect) {
       langOrderSelect.addEventListener("change", (event) => {
         setLanguageOrder(event.target.value);
@@ -1803,6 +1855,7 @@
     setTypeDelay(typeDelayMs);
     setHoldSeconds(holdDurationMs / 1000);
     setCharRotateEnabled(enableCharRotate);
+    setRotateAnimationEnabled(enableRotateAnimation);
     setWallSloganVisible(true);
     setLanguageOrder(languageOrderMode);
 

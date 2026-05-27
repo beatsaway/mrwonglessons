@@ -328,19 +328,111 @@ const inventionsKs3Entries = [
   }
 ];
 
+const runningKs3ExtraEntries = [
+  { title: "間歇跑能同時練速度與耐力", titleEn: "Interval Running Trains Speed and Endurance Together", fact: "短時間快跑搭配慢跑恢復，能在有限課堂時間中同時刺激心肺與步頻控制。", factEn: "Alternating fast intervals with easy recovery can develop both aerobic fitness and cadence control in limited lesson time." },
+  { title: "休息日能讓訓練成果被身體吸收", titleEn: "Rest Days Help the Body Absorb Training", fact: "進步不只發生在訓練中，也發生在恢復期；安排休息可降低過度訓練風險。", factEn: "Progress happens not only during training but also during recovery, and planned rest lowers overtraining risk." },
+  { title: "呼吸節奏會影響配速穩定", titleEn: "Breathing Rhythm Affects Pace Stability", fact: "若呼吸過急，步伐容易亂；固定呼吸節奏常能讓中長跑更穩。", factEn: "If breathing becomes rushed, stride rhythm often breaks down; steady breathing patterns usually improve pacing stability." },
+  { title: "擺臂效率會影響直線跑姿", titleEn: "Efficient Arm Swing Supports Straight Running Form", fact: "手臂前後擺動若過度外張，會增加不必要的左右晃動。", factEn: "When arm swing moves too far outward, it can add side-to-side motion that wastes energy." },
+  { title: "起跑反應可以透過口令訓練", titleEn: "Start Reaction Can Be Trained with Cue Drills", fact: "重複練習聽覺口令與第一步發力，可縮短起跑延遲時間。", factEn: "Practising auditory cues and first-step drive repeatedly can reduce start delay." },
+  { title: "衝線技巧也能影響名次", titleEn: "Finish Technique Can Affect Final Position", fact: "最後幾步保持步頻並控制身體前傾，常比臨時亂撲更有效。", factEn: "Maintaining cadence with controlled forward lean in the last strides is often better than an unplanned lunge." },
+  { title: "跑道分道觀念是安全重點", titleEn: "Lane Discipline Is a Key Safety Skill", fact: "接近終點疲勞時仍要保持分道，能避免碰撞與犯規。", factEn: "Even when fatigued near the finish, staying in lane helps prevent collisions and disqualifications." },
+  { title: "賽前飲食不宜突然大改", titleEn: "Pre-Race Food Should Not Change Suddenly", fact: "比賽當天嘗試新食物可能造成腸胃不適，熟悉與易消化更重要。", factEn: "Trying new food on race day can upset the stomach; familiar and digestible choices are safer." },
+  { title: "炎熱天氣要調整訓練強度", titleEn: "Training Intensity Should Adjust in Heat", fact: "高溫下心率上升較快，適度降強度和補水比硬撐更聰明。", factEn: "Heart rate rises faster in hot weather, so reducing intensity and hydrating is smarter than forcing pace." },
+  { title: "收操能幫助回到日常狀態", titleEn: "Cool-Down Helps the Body Return to Baseline", fact: "慢走與輕鬆伸展可幫助循環逐步回穩，減少突然停下的不適。", factEn: "Easy walking and light mobility work help circulation settle gradually after effort." },
+  { title: "想像練習可提升比賽專注", titleEn: "Mental Imagery Can Improve Race Focus", fact: "事先在腦中演練起跑、轉彎與衝線，有助臨場減少慌亂。", factEn: "Mentally rehearsing starts, bends, and finishing phases can reduce panic under pressure." },
+  { title: "運動課也要重視共融參與", titleEn: "Inclusive Participation Matters in PE", fact: "以分層目標與互助分工設計活動，能讓不同能力學生都看見進步。", factEn: "Tiered goals and supportive team roles help students of different abilities experience progress." },
+  { title: "痠痛與受傷警訊要分辨", titleEn: "Students Should Distinguish Soreness from Injury Signals", fact: "一般痠痛會逐漸緩解；若出現尖銳痛或持續腫脹，應及早停下評估。", factEn: "Normal soreness eases over time, but sharp pain or persistent swelling should be assessed early." },
+  { title: "接力棒次安排有策略", titleEn: "Relay Order Uses Strategy", fact: "不同棒次需要不同特質，例如起跑穩定、彎道能力和終點衝刺。", factEn: "Different relay legs require different strengths, including reliable starts, bend running, and final sprinting." },
+  { title: "長期紀錄能看見真實進步", titleEn: "Long-Term Tracking Reveals Real Progress", fact: "把成績、主觀疲勞和睡眠一起記錄，比只看單次成績更準確。", factEn: "Tracking results with fatigue and sleep over time is more informative than one-off performance." }
+];
+
+const spaceKs3ExtraEntries = [
+  { title: "詹姆斯韋伯望遠鏡看得更遠", titleEn: "The James Webb Telescope Looks Deeper into Space", fact: "韋伯望遠鏡以紅外線觀測早期宇宙，幫助科學家研究恆星與星系形成。", factEn: "The James Webb Space Telescope uses infrared observations to study early galaxies and star formation." },
+  { title: "火星直升機證明稀薄大氣可飛行", titleEn: "The Mars Helicopter Proved Flight in Thin Atmosphere", fact: "Ingenuity 在火星的成功飛行，為未來行星探測提供新視角。", factEn: "Ingenuity's flights on Mars demonstrated powered flight in a thin atmosphere and opened new scouting options." },
+  { title: "阿提米絲計畫推進重返月球", titleEn: "Artemis Is Advancing Lunar Return Missions", fact: "新一代月球任務強調長期探索，包含基地技術與深空合作。", factEn: "New lunar missions focus on sustained exploration, including base technologies and deep-space cooperation." },
+  { title: "DART任務測試行星防禦", titleEn: "The DART Mission Tested Planetary Defence", fact: "透過撞擊小行星改變軌道，科學家驗證了主動防禦概念。", factEn: "By impacting an asteroid to alter its orbit, scientists tested a practical planetary-defence concept." },
+  { title: "小型衛星讓太空研究更普及", titleEn: "Small Satellites Made Space Research More Accessible", fact: "CubeSat 讓大學與學生團隊也能參與真實太空任務。", factEn: "CubeSats allow universities and student teams to participate in real space missions." },
+  { title: "月球極區的冰可能支援基地", titleEn: "Polar Lunar Ice May Support Future Bases", fact: "月球極區冰資源可用於水與燃料，對長期駐留很關鍵。", factEn: "Ice in lunar polar regions could provide water and fuel resources for long-term missions." },
+  { title: "系外行星大氣分析正在加速", titleEn: "Exoplanet Atmosphere Analysis Is Accelerating", fact: "光譜技術讓科學家能推測遠方行星的大氣成分。", factEn: "Spectroscopy now helps scientists infer atmospheric composition on distant exoplanets." },
+  { title: "太空中的植物研究持續進展", titleEn: "Space Plant Research Continues to Progress", fact: "微重力種植實驗能幫助未來長期任務改善食物供應。", factEn: "Microgravity plant experiments support future long-duration missions and food systems." },
+  { title: "深空輻射是載人任務挑戰", titleEn: "Deep-Space Radiation Is a Major Human-Mission Challenge", fact: "超越地球磁場後，如何防護輻射是重要工程課題。", factEn: "Beyond Earth's magnetic protection, radiation shielding becomes a major engineering challenge." },
+  { title: "自動導航讓探測器更自主", titleEn: "Autonomous Navigation Makes Probes More Independent", fact: "通訊延遲下，探測器需自己避障和調整路線。", factEn: "With communication delays, probes must avoid hazards and adjust routes more autonomously." },
+  { title: "太空網路也需要時間同步", titleEn: "Space Networks Also Need Precise Time Sync", fact: "深空通訊依賴精準時鐘與演算法，才能穩定傳輸資料。", factEn: "Deep-space communications depend on precise timing and algorithms for stable data transfer." },
+  { title: "地球觀測衛星守護日常生活", titleEn: "Earth-Observation Satellites Support Daily Life", fact: "天氣預報、防災與農業監測都仰賴持續的衛星資料。", factEn: "Weather forecasting, disaster response, and crop monitoring all rely on continuous satellite data." },
+  { title: "星鏈也帶來光害討論", titleEn: "Satellite Constellations Also Raise Light-Pollution Concerns", fact: "大量低軌衛星提升連線能力，也讓天文觀測面臨新挑戰。", factEn: "Large low-Earth orbit constellations improve connectivity but create new challenges for astronomy." },
+  { title: "行星保護避免跨天體污染", titleEn: "Planetary Protection Prevents Cross-World Contamination", fact: "任務設計需避免把地球微生物帶到其他天體。", factEn: "Mission planning includes strict controls to avoid carrying Earth microbes to other worlds." },
+  { title: "樣本返回任務提升科學精度", titleEn: "Sample-Return Missions Improve Scientific Accuracy", fact: "把岩石帶回地球能用更完整儀器分析其成分和年代。", factEn: "Bringing samples back to Earth enables deeper lab analysis of composition and age." }
+];
+
+const earthScienceKs3ExtraEntries = [
+  { title: "板塊運動塑造山脈與海溝", titleEn: "Plate Motion Shapes Mountains and Trenches", fact: "地殼板塊碰撞與隱沒持續改變地形，地球表面一直在演化。", factEn: "Colliding and subducting tectonic plates continuously reshape Earth's surface." },
+  { title: "聖嬰與反聖嬰會改變全球降雨", titleEn: "El Niño and La Niña Shift Global Rainfall Patterns", fact: "太平洋海溫異常會影響不同地區的乾旱與豪雨風險。", factEn: "Pacific sea-surface anomalies can shift drought and flood risks across regions." },
+  { title: "洋流像地球的熱輸送帶", titleEn: "Ocean Currents Act as Earth's Heat Conveyor", fact: "海洋流動把熱量從赤道帶向高緯，影響沿岸氣候。", factEn: "Ocean circulation moves heat from lower to higher latitudes, influencing coastal climates." },
+  { title: "濕地是天然滯洪系統", titleEn: "Wetlands Are Natural Flood Buffers", fact: "濕地能暫存洪水並改善水質，是重要生態與防災資產。", factEn: "Wetlands store floodwater and improve water quality, supporting both ecosystems and resilience." },
+  { title: "紅樹林能減弱風暴潮衝擊", titleEn: "Mangroves Help Reduce Storm-Surge Impact", fact: "沿岸紅樹林可降低海浪能量，保護聚落與生態。", factEn: "Coastal mangroves can absorb wave energy and help protect communities and habitats." },
+  { title: "指標物種能反映環境健康", titleEn: "Indicator Species Reflect Environmental Health", fact: "某些物種數量變化常是環境壓力的早期訊號。", factEn: "Changes in indicator species often provide early signs of environmental stress." },
+  { title: "空氣品質監測需要長期資料", titleEn: "Air-Quality Monitoring Needs Long-Term Data", fact: "PM2.5 和臭氧等指標必須持續觀測，才能評估改善成效。", factEn: "PM2.5 and ozone require continuous measurement to evaluate policy effectiveness." },
+  { title: "海洋酸化會影響貝殼生物", titleEn: "Ocean Acidification Affects Shell-Forming Life", fact: "海水化學改變可能增加珊瑚和貝類生長壓力。", factEn: "Shifts in seawater chemistry can stress corals and shell-forming organisms." },
+  { title: "山火風險與氣候和管理都有關", titleEn: "Wildfire Risk Depends on Climate and Land Management", fact: "乾旱、熱浪與可燃物累積會共同提高山火機率。", factEn: "Drought, heatwaves, and fuel buildup together raise wildfire probability." },
+  { title: "地震預警可爭取幾秒關鍵時間", titleEn: "Earthquake Early Warning Can Provide Critical Seconds", fact: "快速偵測與通報可讓交通和校園先採取保護動作。", factEn: "Rapid detection and alerts can provide seconds for transport systems and schools to react." },
+  { title: "海嘯預警依賴跨國監測網", titleEn: "Tsunami Warnings Depend on International Monitoring", fact: "海底壓力感測和潮位站資料可提升沿岸警報準確度。", factEn: "Seafloor pressure sensors and tide gauges improve coastal tsunami warnings." },
+  { title: "永續城市重視雨水滲透", titleEn: "Sustainable Cities Prioritise Rainwater Infiltration", fact: "透水鋪面與綠地可降低積水並補注地下水。", factEn: "Permeable surfaces and green areas reduce flooding and help recharge groundwater." },
+  { title: "融冰反照率回饋會加速升溫", titleEn: "Ice-Albedo Feedback Can Accelerate Warming", fact: "白色冰面減少後，地表吸收更多熱量，進一步推升溫度。", factEn: "As reflective ice shrinks, darker surfaces absorb more heat, reinforcing warming." },
+  { title: "公民科學能擴大環境資料來源", titleEn: "Citizen Science Expands Environmental Data", fact: "學生和社區上傳觀測記錄，可協助追蹤生物多樣性變化。", factEn: "Student and community observations can support biodiversity monitoring at larger scales." },
+  { title: "循環經濟可減少資源浪費", titleEn: "Circular Economy Approaches Reduce Resource Waste", fact: "維修、再製與回收設計能延長材料使用壽命。", factEn: "Repair, remanufacturing, and recycling design can extend material lifecycles." },
+  { title: "熱浪健康風險需要預警機制", titleEn: "Heatwave Health Risks Need Warning Systems", fact: "高溫警示與校園降溫措施可降低中暑與脫水風險。", factEn: "Heat alerts and cooling measures in schools reduce dehydration and heat illness risk." },
+  { title: "生態廊道幫助動物遷移", titleEn: "Ecological Corridors Help Wildlife Movement", fact: "連接破碎棲地能提升物種基因交流與生存機會。", factEn: "Connecting fragmented habitats improves gene flow and species survival chances." },
+  { title: "地球科學也需要跨學科合作", titleEn: "Earth Science Also Relies on Interdisciplinary Work", fact: "從感測器到政策設計，地球問題常需要科學與社會科共同解決。", factEn: "From sensors to policy design, Earth challenges often require both scientific and social collaboration." }
+];
+
+const inventionsKs3ExtraEntries = [
+  { title: "Wi-Fi普及讓行動學習更方便", titleEn: "Widespread Wi-Fi Made Mobile Learning Easier", fact: "無線網路普及後，校園與公共空間的即時連線能力大幅提升。", factEn: "As Wi-Fi spread widely, real-time connectivity improved in schools and public spaces." },
+  { title: "藍牙技術讓短距離連接更省電", titleEn: "Bluetooth Enabled Low-Power Short-Range Connections", fact: "耳機、鍵盤與穿戴裝置可在低功耗下穩定傳輸資料。", factEn: "Headphones, keyboards, and wearables can exchange data reliably with low power use." },
+  { title: "USB標準降低了裝置相容難題", titleEn: "USB Standards Reduced Device Compatibility Problems", fact: "統一介面讓資料傳輸與充電更簡單，減少專屬接頭混亂。", factEn: "A common interface made data transfer and charging simpler across many devices." },
+  { title: "雲端運算改變了軟體使用方式", titleEn: "Cloud Computing Changed How Software Is Used", fact: "使用者不必都在本機安裝大型系統，也能共享服務與資料。", factEn: "Users no longer need every large system locally, as services and data can be shared online." },
+  { title: "App生態帶動新型數位產業", titleEn: "App Ecosystems Created New Digital Industries", fact: "行動應用商店讓小型團隊也能快速把產品帶到全球市場。", factEn: "Mobile app stores allowed small teams to launch products to global audiences quickly." },
+  { title: "線上課程平台擴大教育可近性", titleEn: "Online Course Platforms Expanded Access to Learning", fact: "MOOC 與混成學習讓更多學生接觸跨校資源與新主題。", factEn: "MOOCs and blended learning gave more students access to cross-institution resources and topics." },
+  { title: "行動支付讓交易流程更即時", titleEn: "Mobile Payments Made Transactions More Immediate", fact: "QR支付與電子錢包簡化了小額支付和交通票務體驗。", factEn: "QR payments and digital wallets simplified small purchases and transit payments." },
+  { title: "電動車技術在2020年代加速成熟", titleEn: "Electric-Vehicle Technology Matured Rapidly in the 2020s", fact: "電池、充電網絡與控制系統進步推動更多城市導入電動運輸。", factEn: "Advances in batteries, charging networks, and control systems expanded EV adoption." },
+  { title: "先進駕駛輔助提升行車安全", titleEn: "Advanced Driver Assistance Improved Road Safety", fact: "車道維持與自動煞車等功能可降低部分人為失誤風險。", factEn: "Features like lane keeping and automatic braking can reduce some human-error risks." },
+  { title: "穿戴感測器提升健康管理", titleEn: "Wearable Sensors Improved Health Monitoring", fact: "連續量測心率與活動量，讓個人和醫療端更早發現異常趨勢。", factEn: "Continuous heart-rate and activity tracking helps detect unusual patterns earlier." },
+  { title: "手術機器人讓微創操作更精細", titleEn: "Surgical Robotics Enabled More Precise Minimally Invasive Procedures", fact: "高精度控制與影像整合提升了部分手術流程的穩定性。", factEn: "Precision controls with integrated imaging improved stability in selected procedures." },
+  { title: "無人機在測繪與防災越來越重要", titleEn: "Drones Became Important in Mapping and Disaster Response", fact: "空拍資料能更快協助災害判讀與地形更新。", factEn: "Aerial data from drones speeds up damage assessment and terrain updates." },
+  { title: "5G擴展高頻寬即時應用", titleEn: "5G Expanded High-Bandwidth Real-Time Applications", fact: "更低延遲與更高容量支援遠距協作與即時串流場景。", factEn: "Lower latency and higher capacity support remote collaboration and live-stream use cases." },
+  { title: "AlphaFold2推進蛋白質研究", titleEn: "AlphaFold2 Accelerated Protein Research", fact: "AI結構預測讓生物研究在假設建立與驗證上更有效率。", factEn: "AI-based structure prediction improved speed in forming and testing biological hypotheses." },
+  { title: "量子科技從實驗走向應用探索", titleEn: "Quantum Technology Moved from Lab to Early Applications", fact: "量子運算與量子通訊仍在發展，但已帶動新一代演算法研究。", factEn: "Quantum computing and communication are still developing, but they are driving new algorithm research." },
+  { title: "語音辨識普及改變人機互動", titleEn: "Voice Recognition Changed Human-Computer Interaction", fact: "語音助理與即時字幕讓更多人能以自然方式使用數位工具。", factEn: "Voice assistants and live captions made digital tools more natural and accessible to use." },
+  { title: "擴增實境讓學習內容更立體", titleEn: "Augmented Reality Made Learning Content More Interactive", fact: "AR應用可把抽象概念疊加到真實環境中，提升理解效率。", factEn: "AR overlays abstract concepts onto real environments, which can improve understanding." },
+  { title: "低軌衛星網路擴大偏遠地區連線", titleEn: "LEO Satellite Internet Expanded Connectivity in Remote Areas", fact: "新型衛星網路讓偏遠地區更有機會獲得穩定網際網路。", factEn: "New low-Earth orbit networks improved internet access opportunities in remote regions." },
+  { title: "開源硬體與軟體加速創新擴散", titleEn: "Open-Source Hardware and Software Accelerated Innovation Sharing", fact: "公開設計與程式碼降低了學習門檻，也讓改良迭代更快。", factEn: "Open designs and code lowered learning barriers and sped up iterative improvement." }
+];
+
+function ensureMinEntries(baseEntries, extraEntries, minCount = 30) {
+  const base = Array.isArray(baseEntries) ? baseEntries.slice() : [];
+  if (base.length >= minCount) return base;
+  const extras = Array.isArray(extraEntries) ? extraEntries : [];
+  const need = minCount - base.length;
+  return base.concat(extras.slice(0, need));
+}
+
+const runningFactsKs3AllEntries = ensureMinEntries(sportsKs3Entries, runningKs3ExtraEntries, 30);
+const spaceKs3AllEntries = ensureMinEntries(spaceKs3Entries, spaceKs3ExtraEntries, 30);
+const earthScienceKs3AllEntries = ensureMinEntries(earthScienceKs3Entries, earthScienceKs3ExtraEntries, 30);
+const inventionsKs3AllEntries = ensureMinEntries(inventionsKs3Entries, inventionsKs3ExtraEntries, 30);
+
 // Add more themes later under DAILY_READ_SETS (e.g. science, history, nature).
 window.DAILY_READ_SETS = {
   running_facts_ks3: {
-    entries: sportsKs3Entries
+    entries: runningFactsKs3AllEntries
   },
   space_ks3: {
-    entries: spaceKs3Entries
+    entries: spaceKs3AllEntries
   },
   earth_science_ks3: {
-    entries: earthScienceKs3Entries
+    entries: earthScienceKs3AllEntries
   },
   inventions_ks3: {
-    entries: inventionsKs3Entries
+    entries: inventionsKs3AllEntries
   }
 };
 
