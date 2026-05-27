@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2A Classroom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -54,6 +59,48 @@
 
     .star-panel[hidden] {
       display: none;
+    }
+
+    .name-list-panel {
+      position: fixed;
+      left: 12px;
+      bottom: 12px;
+      z-index: 35;
+      width: min(420px, calc(100vw - 24px));
+      max-height: 52vh;
+      overflow: auto;
+      padding: 10px 12px;
+      color: #f8fafc;
+      background: rgba(2, 6, 23, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 10px;
+      backdrop-filter: blur(2px);
+      user-select: text;
+    }
+
+    .name-list-panel[hidden] {
+      display: none;
+    }
+
+    .name-list-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 8px;
+      align-items: center;
+    }
+
+    .name-list-item {
+      display: inline-block;
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1.35;
+      padding: 2px 4px;
+      border-radius: 6px;
+      color: #e2e8f0;
+    }
+
+    .name-list-item:hover {
+      background: rgba(51, 65, 85, 0.9);
     }
 
     .star-grid {
@@ -175,19 +222,44 @@
 <div id="starPanel" class="star-panel" hidden>
   <div id="starGrid" class="star-grid"></div>
 </div>
+<div id="nameListPanel" class="name-list-panel" hidden>
+  <div id="nameListGrid" class="name-list-grid"></div>
+</div>
 <div id="emojiPicker" class="emoji-picker" hidden></div>
 <div id="speedPanel" class="speed-panel" hidden>
   <div class="row">
-    <span>文字顯示速度</span>
-    <strong id="speedValue">200ms</strong>
+    <span>內容主題</span>
+    <select id="readSetSelect" style="min-width:120px;">
+      <option value="running_facts_ks3">running_facts_ks3</option>
+      <option value="space_ks3">space_ks3</option>
+    </select>
   </div>
-  <input id="speedSlider" type="range" min="30" max="300" step="1" value="200" />
+  <div class="row" style="margin-top:10px;">
+    <span>顯示語言順序</span>
+    <select id="langOrderSelect" style="min-width:120px;">
+      <option value="zh-first">中文先</option>
+      <option value="en-first">English first</option>
+    </select>
+  </div>
+  <div class="row">
+    <span>文字顯示速度</span>
+    <strong id="speedValue">120ms</strong>
+  </div>
+  <input id="speedSlider" type="range" min="30" max="300" step="1" value="120" />
   <div class="row" style="margin-top:10px;">
     <span>每則停留時間</span>
     <strong id="holdValue">15s</strong>
   </div>
   <input id="holdSlider" type="range" min="5" max="20" step="1" value="15" />
-  <div class="hint">按 M 顯示/隱藏（速度 30-300ms，停留 5-20s）</div>
+  <div class="row" style="margin-top:10px;">
+    <span>字元旋轉效果</span>
+    <input id="charRotateToggle" type="checkbox" checked />
+  </div>
+  <div class="row" style="margin-top:10px;">
+    <span>顯示牆上標語</span>
+    <input id="sloganToggle" type="checkbox" checked />
+  </div>
+  <div class="hint">按 M 顯示/隱藏（主題切換、速度 30-300ms、停留 5-20s）</div>
 </div>
 <script src="./dailyread/dailyread.js"></script>
 <script type="importmap">
@@ -261,25 +333,64 @@
     const MAX_TYPE_DELAY_MS = 300;
     const MIN_HOLD_SEC = 5;
     const MAX_HOLD_SEC = 20;
-    let typeDelayMs = 200;
+    let typeDelayMs = 120;
     let holdDurationMs = 15000;
+    let languageOrderMode = "en-first";
+    let enableCharRotate = true;
     const DEFAULT_DAILY_READ_TITLE = "你知道嗎？";
-    const dailyReadEntries = (() => {
+    const DEFAULT_DAILY_READ_TITLE_EN = "Did You Know?";
+    const availableDailyReadSets =
+      window.DAILY_READ_SETS && typeof window.DAILY_READ_SETS === "object"
+        ? window.DAILY_READ_SETS
+        : {};
+
+    function normalizeDailyReadEntries(rawEntries, fallbackTitle, fallbackTitleEn) {
+      return (Array.isArray(rawEntries) ? rawEntries : [])
+        .map((entry) => {
+          if (entry && typeof entry === "object") {
+            return {
+              title: String(entry.title || fallbackTitle).trim() || fallbackTitle,
+              titleEn: String(entry.titleEn || fallbackTitleEn).trim() || fallbackTitleEn,
+              fact: String(entry.fact || "").trim(),
+              factEn: String(entry.factEn || "").trim()
+            };
+          }
+          if (typeof entry === "string") {
+            return {
+              title: fallbackTitle,
+              titleEn: fallbackTitleEn,
+              fact: entry.trim(),
+              factEn: ""
+            };
+          }
+          return null;
+        })
+        .filter((entry) => entry && entry.fact.length > 0);
+    }
+
+    function entriesFromSetKey(setKey) {
+      const set = availableDailyReadSets[setKey];
+      if (set && typeof set === "object") {
+        const fallbackTitle =
+          String(set.title || DEFAULT_DAILY_READ_TITLE).trim() || DEFAULT_DAILY_READ_TITLE;
+        const fallbackTitleEn =
+          String(set.titleEn || DEFAULT_DAILY_READ_TITLE_EN).trim() || DEFAULT_DAILY_READ_TITLE_EN;
+        const sourceEntries = Array.isArray(set.entries)
+          ? set.entries
+          : (Array.isArray(set.facts) ? set.facts : []).map((fact) => ({
+              title: fallbackTitle,
+              titleEn: fallbackTitleEn,
+              fact
+            }));
+        return normalizeDailyReadEntries(sourceEntries, fallbackTitle, fallbackTitleEn);
+      }
+
       if (Array.isArray(window.DAILY_READ_ENTRIES) && window.DAILY_READ_ENTRIES.length) {
-        return window.DAILY_READ_ENTRIES
-          .map((entry) => {
-            if (entry && typeof entry === "object") {
-              return {
-                title: String(entry.title || DEFAULT_DAILY_READ_TITLE).trim() || DEFAULT_DAILY_READ_TITLE,
-                fact: String(entry.fact || "").trim()
-              };
-            }
-            if (typeof entry === "string") {
-              return { title: DEFAULT_DAILY_READ_TITLE, fact: entry.trim() };
-            }
-            return null;
-          })
-          .filter((entry) => entry && entry.fact.length > 0);
+        return normalizeDailyReadEntries(
+          window.DAILY_READ_ENTRIES,
+          DEFAULT_DAILY_READ_TITLE,
+          DEFAULT_DAILY_READ_TITLE_EN
+        );
       }
 
       const fallbackTitle =
@@ -290,8 +401,20 @@
       return fallbackFacts
         .map((fact) => String(fact || "").trim())
         .filter((fact) => fact.length > 0)
-        .map((fact) => ({ title: fallbackTitle, fact }));
-    })();
+        .map((fact) => ({
+          title: fallbackTitle,
+          titleEn: DEFAULT_DAILY_READ_TITLE_EN,
+          fact,
+          factEn: ""
+        }));
+    }
+
+    const defaultDailyReadSetKey =
+      (typeof window.DAILY_READ_ACTIVE_SET === "string" && window.DAILY_READ_ACTIVE_SET) ||
+      Object.keys(availableDailyReadSets)[0] ||
+      "running_facts_ks3";
+    let currentDailyReadSetKey = defaultDailyReadSetKey;
+    let dailyReadEntries = entriesFromSetKey(currentDailyReadSetKey);
 
     function randomBrightColor() {
       return new THREE.Color(Math.random(), Math.random(), Math.random());
@@ -691,7 +814,7 @@
     boardGroup.position.set(0, 3.75, roomMinZ - boardFrameBackLocalZ);
 
     const boardFrame = new THREE.Mesh(
-      new THREE.BoxGeometry(19.4, 4.55, boardFrameDepth),
+      new THREE.BoxGeometry(19.4, 5.45, boardFrameDepth),
       new THREE.MeshLambertMaterial({ color: 0x94a3b8 })
     );
     boardFrame.position.z = -0.04;
@@ -701,9 +824,9 @@
     function createWhiteboardTexture() {
       const canvas = document.createElement("canvas");
       const planeW = 18.9;
-      const planeH = 4.2;
+      const planeH = 5.3;
       const aspect = planeW / planeH;
-      canvas.height = 640;
+      canvas.height = 860;
       canvas.width = Math.round(canvas.height * aspect);
       const ctx = canvas.getContext("2d");
       const tex = new THREE.CanvasTexture(canvas);
@@ -712,15 +835,142 @@
       const state = {
         texture: tex,
         deck: [],
+        history: [],
+        historyCursor: -1,
         currentTitle: DEFAULT_DAILY_READ_TITLE,
+        currentTitleEn: DEFAULT_DAILY_READ_TITLE_EN,
         currentFact: "",
+        currentFactEn: "",
+        shownTitleChars: 0,
+        shownTitleEnChars: 0,
         shownChars: 0,
+        shownCharsEn: 0,
         lastStepAtMs: 0,
+        lastStepAtMsEn: 0,
+        phase: "titleZh",
         holdUntilMs: 0,
         initialized: false
       };
 
-      function draw(fullTitle, fullFact, shownChars = null) {
+      function wrapTextByChars(text, charsPerLine, maxLines) {
+        const lines = [];
+        let i = 0;
+        while (i < text.length && lines.length < maxLines) {
+          const end = Math.min(text.length, i + charsPerLine);
+          lines.push({ text: text.slice(i, end), start: i });
+          i = end;
+        }
+        return lines;
+      }
+
+      function wrapTextByWords(text, charsPerLine, maxLines) {
+        const words = Array.from(text.matchAll(/\S+/g)).map((m) => ({
+          word: m[0],
+          start: m.index || 0
+        }));
+        const lines = [];
+        let line = "";
+        let lineStart = 0;
+        for (const item of words) {
+          const word = item.word;
+          if (!line) {
+            line = word;
+            lineStart = item.start;
+            continue;
+          }
+          if (line.length >= charsPerLine) {
+            lines.push({ text: line, start: lineStart });
+            line = word;
+            lineStart = item.start;
+            if (lines.length >= maxLines) break;
+          } else {
+            line = line ? `${line} ${word}` : word;
+          }
+        }
+        if (line && lines.length < maxLines) {
+          lines.push({ text: line, start: lineStart });
+        }
+        return lines;
+      }
+
+      function hashString(text) {
+        let h = 2166136261 >>> 0;
+        for (let i = 0; i < text.length; i += 1) {
+          h ^= text.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return h >>> 0;
+      }
+
+      function random01FromSeed(seed) {
+        let x = seed >>> 0;
+        x ^= x << 13;
+        x ^= x >>> 17;
+        x ^= x << 5;
+        return (x >>> 0) / 4294967295;
+      }
+
+      function currentFontPx() {
+        const match = String(ctx.font || "").match(/(\d+(?:\.\d+)?)px/);
+        return match ? Number(match[1]) : 48;
+      }
+
+      function drawTextLineWithOptionalRotation(
+        text,
+        x,
+        y,
+        sourceHash,
+        startIndex = 0,
+        options = {}
+      ) {
+        const hueByChar = !!options.hueByChar;
+        if (!enableCharRotate && !hueByChar) {
+          ctx.fillText(text, x, y);
+          return;
+        }
+
+        const fontPx = currentFontPx();
+        const pivotY = fontPx * 0.52;
+        let cursorX = x;
+        for (let i = 0; i < text.length; i += 1) {
+          const ch = text[i];
+          const w = Math.max(1, ctx.measureText(ch).width);
+          if (ch === " ") {
+            cursorX += w;
+            continue;
+          }
+          const absoluteIndex = startIndex + i;
+          const r = random01FromSeed(sourceHash + absoluteIndex * 2654435761);
+          const deg = -4 + r * 8;
+          const rad = (deg * Math.PI) / 180;
+          const baseFill = ctx.fillStyle;
+          if (hueByChar) {
+            const hue = Math.round(r * 360);
+            // Keep saturation/lightness fixed so brightness stays consistent.
+            ctx.fillStyle = `hsla(${hue}, 95%, 30%, 0.92)`;
+          }
+          ctx.save();
+          ctx.translate(cursorX + w / 2, y + pivotY);
+          ctx.rotate(rad);
+          ctx.fillText(ch, -w / 2, -pivotY);
+          ctx.restore();
+          if (hueByChar) {
+            ctx.fillStyle = baseFill;
+          }
+          cursorX += w;
+        }
+      }
+
+      function draw(
+        fullTitle,
+        fullTitleEn,
+        fullFact,
+        fullFactEn,
+        shownTitleChars = null,
+        shownTitleEnChars = null,
+        shownChars = null,
+        shownCharsEn = null
+      ) {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -728,33 +978,131 @@
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
 
-        if (fullFact) {
-          const charsPerLine = 22;
-          const maxLines = 8;
+        if (fullTitle || fullTitleEn || fullFact || fullFactEn) {
+          const charsPerLine = 25;
+          const maxLinesZh = 4;
+          const maxLinesEn = 4;
           const compact = fullFact.replace(/\s+/g, " ").trim();
           const visibleCompact =
             shownChars == null ? compact : compact.slice(0, Math.max(0, shownChars));
           const title = fullTitle || DEFAULT_DAILY_READ_TITLE;
-          const lines = [];
-          let i = 0;
-          while (i < visibleCompact.length && lines.length < maxLines) {
-            let end = Math.min(visibleCompact.length, i + charsPerLine);
-            lines.push(visibleCompact.slice(i, end));
-            i = end;
-          }
-          ctx.fillStyle = "#334155";
-          ctx.font = '800 74px "Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif';
+          const titleEn = String(fullTitleEn || DEFAULT_DAILY_READ_TITLE_EN).trim();
+          const visibleTitle =
+            shownTitleChars == null
+              ? title
+              : title.slice(0, Math.max(0, shownTitleChars));
+          const visibleTitleEn =
+            shownTitleEnChars == null
+              ? titleEn
+              : titleEn.slice(0, Math.max(0, shownTitleEnChars));
+          const zhLines = wrapTextByChars(visibleCompact, charsPerLine, maxLinesZh);
+          const englishCompact = String(fullFactEn || "").replace(/\s+/g, " ").trim();
+          const visibleEnglish =
+            shownCharsEn == null
+              ? englishCompact
+              : englishCompact.slice(0, Math.max(0, shownCharsEn));
+          const enLines = visibleEnglish
+            ? wrapTextByWords(visibleEnglish, 60, maxLinesEn)
+            : [];
+          const titleHash = hashString(`title-zh|${title}`);
+          const titleEnHash = hashString(`title-en|${titleEn}`);
+          const factZhHash = hashString(`fact-zh|${compact}`);
+          const factEnHash = hashString(`fact-en|${englishCompact}`);
           const x = canvas.width * 0.05;
-          const titleY = canvas.height * 0.02;
-          ctx.fillText(title, x, titleY);
+          const titleY = canvas.height * 0.05;
+          if (languageOrderMode === "en-first") {
+            ctx.fillStyle = "hsla(220, 95%, 30%, 0.92)";
+            ctx.font = '600 52px "Noto Serif", "Segoe UI", "Inter", "Arial", serif';
+            if (visibleTitleEn) {
+              drawTextLineWithOptionalRotation(
+                visibleTitleEn,
+                x,
+                titleY,
+                titleEnHash,
+                0,
+                { hueByChar: true }
+              );
+            }
+            ctx.fillStyle = "hsla(220, 95%, 30%, 0.92)";
+            ctx.font = '800 74px "Noto Serif TC", "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Microsoft JhengHei", "PingFang TC", "Segoe UI", serif';
+            if (visibleTitle) {
+              drawTextLineWithOptionalRotation(
+                visibleTitle,
+                x,
+                titleY + 82,
+                titleHash,
+                0,
+                { hueByChar: true }
+              );
+            }
+          } else {
+            ctx.fillStyle = "hsla(220, 95%, 30%, 0.92)";
+            ctx.font = '800 74px "Noto Serif TC", "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Microsoft JhengHei", "PingFang TC", "Segoe UI", serif';
+            if (visibleTitle) {
+              drawTextLineWithOptionalRotation(
+                visibleTitle,
+                x,
+                titleY,
+                titleHash,
+                0,
+                { hueByChar: true }
+              );
+            }
+            ctx.fillStyle = "hsla(220, 95%, 30%, 0.92)";
+            ctx.font = '600 52px "Noto Serif", "Segoe UI", "Inter", "Arial", serif';
+            if (visibleTitleEn) {
+              drawTextLineWithOptionalRotation(
+                visibleTitleEn,
+                x,
+                titleY + 102,
+                titleEnHash,
+                0,
+                { hueByChar: true }
+              );
+            }
+          }
 
-          ctx.font = '600 68px "Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif';
-          const lineH = 74;
-          const bodyStartY = titleY + 80;
+          ctx.fillStyle = "rgba(51, 65, 85, 0.66)";
+          ctx.font = '600 58px "Noto Serif TC", "Microsoft JhengHei", "PingFang TC", "Segoe UI", serif';
+          const lineHZh = 74;
+          const bodyStartY = titleY + 192;
           let y = bodyStartY;
-          for (const line of lines) {
-            ctx.fillText(line, x, y);
-            y += lineH;
+          const maxY = canvas.height - 8;
+          const lineHEn = 64;
+          if (languageOrderMode === "en-first") {
+            if (enLines.length) {
+              ctx.fillStyle = "#475569";
+              ctx.font = '500 48px "Noto Serif", "Segoe UI", "Inter", "Arial", serif';
+              for (const line of enLines) {
+                if (y + lineHEn > maxY) break;
+                drawTextLineWithOptionalRotation(line.text, x, y, factEnHash, line.start);
+                y += lineHEn;
+              }
+              y += 10;
+            }
+            ctx.fillStyle = "rgba(51, 65, 85, 0.66)";
+            ctx.font = '600 58px "Noto Serif TC", "Microsoft JhengHei", "PingFang TC", "Segoe UI", serif';
+            for (const line of zhLines) {
+              if (y + lineHZh > maxY) break;
+              drawTextLineWithOptionalRotation(line.text, x, y, factZhHash, line.start);
+              y += lineHZh;
+            }
+          } else {
+            for (const line of zhLines) {
+              if (y + lineHZh > maxY) break;
+              drawTextLineWithOptionalRotation(line.text, x, y, factZhHash, line.start);
+              y += lineHZh;
+            }
+            if (enLines.length) {
+              y += 10;
+              ctx.fillStyle = "#475569";
+              ctx.font = '500 48px "Noto Serif", "Segoe UI", "Inter", "Arial", serif';
+              for (const line of enLines) {
+                if (y + lineHEn > maxY) break;
+                drawTextLineWithOptionalRotation(line.text, x, y, factEnHash, line.start);
+                y += lineHEn;
+              }
+            }
           }
         }
         tex.needsUpdate = true;
@@ -770,23 +1118,50 @@
         }
       }
 
+      function applyEntryByIndex(idx, nowMs) {
+        const next = dailyReadEntries[idx] || {};
+        state.currentTitle = String(next.title || DEFAULT_DAILY_READ_TITLE);
+        state.currentTitleEn = String(next.titleEn || DEFAULT_DAILY_READ_TITLE_EN);
+        state.currentFact = String(next.fact || "");
+        state.currentFactEn = String(next.factEn || "");
+        state.shownTitleChars = 0;
+        state.shownTitleEnChars = 0;
+        state.shownChars = 0;
+        state.shownCharsEn = 0;
+        state.lastStepAtMs = nowMs;
+        state.lastStepAtMsEn = nowMs;
+        state.phase = languageOrderMode === "en-first" ? "titleEn" : "titleZh";
+        state.holdUntilMs = 0;
+      }
+
+      function pushHistoryIndex(idx) {
+        if (state.historyCursor < state.history.length - 1) {
+          state.history = state.history.slice(0, state.historyCursor + 1);
+        }
+        state.history.push(idx);
+        state.historyCursor = state.history.length - 1;
+      }
+
       function pickNextFact(nowMs) {
         if (!dailyReadEntries.length) {
           state.currentTitle = DEFAULT_DAILY_READ_TITLE;
+          state.currentTitleEn = DEFAULT_DAILY_READ_TITLE_EN;
           state.currentFact = "";
+          state.currentFactEn = "";
+          state.shownTitleChars = 0;
+          state.shownTitleEnChars = 0;
           state.shownChars = 0;
+          state.shownCharsEn = 0;
           state.lastStepAtMs = nowMs;
+          state.lastStepAtMsEn = nowMs;
+          state.phase = "hold";
           state.holdUntilMs = nowMs + holdDurationMs;
           return;
         }
         if (!state.deck.length) refillDeck();
         const idx = state.deck.pop();
-        const next = dailyReadEntries[idx] || {};
-        state.currentTitle = String(next.title || DEFAULT_DAILY_READ_TITLE);
-        state.currentFact = String(next.fact || "");
-        state.shownChars = 0;
-        state.lastStepAtMs = nowMs;
-        state.holdUntilMs = 0;
+        applyEntryByIndex(idx, nowMs);
+        pushHistoryIndex(idx);
       }
 
       state.advance = (elapsedSec) => {
@@ -801,28 +1176,130 @@
           if (nowMs >= state.holdUntilMs) {
             pickNextFact(nowMs);
           }
-        } else if (state.currentFact) {
-          const stepMs = typeDelayMs;
-          if (state.shownChars < state.currentFact.length && nowMs - state.lastStepAtMs >= stepMs) {
-            const steps = Math.floor((nowMs - state.lastStepAtMs) / stepMs);
-            state.shownChars = Math.min(state.currentFact.length, state.shownChars + steps);
-            state.lastStepAtMs += steps * stepMs;
-          }
-          if (state.shownChars >= state.currentFact.length) {
+        } else {
+          const titleText = String(state.currentTitle || "").trim();
+          const titleEnText = String(state.currentTitleEn || "").trim();
+          const factText = String(state.currentFact || "").replace(/\s+/g, " ").trim();
+          const factEnText = String(state.currentFactEn || "").replace(/\s+/g, " ").trim();
+          const stepMsZh = typeDelayMs;
+          const stepMsEn = Math.max(1, Math.round(typeDelayMs / 2));
+
+          if (state.phase === "titleZh") {
+            if (!titleText.length) {
+              state.phase = languageOrderMode === "en-first" ? "factEn" : "titleEn";
+              if (state.phase === "titleEn") state.lastStepAtMsEn = nowMs;
+              if (state.phase === "factEn") state.lastStepAtMsEn = nowMs;
+            } else if (nowMs - state.lastStepAtMs >= stepMsZh) {
+              const steps = Math.floor((nowMs - state.lastStepAtMs) / stepMsZh);
+              state.shownTitleChars = Math.min(titleText.length, state.shownTitleChars + steps);
+              state.lastStepAtMs += steps * stepMsZh;
+              if (state.shownTitleChars >= titleText.length) {
+                state.phase = languageOrderMode === "en-first" ? "factEn" : "titleEn";
+                if (state.phase === "titleEn") state.lastStepAtMsEn = nowMs;
+                if (state.phase === "factEn") state.lastStepAtMsEn = nowMs;
+              }
+            }
+          } else if (state.phase === "titleEn") {
+            if (!titleEnText.length) {
+              state.phase = languageOrderMode === "en-first" ? "titleZh" : "factZh";
+              if (state.phase === "titleZh") state.lastStepAtMs = nowMs;
+              if (state.phase === "factZh") state.lastStepAtMs = nowMs;
+            } else if (nowMs - state.lastStepAtMsEn >= stepMsEn) {
+              const steps = Math.floor((nowMs - state.lastStepAtMsEn) / stepMsEn);
+              state.shownTitleEnChars = Math.min(titleEnText.length, state.shownTitleEnChars + steps);
+              state.lastStepAtMsEn += steps * stepMsEn;
+              if (state.shownTitleEnChars >= titleEnText.length) {
+                state.phase = languageOrderMode === "en-first" ? "titleZh" : "factZh";
+                if (state.phase === "titleZh") state.lastStepAtMs = nowMs;
+                if (state.phase === "factZh") state.lastStepAtMs = nowMs;
+              }
+            }
+          } else if (state.phase === "factZh") {
+            if (!factText.length) {
+              state.phase = languageOrderMode === "en-first" ? "hold" : "factEn";
+              if (state.phase === "factEn") state.lastStepAtMsEn = nowMs;
+              if (state.phase === "hold") state.holdUntilMs = nowMs + holdDurationMs;
+            } else if (nowMs - state.lastStepAtMs >= stepMsZh) {
+              const steps = Math.floor((nowMs - state.lastStepAtMs) / stepMsZh);
+              state.shownChars = Math.min(factText.length, state.shownChars + steps);
+              state.lastStepAtMs += steps * stepMsZh;
+              if (state.shownChars >= factText.length) {
+                state.phase = languageOrderMode === "en-first" ? "hold" : "factEn";
+                if (state.phase === "factEn") state.lastStepAtMsEn = nowMs;
+                if (state.phase === "hold") state.holdUntilMs = nowMs + holdDurationMs;
+              }
+            }
+          } else if (state.phase === "factEn") {
+            if (!factEnText.length) {
+              state.phase = languageOrderMode === "en-first" ? "factZh" : "hold";
+              if (state.phase === "factZh") state.lastStepAtMs = nowMs;
+              if (state.phase === "hold") state.holdUntilMs = nowMs + holdDurationMs;
+            } else if (nowMs - state.lastStepAtMsEn >= stepMsEn) {
+              const steps = Math.floor((nowMs - state.lastStepAtMsEn) / stepMsEn);
+              state.shownCharsEn = Math.min(factEnText.length, state.shownCharsEn + steps);
+              state.lastStepAtMsEn += steps * stepMsEn;
+              if (state.shownCharsEn >= factEnText.length) {
+                state.phase = languageOrderMode === "en-first" ? "factZh" : "hold";
+                if (state.phase === "factZh") state.lastStepAtMs = nowMs;
+                if (state.phase === "hold") state.holdUntilMs = nowMs + holdDurationMs;
+              }
+            }
+          } else if (state.phase === "hold") {
             state.holdUntilMs = nowMs + holdDurationMs;
           }
         }
 
-        draw(state.currentTitle, state.currentFact, state.shownChars);
+        draw(
+          state.currentTitle,
+          state.currentTitleEn,
+          state.currentFact,
+          state.currentFactEn,
+          state.shownTitleChars,
+          state.shownTitleEnChars,
+          state.shownChars,
+          state.shownCharsEn
+        );
       };
 
-      draw(DEFAULT_DAILY_READ_TITLE, "");
+      state.restartNow = (elapsedSec = 0) => {
+        const nowMs = Math.max(0, elapsedSec * 1000);
+        state.initialized = false;
+        state.deck = [];
+        state.history = [];
+        state.historyCursor = -1;
+        state.holdUntilMs = 0;
+        pickNextFact(nowMs);
+        state.initialized = true;
+      };
+
+      state.nextEntry = (elapsedSec = 0) => {
+        const nowMs = Math.max(0, elapsedSec * 1000);
+        if (!dailyReadEntries.length) return;
+        if (state.historyCursor < state.history.length - 1) {
+          state.historyCursor += 1;
+          const idx = state.history[state.historyCursor];
+          applyEntryByIndex(idx, nowMs);
+          return;
+        }
+        pickNextFact(nowMs);
+      };
+
+      state.prevEntry = (elapsedSec = 0) => {
+        const nowMs = Math.max(0, elapsedSec * 1000);
+        if (!dailyReadEntries.length) return;
+        if (state.historyCursor <= 0) return;
+        state.historyCursor -= 1;
+        const idx = state.history[state.historyCursor];
+        applyEntryByIndex(idx, nowMs);
+      };
+
+      draw(DEFAULT_DAILY_READ_TITLE, DEFAULT_DAILY_READ_TITLE_EN, "", "", null, null, null, null);
       return state;
     }
 
     const whiteboardRotator = createWhiteboardTexture();
     const boardSurface = new THREE.Mesh(
-      new THREE.PlaneGeometry(18.9, 4.5),
+      new THREE.PlaneGeometry(18.9, 5.3),
       new THREE.MeshBasicMaterial({ map: whiteboardRotator.texture })
     );
     boardSurface.position.z = 0.03;
@@ -834,15 +1311,31 @@
       canvas.width = 3000;
       canvas.height = 420;
       const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.font = '700 170px "Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif';
-      ctx.fillStyle = "rgba(255,255,255,0.98)";
-      ctx.fillText("靜心悅讀 收起平板 顧及他人 請勿喧嘩", canvas.width / 2, canvas.height / 2);
+
+      function drawWallSlogan() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = '400 166px "Huninn", "DFKai-SB", "標楷體", "BiauKai", serif';
+        ctx.fillStyle = "rgba(255,255,255,0.66)";
+        ctx.fillText("靜心悅讀 收起平板 顧及他人 請勿喧嘩", canvas.width / 2, canvas.height / 2);
+      }
+
+      drawWallSlogan();
       const tex = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.needsUpdate = true;
+
+      if (document.fonts && typeof document.fonts.load === "function") {
+        document.fonts
+          .load('400 160px "Huninn"')
+          .then(() => {
+            drawWallSlogan();
+            tex.needsUpdate = true;
+          })
+          .catch(() => {});
+      }
+
       return tex;
     }
 
@@ -853,7 +1346,7 @@
         transparent: true
       })
     );
-    wallSlogan.position.set(-2.2, 6.45, roomMinZ + 0.03);
+    wallSlogan.position.set(-2.2, 6.9, roomMinZ + 0.03);
     scene.add(wallSlogan);
 
     scene.add(boardGroup);
@@ -996,47 +1489,64 @@
       signCanvas.width = 3200;
       signCanvas.height = 900;
       const sctx = signCanvas.getContext("2d");
-      sctx.fillStyle = "#fffbeb";
-      sctx.fillRect(0, 0, signCanvas.width, signCanvas.height);
-      sctx.strokeStyle = "#a16207";
-      sctx.lineWidth = 10;
-      sctx.strokeRect(6, 6, signCanvas.width - 12, signCanvas.height - 12);
-
       const signLine = "自助借還書";
       const pad = 32;
       const innerW = signCanvas.width - pad * 2;
       const innerH = signCanvas.height - pad * 2;
-      const fontStack = '"Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif';
+      const fontStack = '"Huninn", "Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif';
       sctx.textAlign = "center";
       sctx.textBaseline = "middle";
 
-      function textFits(px) {
-        sctx.font = `bold ${px}px ${fontStack}`;
-        const m = sctx.measureText(signLine);
-        const tw = m.width;
-        const asc = m.actualBoundingBoxAscent ?? px * 0.55;
-        const desc = m.actualBoundingBoxDescent ?? px * 0.45;
-        return tw <= innerW && asc + desc <= innerH;
+      function drawShelfSign() {
+        sctx.clearRect(0, 0, signCanvas.width, signCanvas.height);
+        sctx.fillStyle = "#fffbeb";
+        sctx.fillRect(0, 0, signCanvas.width, signCanvas.height);
+        sctx.strokeStyle = "#a16207";
+        sctx.lineWidth = 10;
+        sctx.strokeRect(6, 6, signCanvas.width - 12, signCanvas.height - 12);
+
+        function textFits(px) {
+          sctx.font = `400 ${px}px ${fontStack}`;
+          const m = sctx.measureText(signLine);
+          const tw = m.width;
+          const asc = m.actualBoundingBoxAscent ?? px * 0.55;
+          const desc = m.actualBoundingBoxDescent ?? px * 0.45;
+          return tw <= innerW && asc + desc <= innerH;
+        }
+
+        let lo = 64;
+        let hi = Math.min(1600, innerH, Math.floor(innerW * 0.35));
+        let fontPx = lo;
+        while (lo <= hi) {
+          const mid = Math.floor((lo + hi) / 2);
+          if (textFits(mid)) {
+            fontPx = mid;
+            lo = mid + 1;
+          } else {
+            hi = mid - 1;
+          }
+        }
+
+        sctx.font = `400 ${fontPx}px ${fontStack}`;
+        sctx.fillStyle = "#422006";
+        sctx.fillText(signLine, signCanvas.width / 2, signCanvas.height / 2);
       }
 
-      let lo = 64;
-      let hi = Math.min(1600, innerH, Math.floor(innerW * 0.35));
-      let fontPx = lo;
-      while (lo <= hi) {
-        const mid = Math.floor((lo + hi) / 2);
-        if (textFits(mid)) {
-          fontPx = mid;
-          lo = mid + 1;
-        } else {
-          hi = mid - 1;
-        }
-      }
-      sctx.font = `bold ${fontPx}px ${fontStack}`;
-      sctx.fillStyle = "#422006";
-      sctx.fillText(signLine, signCanvas.width / 2, signCanvas.height / 2);
+      drawShelfSign();
 
       const signTex = new THREE.CanvasTexture(signCanvas);
       signTex.colorSpace = THREE.SRGBColorSpace;
+      signTex.needsUpdate = true;
+
+      if (document.fonts && typeof document.fonts.load === "function") {
+        document.fonts
+          .load(`400 160px "Huninn"`)
+          .then(() => {
+            drawShelfSign();
+            signTex.needsUpdate = true;
+          })
+          .catch(() => {});
+      }
 
       const sign = new THREE.Mesh(
         new THREE.PlaneGeometry(5.15, 1.45),
@@ -1164,13 +1674,20 @@
     const selectedSlots = [];
     const starPanel = document.getElementById("starPanel");
     const starGrid = document.getElementById("starGrid");
+    const nameListPanel = document.getElementById("nameListPanel");
+    const nameListGrid = document.getElementById("nameListGrid");
     const emojiPicker = document.getElementById("emojiPicker");
     const speedPanel = document.getElementById("speedPanel");
+    const readSetSelect = document.getElementById("readSetSelect");
     const speedSlider = document.getElementById("speedSlider");
     const speedValue = document.getElementById("speedValue");
     const holdSlider = document.getElementById("holdSlider");
     const holdValue = document.getElementById("holdValue");
+    const charRotateToggle = document.getElementById("charRotateToggle");
+    const sloganToggle = document.getElementById("sloganToggle");
+    const langOrderSelect = document.getElementById("langOrderSelect");
     let starPanelVisible = false;
+    let nameListPanelVisible = false;
     let pickerTargetName = "";
 
     function setTypeDelay(ms) {
@@ -1195,9 +1712,66 @@
       }
     }
 
+    function setCharRotateEnabled(enabled) {
+      enableCharRotate = !!enabled;
+      if (charRotateToggle) {
+        charRotateToggle.checked = enableCharRotate;
+      }
+    }
+
+    function setLanguageOrder(mode) {
+      languageOrderMode = mode === "en-first" ? "en-first" : "zh-first";
+      if (langOrderSelect) {
+        langOrderSelect.value = languageOrderMode;
+      }
+      if (whiteboardRotator && typeof whiteboardRotator.restartNow === "function") {
+        whiteboardRotator.restartNow(animClock.elapsedTime);
+      }
+    }
+
+    function setWallSloganVisible(visible) {
+      wallSlogan.visible = !!visible;
+      if (sloganToggle) {
+        sloganToggle.checked = wallSlogan.visible;
+      }
+    }
+
     function toggleSpeedPanel() {
       if (!speedPanel) return;
       speedPanel.hidden = !speedPanel.hidden;
+    }
+
+    function setDailyReadSet(setKey) {
+      const key = (setKey && availableDailyReadSets[setKey]) ? setKey : defaultDailyReadSetKey;
+      currentDailyReadSetKey = key;
+      dailyReadEntries = entriesFromSetKey(key);
+      window.DAILY_READ_ACTIVE_SET = key;
+      if (readSetSelect && readSetSelect.value !== key) {
+        readSetSelect.value = key;
+      }
+      if (whiteboardRotator && typeof whiteboardRotator.restartNow === "function") {
+        whiteboardRotator.restartNow(animClock.elapsedTime);
+      }
+    }
+
+    function setupReadSetSelect() {
+      if (!readSetSelect) return;
+      const keys = Object.keys(availableDailyReadSets);
+      if (!keys.length) {
+        readSetSelect.hidden = true;
+        return;
+      }
+      readSetSelect.replaceChildren();
+      for (const key of keys) {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = key;
+        readSetSelect.appendChild(option);
+      }
+      readSetSelect.addEventListener("change", (event) => {
+        setDailyReadSet(event.target.value);
+      });
+      setDailyReadSet(currentDailyReadSetKey);
     }
 
     if (speedSlider) {
@@ -1210,8 +1784,27 @@
         setHoldSeconds(event.target.value);
       });
     }
+    if (charRotateToggle) {
+      charRotateToggle.addEventListener("change", (event) => {
+        setCharRotateEnabled(event.target.checked);
+      });
+    }
+    if (langOrderSelect) {
+      langOrderSelect.addEventListener("change", (event) => {
+        setLanguageOrder(event.target.value);
+      });
+    }
+    if (sloganToggle) {
+      sloganToggle.addEventListener("change", (event) => {
+        setWallSloganVisible(event.target.checked);
+      });
+    }
+    setupReadSetSelect();
     setTypeDelay(typeDelayMs);
     setHoldSeconds(holdDurationMs / 1000);
+    setCharRotateEnabled(enableCharRotate);
+    setWallSloganVisible(true);
+    setLanguageOrder(languageOrderMode);
 
     function hideEmojiPicker() {
       pickerTargetName = "";
@@ -1335,6 +1928,34 @@
         hideEmojiPicker();
       }
       if (show) renderStarPanel();
+    }
+
+    function renderNameListPanel() {
+      if (!nameListGrid) return;
+      nameListGrid.replaceChildren();
+      for (const name of rosterNames) {
+        const nameEl = document.createElement("span");
+        nameEl.className = "name-list-item";
+        nameEl.textContent = panelDisplayLabel(name);
+        nameEl.title = "Click to choose emoji";
+        nameEl.addEventListener("click", (event) => {
+          event.stopPropagation();
+          showEmojiPicker(name, nameEl);
+        });
+        nameListGrid.appendChild(nameEl);
+      }
+    }
+
+    function setNameListPanelVisible(show) {
+      nameListPanelVisible = show;
+      if (nameListPanel) {
+        nameListPanel.hidden = !show;
+      }
+      if (show) {
+        renderNameListPanel();
+      } else {
+        hideEmojiPicker();
+      }
     }
 
     function syncSlotOccupancyVisual(slot) {
@@ -1523,12 +2144,17 @@
       if (event.key === "t" || event.key === "T") {
         setStarPanelVisible(!starPanelVisible);
       }
+      if (event.key === "Enter") {
+        event.preventDefault();
+        setNameListPanelVisible(!nameListPanelVisible);
+      }
       if (event.key === "r" || event.key === "R") {
         resetSeatsToDefault();
       }
       if (event.key === "Escape") {
         hideEmojiPicker();
         if (speedPanel && !speedPanel.hidden) speedPanel.hidden = true;
+        if (nameListPanelVisible) setNameListPanelVisible(false);
       }
       if (event.key === "m" || event.key === "M") {
         toggleSpeedPanel();
@@ -1536,6 +2162,18 @@
       if (event.code === "Space") {
         event.preventDefault();
         toggleCameraView();
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        if (whiteboardRotator && typeof whiteboardRotator.nextEntry === "function") {
+          whiteboardRotator.nextEntry(animClock.elapsedTime);
+        }
+      }
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        if (whiteboardRotator && typeof whiteboardRotator.prevEntry === "function") {
+          whiteboardRotator.prevEntry(animClock.elapsedTime);
+        }
       }
     });
 

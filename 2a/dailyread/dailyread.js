@@ -1,76 +1,368 @@
-const sportsFacts = [
-  "馬拉松的起源其實是一場美麗的誤會。馬拉松項目源自公元前490年的馬拉松戰役。雅典軍隊擊敗波斯後，士兵菲迪皮德斯從馬拉松跑回雅典報捷，大喊「我們勝利了！」後隨即倒地身亡。然而，歷史學家考證指出，他當時跑的路程約為40公里，而非現今標準的42.195公里。現代馬拉松距離之所以定為42.195公里，是在1908年倫敦奧運會上，為配合英國皇室成員在溫莎城堡觀看比賽而特意延長的。",
-  "古希臘的運動員曾經裸體參加跑步訓練與比賽。在古希臘，裸體運動被視為對神靈的致敬，也是展示人體之美的方式。希臘文中的「健身房」一詞正源於gymnos，意即「裸體」。運動員會在身上塗抹橄欖油，然後用金屬刮刀清除污垢與汗水，這既能減少衣物摩擦與悶熱不適，也被認為是對宙斯等神明的崇敬表現，體現了當時身心靈和諧的競技精神。",
-  "中國古代曾經存在專門的「跑步郵差」。在周朝至清朝的驛站系統中，除了騎馬快遞外，也有徒步傳遞緊急文書的步遞人員。根據《宋史》記載，宋代步遞士兵每日可奔跑約50公里，沿途設有換班點與補給站，腰繫鈴鐺以警示路人讓道。這套人力網絡不僅是古代資訊傳遞的重要力量，也展現了當時對於耐力與效率的高度組織能力。",
-  "維多利亞時代曾掀起「步行狂熱」。十九世紀英美流行職業步行競賽，選手需在室內六天內走完500英里，觀眾買票入場、下注觀賽，熱度堪比今日職業球賽。頂尖選手如愛德華・佩森・威斯頓備受崇拜，他們在鋪著軟墊的室內賽道連續奮戰近一週，睡眠與進食都壓縮到極限，這種賽事後來成為超耐力運動的重要前身。",
-  "女性曾被田徑組織禁止參加長跑。1967年波士頓馬拉松上，凱瑟琳・斯威策以縮寫報名參賽，起跑後不久，主辦方人員試圖強行將她拉出賽道，這張對抗的畫面成為女性運動平權的經典影像。當時的輿論普遍認為女子長跑會損害生育健康，直到1984年女子馬拉松才正式進入奧運，標誌著運動場上的性別偏見逐步被打破。",
-  "史上最長的耐力跑賽之一發生在十九世紀紐約六日賽。選手需在室內連續繞圈六天，睡眠與補給都被壓縮到極限，總距離可達500英里以上。觀眾購票入場，近距離觀察選手因極度疲勞而出現的幻覺、嘔吐與足部潰傷，這類賽事後來被視為現代超級馬拉松的雛形，說明人類對耐力極限有著長期的探索傳統。",
-  "跑步曾是古埃及法老的重要儀式。法老要在特定節慶中奔跑一段固定路線，象徵對疆域的掌控與神授權力。考古浮雕顯示，這不只宗教象徵，也是一種對外展示「統治者依然強健」的政治表演。如果法老無法完成全程，便可能動搖臣民對其統治正當性的信任，可見跑步在當時已具備權力鞏固的功能。",
-  "第一次世界大戰聖誕停火期間，前線士兵不只踢足球，還舉行短跑比賽。1914年平安夜，部分西歐戰場上的英德士兵自發停火，在無人地帶交換食物與香菸，並進行了簡易的短跑競賽。這段戰史常被引用來說明：即使在極端衝突與壕溝僵局下，體育仍可能成為人與人重新建立連結的語言，短暫喚回共同的人性。",
-  "肯亞高地跑者的優勢不只來自基因。研究指出，高海拔生活提升了攜氧能力與紅血球數量，自幼長距離步行與跑步通學也建立了耐力基礎；再加上訓練文化中強調團體節奏跑、低強度恢復與社群支持，才形成穩定且長期的人才輸出。單純歸因於遺傳，往往忽略了社會支持與環境適應的關鍵角色。",
-  "奧運火炬接力看似古老，其現代形式其實在1936年柏林奧運才首次出現。當時納粹政權為宣傳其意識形態，設計了從奧林匹亞傳遞至柏林的儀式。之後國際奧委會沿用並重新詮釋其象徵意義，加入和平、團結與傳承的價值，讓它逐漸脫離原始政治宣傳背景，成為全球共享的儀式，可見同一活動在不同時代可被賦予截然不同的內涵。",
-  "日本驛傳文化重視接力與責任。箱根驛傳每年吸引數百萬觀眾，每位跑者承受的不只是體能壓力，還有「把接力帶交給下一棒」的心理使命感。掉帶、提前起跑或無法完成區段，都可能被視為對全隊的辜負。這種將個人榮辱與集體成敗緊密結合的精神，深刻影響了日本長跑文化，也解釋了為何驛傳在該國擁有超越一般體育賽事的社會地位。",
-  "「四分鐘英里」曾被視為不可能突破的生理屏障。1954年班尼斯特以3分59.4秒完成後，僅僅46天後另一選手也成功突破，此後數年間超過十位跑者接連達標。這顯示心理門檻被打破後，訓練策略與信念會快速提升群體表現，也成為運動心理學中「自我設限」與「信念效應」的經典案例。",
-  "印加帝國的查斯基信使依靠接力奔跑傳遞軍政情報。他們在安地斯山脈的驛站系統中分段接力，據記載甚至能在數日內將鮮魚從沿海送到內陸高地皇宮。這種高效率人力網絡在沒有現代交通、車輪與文字系統的條件下，僅靠記憶與體能便維繫了龐大帝國的訊息流通，展現了驚人的組織能力與社會分工。",
-  "十九世紀的耐力賽常在室內繞圈進行，觀眾可近距離觀察選手疲勞、補給與策略。這類比賽沒有固定距離上限，而是以「誰能堅持最久」或「六日總距離最長」定勝負。它們為現代賽事的補給節奏、配速管理與恢復科學提供了早期經驗，也意外催生了運動營養學的初步探索，例如選手嘗試咖啡因、肉湯與按摩的效果記錄。",
-  "「跑步高潮」在二十世紀末才被科學更完整解釋。長時間有氧運動可促使大腦釋放內啡肽與內源性大麻素，帶來愉悅感、焦慮下降與輕度鎮痛效果。但每個人出現門檻與強度反應並不相同，有些人從未體驗過，有些人在中等強度下便能進入這種狀態。研究也發現，群體跑步時社交互動可能進一步強化此效應。",
-  "南極馬拉松顯示了極端環境對跑步策略的影響。地表摩擦低、氣溫常低於零下20度、強風與補給間隔過長，都與一般道路賽截然不同。參賽者需穿著防寒裝備與雪地專用鞋釘，調整步幅以避免滑倒，同時管理面罩結冰與飲水不凍結問題。完成比賽需要裝備管理、步態調整與心理韌性的綜合能力，也成為極限運動生理學的重要研究場域。",
-  "「喪屍路跑」等趣味賽揭示了情境對運動表現的影響。參賽者需在被裝扮成喪屍的演員追逐下完成賽道，當人感受到後方壓力時，心率與爆發力可能瞬間提升，但也更容易出現前段過快、後段崩潰的配速錯誤。這類賽事間接印證了啟動反射與恐懼對運動輸出的雙面刃效應，同時也提醒跑者：情緒興奮時更需要守住既定節奏。",
-  "跑鞋科技從帆布鞋走到碳板中底，關鍵在於能量回饋與步態穩定。早期帆布跑鞋僅提供極簡防護，1970年代起EVA中底與氣墊陸續出現，近年碳纖維板加上高回彈泡棉則能減少每一步的蹠屈耗能。新材料可改善跑步經濟性約2-4%，但真正成績提升仍需配合訓練量、恢復品質與技術動作，並非單純換鞋便能大幅進步。",
-  "跑道材質也改寫了成績歷史。煤渣跑道時代，路面軟硬不均且雨天易積水，選手更重抓地與穩定，釘鞋長度可達15毫米以上。現代合成跑道（如蒙多跑道）提供一致反彈與排水，使短跑與中距離比賽表現更穩定、極端天氣影響較小，也間接推動了世界紀錄頻繁更迭，從設備面說明了為何不同時代的成績難以直接比較。",
-  "接力賽最容易失誤的不是速度，而是交接節奏。視覺訊號、口令節拍與手部路徑若不一致，再快的個人能力也可能在接棒區流失甚至掉棒。頂尖接力隊透過反覆練習，建立固定的「預備—送出」口號與標誌物啟動點，使交接流程在壓力下依然自動化。這說明團隊運動中的流暢性，往往比單純的個人極速更能決定最終名次。",
-  "4x100公尺接力的棒次安排是一門精密科學。第一棒通常選起跑反應最快、彎道技術穩定的選手，因為起跑與第一個彎道是建立節奏的關鍵。第二棒跑直線距離最長，需要具備絕對速度與維持速度的能力；第三棒是第二個彎道，要求彎道跑技術最好、能在彎道加速的選手；第四棒則交給心理素質最強、衝線能力最佳的選手，因為最後一棒常面臨被追趕或追趕對手的壓力，決勝時刻的心理穩定度往往比純粹的速度更重要。",
-  "4x400公尺接力的棒次策略與短距離截然不同。第一棒需要速度與節奏感兼具的選手，因為要跑完整一圈且沒有領先參考點；第二棒通常是全隊實力最強的一棒，肩負拉開差距或追回劣勢的任務；第三棒常安排戰術執行力高的選手，能在最混亂的中段穩住局面；第四棒則由意志力最堅韌、能在疲勞下維持技術的選手擔任，因為400公尺後的疲勞會嚴重影響跑姿，最後200公尺往往是意志力而非速度的對決。",
-  "接力賽中的接棒區長度僅有20公尺（從預跑標記到接力區末端），選手必須在30公尺的加速區內判斷啟動時機。如果前一棒過早到達，接棒者可能被迫在區外接棒而失格；如果啟動太晚，則可能在區內追不到而損失時間。頂尖隊伍將此誤差控制在0.1秒內，這需要數百次反覆練習建立的肌肉記憶與彼此信任，也解釋了為何更換任何一棒選手都可能需要重新磨合整套節奏。",
-  "人類演化中的長距離奔跑能力，與散熱與步態穩定密切相關。汗腺散熱系統使人類可以在日間持續追逐獵物，足弓結構、跟腱彈性與頸韌帶穩定則提供了高效儲能與頭部減震。這些特徵在其他靈長類中並不完整，顯示耐力跑在狩採生活中扮演了關鍵角色，也是為何現代人類能在高溫下進行長時間中等強度移動的核心原因。",
-  "與多數哺乳動物相比，人類在短距離爆發並不佔優，但在長時間中等強度移動上具有優勢。例如羚羊或兔子可輕易衝刺脫逃，但數公里後便需停下來散熱；人類則透過持續追蹤迫使獵物過熱衰竭。這也是為何耐力賽事更能體現人類的節奏控制與意志力，而非單純仰賴肌力或瞬發力。",
-  "獵豹速度極快卻只能短時間維持，體溫急升後必須停止；狼與馬則具備較好耐力。不同動物的肌纖維比例（快縮 vs. 慢縮）與散熱系統（汗腺、喘氣方式）差異，正好對應短跑與耐力跑的生理分工概念。人類雖然絕對速度遠遜於獵豹，但在夏季午後的持續移動能力上反而能勝過許多更大型的哺乳類。",
-  "乳酸不是單純「疲勞廢物」，它也是可再利用的能量中介。高強度跑步時乳酸堆積反映代謝壓力，但部分乳酸可經由血液運送至肝臟與心臟轉換為能量。透過間歇訓練可提升身體對乳酸的清除與再利用效率，這也是為何頂尖選手在高輸出下仍能維持穩定配速，而不是被「乳酸閾值」硬性限制。",
-  "VO2max 代表最大攝氧能力，但比賽成績還受跑步經濟性與乳酸閾值影響。許多頂尖選手並非VO2max最高的運動員，卻能在高強度下維持更久，關鍵在於單位耗氧產生的速度與較高的乳酸清除效率。因此訓練除了提升攝氧峰值，更應重視長時間維持次高強度的能力，這也是中長跑訓練週期中的核心原則。",
-  "步頻與步幅沒有絕對標準，最佳組合取決於身高、肌力與速度目標。常見建議步頻落在每分鐘170-190之間，但個別差異很大。訓練中常透過節拍器提示改善步頻，減少過大步幅帶來的煞車效應與衝擊負荷。關鍵不是追求某個固定數字，而是找到個人落地輕盈、重心穩定且髖關節伸展完整的經濟組合。",
-  "穿戴裝置可追蹤心率、步頻、觸地時間與垂直振幅，讓跑者用數據調整訓練強度。重點不是追求「漂亮數字」，而是看長期趨勢與疲勞反應。例如垂直振幅過高（超過8-10公分）可能代表核心穩定不足，觸地時間過長則暗示發力效率下降。但這些指標應結合主觀疲勞感受，避免陷入僅以數據好壞論斷訓練成效的盲區。",
-  "GPS手錶在高樓林立地區可能出現飄移，導致配速判斷誤差。常見情況是即時配速忽快忽慢，影響節奏穩定。高階訓練常結合跑道計時、功率計或心率區間，避免單一數據來源誤導。有些跑者會關閉即時配速，改以每公里分段檢視，減少數字波動造成的心理干擾。",
-  "碳板跑鞋可提升推進效率，但也可能改變小腿與足底受力分配。剛性碳板與高回彈中底會減少腳踝蹠屈的需求，使負荷轉移至膝關節與髖屈肌。使用新鞋應循序適應，先從短距離或節奏跑開始，避免在高里程週突然更換造成過度使用傷害，例如脛後肌肌腱炎或足底筋膜不適。",
-  "跑前動態暖身比靜態拉筋更能提升神經活化與關節活動。靜態拉筋反而可能暫時降低肌肉爆發力。短跑前常加入高抬腿、後踢腿與加速跑，讓身體逐步進入比賽節奏。一般長跑者也可進行馬克操或開合跳等動作，提升核心溫度與本體感覺，降低起跑後肌肉拉傷的風險。",
-  "跑後恢復包含補水、醣原補充與低強度放鬆。研究顯示，運動後30至60分鐘內補充碳水與蛋白質（如3:1至4:1比例），可更有效支持肌肉修復與肝醣再合成。同時進行5-10分鐘極慢跑或步行，有助清除代謝廢物、逐步降低心率，避免突然靜止造成血液滯留與頭暈。",
-  "睡眠是最被低估的訓練增益。深層睡眠期間，生長激素分泌有助組織修復與免疫調節；長期睡眠不足（少於6小時）會降低反應速度、增加主觀疲勞並提升受傷風險。許多頂尖耐力選手將每日8-10小時睡眠視為週期計畫的核心環節，其重要性不亞於里程與強度安排。",
-  "青少年運動員的訓練重點應是動作質量與規律習慣，不宜只追求高強度。過早專項化（如全年僅練中長跑）可能提高過度使用傷害機率，並削弱長期運動動機。專家建議青少年時期應接觸多種運動，建立多元動作庫與協調能力，專項高強度訓練最好延至16歲後逐漸加重，以確保持續發展與降低早退率。",
-  "比賽焦慮會影響呼吸節奏與肌肉張力，進而干擾配速。透過可重複的賽前流程，如固定熱身順序、口令與呼吸節拍（例如四步吸、兩步吐），可有效穩定心理狀態。認知重構技巧（將心跳加速解讀為「準備就緒」而非「緊張」）也被證實能降低焦慮對表現的負面影響。",
-  "接力隊的默契可透過固定口令和視覺標記建立。例如接棒區前設置標誌點，待前一棒到達時接棒者才起跑。當交接流程足夠自動化，選手在壓力情境下也更能維持穩定表現，減少因回頭、猶豫或過早啟動造成的違規與時間損失。",
-  "鞋底抓地紋路會影響彎道穩定與濕地表現。運動會遇到雨後場地時，鞋款與釘長選擇往往直接影響起跑與轉彎安全。短跑釘鞋常採用較尖的針釘以切入跑道，長跑釘鞋則多用餅乾釘或較短齒紋。一般路跑鞋的橡膠分佈與溝槽設計，也會大幅改變濕滑路面的信任感與落腳信心。",
-  "運動科技中的影像分析可拆解跑姿細節。透過側面與後方慢動作錄影，教練能逐一檢視骨盆穩定、足部落點與擺臂角度，從「感覺」走向可驗證的技術修正。例如過度跨步往往伴隨明顯的煞車波與垂直振幅增加，調整後可降低膝關節衝擊並提升經濟性。",
-  "群體競賽中的社會促進效應會提升輸出。身旁有人並肩或追趕時，跑者通常比單獨訓練更快，這與競爭激發、分散疲勞知覺有關。但也更需要配速紀律，否則容易被拉高至超出體能區間，導致後半段嚴重掉速。成熟跑者會選擇實力相近的集團，並守住預定配速而非盲目跟隨。",
-  "歷史上許多校運會口號都圍繞紀律、尊重與合作。體育課的真正價值不只在名次或獎牌，而是把規則意識、勝不驕敗不餒與團隊責任帶回日常生活。從接力賽中的信任、長跑中的堅持到裁判判決的服從，這些經驗比單一項目的成績更能長久影響人格發展。",
-  "現代恢復科技如冷熱交替、壓縮裝備與心率變異監測，可幫助掌握疲勞狀態。冷熱交替浴（如冷水10-15°C搭配溫水）能降低發炎反應，壓縮腿套則可促進靜脈回流。但最核心仍是訓練負荷管理與穩定作息，再先進的設備也無法取代合理訓練週期與充足的睡眠恢復。",
-  "從生物力學角度看，落地時膝踝協調吸收衝擊可降低受傷風險。強化臀肌與核心（如橋式、鳥狗式、棒式）往往比單純增加跑量更能提升穩定性。常見的跑步相關傷害（髕骨股骨疼痛、脛骨內側壓力症候群）多與骨盆控制不足或髖外展肌無力有關，因此輔助肌力訓練應被視為耐力跑者的必要環節，而非可有可無的附加選項。"
+const sportsKs3Entries = [
+  {
+    title: "熱身能讓表現更穩定",
+    titleEn: "Warm-Ups Help Performance Stay Stable",
+    fact: "運動前做動態熱身，例如高抬腿、開合跳和短距離加速，可以提升肌肉溫度與神經反應。這不只讓起跑更順，也能降低拉傷風險。",
+    factEn: "A dynamic warm-up before sport, such as high knees, jumping jacks, and short accelerations, raises muscle temperature and reaction readiness. It improves movement quality and helps reduce strain injuries."
+  },
+  {
+    title: "接力最快不只靠跑得快",
+    titleEn: "Relay Speed Is Not Only About Sprinting Fast",
+    fact: "接力常輸在交棒節奏，而不只是個人速度。只要口令、起跑點和手部位置不一致，就容易浪費時間。穩定交棒往往比單棒爆發更重要。",
+    factEn: "Relays are often lost through poor baton exchange rather than individual speed. If calls, take-off marks, and hand position are inconsistent, time is lost quickly. Smooth exchanges usually matter more than one fast runner."
+  },
+  {
+    title: "跑步步頻比步幅更容易調整",
+    titleEn: "Cadence Is Easier to Adjust Than Stride Length",
+    fact: "很多初學者會使用過大的步幅，導致落地時阻力感變強。先微調步頻，讓步伐更輕更連續，通常能提升效率，也較不容易讓膝蓋過度受力。",
+    factEn: "Many beginners overstride, which increases braking on each landing. Slightly increasing cadence often makes running lighter and smoother, improving efficiency and reducing excessive knee loading."
+  },
+  {
+    title: "運動後30分鐘是補給黃金期",
+    titleEn: "The First 30 Minutes After Exercise Are Key for Refuelling",
+    fact: "運動後盡快補水，並補充碳水與蛋白質，有助肌肉修復和能量回補。若長時間不補給，恢復速度通常會變慢。",
+    factEn: "Rehydrating soon after exercise and taking in carbohydrates plus protein supports muscle repair and energy recovery. If refuelling is delayed for too long, recovery is usually slower."
+  },
+  {
+    title: "睡眠是訓練的一部分",
+    titleEn: "Sleep Is Part of Training",
+    fact: "睡眠不足會影響反應、專注和情緒，也會提高受傷風險。規律睡眠能幫助身體完成修復，其重要性不亞於一次高品質訓練。",
+    factEn: "Lack of sleep affects reaction time, focus, and mood, and can increase injury risk. Consistent sleep helps the body complete repair and adaptation, and is as important as a quality training session."
+  },
+  {
+    title: "喝水太晚會影響表現",
+    titleEn: "Hydrating Too Late Can Hurt Performance",
+    fact: "等到口渴才喝水通常已經偏脫水。運動前先補充少量水分、運動中分次喝，能讓體溫調節和耐力表現更穩定。",
+    factEn: "If you wait until you feel thirsty, mild dehydration may already have started. Taking small amounts before and during exercise helps temperature control and keeps endurance steadier."
+  },
+  {
+    title: "比賽緊張是正常生理反應",
+    titleEn: "Pre-Race Nerves Are a Normal Body Response",
+    fact: "心跳變快不一定是壞事，代表身體正在準備輸出。若用固定呼吸節奏和熱身流程，通常能把緊張轉成專注。",
+    factEn: "A faster heartbeat before a race is not always bad; it often means the body is preparing to perform. A consistent breathing rhythm and warm-up routine can turn nerves into focus."
+  },
+  {
+    title: "短跑與長跑用力方式不同",
+    titleEn: "Sprinting and Distance Running Use Different Effort Patterns",
+    fact: "短跑重視爆發與加速，長跑重視節奏與配速。若把短跑節奏套用在長跑，前段可能很快，但後段容易明顯掉速。",
+    factEn: "Sprinting depends on explosive acceleration, while distance running depends on rhythm and pacing. If sprint effort is used in a longer race, the start may be fast but the finish often fades."
+  },
+  {
+    title: "運動科技能幫你看懂疲勞",
+    titleEn: "Sports Tech Can Help You Read Fatigue",
+    fact: "手錶與感測器可記錄心率、步頻與配速趨勢。重點不是追漂亮數字，而是看自己在不同訓練日是否恢復足夠、節奏是否穩定。",
+    factEn: "Watches and sensors can track trends in heart rate, cadence, and pace. The goal is not pretty numbers, but understanding whether recovery is enough and whether your rhythm stays stable across sessions."
+  },
+  {
+    title: "團隊默契可以被訓練",
+    titleEn: "Team Chemistry Can Be Trained",
+    fact: "像接力或球類防守，很多成功來自固定口令與反覆演練。當流程練成習慣後，在壓力情境下失誤通常會明顯減少。",
+    factEn: "In relays and team defence, success often comes from clear calls and repeated rehearsal. When key actions become automatic, mistakes under pressure drop noticeably."
+  },
+  {
+    title: "鞋子要配合項目和場地",
+    titleEn: "Shoes Should Match the Event and Surface",
+    fact: "短跑、長跑和雨天場地需求不同。選鞋時除了舒適，也要考慮抓地與穩定，避免在轉彎或起跑時打滑。",
+    factEn: "Sprinting, distance running, and wet surfaces all require different shoe characteristics. Beyond comfort, traction and stability are crucial for safer starts and turns."
+  },
+  {
+    title: "核心肌群影響跑姿穩定",
+    titleEn: "Core Muscles Affect Running Stability",
+    fact: "核心與臀部力量不足時，跑步容易左右晃動，效率下降。加入橋式、平板撐等基礎訓練，能改善姿勢控制與落地穩定。",
+    factEn: "When core and glute strength are weak, running often becomes less stable and less efficient. Basic exercises like bridges and planks can improve posture control and landing stability."
+  },
+  {
+    title: "規律訓練比偶爾衝刺更有效",
+    titleEn: "Regular Training Beats Occasional Hard Effort",
+    fact: "一次過高強度訓練，不如每週穩定練習。固定頻率能讓身體逐步適應，降低受傷機率，也更容易看見持續進步。",
+    factEn: "One very hard session is usually less useful than regular weekly training. Consistency allows gradual adaptation, lowers injury risk, and makes long-term progress easier to see."
+  },
+  {
+    title: "公平競賽也是運動能力",
+    titleEn: "Fair Play Is Also a Sporting Skill",
+    fact: "尊重裁判、遵守規則、勝不驕敗不餒，都是運動教育的重要部分。真正的強者不只比成績，也比態度與責任感。",
+    factEn: "Respecting officials, following rules, and handling wins and losses well are core parts of sport education. Strong athletes are judged not only by results, but also by attitude and responsibility."
+  },
+  {
+    title: "每個人進步節奏都不同",
+    titleEn: "Everyone Improves at a Different Pace",
+    fact: "有些人先快後慢，有些人後來追上。把焦點放在自己的配速、技巧和恢復，比只和別人比較更能累積真正實力。",
+    factEn: "Some students improve early, while others catch up later. Focusing on your own pacing, technique, and recovery usually builds stronger long-term ability than constant comparison with others."
+  }
+];
+
+const spaceKs3Entries = [
+  {
+    title: "太空不是完全沒有重力",
+    titleEn: "Space Is Not Completely Free of Gravity",
+    fact: "國際太空站上的太空人看起來像在「無重力」中漂浮，其實他們仍受到地球重力作用，只是太空站與太空人一起持續自由落體，所以才會出現失重感。這也是為什麼物體在艙內會漂浮，而不是因為重力真的消失。",
+    factEn: "Astronauts on the International Space Station seem weightless, but Earth's gravity is still acting on them. The station and crew are in continuous free fall together, which creates microgravity. Objects float because everything is falling at the same rate, not because gravity has vanished."
+  },
+  {
+    title: "一天不一定是24小時",
+    titleEn: "A Day Is Not Always 24 Hours",
+    fact: "地球自轉一圈大約24小時，所以我們習慣一天是24小時；但在金星，一天（自轉週期）比一年（公轉週期）還長。這提醒我們，時間單位在不同天體上會有很大差異，天文中的「一天」其實是相對概念。",
+    factEn: "On Earth, one rotation takes about 24 hours, so our day is 24 hours long. On Venus, however, one day (its rotation period) is longer than one year (its orbit around the Sun). This shows that a 'day' depends on the planet, not a universal clock."
+  },
+  {
+    title: "太空中的聲音傳不遠",
+    titleEn: "Sound Does Not Travel Far in Space",
+    fact: "聲音需要介質（例如空氣）才能傳播，而外太空幾乎是真空，因此太空船外即使發生爆炸，外部也不會像電影那樣有巨大聲響。太空人主要靠無線電通訊，將聲波先轉換成電磁訊號再傳送。",
+    factEn: "Sound needs a medium, such as air, to travel. Space is close to a vacuum, so explosions outside a spacecraft would not boom like in films. Astronauts communicate mainly by radio, which converts sound into electromagnetic signals."
+  },
+  {
+    title: "北極星不是最亮的星",
+    titleEn: "Polaris Is Not the Brightest Star",
+    fact: "很多人以為北極星最亮，但它只是剛好位於地球自轉軸延伸方向附近，能幫助辨認方位。夜空中最亮的恆星其實是天狼星。這也說明天文觀測時，「亮度」與「定位用途」是不同概念。",
+    factEn: "Many people think Polaris is the brightest star, but it is mainly useful because it sits near Earth's rotational axis and helps with direction finding. The brightest star in the night sky is Sirius. Brightness and navigational value are different ideas."
+  },
+  {
+    title: "看到星星就是看到過去",
+    titleEn: "Seeing Stars Means Seeing the Past",
+    fact: "光從遙遠星體傳到地球需要時間，所以我們看見的其實是它「以前」發出的光。太陽光到地球約8分鐘，表示我們看到的是8分鐘前的太陽；更遠的恆星可能是幾十甚至幾千年前的樣子。",
+    factEn: "Light takes time to travel, so when we look at stars we are seeing the past. Sunlight reaches Earth in about eight minutes, meaning we see the Sun as it was eight minutes ago. For distant stars, the light can be decades, centuries, or more old."
+  },
+  {
+    title: "月球總是同一面朝向地球",
+    titleEn: "The Moon Always Shows the Same Side to Earth",
+    fact: "月球自轉一圈所需時間與它繞地球公轉一圈幾乎相同，稱為潮汐鎖定，因此我們在地球上長期看到的是同一面。月球並不是不自轉，而是自轉速度剛好與公轉速度同步。",
+    factEn: "The Moon's rotation period is almost the same as its orbital period around Earth. This tidal locking means we usually see the same lunar face. The Moon is rotating, but at a rate that matches its orbit."
+  },
+  {
+    title: "火星上的日子比地球稍長",
+    titleEn: "A Day on Mars Is Slightly Longer Than on Earth",
+    fact: "火星一天約24小時39分鐘，與地球很接近，所以探測任務常用「火星日（sol）」來安排工作與休息。雖然只多約39分鐘，但長期累積會讓作息逐漸與地球時鐘錯開。",
+    factEn: "A Martian day is about 24 hours and 39 minutes, close to Earth's day length. That is why missions often plan work in Martian sols. Even a small difference of 39 minutes can shift schedules significantly over time."
+  },
+  {
+    title: "木星是太陽系的防護盾之一",
+    titleEn: "Jupiter Is One of the Solar System's Shields",
+    fact: "木星質量巨大，強重力會改變部分彗星與小行星軌道，讓一些天體偏離原本可能接近內太陽系的路徑。雖然不能完全阻擋撞擊風險，但木星在太陽系動力學中確實扮演重要緩衝角色。",
+    factEn: "Jupiter's huge mass gives it strong gravity, which can alter the paths of some comets and asteroids. This may deflect certain objects away from the inner Solar System. It does not remove all impact risk, but it is an important gravitational buffer."
+  },
+  {
+    title: "土星不是唯一有環的行星",
+    titleEn: "Saturn Is Not the Only Planet with Rings",
+    fact: "除了土星，木星、天王星和海王星也都有行星環，只是較暗、較薄，不像土星那麼明顯。土星環主要由冰粒與岩石碎片組成，大小從微小顆粒到大型塊體都有。",
+    factEn: "Saturn is not the only planet with rings. Jupiter, Uranus, and Neptune also have ring systems, but they are dimmer and thinner. Saturn's rings are mostly made of ice and rocky debris, ranging from tiny grains to larger chunks."
+  },
+  {
+    title: "黑洞不是宇宙吸塵器",
+    titleEn: "Black Holes Are Not Cosmic Vacuum Cleaners",
+    fact: "黑洞只有在非常接近時才會強烈影響物體；如果把太陽瞬間換成同質量黑洞，地球在遠距離上仍會沿相近軌道運行。黑洞可怕之處在於事件視界內連光都無法逃離，而不是會無限遠地「吸走一切」。",
+    factEn: "Black holes strongly affect objects only when they are very close. If the Sun were replaced by a black hole of the same mass, Earth would still orbit at roughly the same distance. Their key feature is that light cannot escape inside the event horizon."
+  },
+  {
+    title: "我們真的拍到黑洞影像",
+    titleEn: "We Have Really Captured a Black Hole Image",
+    fact: "2019年事件視界望遠鏡公布了黑洞影像，畫面中的亮環其實是黑洞附近高溫物質發出的輻射，中央暗區是黑洞陰影。這是多地望遠鏡聯合觀測與資料合成的成果，也是天文合作的里程碑。",
+    factEn: "In 2019, the Event Horizon Telescope released the first black hole image. The bright ring is radiation from superheated material around the black hole, while the dark centre is its shadow. It was achieved through global telescope coordination and data synthesis."
+  },
+  {
+    title: "宇宙中可能有很多「地球大小」行星",
+    titleEn: "There May Be Many Earth-Sized Planets",
+    fact: "天文學家已發現數千顆系外行星，其中不少大小接近地球，部分位於母恆星的宜居帶。是否真的適合生命，還要看大氣、磁場與水循環等條件，大小相似不代表環境相同。",
+    factEn: "Astronomers have found thousands of exoplanets, including many that are close to Earth in size. Some are in the habitable zone of their stars. However, potential habitability also depends on atmosphere, magnetic protection, and water cycles, not size alone."
+  },
+  {
+    title: "太陽也會有天氣",
+    titleEn: "The Sun Has Weather Too",
+    fact: "太陽表面會出現太陽黑子、耀斑與日冕物質拋射，這些活動會影響地球附近太空環境，可能造成衛星通訊干擾或極光增強。這類研究稱為太空天氣，對現代科技社會非常重要。",
+    factEn: "The Sun has its own weather, including sunspots, flares, and coronal mass ejections. These events can disturb near-Earth space, affecting satellites and communications while strengthening auroras. Studying space weather is vital for modern technology-dependent societies."
+  },
+  {
+    title: "衛星定位要靠相對論修正",
+    titleEn: "Satellite Positioning Depends on Relativistic Corrections",
+    fact: "GPS 衛星上的時鐘與地面時鐘流逝速率略有差異，若不進行相對論修正，定位誤差每天會累積到很大。也就是說，你手機導航能準確運作，背後其實包含愛因斯坦理論的實際應用。",
+    factEn: "GPS satellite clocks tick at slightly different rates from clocks on Earth. Without relativistic corrections, position errors would grow quickly each day. In other words, everyday phone navigation works accurately because Einstein's physics is built into the system."
+  },
+  {
+    title: "太空探索也要重視垃圾問題",
+    titleEn: "Space Exploration Must Tackle Space Debris",
+    fact: "地球軌道上有大量退役衛星與碎片，這些太空垃圾高速移動，可能撞擊運作中的太空器。各國正研究主動清除與減量設計，例如可控脫軌、可回收結構與防碰撞追蹤系統。",
+    factEn: "Earth orbit contains many retired satellites and fragments moving at very high speed. This space debris can damage operational spacecraft. Agencies are developing mitigation methods, including controlled de-orbiting, recoverable designs, and better collision tracking."
+  }
+];
+
+const earthScienceKs3Entries = [
+  {
+    title: "天氣和氣候不是同一件事",
+    titleEn: "Weather and Climate Are Not the Same Thing",
+    fact: "天氣是短時間的狀態，例如今天下雨或明天放晴；氣候是長時間平均的趨勢，例如某地區通常冬天較冷、夏天較熱。理解兩者差別，有助我們正確閱讀新聞中的極端天氣與氣候變遷議題。",
+    factEn: "Weather describes short-term conditions, such as rain today or sunshine tomorrow, while climate describes long-term patterns over many years. Knowing the difference helps students interpret extreme weather reports and climate-change discussions more accurately."
+  },
+  {
+    title: "樹木年輪像地球的時間檔案",
+    titleEn: "Tree Rings Work Like a Time Archive",
+    fact: "樹木每年生長會留下年輪，寬窄差異可反映當年水分和溫度條件。科學家能利用年輪重建過去環境變化，了解某些地區曾經歷過的乾旱或濕潤時期，這是自然界保存歷史的一種方式。",
+    factEn: "Trees form annual rings as they grow, and ring width can reflect rainfall and temperature conditions in that year. Scientists use these patterns to reconstruct past environments, including dry and wet periods, giving us a natural record of environmental history."
+  },
+  {
+    title: "地震波能幫我們看見地球內部",
+    titleEn: "Seismic Waves Help Us See Inside Earth",
+    fact: "地球內部無法直接開挖到很深，但地震發生時產生的波在不同物質中速度會改變。透過分析這些波的到達時間，科學家能推測地殼、地函與地核的結構，就像替地球做超音波檢查。",
+    factEn: "We cannot dig directly into Earth's deep interior, but seismic waves from earthquakes travel at different speeds through different materials. By analysing arrival times, scientists infer the structure of the crust, mantle, and core, rather like giving Earth an ultrasound scan."
+  },
+  {
+    title: "火山土壤常常特別肥沃",
+    titleEn: "Volcanic Soils Are Often Very Fertile",
+    fact: "火山噴發看起來破壞力很大，但火山灰與岩石風化後會釋放多種礦物質，長期可形成肥沃土壤。因此不少火山周邊地區後來成為重要農業地帶，呈現自然災害與生態恢復的雙面性。",
+    factEn: "Volcanic eruptions can be destructive, yet weathered ash and rock release minerals that can create fertile soils over time. This is why some volcanic regions later become productive farming areas, showing both the risk and recovery sides of natural processes."
+  },
+  {
+    title: "河流會一直改變路線",
+    titleEn: "Rivers Keep Changing Their Routes",
+    fact: "河道不是固定不變的直線，水流會侵蝕外彎、堆積內彎，久了就可能形成新的曲流形狀。若再遇到洪水，河流甚至可能切出更短路徑。這些變化會影響農地、聚落和生態棲地分布。",
+    factEn: "River channels are not fixed straight lines. Flow erodes outer bends and deposits material on inner bends, gradually reshaping meanders. During floods, rivers may even cut new shorter paths, which can affect farmland, settlements, and habitats."
+  },
+  {
+    title: "冰川其實會「流動」",
+    titleEn: "Glaciers Actually Flow",
+    fact: "冰川看起來像靜止的大冰塊，但在重力作用下會非常緩慢地移動，並在地表留下刮痕與堆積地形。科學家透過冰川移動速度和厚度變化，能評估區域氣候是否正在變暖。",
+    factEn: "A glacier may look like a static block of ice, but it moves slowly under gravity and leaves scratches and deposits on the landscape. By tracking glacier speed and thickness, scientists can assess whether regional climate is warming."
+  },
+  {
+    title: "珊瑚礁是海洋的高生物多樣性區",
+    titleEn: "Coral Reefs Are Biodiversity Hotspots",
+    fact: "珊瑚礁雖只占海洋面積的一小部分，卻提供大量生物棲息與覓食空間，被稱為海洋雨林。水溫過高或污染增加都可能造成白化，保護珊瑚不只是保護景觀，也是維持食物網穩定。",
+    factEn: "Coral reefs cover a small part of the ocean but support rich habitats and feeding grounds, so they are often called the rainforests of the sea. Heat stress and pollution can cause bleaching, making reef protection crucial for stable marine food webs."
+  },
+  {
+    title: "土壤裡住著看不見的工程師",
+    titleEn: "Invisible Engineers Live in Soil",
+    fact: "土壤不只是泥土，裡面有細菌、真菌和小型生物分解落葉與有機物，讓養分回到生態系。若土壤長期被壓實或過度污染，這些微生物活動會下降，土地生產力也可能跟著下滑。",
+    factEn: "Soil is not just dirt. It contains bacteria, fungi, and tiny organisms that break down organic matter and recycle nutrients. If soil is compacted or polluted for long periods, these microbial processes weaken and land productivity may decline."
+  },
+  {
+    title: "城市也會有自己的小氣候",
+    titleEn: "Cities Can Create Their Own Microclimates",
+    fact: "柏油路面和高樓容易吸熱並在夜間慢慢釋放，形成都市熱島效應，使市區溫度常高於郊區。增加樹蔭、透水鋪面與通風走廊，是城市設計中常見的降溫策略。",
+    factEn: "Road surfaces and dense buildings absorb heat and release it slowly at night, creating an urban heat-island effect. This often makes cities warmer than nearby rural areas. More shade, permeable surfaces, and ventilation corridors are common cooling strategies."
+  },
+  {
+    title: "地下水不是取之不盡",
+    titleEn: "Groundwater Is Not Unlimited",
+    fact: "地下水的補注速度通常比大量抽取慢，若長期超抽，可能導致地層下陷與水質惡化。建立節水習慣、回收再利用與合理用水規畫，都是讓水資源更永續的重要方法。",
+    factEn: "Groundwater usually recharges more slowly than heavy pumping rates. Long-term overuse can lead to land subsidence and poorer water quality. Efficient use, recycling, and sensible planning are essential for sustainable water management."
+  },
+  {
+    title: "沙塵可以跨洲旅行",
+    titleEn: "Dust Can Travel Across Continents",
+    fact: "強風可把乾燥地區的細小塵粒帶到很遠的地方，甚至跨越海洋。這些沙塵有時會影響空氣品質，但也可能把礦物養分帶到其他地區，顯示地球系統之間其實高度連結。",
+    factEn: "Strong winds can carry fine dust from dry regions over very long distances, even across oceans. Dust can reduce air quality, but it can also deliver mineral nutrients elsewhere, showing how tightly connected Earth's systems are."
+  },
+  {
+    title: "自然觀測是長期累積的科學",
+    titleEn: "Environmental Science Depends on Long-Term Observation",
+    fact: "單一天的數據往往不足以判斷趨勢，科學家需要多年連續觀測溫度、降雨、海平面與生態指標，才能看見真正變化。耐心蒐集資料與正確比較，是科學推論最重要的基礎之一。",
+    factEn: "One day of data is rarely enough to identify trends. Scientists need long records of temperature, rainfall, sea level, and ecological indicators to detect real change. Careful data collection and fair comparison are core parts of scientific reasoning."
+  }
+];
+
+const inventionsKs3Entries = [
+  {
+    title: "全球資訊網讓網路真正走進日常（1990s）",
+    titleEn: "The World Wide Web Brought the Internet to Everyday Life (1990s)",
+    fact: "1990年代全球資訊網與瀏覽器普及後，網路從研究單位工具變成一般人可使用的平台。學校、家庭和圖書館開始透過網站找資料、讀新聞與交流，資訊取得速度大幅提升，也改變了學習與媒體使用習慣。",
+    factEn: "In the 1990s, the World Wide Web and web browsers moved the internet from research institutions into everyday life. Schools, homes, and libraries began using websites for information, news, and communication, transforming how people learn and access media."
+  },
+  {
+    title: "GPS民用普及改變導航方式（1990s-2000s）",
+    titleEn: "Civilian GPS Changed How We Navigate (1990s-2000s)",
+    fact: "當衛星定位逐漸普及到民用裝置後，地圖不再只是紙本查詢工具，而是可即時規劃路線的數位服務。交通、物流、救援與戶外教育都因此受益，也讓位置資訊成為現代應用程式的重要基礎。",
+    factEn: "As satellite positioning became widely available for civilian use, maps evolved from paper references into real-time routing tools. Transport, logistics, emergency response, and outdoor learning all benefited, and location data became a core part of modern apps."
+  },
+  {
+    title: "鋰電池商用化開啟行動裝置時代（1991起）",
+    titleEn: "Lithium-Ion Batteries Enabled the Mobile Device Era (from 1991)",
+    fact: "鋰離子電池在1990年代初商用後，因能量密度高與可重複充電，快速成為手機、筆電與後來電動車的重要核心。電池技術進步不只影響電子產品，也和能源轉型、交通減碳密切相關。",
+    factEn: "After commercialisation in the early 1990s, lithium-ion batteries became central to phones, laptops, and later electric vehicles due to high energy density and rechargeability. Battery progress shapes not only electronics, but also energy transition and low-carbon transport."
+  },
+  {
+    title: "人類基因組草圖加速精準醫學（2000s）",
+    titleEn: "The Human Genome Draft Accelerated Precision Medicine (2000s)",
+    fact: "人類基因組計畫在2000年代初完成關鍵里程碑，讓科學家更快理解疾病與基因之間的關係。後續基因定序成本下降，使醫療研究能更重視個體差異，推動更精準的診斷與治療策略。",
+    factEn: "Key milestones in the Human Genome Project in the early 2000s gave scientists a stronger map of how genes relate to disease. As sequencing costs fell, research increasingly supported personalised diagnosis and treatment strategies."
+  },
+  {
+    title: "智慧型手機把多種工具合一（2007起）",
+    titleEn: "Smartphones Combined Many Tools into One (from 2007)",
+    fact: "智慧型手機把相機、地圖、通訊、學習平台與支付功能整合到一台裝置，改變了日常行為和資訊習慣。它不只是新硬體，也帶動應用程式生態，影響教育、商業、交通與社交方式。",
+    factEn: "Smartphones combined cameras, maps, communication, learning platforms, and payments in one device, reshaping daily behaviour and information habits. This was not only a hardware shift; it also created app ecosystems that transformed education, commerce, mobility, and social life."
+  },
+  {
+    title: "CRISPR基因編輯開啟新研究方法（2012起）",
+    titleEn: "CRISPR Opened New Paths in Gene Editing (from 2012)",
+    fact: "CRISPR技術讓科學家能更精準地修改DNA片段，研究速度比過去更快，也降低了部分實驗門檻。它被用於疾病機制研究與作物改良，但同時也引發倫理、風險管理與法規討論，提醒我們科技進步需要負責任地使用。",
+    factEn: "CRISPR allowed scientists to edit DNA more precisely, speeding up biological research and reducing some technical barriers. It supports disease studies and crop improvement, but also raises ethical, safety, and regulatory questions about responsible use."
+  },
+  {
+    title: "3D列印讓原型製作更快速（2010s）",
+    titleEn: "3D Printing Made Prototyping Faster (2010s)",
+    fact: "3D列印在2010年代更廣泛進入教育與產業，讓設計者能快速把數位模型做成實體原型。學生可用它理解工程設計流程，企業則能縮短測試周期。它展示了從想法到實物之間可以更快迭代。",
+    factEn: "In the 2010s, 3D printing became more common in education and industry, allowing digital designs to become physical prototypes quickly. Students can learn design cycles more clearly, while companies reduce testing time through faster iteration."
+  },
+  {
+    title: "可重複使用火箭降低太空成本（2015起）",
+    titleEn: "Reusable Rockets Helped Reduce Spaceflight Costs (from 2015)",
+    fact: "可重複使用火箭回收成功後，太空任務的成本與發射頻率出現明顯改變。雖然仍然昂貴，但回收技術讓衛星部署、科學任務與太空產業更具可持續性，也推動新一波工程創新。",
+    factEn: "Successful reusable rocket landings changed launch frequency and cost structures in spaceflight. Missions are still expensive, but recovery technology has improved sustainability and expanded opportunities for satellites, science missions, and new engineering development."
+  },
+  {
+    title: "mRNA疫苗平台快速應對疫情（2020s）",
+    titleEn: "mRNA Vaccine Platforms Responded Rapidly to Pandemics (2020s)",
+    fact: "mRNA疫苗技術在2020年代的大規模應用，顯示平台式生醫研發可在短時間內完成設計與生產流程。這不代表所有問題都被解決，但它提供了更快的公共衛生應變工具，也推動後續疫苗研究。",
+    factEn: "Large-scale use of mRNA vaccines in the 2020s showed how platform-based biomedical development can accelerate design and production. It did not solve every challenge, but it provided faster public-health response tools and advanced future vaccine research."
+  },
+  {
+    title: "生成式AI改變學習與創作方式（2022起）",
+    titleEn: "Generative AI Changed How People Learn and Create (from 2022)",
+    fact: "生成式AI工具在2022年後快速普及，能協助整理重點、產生草稿與提供多角度解釋。對學生來說，重點是把AI當作學習助手而非答案機器，並培養查證、批判思考與原創表達能力。",
+    factEn: "Since 2022, generative AI tools have spread quickly, helping users summarise, draft, and explore ideas from different angles. For students, the key is to use AI as a learning assistant, not an answer machine, while strengthening verification, critical thinking, and original expression."
+  },
+  {
+    title: "太陽能與儲能成本下降推動能源轉型（2010s-2025）",
+    titleEn: "Falling Solar and Storage Costs Accelerated Energy Transition (2010s-2025)",
+    fact: "2010年代到2025年間，太陽能模組與電池儲能成本持續下降，使更多學校、社區與城市能導入再生能源方案。技術進步加上政策設計，讓減碳不再只是口號，而是逐步落實在電力系統中的選項。",
+    factEn: "From the 2010s to 2025, the cost of solar modules and battery storage continued to fall, enabling wider adoption in schools, communities, and cities. Combined with policy support, these advances have turned decarbonisation from a slogan into practical power-system choices."
+  }
 ];
 
 // Add more themes later under DAILY_READ_SETS (e.g. science, history, nature).
 window.DAILY_READ_SETS = {
-  sports: {
-    entries: sportsFacts.map((fact) => ({
-      title: "你知道嗎？",
-      fact
-    }))
+  running_facts_ks3: {
+    entries: sportsKs3Entries
+  },
+  space_ks3: {
+    entries: spaceKs3Entries
+  },
+  earth_science_ks3: {
+    entries: earthScienceKs3Entries
+  },
+  inventions_ks3: {
+    entries: inventionsKs3Entries
   }
 };
 
 // Change this key to switch theme.
-window.DAILY_READ_ACTIVE_SET = "sports";
+window.DAILY_READ_ACTIVE_SET = "space_ks3";
 
 // Build active entries + keep compatibility globals.
 (() => {
-  const fallbackTitle = "你知道嗎？";
+  const fallbackTitle = "每日閱讀";
+  const fallbackTitleEn = "Did You Know?";
   const fallbackSet = { title: fallbackTitle, facts: [], entries: [] };
   const sets = window.DAILY_READ_SETS || {};
-  const key = window.DAILY_READ_ACTIVE_SET || "sports";
+  const key = window.DAILY_READ_ACTIVE_SET || "running_facts_ks3";
   const activeSet = sets[key] || fallbackSet;
   const fallbackEntryTitle = String(activeSet.title || fallbackTitle).trim() || fallbackTitle;
+  const fallbackEntryTitleEn = String(activeSet.titleEn || fallbackTitleEn).trim() || fallbackTitleEn;
 
   const rawEntries = Array.isArray(activeSet.entries)
     ? activeSet.entries
     : (Array.isArray(activeSet.facts) ? activeSet.facts : []).map((fact) => ({
         title: fallbackEntryTitle,
+        titleEn: fallbackEntryTitleEn,
         fact
       }));
 
@@ -78,11 +370,15 @@ window.DAILY_READ_ACTIVE_SET = "sports";
     .map((entry) => {
       if (entry && typeof entry === "object") {
         const title = String(entry.title || fallbackEntryTitle).trim() || fallbackEntryTitle;
+        const titleEn = String(entry.titleEn || fallbackEntryTitleEn).trim() || fallbackEntryTitleEn;
         const fact = String(entry.fact || "").trim();
-        return fact ? { title, fact } : null;
+        const factEn = String(entry.factEn || "").trim();
+        return fact ? { title, titleEn, fact, factEn } : null;
       }
       const fact = String(entry || "").trim();
-      return fact ? { title: fallbackEntryTitle, fact } : null;
+      return fact
+        ? { title: fallbackEntryTitle, titleEn: fallbackEntryTitleEn, fact, factEn: "" }
+        : null;
     })
     .filter(Boolean);
 
