@@ -182,7 +182,7 @@
       position: fixed;
       top: 12px;
       right: 12px;
-      z-index: 45;
+      z-index: 70;
       min-width: 260px;
       padding: 10px 12px;
       border-radius: 10px;
@@ -216,6 +216,119 @@
       width: 100%;
     }
 
+    .mc-popup {
+      position: fixed;
+      inset: 0;
+      z-index: 55;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      overflow: hidden;
+      background: rgba(2, 6, 23, 0.94);
+      color: #f1f5f9;
+      pointer-events: auto;
+    }
+
+    .mc-popup[hidden] {
+      display: none;
+    }
+
+    .mc-popup__bar {
+      flex-shrink: 0;
+      width: 100%;
+      height: 3px;
+      background: rgba(148, 163, 184, 0.22);
+    }
+
+    .mc-popup__bar-fill {
+      display: block;
+      height: 100%;
+      width: 100%;
+      background: #fbbf24;
+      transform-origin: left center;
+      transition: width 0.12s linear;
+    }
+
+    .mc-popup--reveal .mc-popup__bar-fill {
+      background: #86efac;
+    }
+
+    .mc-popup__main {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.35rem;
+      width: min(56rem, 96vw);
+      margin: 0 auto;
+      min-height: 0;
+      padding: 0.5rem 1rem 0.65rem;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .mc-popup__q-zh {
+      margin: 0;
+      font-size: clamp(1.65rem, 4.8vw, 2.4rem);
+      font-weight: 700;
+      line-height: 1.22;
+    }
+
+    .mc-popup__q-en {
+      margin: 0 0 0.2rem;
+      font-size: clamp(0.9rem, 2.1vw, 1.05rem);
+      line-height: 1.25;
+      color: #94a3b8;
+    }
+
+    .mc-choices {
+      display: grid;
+      gap: 0.32rem;
+      margin-top: 0.15rem;
+    }
+
+    .mc-choice {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.42rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      background: rgba(30, 41, 59, 0.65);
+      color: #f8fafc;
+      font: inherit;
+      font-size: clamp(1.12rem, 3.1vw, 1.55rem);
+      font-weight: 550;
+      line-height: 1.28;
+      cursor: default;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .mc-choice__en {
+      display: block;
+      margin-top: 0.08rem;
+      font-size: 0.68em;
+      font-weight: 400;
+      line-height: 1.2;
+      color: #94a3b8;
+    }
+
+    .mc-choice--correct {
+      border: 2px solid #86efac;
+      background: rgba(30, 41, 59, 0.65);
+      color: #e2e8f0;
+      box-shadow: 0 0 0 1px rgba(134, 239, 172, 0.35);
+    }
+
+    .mc-choice--correct .mc-choice__en {
+      color: #94a3b8;
+    }
+
   </style>
 </head>
 <body>
@@ -229,10 +342,7 @@
 <div id="speedPanel" class="speed-panel" hidden>
   <div class="row">
     <span>內容主題</span>
-    <select id="readSetSelect" style="min-width:120px;">
-      <option value="running_facts_ks3">running_facts_ks3</option>
-      <option value="space_ks3">space_ks3</option>
-    </select>
+    <select id="readSetSelect" style="min-width:120px;"></select>
   </div>
   <div class="row" style="margin-top:10px;">
     <span>顯示語言順序</span>
@@ -247,10 +357,10 @@
   </div>
   <input id="speedSlider" type="range" min="30" max="300" step="1" value="120" />
   <div class="row" style="margin-top:10px;">
-    <span>每則停留時間</span>
-    <strong id="holdValue">15s</strong>
+    <span>解說閱讀時間</span>
+    <strong id="holdValue">10s</strong>
   </div>
-  <input id="holdSlider" type="range" min="5" max="20" step="1" value="15" />
+  <input id="holdSlider" type="range" min="5" max="60" step="1" value="10" />
   <div class="row" style="margin-top:10px;">
     <span>字元旋轉效果</span>
     <input id="charRotateToggle" type="checkbox" checked />
@@ -263,7 +373,15 @@
     <span>顯示牆上標語</span>
     <input id="sloganToggle" type="checkbox" checked />
   </div>
-  <div class="hint">按 M 顯示/隱藏（主題切換、速度 30-300ms、停留 5-20s）</div>
+  <div class="hint">按 M。理解題 15s → 答案 5s → 板書解說（5–60s，預設 10s）</div>
+</div>
+<div id="mcPopup" class="mc-popup" hidden>
+  <div class="mc-popup__bar" aria-hidden="true"><span id="mcCountdownBar" class="mc-popup__bar-fill"></span></div>
+  <div class="mc-popup__main">
+    <p id="mcQuestionZh" class="mc-popup__q-zh"></p>
+    <p id="mcQuestionEn" class="mc-popup__q-en"></p>
+    <div id="mcChoices" class="mc-choices"></div>
+  </div>
 </div>
 <script src="./dailyread/dailyread.js"></script>
 <script type="importmap">
@@ -336,9 +454,11 @@
     const MIN_TYPE_DELAY_MS = 30;
     const MAX_TYPE_DELAY_MS = 300;
     const MIN_HOLD_SEC = 5;
-    const MAX_HOLD_SEC = 20;
+    const MAX_HOLD_SEC = 60;
+    const MC_QUIZ_MS = 15000;
+    const MC_REVEAL_MS = 5000;
     let typeDelayMs = 120;
-    let holdDurationMs = 15000;
+    let holdDurationMs = 10000;
     let languageOrderMode = "en-first";
     let enableCharRotate = true;
     let enableRotateAnimation = true;
@@ -356,8 +476,13 @@
             return {
               title: String(entry.title || fallbackTitle).trim() || fallbackTitle,
               titleEn: String(entry.titleEn || fallbackTitleEn).trim() || fallbackTitleEn,
-              fact: String(entry.fact || "").trim(),
-              factEn: String(entry.factEn || "").trim()
+              answer: String(entry.answer || "").trim(),
+              answerEn: String(entry.answerEn || "").trim(),
+              explain: String(entry.explain || entry.fact || "").trim(),
+              explainEn: String(entry.explainEn || entry.factEn || "").trim(),
+              fact: String(entry.explain || entry.fact || "").trim(),
+              factEn: String(entry.explainEn || entry.factEn || "").trim(),
+              mc: entry.mc && typeof entry.mc === "object" ? entry.mc : null
             };
           }
           if (typeof entry === "string") {
@@ -370,7 +495,7 @@
           }
           return null;
         })
-        .filter((entry) => entry && entry.fact.length > 0);
+        .filter((entry) => entry && (entry.explain || entry.fact).length > 0);
     }
 
     function entriesFromSetKey(setKey) {
@@ -417,9 +542,23 @@
     const defaultDailyReadSetKey =
       (typeof window.DAILY_READ_ACTIVE_SET === "string" && window.DAILY_READ_ACTIVE_SET) ||
       Object.keys(availableDailyReadSets)[0] ||
-      "running_facts_ks3";
+      "living_f2";
     let currentDailyReadSetKey = defaultDailyReadSetKey;
-    let dailyReadEntries = entriesFromSetKey(currentDailyReadSetKey);
+
+    function enrichDailyReadEntries(entries) {
+      let list = Array.isArray(entries) ? entries : [];
+      if (typeof window.prepareDailyReadEntriesForReading === "function") {
+        list = window.prepareDailyReadEntriesForReading(list);
+      } else if (typeof window.standardizeDailyReadEntriesForReading === "function") {
+        list = window.standardizeDailyReadEntriesForReading(list);
+      }
+      if (typeof window.enrichDailyReadEntriesWithMc === "function") {
+        list = window.enrichDailyReadEntriesWithMc(list);
+      }
+      return list;
+    }
+
+    let dailyReadEntries = enrichDailyReadEntries(entriesFromSetKey(currentDailyReadSetKey));
 
     function randomBrightColor() {
       return new THREE.Color(Math.random(), Math.random(), Math.random());
@@ -852,9 +991,69 @@
         shownCharsEn: 0,
         lastStepAtMs: 0,
         lastStepAtMsEn: 0,
-        phase: "titleZh",
-        holdUntilMs: 0,
+        phase: "mcQuiz",
+        segmentUntilMs: 0,
+        currentEntryIndex: -1,
         initialized: false
+      };
+
+      const startMcQuiz = (nowMs) => {
+        const titleText = String(state.currentTitle || "").trim();
+        const titleEnText = String(state.currentTitleEn || "").trim();
+        state.phase = "mcQuiz";
+        state.segmentUntilMs = nowMs + MC_QUIZ_MS;
+        state.shownTitleChars = titleText.length;
+        state.shownTitleEnChars = titleEnText.length;
+        state.shownChars = 0;
+        state.shownCharsEn = 0;
+      };
+
+      const startExplainDwell = (nowMs) => {
+        const factText = String(state.currentFact || "").replace(/\s+/g, " ").trim();
+        const factEnText = String(state.currentFactEn || "").replace(/\s+/g, " ").trim();
+        state.phase = "explainDwell";
+        state.segmentUntilMs = nowMs + holdDurationMs;
+        state.shownChars = factText.length;
+        state.shownCharsEn = factEnText.length;
+      };
+
+      const advancePhase = (nowMs) => {
+        const titleText = String(state.currentTitle || "").trim();
+        const titleEnText = String(state.currentTitleEn || "").trim();
+        const factText = String(state.currentFact || "").replace(/\s+/g, " ").trim();
+        const factEnText = String(state.currentFactEn || "").replace(/\s+/g, " ").trim();
+
+        if (state.phase === "mcQuiz") {
+          state.phase = "mcReveal";
+          state.segmentUntilMs = nowMs + MC_REVEAL_MS;
+          return;
+        }
+        if (state.phase === "mcReveal") {
+          state.segmentUntilMs = 0;
+          state.shownTitleChars = titleText.length;
+          state.shownTitleEnChars = titleEnText.length;
+          if (!factText.length && !factEnText.length) {
+            startExplainDwell(nowMs);
+            return;
+          }
+          state.phase = languageOrderMode === "en-first" ? "factEn" : "factZh";
+          state.shownChars = 0;
+          state.shownCharsEn = 0;
+          state.lastStepAtMs = nowMs;
+          state.lastStepAtMsEn = nowMs;
+          if (state.phase === "factEn" && !factEnText.length) {
+            state.phase = "factZh";
+            state.lastStepAtMs = nowMs;
+          }
+          if (state.phase === "factZh" && !factText.length) {
+            state.phase = "factEn";
+            state.lastStepAtMsEn = nowMs;
+          }
+          return;
+        }
+        if (state.phase === "explainDwell") {
+          pickNextFact(nowMs);
+        }
       };
 
       function wrapTextByChars(text, charsPerLine, maxLines) {
@@ -980,7 +1179,8 @@
         shownTitleChars = null,
         shownTitleEnChars = null,
         shownChars = null,
-        shownCharsEn = null
+        shownCharsEn = null,
+        showFactBody = true
       ) {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1080,7 +1280,7 @@
           let y = bodyStartY;
           const maxY = canvas.height - 8;
           const lineHEn = 64;
-          if (languageOrderMode === "en-first") {
+          if (showFactBody && languageOrderMode === "en-first") {
             if (enLines.length) {
               ctx.fillStyle = "#475569";
               ctx.font = '500 48px "Noto Serif", "Segoe UI", "Inter", "Arial", serif';
@@ -1112,7 +1312,7 @@
               );
               y += lineHZh;
             }
-          } else {
+          } else if (showFactBody) {
             for (const line of zhLines) {
               if (y + lineHZh > maxY) break;
               drawTextLineWithOptionalRotation(
@@ -1159,18 +1359,18 @@
 
       function applyEntryByIndex(idx, nowMs) {
         const next = dailyReadEntries[idx] || {};
+        state.currentEntryIndex = idx;
         state.currentTitle = String(next.title || DEFAULT_DAILY_READ_TITLE);
         state.currentTitleEn = String(next.titleEn || DEFAULT_DAILY_READ_TITLE_EN);
-        state.currentFact = String(next.fact || "");
-        state.currentFactEn = String(next.factEn || "");
+        state.currentFact = String(next.explain || next.fact || "");
+        state.currentFactEn = String(next.explainEn || next.factEn || "");
         state.shownTitleChars = 0;
         state.shownTitleEnChars = 0;
         state.shownChars = 0;
         state.shownCharsEn = 0;
         state.lastStepAtMs = nowMs;
         state.lastStepAtMsEn = nowMs;
-        state.phase = languageOrderMode === "en-first" ? "titleEn" : "titleZh";
-        state.holdUntilMs = 0;
+        startMcQuiz(nowMs);
       }
 
       function pushHistoryIndex(idx) {
@@ -1193,8 +1393,7 @@
           state.shownCharsEn = 0;
           state.lastStepAtMs = nowMs;
           state.lastStepAtMsEn = nowMs;
-          state.phase = "hold";
-          state.holdUntilMs = nowMs + holdDurationMs;
+          startMcQuiz(nowMs);
           return;
         }
         if (!state.deck.length) refillDeck();
@@ -1211,11 +1410,14 @@
           state.initialized = true;
         }
 
-        if (state.holdUntilMs > 0) {
-          if (nowMs >= state.holdUntilMs) {
-            pickNextFact(nowMs);
-          }
-        } else {
+        if (state.segmentUntilMs > 0 && nowMs >= state.segmentUntilMs) {
+          advancePhase(nowMs);
+        } else if (
+          state.phase === "titleZh" ||
+          state.phase === "titleEn" ||
+          state.phase === "factZh" ||
+          state.phase === "factEn"
+        ) {
           const titleText = String(state.currentTitle || "").trim();
           const titleEnText = String(state.currentTitleEn || "").trim();
           const factText = String(state.currentFact || "").replace(/\s+/g, " ").trim();
@@ -1225,6 +1427,10 @@
 
           if (state.phase === "titleZh") {
             if (!titleText.length) {
+              state.phase = languageOrderMode === "en-first" ? "factEn" : "titleEn";
+              if (state.phase === "titleEn") state.lastStepAtMsEn = nowMs;
+              if (state.phase === "factEn") state.lastStepAtMsEn = nowMs;
+            } else if (state.shownTitleChars >= titleText.length) {
               state.phase = languageOrderMode === "en-first" ? "factEn" : "titleEn";
               if (state.phase === "titleEn") state.lastStepAtMsEn = nowMs;
               if (state.phase === "factEn") state.lastStepAtMsEn = nowMs;
@@ -1243,6 +1449,10 @@
               state.phase = languageOrderMode === "en-first" ? "titleZh" : "factZh";
               if (state.phase === "titleZh") state.lastStepAtMs = nowMs;
               if (state.phase === "factZh") state.lastStepAtMs = nowMs;
+            } else if (state.shownTitleEnChars >= titleEnText.length) {
+              state.phase = languageOrderMode === "en-first" ? "titleZh" : "factZh";
+              if (state.phase === "titleZh") state.lastStepAtMs = nowMs;
+              if (state.phase === "factZh") state.lastStepAtMs = nowMs;
             } else if (nowMs - state.lastStepAtMsEn >= stepMsEn) {
               const steps = Math.floor((nowMs - state.lastStepAtMsEn) / stepMsEn);
               state.shownTitleEnChars = Math.min(titleEnText.length, state.shownTitleEnChars + steps);
@@ -1255,38 +1465,41 @@
             }
           } else if (state.phase === "factZh") {
             if (!factText.length) {
-              state.phase = languageOrderMode === "en-first" ? "hold" : "factEn";
+              state.phase = languageOrderMode === "en-first" ? "explainDwell" : "factEn";
               if (state.phase === "factEn") state.lastStepAtMsEn = nowMs;
-              if (state.phase === "hold") state.holdUntilMs = nowMs + holdDurationMs;
+              if (state.phase === "explainDwell") startExplainDwell(nowMs);
             } else if (nowMs - state.lastStepAtMs >= stepMsZh) {
               const steps = Math.floor((nowMs - state.lastStepAtMs) / stepMsZh);
               state.shownChars = Math.min(factText.length, state.shownChars + steps);
               state.lastStepAtMs += steps * stepMsZh;
               if (state.shownChars >= factText.length) {
-                state.phase = languageOrderMode === "en-first" ? "hold" : "factEn";
+                state.phase = languageOrderMode === "en-first" ? "explainDwell" : "factEn";
                 if (state.phase === "factEn") state.lastStepAtMsEn = nowMs;
-                if (state.phase === "hold") state.holdUntilMs = nowMs + holdDurationMs;
+                if (state.phase === "explainDwell") startExplainDwell(nowMs);
               }
             }
           } else if (state.phase === "factEn") {
             if (!factEnText.length) {
-              state.phase = languageOrderMode === "en-first" ? "factZh" : "hold";
+              state.phase = languageOrderMode === "en-first" ? "factZh" : "explainDwell";
               if (state.phase === "factZh") state.lastStepAtMs = nowMs;
-              if (state.phase === "hold") state.holdUntilMs = nowMs + holdDurationMs;
+              if (state.phase === "explainDwell") startExplainDwell(nowMs);
             } else if (nowMs - state.lastStepAtMsEn >= stepMsEn) {
               const steps = Math.floor((nowMs - state.lastStepAtMsEn) / stepMsEn);
               state.shownCharsEn = Math.min(factEnText.length, state.shownCharsEn + steps);
               state.lastStepAtMsEn += steps * stepMsEn;
               if (state.shownCharsEn >= factEnText.length) {
-                state.phase = languageOrderMode === "en-first" ? "factZh" : "hold";
+                state.phase = languageOrderMode === "en-first" ? "factZh" : "explainDwell";
                 if (state.phase === "factZh") state.lastStepAtMs = nowMs;
-                if (state.phase === "hold") state.holdUntilMs = nowMs + holdDurationMs;
+                if (state.phase === "explainDwell") startExplainDwell(nowMs);
               }
             }
-          } else if (state.phase === "hold") {
-            state.holdUntilMs = nowMs + holdDurationMs;
           }
         }
+
+        const showFactBody =
+          state.phase === "factZh" ||
+          state.phase === "factEn" ||
+          state.phase === "explainDwell";
 
         draw(
           state.currentTitle,
@@ -1296,7 +1509,8 @@
           state.shownTitleChars,
           state.shownTitleEnChars,
           state.shownChars,
-          state.shownCharsEn
+          state.shownCharsEn,
+          showFactBody
         );
       };
 
@@ -1306,7 +1520,7 @@
         state.deck = [];
         state.history = [];
         state.historyCursor = -1;
-        state.holdUntilMs = 0;
+        state.segmentUntilMs = 0;
         pickNextFact(nowMs);
         state.initialized = true;
       };
@@ -1332,11 +1546,83 @@
         applyEntryByIndex(idx, nowMs);
       };
 
+      state.getFlowState = () => ({
+        phase: state.phase,
+        segmentUntilMs: state.segmentUntilMs,
+        entryIndex: state.currentEntryIndex,
+        inMcPopup: state.phase === "mcQuiz" || state.phase === "mcReveal"
+      });
+
       draw(DEFAULT_DAILY_READ_TITLE, DEFAULT_DAILY_READ_TITLE_EN, "", "", null, null, null, null);
       return state;
     }
 
     const whiteboardRotator = createWhiteboardTexture();
+    const mcPopup = document.getElementById("mcPopup");
+    const mcQuestionZh = document.getElementById("mcQuestionZh");
+    const mcQuestionEn = document.getElementById("mcQuestionEn");
+    const mcChoices = document.getElementById("mcChoices");
+    const mcCountdownBar = document.getElementById("mcCountdownBar");
+    let mcRenderedEntryIndex = -1;
+
+    function updateMcPopup(elapsed) {
+      if (!mcPopup || !whiteboardRotator?.getFlowState) {
+        if (mcPopup) mcPopup.hidden = true;
+        return;
+      }
+
+      const nowMs = elapsed * 1000;
+      const flow = whiteboardRotator.getFlowState();
+      if (!flow.inMcPopup || flow.entryIndex < 0) {
+        mcPopup.hidden = true;
+        mcRenderedEntryIndex = -1;
+        return;
+      }
+
+      const entry = dailyReadEntries[flow.entryIndex];
+      const mc = entry?.mc;
+      if (!mc || !Array.isArray(mc.choices) || !mc.choices.length) {
+        mcPopup.hidden = true;
+        return;
+      }
+
+      mcPopup.hidden = false;
+      const reveal = flow.phase === "mcReveal";
+      mcPopup.classList.toggle("mc-popup--reveal", reveal);
+
+      if (mcRenderedEntryIndex !== flow.entryIndex) {
+        mcRenderedEntryIndex = flow.entryIndex;
+        if (mcQuestionZh) mcQuestionZh.textContent = mc.question || "";
+        if (mcQuestionEn) mcQuestionEn.textContent = mc.questionEn || "";
+        if (mcChoices) {
+          mcChoices.replaceChildren();
+          mc.choices.forEach((choice, choiceIndex) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "mc-choice";
+            btn.dataset.index = String(choiceIndex);
+            const zh = document.createElement("span");
+            zh.textContent = choice.zh || "";
+            const en = document.createElement("span");
+            en.className = "mc-choice__en";
+            en.textContent = choice.en || "";
+            btn.append(zh, en);
+            mcChoices.appendChild(btn);
+          });
+        }
+      }
+
+      const segmentMs = reveal ? MC_REVEAL_MS : MC_QUIZ_MS;
+      const remainingMs = Math.max(0, flow.segmentUntilMs - nowMs);
+      const pct = segmentMs > 0 ? (remainingMs / segmentMs) * 100 : 0;
+      if (mcCountdownBar) mcCountdownBar.style.width = `${pct}%`;
+
+      const buttons = mcChoices ? mcChoices.querySelectorAll(".mc-choice") : [];
+      buttons.forEach((btn, choiceIndex) => {
+        btn.classList.toggle("mc-choice--correct", reveal && choiceIndex === mc.correctIndex);
+      });
+    }
+
     const boardSurface = new THREE.Mesh(
       new THREE.PlaneGeometry(18.9, 5.3),
       new THREE.MeshBasicMaterial({ map: whiteboardRotator.texture })
@@ -1742,7 +2028,7 @@
     }
 
     function setHoldSeconds(sec) {
-      const n = Math.max(MIN_HOLD_SEC, Math.min(MAX_HOLD_SEC, Math.round(Number(sec) || 15)));
+      const n = Math.max(MIN_HOLD_SEC, Math.min(MAX_HOLD_SEC, Math.round(Number(sec) || 10)));
       holdDurationMs = n * 1000;
       if (holdSlider && Number(holdSlider.value) !== n) {
         holdSlider.value = String(n);
@@ -1791,7 +2077,7 @@
     function setDailyReadSet(setKey) {
       const key = (setKey && availableDailyReadSets[setKey]) ? setKey : defaultDailyReadSetKey;
       currentDailyReadSetKey = key;
-      dailyReadEntries = entriesFromSetKey(key);
+      dailyReadEntries = enrichDailyReadEntries(entriesFromSetKey(key));
       window.DAILY_READ_ACTIVE_SET = key;
       if (readSetSelect && readSetSelect.value !== key) {
         readSetSelect.value = key;
@@ -1811,8 +2097,10 @@
       readSetSelect.replaceChildren();
       for (const key of keys) {
         const option = document.createElement("option");
+        const set = availableDailyReadSets[key];
         option.value = key;
-        option.textContent = key;
+        option.textContent =
+          (set && typeof set.title === "string" && set.title.trim()) || key;
         readSetSelect.appendChild(option);
       }
       readSetSelect.addEventListener("change", (event) => {
@@ -2316,6 +2604,7 @@
       const elapsed = animClock.elapsedTime;
       controls.update();
       whiteboardRotator.advance(elapsed);
+      updateMcPopup(elapsed);
       for (const a of avatars) {
         updateLabel(a);
         updateHeadIdle(a, dt, elapsed);
