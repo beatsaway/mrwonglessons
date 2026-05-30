@@ -1,11 +1,11 @@
 /**
- * Visual arts foundations lessons (ks3art.html) — data + etext + enrich + app.
+ * Visual arts foundations lessons (index.html) — data + etext + enrich + app.
  */
 
 /**
  * 視覺藝術教案 v2 — 節次內容（供 lesson-plansv2.html 載入）
  * 每節含：參考圖、詞彙庫、理解檢核、延伸思考、小實作、配對題、填空題。
- * 英文版文案見 lesson-plansv2-etext.js（ks3art.html 設定 LESSON_PLAN_LOCALE === 'en'）。
+ * 英文版文案見 lesson-plansv2-etext.js（index.html 設定 LESSON_PLAN_LOCALE === 'en'）。
  */
 window.LESSONS_V2_DATA = [
   {
