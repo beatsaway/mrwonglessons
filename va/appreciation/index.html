@@ -362,6 +362,66 @@
       margin: 8px 0 12px;
     }
     .helper .hint { margin-bottom: 6px; }
+    .daj-grid {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .daj-step {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #fafafa;
+    }
+    .daj-step-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+    .daj-step-num {
+      flex-shrink: 0;
+      width: 1.35rem;
+      height: 1.35rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .daj-step-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .daj-step-tip {
+      margin: 0 0 5px 1.55rem;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .daj-qs {
+      margin: 0 0 0 1.55rem;
+      padding-left: 1rem;
+      font-size: 12.5px;
+      line-height: 1.42;
+    }
+    .daj-qs li { margin: 2px 0; }
+    .daj-step .helper {
+      margin: 6px 0 0;
+      padding: 5px 7px;
+      border-radius: 6px;
+    }
+    .daj-step .chips { gap: 4px; margin-top: 0; }
+    .daj-step .chips .kw {
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 0;
+    }
     .example {
       border: 1px solid var(--line);
       border-radius: 10px;
@@ -667,25 +727,56 @@
           `,
           steps: `
             <h2>Part A: 4-Step Method</h2>
-            <h3>1) Description</h3>
-            <p>Write objective facts first: title, artist, medium, objects, color, shape, texture, space. Identify commonalities if comparing two works.</p>
-            <div class="helper">
-              <div class="chips" data-wordlist-step="description"></div>
-            </div>
-            <h3>2) Analysis</h3>
-            <p>Use elements + principles to explain organization and visual effects. Add suitable adjectives.</p>
-            <div class="helper">
-              <div class="chips" data-wordlist-step="analysis"></div>
-            </div>
-            <h3>3) Interpretation</h3>
-            <p>What message, idea or emotion is the artist communicating? Link your ideas to visual evidence.</p>
-            <div class="helper">
-              <div class="chips" data-wordlist-step="interpretation"></div>
-            </div>
-            <h3>4) Judgement</h3>
-            <p>State whether the work is successful/original and whether you like it. Give reasons.</p>
-            <div class="helper">
-              <div class="chips" data-wordlist-step="judgement"></div>
+            <p class="hint">Work through the five mini questions in each step — one answer ≈ one mark point. Aim for D 25–30% · A 35–40% · I 20–25% · J 10–15%.</p>
+            <div class="daj-grid">
+              <section class="daj-step">
+                <div class="daj-step-head"><span class="daj-step-num">1</span><p class="daj-step-title">Description</p></div>
+                <p class="daj-step-tip">Facts only — title, artist, medium, what you see. No opinion yet.</p>
+                <ol class="daj-qs">
+                  <li>What is the <strong>medium</strong> (e.g. oil paint, ink, photograph, sculpture)?</li>
+                  <li>What is the <strong>subject matter</strong> — what objects, figures or scenes can you see?</li>
+                  <li>How is the image <strong>arranged</strong> (foreground, background, composition)?</li>
+                  <li>What do <strong>both</strong> plates have in common?</li>
+                  <li>What is one clear <strong>difference</strong> between plate (a) and plate (b)?</li>
+                </ol>
+                <div class="helper"><div class="chips" data-wordlist-step="description"></div></div>
+              </section>
+              <section class="daj-step">
+                <div class="daj-step-head"><span class="daj-step-num">2</span><p class="daj-step-title">Analysis</p></div>
+                <p class="daj-step-tip">Use elements + principles — explain how the picture is organised and what effect that creates.</p>
+                <ol class="daj-qs">
+                  <li>Name one <strong>element</strong> you notice (line, colour, shape, form, texture, value, space).</li>
+                  <li>Name one <strong>principle</strong> (balance, contrast, emphasis, proportion, movement, rhythm, pattern, unity, variety).</li>
+                  <li>What <strong>effect</strong> does it create? (e.g. calm, tense, crowded, dramatic, harmonious)</li>
+                  <li>In plate (a), the artist uses ___ to ___ — fill in with a visual detail.</li>
+                  <li>In plate (b), how is that handled <strong>differently</strong>?</li>
+                </ol>
+                <div class="helper"><div class="chips" data-wordlist-step="analysis"></div></div>
+              </section>
+              <section class="daj-step">
+                <div class="daj-step-head"><span class="daj-step-num">3</span><p class="daj-step-title">Interpretation</p></div>
+                <p class="daj-step-tip">What message, idea or emotion might the artist communicate? Always link back to what you see.</p>
+                <ol class="daj-qs">
+                  <li>What <strong>mood</strong> or feeling does each plate give you?</li>
+                  <li>What might the artist want to <strong>show or say</strong>?</li>
+                  <li>What could one object or motif <strong>symbolise</strong>?</li>
+                  <li>Link to evidence: “This is suggested by ___.”</li>
+                  <li>Can you mention a <strong>social or cultural</strong> idea (identity, tradition, change, power…)?</li>
+                </ol>
+                <div class="helper"><div class="chips" data-wordlist-step="interpretation"></div></div>
+              </section>
+              <section class="daj-step">
+                <div class="daj-step-head"><span class="daj-step-num">4</span><p class="daj-step-title">Judgement</p></div>
+                <p class="daj-step-tip">Say if each work succeeds, which you prefer, and why — use reasons, not just “I like it”.</p>
+                <ol class="daj-qs">
+                  <li>Is plate (a) <strong>successful</strong>? Give one reason.</li>
+                  <li>Is plate (b) successful? Give one reason.</li>
+                  <li>Which plate do you <strong>prefer</strong>?</li>
+                  <li>What is the <strong>strongest visual choice</strong> in either work?</li>
+                  <li>In one sentence: which work is <strong>stronger overall</strong>, and why?</li>
+                </ol>
+                <div class="helper"><div class="chips" data-wordlist-step="judgement"></div></div>
+              </section>
             </div>
           `,
           template: `
@@ -796,25 +887,56 @@ The most convincing visual decision is ______.</div>
           `,
           steps: `
             <h2>Part A 四步法</h2>
-            <h3>1) Description</h3>
-            <p>先寫客觀事實：名稱、藝術家、媒介、看到的物件、顏色、形狀、質感、空間等。比較題先找共同點。</p>
-            <div class="helper">
-              <div class="chips" data-wordlist-step="description"></div>
-            </div>
-            <h3>2) Analysis</h3>
-            <p>用元素與原理解釋畫面如何組織，並用形容詞寫效果。</p>
-            <div class="helper">
-              <div class="chips" data-wordlist-step="analysis"></div>
-            </div>
-            <h3>3) Interpretation</h3>
-            <p>推測藝術家想傳達的概念／情緒，並連回畫面證據。</p>
-            <div class="helper">
-              <div class="chips" data-wordlist-step="interpretation"></div>
-            </div>
-            <h3>4) Judgement</h3>
-            <p>判斷是否成功、是否原創、是否喜歡，並給理由。</p>
-            <div class="helper">
-              <div class="chips" data-wordlist-step="judgement"></div>
+            <p class="hint">每步回答下面五個小問題 — 一題約一個得分點。建議篇幅：D 25–30% · A 35–40% · I 20–25% · J 10–15%。</p>
+            <div class="daj-grid">
+              <section class="daj-step">
+                <div class="daj-step-head"><span class="daj-step-num">1</span><p class="daj-step-title">Description</p></div>
+                <p class="daj-step-tip">只寫客觀事實 — 名稱、藝術家、媒介、看見什麼。不要評價。</p>
+                <ol class="daj-qs">
+                  <li><strong>媒介</strong>是什麼？（油彩、水墨、照片、雕塑等）</li>
+                  <li><strong>題材</strong>是什麼 — 看見哪些物件、人物或場景？</li>
+                  <li>畫面如何<strong>安排</strong>（前景、背景、構圖）？</li>
+                  <li>兩幅 plate 有什麼<strong>相同</strong>之處？</li>
+                  <li>plate (a) 和 plate (b) 有什麼<strong>明顯不同</strong>？</li>
+                </ol>
+                <div class="helper"><div class="chips" data-wordlist-step="description"></div></div>
+              </section>
+              <section class="daj-step">
+                <div class="daj-step-head"><span class="daj-step-num">2</span><p class="daj-step-title">Analysis</p></div>
+                <p class="daj-step-tip">用元素 + 原理解釋畫面如何組織，以及造成什麼視覺效果。</p>
+                <ol class="daj-qs">
+                  <li>指出一個<strong>元素</strong>（線條、色彩、形狀、形體、質感、明暗、空間）。</li>
+                  <li>指出一個<strong>原理</strong>（平衡、對比、重點、比例、動勢、節奏、圖案、統一、變化）。</li>
+                  <li>造成什麼<strong>效果</strong>？（寧靜、緊張、擁擠、戲劇感、和諧等）</li>
+                  <li>在 plate (a)，藝術家運用 ___ 去 ___ — 用畫面細節填寫。</li>
+                  <li>在 plate (b)，這方面如何<strong>不同</strong>？</li>
+                </ol>
+                <div class="helper"><div class="chips" data-wordlist-step="analysis"></div></div>
+              </section>
+              <section class="daj-step">
+                <div class="daj-step-head"><span class="daj-step-num">3</span><p class="daj-step-title">Interpretation</p></div>
+                <p class="daj-step-tip">推測藝術家想傳達什麼 — 必須連回你看到的證據。</p>
+                <ol class="daj-qs">
+                  <li>每幅 plate 給你什麼<strong>情緒</strong>或感覺？</li>
+                  <li>藝術家可能想<strong>表達</strong>什麼？</li>
+                  <li>某個物件或意象可能<strong>象徵</strong>什麼？</li>
+                  <li>連回證據：「這可從 ___ 看出。」</li>
+                  <li>能否提到<strong>社會或文化</strong>角度（身份、傳統、改變、權力…）？</li>
+                </ol>
+                <div class="helper"><div class="chips" data-wordlist-step="interpretation"></div></div>
+              </section>
+              <section class="daj-step">
+                <div class="daj-step-head"><span class="daj-step-num">4</span><p class="daj-step-title">Judgement</p></div>
+                <p class="daj-step-tip">判斷是否成功、你較喜歡哪一幅 — 要寫理由，不只寫「我喜歡」。</p>
+                <ol class="daj-qs">
+                  <li>plate (a) 是否<strong>成功</strong>？寫一個理由。</li>
+                  <li>plate (b) 是否成功？寫一個理由。</li>
+                  <li>你較<strong>喜歡</strong>哪一幅？</li>
+                  <li>哪一個<strong>視覺選擇</strong>最有說服力？</li>
+                  <li>用一句話：哪一幅<strong>整體較強</strong>，為什麼？</li>
+                </ol>
+                <div class="helper"><div class="chips" data-wordlist-step="judgement"></div></div>
+              </section>
             </div>
           `,
           template: `
@@ -1075,7 +1197,7 @@ The most convincing visual decision is ______.</div>
         "figure", "object", "both", "similarly", "in contrast", "whereas"
       ],
       analysis: [
-        "line", "color", "space", "shape", "form", "texture", "value",
+        "line", "colour", "space", "shape", "form", "texture", "value",
         "balance", "contrast", "emphasis", "proportion", "movement", "rhythm",
         "pattern", "repetition", "unity", "variety"
       ],
