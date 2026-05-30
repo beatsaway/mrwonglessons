@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>F5 DSE VA Guide</title>
+  <style>
+    :root {
+      --text: #1c1917;
+      --muted: #57534e;
+      --line: #e7e5e4;
+      --accent: #1d4ed8;
+      --soft: #f5f5f4;
+      --warn: #b45309;
+    }
+    * { box-sizing: border-box; }
+    html {
+      scroll-padding-top: var(--header-h, 2.75rem);
+    }
+    body {
+      margin: 0;
+      font: 15px/1.55 ui-sans-serif, system-ui, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--text);
+      background: #fff;
+    }
+    a { color: var(--accent); }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.65rem;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+    header a.home {
+      flex-shrink: 0;
+      width: 2rem;
+      height: 2rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    header select {
+      flex: 1;
+      min-width: 0;
+      margin: 0;
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font: inherit;
+      font-size: 0.84rem;
+      color: var(--text);
+    }
+    main {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 0.65rem 0.75rem 2rem;
+    }
+    section {
+      margin: 1rem 0 0;
+      padding-top: 0.2rem;
+      scroll-margin-top: var(--header-h, 2.75rem);
+    }
+    section > h2 {
+      margin: 0 0 0.65rem;
+      font-size: 1.05rem;
+      line-height: 1.3;
+      color: #0f172a;
+    }
+    h3 {
+      margin: 1rem 0 0.35rem;
+      font-size: 0.92rem;
+      color: #334155;
+    }
+    p { margin: 0.45rem 0; }
+    .lede { color: var(--muted); font-size: 0.88rem; }
+    .pill {
+      display: inline-block;
+      margin-right: 0.35rem;
+      padding: 0.12rem 0.45rem;
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #44403c;
+      vertical-align: middle;
+    }
+    ul, ol { margin: 0.35rem 0 0.5rem; padding-left: 1.15rem; }
+    li { margin: 0.2rem 0; }
+    li ul { margin-top: 0.15rem; }
+    .links { margin: 0.35rem 0; padding-left: 0; list-style: none; }
+    .links li { margin: 0.25rem 0; }
+    .grid2 {
+      display: grid;
+      gap: 0.65rem;
+      margin: 0.65rem 0;
+    }
+    @media (min-width: 34rem) {
+      .grid2 { grid-template-columns: 1fr 1fr; }
+    }
+    .card {
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .card h3 { margin-top: 0; }
+    .acronym {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      margin-bottom: 0.35rem;
+    }
+    dl.compact { margin: 0.35rem 0; }
+    dl.compact dt {
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-top: 0.35rem;
+    }
+    dl.compact dd {
+      margin: 0.1rem 0 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      margin: 0.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 0.4rem 0.5rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--soft); font-weight: 600; }
+    .warn {
+      padding: 0.55rem 0.65rem;
+      border-left: 3px solid var(--warn);
+      background: #fffbeb;
+      font-size: 0.88rem;
+      margin: 0.5rem 0;
+    }
+    .tip-num {
+      display: inline-block;
+      min-width: 1.35rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .meta { font-size: 0.82rem; color: var(--muted); }
+    .pdf-dl {
+      display: inline-block;
+      margin-top: 0.35rem;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="home" href="../../index.html" aria-label="Home"><span aria-hidden="true">🏠</span></a>
+    <select id="jump" aria-label="Section">
+      <option value="overview" selected>Overview</option>
+      <option value="part-a">P1 Part A · 10%</option>
+      <option value="part-b">P1 Part B · 40%</option>
+      <option value="sba-art">SBA artworks · 30%</option>
+      <option value="sba-book">SBA workbook · 20%</option>
+      <option value="exam-rules">Exam rules</option>
+    </select>
+  </header>
+
+  <main>
+    <section id="overview">
+      <h2>Overview</h2>
+
+      <h3><span class="pill">Paper 1A</span> Art appreciation · 10% · 45 min</h3>
+      <p>Choose and answer one question. Aim for four paragraphs with about five key points each, using relevant keywords in a <strong>D A I J</strong> structure. Some students write five paragraphs with the first as an intro.</p>
+      <ul class="links">
+        <li><a href="../foundations/">Foundations — CSSFLTV &amp; MCUBEPP keywords</a></li>
+        <li><a href="../appreciation/">Appreciation — how to answer (DAIJ)</a></li>
+      </ul>
+
+      <h3><span class="pill">Paper 1B</span> Practical · 40% · 3 hr 15 min</h3>
+      <p>Express a given theme clearly, personally, and creatively. Work time-efficiently: establish mid-tone quickly, define perspective, foreground, main focus, background, and symbolic elements — literal and figurative.</p>
+      <ul class="links">
+        <li><a href="#part-b">Time management &amp; level 5+ tips</a></li>
+        <li><a href="../bg/background5">Background reference video</a></li>
+        <li><a href="#exam-rules">Allowed / not allowed materials</a></li>
+      </ul>
+
+      <h3><span class="pill">SBA artworks</span> 30%</h3>
+      <p>Four pieces / critical studies for your theme(s), at least one artwork. Span S5–S6. Use your medium’s qualities to connect theme with social, historical, or cultural context.</p>
+      <ul class="links">
+        <li><a href="#sba-art">Level 5+ tips</a></li>
+        <li><a href="https://artslideshow.netlify.app/" target="_blank" rel="noopener">Art slideshows</a></li>
+        <li><a href="../bg/">Background videos</a></li>
+      </ul>
+
+      <h3><span class="pill">SBA workbook</span> 20%</h3>
+      <p>Cover all four assessment areas: inspiration &amp; research, artist references, experimentation, reflection &amp; evaluation.</p>
+      <ul class="links">
+        <li><a href="#sba-book">Workbook tips</a></li>
+        <li><a href="../../sba/general-guide.html">SBA general guide</a></li>
+        <li><a href="../../sba/page-directions.html">Page directions</a></li>
+      </ul>
+
+      <p class="meta">PDF version: <a class="pdf-dl" href="f5dseva.pdf" target="_blank" rel="noopener">Download f5dseva.pdf</a></p>
+    </section>
+
+    <section id="part-a">
+      <h2>Part A — DAIJ &amp; keywords <span class="pill">Page 1</span></h2>
+      <p class="lede">Tips referencing Ms Cho’s notes · 45 min · ~10 min per paragraph</p>
+
+      <h3>DAIJ sentence frames</h3>
+      <div class="grid2">
+        <article class="card">
+          <h3>Description</h3>
+          <ul>
+            <li>The commonalities of plate (a) and plate (b) is that both are ______.</li>
+            <li>In plate (a), I can see ______.</li>
+            <li>In plate (b), there is / there are ______.</li>
+            <li>Both artworks present ______ in different ways.</li>
+            <li>A key visual feature in both works is ______.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Analysis</h3>
+          <ul>
+            <li>In plate (a), the artist uses ______ to show ______.</li>
+            <li>In plate (b), the artist uses ______, creating a ______ feeling.</li>
+            <li>The contrast between ______ and ______ strengthens ______.</li>
+            <li>This arrangement creates a sense of ______ through ______.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Interpretation</h3>
+          <ul>
+            <li>In plate (a), I think the artist wants to show ______.</li>
+            <li>In plate (b), I think the artist wants to show ______.</li>
+            <li>_____ may symbolize ______ in the social/cultural context.</li>
+            <li>The ______ mood suggests ideas of ______ and ______, hinted by ______.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Judgement</h3>
+          <ul>
+            <li>I think plate (a) is a success because ______.</li>
+            <li>I think plate (b) is / is not successful because ______.</li>
+            <li>I like plate (__) more because ______.</li>
+            <li>Overall, the stronger work is plate (__) because ______.</li>
+            <li>The most convincing visual decision is ______.</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="grid2">
+        <article class="card">
+          <p class="acronym">C S S F L T V — 7 Elements</p>
+          <dl class="compact">
+            <dt>Color</dt><dd>Hue, intensity, value; symbolism, pattern, contrast.</dd>
+            <dt>Space</dt><dd>Positive/negative space, perspective, foreground/middle/background.</dd>
+            <dt>Shape</dt><dd>Closed flat forms; geometric or organic.</dd>
+            <dt>Form</dt><dd>3D form — real or illusion through perspective/shading.</dd>
+            <dt>Line</dt><dd>Continuous, broken, jagged; vertical, horizontal, diagonal.</dd>
+            <dt>Texture</dt><dd>Real or implied surface quality.</dd>
+            <dt>Value</dt><dd>Light–dark range; contrast drives mood and focus.</dd>
+          </dl>
+        </article>
+        <article class="card">
+          <p class="acronym">M C U B E P P — 7 Principles</p>
+          <dl class="compact">
+            <dt>Movement &amp; Rhythm</dt><dd>Eye path and repetition flow.</dd>
+            <dt>Contrast</dt><dd>Differences in size, value, colour, etc.</dd>
+            <dt>Unity &amp; Variety</dt><dd>Coherence plus controlled variation.</dd>
+            <dt>Balance</dt><dd>Visual weight (symmetrical, asymmetrical, radial).</dd>
+            <dt>Emphasis</dt><dd>Focal point and attention control.</dd>
+            <dt>Proportion</dt><dd>Scale relationship between parts.</dd>
+            <dt>Pattern &amp; Repetition</dt><dd>Repeated units that build order.</dd>
+          </dl>
+        </article>
+      </div>
+
+      <p class="meta">Google “HKEAA VA” for Samples of Candidates’ Performance and Level Descriptors — <a href="https://www.hkeaa.edu.hk/en/hkdse/hkdse_subj.html?A2&2&25" target="_blank" rel="noopener">HKEAA subject page</a></p>
+    </section>
+
+    <section id="part-b">
+      <h2>Part B — exam tips <span class="pill">Page 2</span></h2>
+      <p class="lede">From <a href="https://www.youtube.com/watch?v=ie0gk3InCzI" target="_blank" rel="noopener">artsyjujube</a> (overall level 5*) · Paper 1: Part A 45 min + Part B 3 hr 15 min</p>
+
+      <article class="card">
+        <h3><span class="tip-num">1</span> Image bank / visual library</h3>
+        <p>A binder of reference images for the exam — photos and other people’s artworks (to show photo vs drawing).</p>
+        <p><strong>Collect by category</strong> (2–4 images each): animals, plants, people, CNY decorations, famous people, everyday objects, compositions from other artists (layout, foreground/mid/background).</p>
+        <p><strong>Why:</strong> flip to a section instantly if you forget how to draw something; saves time and panic.</p>
+      </article>
+
+      <article class="card">
+        <h3><span class="tip-num">2</span> Time management</h3>
+        <ul>
+          <li><strong>Sketch:</strong> 10–15 min — composition and basic layout only.</li>
+          <li><strong>Colour:</strong> all remaining time except the last hour.</li>
+          <li><strong>Detail:</strong> last 1–1.5 hr — highlights, linework on a fully coloured piece.</li>
+          <li><strong>Last 15 min:</strong> artist statement, sign name, add sketches/drafts.</li>
+        </ul>
+        <p class="warn">Don’t skip the written reflection — markers read it. Explain materials, story, and what you drew.</p>
+      </article>
+
+      <article class="card">
+        <h3><span class="tip-num">3</span> How to practise</h3>
+        <ul>
+          <li>Past papers: 6–7 years at school (teacher-led).</li>
+          <li>At home: repeat specific skills — same reference many times for colour, brushstrokes, details.</li>
+          <li>Goal: know certain subjects so well you don’t waste time thinking in the exam.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3><span class="tip-num">4</span> Level 5+ techniques</h3>
+        <ul>
+          <li><strong>Repetition:</strong> draw the same subject (e.g. old lady) the same way each time — faster and better.</li>
+          <li><strong>Consistent style:</strong> exaggerated, dramatic stories and expressions often score well.</li>
+          <li><strong>Creative storytelling:</strong> most candidates pick the same story — ask who, when, where, why. Write it in your reflection and show it in the drawing. A bad story is worse than a simple safe one.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3><span class="tip-num">5</span> Finish the drawing</h3>
+        <p>Extremely important — running out of time is the biggest disaster.</p>
+        <ul>
+          <li>Set a timer per stage; stop when time is up and move on.</li>
+          <li>Example split: 1 hr main character, 30 min background, 1 hr highlights.</li>
+          <li>Master this before DSE. Try speed-run techniques.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3><span class="tip-num">6</span> Theory / appreciation prep</h3>
+        <ul>
+          <li>Past papers help, but last-minute cramming won’t do much.</li>
+          <li>Study high-scoring answers (HKEAA level 5 examples) and technique.</li>
+          <li>Writing speed is critical — write non-stop from the moment you see the question.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section id="sba-art">
+      <h2>SBA — four artworks <span class="pill">30%</span></h2>
+      <p class="lede">Four pieces / critical studies · at least one artwork · S5–S6 · <a href="https://youtu.be/9kx5zfGDWGA" target="_blank" rel="noopener">artsyjujube SBA tips</a> (96/100)</p>
+
+      <table>
+        <thead>
+          <tr><th>Area</th><th>What markers look for</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Media, skills &amp; techniques</td><td>Excellence in manipulating media / writing skills</td></tr>
+          <tr><td>Visual presentation / analysis</td><td>Exceptional use / analysis of elements &amp; principles</td></tr>
+          <tr><td>Relationship with context</td><td>Deep knowledge of personal, aesthetic or cultural context</td></tr>
+          <tr><td>Creativity &amp; imagination</td><td>Complete ideas / informed personal views with evidence</td></tr>
+          <tr><td>Overall presentation</td><td>Theme communicated innovatively and coherently</td></tr>
+          <tr><td>Progression</td><td>Substantial progression across all four pieces</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Four key assessment areas</h3>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Area</th><th>Focus</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Inspiration &amp; research</td><td>Where ideas came from; personal experience; how inspiration led to your concept</td></tr>
+          <tr><td>2</td><td>Artist references</td><td>Style (brief), skills learned, how you applied them (detailed) + small copy</td></tr>
+          <tr><td>3</td><td>Experimentation</td><td>Different media, techniques, compositions — compare results, choose one</td></tr>
+          <tr><td>4</td><td>Reflection</td><td>Problems found, changes made, before/after photos, what you learned</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Workbook — what not to do</h3>
+      <table>
+        <thead>
+          <tr><th>Avoid</th><th>Do instead</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Paste large images just to fill space</td><td>Small meaningful images to the side (OK to write over them)</td></tr>
+          <tr><td>Random decorative drawings</td><td>Every drawing serves a purpose / shows learning</td></tr>
+          <tr><td>Copy long passages from books</td><td>Write your own thoughts and applications</td></tr>
+          <tr><td>Ignore one of the four areas</td><td>Develop all four equally</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Final tips</h3>
+      <ul>
+        <li>Quality over quantity — excellent pages beat many average ones.</li>
+        <li>Every page needs a purpose; no filler.</li>
+        <li>Take progress photos for reflection.</li>
+        <li>Describe ideas in effective or poetic terms; include reflections and analysis.</li>
+      </ul>
+    </section>
+
+    <section id="sba-book">
+      <h2>SBA — workbook detail <span class="pill">20%</span> <span class="pill">Page 4</span></h2>
+      <p class="lede">Teachers mark whether your portfolio covers all four areas.</p>
+
+      <table>
+        <thead>
+          <tr><th>Area</th><th>What to include</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>#1 Inspiration &amp; research</strong></td>
+            <td>How initial inspiration guided direction; link inspiration to final idea. Use personal experience, documentaries, pasted images with your thoughts. Note key quotes from videos/talks.</td>
+          </tr>
+          <tr>
+            <td><strong>#2 Artist references</strong></td>
+            <td>Artist style and techniques (brief facts only). Focus on skills learned and how you applied them. Include a small copy or detail study — e.g. three pen artists if your final piece is pen.</td>
+          </tr>
+          <tr>
+            <td><strong>#3 Experimentation</strong></td>
+            <td>Side-by-side comparisons of media, techniques, compositions. Observations, pros/cons, which you chose and why. Try layout experiments, not just technique.</td>
+          </tr>
+          <tr>
+            <td><strong>#4 Reflection</strong></td>
+            <td>WIP photos before erasing or overpainting; before/after comparisons. What problem, how you improved, what changed. Challenges and key learning points — short, not a long story.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Experiment examples</h3>
+      <table>
+        <thead>
+          <tr><th>Type</th><th>Example</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Different media</td><td>Pen on white paper vs white pen on black paper</td></tr>
+          <tr><td>Different techniques</td><td>Three ways to draw tree bark</td></tr>
+          <tr><td>Different compositions</td><td>Vertical vs horizontal vs diagonal / rotating layout</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Workbook rubric (20%)</h3>
+      <table>
+        <thead>
+          <tr><th>Area</th><th>Strong performance</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Exploration &amp; development</td><td>Diverse sources; select, transform, integrate; substantial investigation → original ideas</td></tr>
+          <tr><td>Interpretation &amp; articulation</td><td>Multiple contexts and formal qualities; informed views with evidence; translate to artwork / critical studies</td></tr>
+          <tr><td>Experimentation</td><td>Abundant, thorough experiments of media, skills, and expression</td></tr>
+          <tr><td>Reflection &amp; progression</td><td>Continuous reflection from diverse perspectives; substantial learning progression</td></tr>
+        </tbody>
+      </table>
+
+      <p class="meta">Good pages mix writing, drawing, and pasted items. One page can be writing + paste only — no drawing required.</p>
+    </section>
+
+    <section id="exam-rules">
+      <h2>HKEAA exam rules <span class="pill">Page 5</span></h2>
+      <p class="meta"><a href="https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Candidate_Handbook/5_26Instructions_on_Individual_Subjects_E.pdf" target="_blank" rel="noopener">Candidate Handbook — HKDSE VA (PDF)</a></p>
+
+      <ul>
+        <li><strong>Part A:</strong> write in the answer book; collected 45 minutes after the exam starts.</li>
+        <li><strong>Part B:</strong> draw on HKEAA white cartridge paper or xuan paper only — unauthorised paper → script not accepted (normally zero).</li>
+        <li>Do not write your name or ID on cartridge or bond paper.</li>
+        <li>Do not cover cartridge paper with ~A2-size sheets (Paper 1 only; not Paper 2).</li>
+        <li>Do not cut the cartridge paper — penalty if paper is cut or not the one provided.</li>
+        <li>“Materials NOT Allowed” → mark penalty; dangerous materials / smoking devices → disqualification.</li>
+        <li>Reference materials are for reference only; invigilators may inspect what you bring. No cutting boards at centres.</li>
+      </ul>
+
+      <h3>Materials NOT allowed</h3>
+      <p>English and Chinese dictionaries (including excerpts), slow-drying materials (e.g. oil paint), retarder, dangerous materials (aerosol paints, air-brushes, aerosol fixatives, etc.), burning and smoking devices.</p>
+
+      <h3>Materials allowed</h3>
+      <p><strong>Paper 1:</strong> pencils, brushes, colours, palettes, boards, clips, pins, erasers, tape, paper; small collage materials; reference books, magazines, art dictionaries.</p>
+      <p><strong>Paper 2:</strong> drawing instruments and aids, rulers, compasses, colour/adhesive paper, transfer letters, stencils, cutting/sticking/collage materials, reference books, type specimens, magazines, scrapbooks, art dictionaries.</p>
+    </section>
+  </main>
+  <script>
+    (function () {
+      var header = document.querySelector("header");
+      var sel = document.getElementById("jump");
+      if (!header || !sel) return;
+
+      function setHeaderOffset() {
+        document.documentElement.style.setProperty("--header-h", header.offsetHeight + "px");
+      }
+
+      function scrollToSection(id, smooth) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        setHeaderOffset();
+        var top = el.getBoundingClientRect().top + window.pageYOffset - header.offsetHeight - 6;
+        window.scrollTo({ top: top, behavior: smooth ? "smooth" : "auto" });
+      }
+
+      function go(id, smooth) {
+        if (!document.getElementById(id)) id = "overview";
+        sel.value = id;
+        scrollToSection(id, smooth);
+      }
+
+      sel.addEventListener("change", function () {
+        var id = sel.value;
+        if (location.hash.slice(1) !== id) location.hash = id;
+        else go(id, true);
+      });
+
+      window.addEventListener("hashchange", function () {
+        go(location.hash.slice(1) || "overview", true);
+      });
+
+      document.addEventListener("click", function (e) {
+        var a = e.target.closest('a[href^="#"]');
+        if (!a || !a.hash) return;
+        var id = a.hash.slice(1);
+        if (!document.getElementById(id)) return;
+        e.preventDefault();
+        if (location.hash.slice(1) !== id) location.hash = id;
+        else go(id, true);
+      });
+
+      window.addEventListener("resize", setHeaderOffset);
+      setHeaderOffset();
+      var start = location.hash.slice(1) || "overview";
+      sel.value = document.getElementById(start) ? start : "overview";
+      if (location.hash) go(start, false);
+    })();
+  </script>
+</body>
+</html>
