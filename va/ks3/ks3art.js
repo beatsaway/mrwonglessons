@@ -1,5 +1,5 @@
 /**
- * ks3art bundle: data + etext + enrich + app (single file for ks3art.html)
+ * Visual arts foundations lessons (ks3art.html) — data + etext + enrich + app.
  */
 
 /**
@@ -1017,9 +1017,24 @@ window.LESSONS_V2_ETEXT_ENRICH = {
 
 
 /**
- * ks3art — renders LESSONS_V2_DATA (+ LESSONS_V2_ETEXT when locale is en)
+ * Renders LESSONS_V2_DATA (+ LESSONS_V2_ETEXT when locale is en).
  */
 (function () {
+  const SITE = {
+    en: {
+      documentTitle: "Visual Arts Foundations | Lessons",
+      brandTitle: "Visual arts foundations",
+      brandTag: "Core elements & principles · useful for HKDSE appreciation",
+      ariaNav: "Visual arts foundations lessons"
+    },
+    zh: {
+      documentTitle: "視覺藝術基礎｜單元",
+      brandTitle: "視覺藝術基礎",
+      brandTag: "視覺元素與組織原理 · 銜接 DSE 評賞",
+      ariaNav: "視覺藝術基礎單元"
+    }
+  };
+
   const data = window.LESSONS_V2_DATA;
   if (!Array.isArray(data) || !data.length) {
     console.error("LESSONS_V2_DATA missing");
@@ -2045,7 +2060,19 @@ window.LESSONS_V2_ETEXT_ENRICH = {
     return t;
   }
 
+  function applySiteChrome() {
+    const site = SITE[getLocale()] || SITE.en;
+    document.title = site.documentTitle;
+    const bar = document.querySelector(".app-bar");
+    if (bar) bar.setAttribute("aria-label", site.ariaNav);
+    const bt = document.getElementById("app-brand-title");
+    const bg = document.getElementById("app-brand-tag");
+    if (bt) bt.textContent = site.brandTitle;
+    if (bg) bg.textContent = site.brandTag;
+  }
+
   function init() {
+    applySiteChrome();
     const sel = $("#lesson-select");
     if (!sel) return;
     data.forEach(function (l) {

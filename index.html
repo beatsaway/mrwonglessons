@@ -147,17 +147,26 @@
       margin: 0.4rem 0;
     }
     .main li.sep {
-      margin: 0.75rem 0;
-      padding-top: 0.75rem;
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
       border-top: 1px solid rgba(30, 58, 95, 0.18);
     }
     .main li.group {
-      margin: 0.9rem 0 0.35rem;
-      font-size: 0.82rem;
+      margin: 1rem 0 0.3rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      color: #64748b;
-      letter-spacing: 0.02em;
+      color: #475569;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
+    }
+    .main li.group:first-child {
+      margin-top: 0;
+    }
+    .main li.group-note {
+      margin: -0.15rem 0 0.45rem;
+      font-size: 0.8rem;
+      color: #64748b;
+      line-height: 1.4;
     }
     .main a {
       color: #1d4ed8;
@@ -374,7 +383,56 @@
     <div class="main">
       <nav id="panel-va" aria-labelledby="sub-va">
         <ul>
-          <li class="group">Miscellaneous</li>
+          <li class="group">HKDSE &amp; foundations</li>
+          <li class="group-note">Core appreciation skills — useful from junior years through DSE.</li>
+          <li><a href="va/appreciation/hkdse-answering-guide-va.html">HKDSE VA appreciation — how to answer</a></li>
+          <li><a href="va/ks3/ks3art.html">Visual arts foundations — elements &amp; principles</a></li>
+
+          <li class="sep group">Lessons &amp; worksheets</li>
+          <li><a href="va/ks3/opart/index.html">Op Art — quiz, worksheet, PDF</a></li>
+          <li><a href="va/ks3/grips/index.html">Pencil grips (EN / 中文)</a></li>
+          <li><a href="va/ks3/chinese_ceramics/index.html">Chinese ceramics (EN / 中文)</a></li>
+          <li><a href="va/ks3/1ptp/TextureRenderGuide.pdf" target="_blank" rel="noopener noreferrer">1-point perspective (PDF)</a></li>
+
+          <li class="sep group">Reading quizzes</li>
+          <li><a href="va/quiz/surrealism.html">Surrealism</a></li>
+          <li><a href="va/quiz/cubism.html">Cubism</a></li>
+          <li><a href="va/quiz/cubism2.html">Cubism (2)</a></li>
+          <li><a href="va/quiz/chinese_ceramics.html">Chinese ceramics</a></li>
+
+          <li class="sep group">Reference</li>
+          <li><a href="va/scamper/scamper-for-art.html">SCAMPER for art</a></li>
+          <li>
+            <a
+              class="link-with-new"
+              href="va/medium/listofmediums.html"
+              title="List of art mediums (scroll)"
+              aria-label="List of mediums. New."
+            >
+              <span>List of mediums</span>
+              <span class="badge-new" aria-hidden="true">New</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="link-with-new"
+              href="va/medium/listofartists/artists-abstract-intro.html"
+              title="Abstract artists — intros and video picks"
+              aria-label="List of artists. New."
+            >
+              <span>List of artists</span>
+              <span class="badge-new" aria-hidden="true">New</span>
+            </a>
+          </li>
+          <li><a href="scamper/image-ascii.html">Image → ASCII (glow)</a></li>
+
+          <li class="sep group">SBA workbook</li>
+          <li><a href="sba/letter-trilingual.html">Why a workbook?</a></li>
+          <li><a href="sba/general-guide.html">General guide</a></li>
+          <li><a href="sba/page-directions.html">Page-by-page directions</a></li>
+          <li><a href="sba/workbook-pages-guide.html">Workbook design guide</a></li>
+
+          <li class="sep group">Class tools</li>
           <li>
             <a
               class="link-with-new"
@@ -382,12 +440,12 @@
               title="Mr Wong daily work blog"
               aria-label="Mr Wong blog. New."
             >
-              <span aria-hidden="true">📝 Mr Wong Blog</span>
+              <span>Mr Wong blog</span>
               <span class="badge-new" aria-hidden="true">New</span>
             </a>
           </li>
-          <li><a href="hello.html">👋 Hello</a></li>
-          <li><a href="va/bg/index.html">🎞️ Background (videos)</a></li>
+          <li><a href="hello.html">Hello</a></li>
+          <li><a href="va/bg/index.html">Background videos</a></li>
           <li>
             <a
               class="link-with-new"
@@ -397,7 +455,7 @@
               title="ReadingQuiz"
               aria-label="ReadingQuiz. New."
             >
-              <span aria-hidden="true">📖 ReadingQuiz</span>
+              <span>ReadingQuiz</span>
               <span class="badge-new" aria-hidden="true">New</span>
             </a>
           </li>
@@ -408,56 +466,12 @@
               target="_blank"
               rel="noopener noreferrer"
               title="Art slideshows for inspiration"
-              aria-label="Art slideshows for inspiration. New."
+              aria-label="Art slideshows. New."
             >
-              <span aria-hidden="true">🖼️ Art slideshows (inspiration)</span>
+              <span>Art slideshows</span>
               <span class="badge-new" aria-hidden="true">New</span>
             </a>
           </li>
-
-          <li class="sep group">KS3</li>
-          <li><a href="va/ks3/ks3art.html">🎨 KS3 Art lessons</a></li>
-          <li><a href="va/ks3/opart/index.html">🌀 Op Art — KS3 (quiz, worksheet, PDF)</a></li>
-          <li><a href="va/ks3/grips/index.html">✏️ Pencil grips — KS3 (EN / 中文)</a></li>
-          <li><a href="va/ks3/chinese_ceramics/index.html">🏺 Chinese Ceramics — KS3 (EN / 中文)</a></li>
-          <li><a href="va/quiz/surrealism.html">🧠 Surrealism reading quiz</a></li>
-          <li><a href="va/quiz/cubism.html">🧊 Cubism reading quiz</a></li>
-          <li><a href="va/quiz/cubism2.html">🧊 Cubism reading quiz 2</a></li>
-          <li><a href="va/quiz/chinese_ceramics.html">🏺 Chinese Ceramics reading quiz</a></li>
-          <li><a href="va/appreciation/hkdse-answering-guide-va.html">🧠 HKDSE VA Art Appreciation Guide</a></li>
-          <li><a href="va/ks3/1ptp/TextureRenderGuide.pdf" target="_blank" rel="noopener noreferrer">📐 1-point perspective — KS3 (PDF)</a></li>
-
-          <li class="sep group">Resources</li>
-          <li><a href="va/scamper/scamper-for-art.html">💡 SCAMPER techniques</a></li>
-          <li><a href="scamper/image-ascii.html">🖼️ Image → ASCII (glow)</a></li>
-          <li>
-            <a
-              class="link-with-new"
-              href="va/medium/listofmediums.html"
-              title="List of art mediums (scroll)"
-              aria-label="List of mediums, scroll. New."
-            >
-              <span aria-hidden="true">📚 List of mediums (scroll)</span>
-              <span class="badge-new" aria-hidden="true">New</span>
-            </a>
-          </li>
-          <li>
-            <a
-              class="link-with-new"
-              href="va/medium/listofartists/artists-abstract-intro.html"
-              title="Abstract artists — intros and video picks"
-              aria-label="List of artists — intros and videos. New."
-            >
-              <span aria-hidden="true">🎨 List of artists</span>
-              <span class="badge-new" aria-hidden="true">New</span>
-            </a>
-          </li>
-
-          <li class="sep group">SBA</li>
-          <li><a href="sba/letter-trilingual.html">❓ Why workbook?</a></li>
-          <li><a href="sba/general-guide.html">🧭 SBA — General Guide</a></li>
-          <li><a href="sba/page-directions.html">🧾 SBA — Workbook page directions</a></li>
-          <li><a href="sba/workbook-pages-guide.html">🧩 SBA — Workbook design guide</a></li>
         </ul>
       </nav>
       <nav id="panel-en" hidden aria-labelledby="sub-en">

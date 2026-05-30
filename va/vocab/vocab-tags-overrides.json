@@ -1,0 +1,8 @@
+{
+  "chinese painting": ["chinese", "painting"],
+  "chinese calligraphy": ["chinese", "calligraphy"],
+  "ukiyo-e": ["japanese", "printmaking", "painting"],
+  "impressionism": ["impressionism", "modern", "painting"],
+  "cubism": ["cubism", "modern", "abstract"],
+  "surrealism": ["surrealism", "modern", "abstract"]
+}

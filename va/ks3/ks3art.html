@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Visual Arts | Lessons</title>
+  <title>Visual Arts Foundations | Lessons</title>
   <style>
     :root {
       --bg: #ffffff;
@@ -42,6 +42,32 @@
       backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
       font-size: 0.9rem;
+    }
+    .app-brand {
+      flex: 0 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.05rem;
+      line-height: 1.2;
+      padding-right: 0.25rem;
+    }
+    .app-brand-title {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--core);
+      white-space: nowrap;
+    }
+    .app-brand-tag {
+      font-size: 0.72rem;
+      color: var(--muted);
+      max-width: 14rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    @media (max-width: 40rem) {
+      .app-brand-tag { display: none; }
     }
     .app-bar select {
       width: min(20rem, 100%);
@@ -760,7 +786,11 @@
   </style>
 </head>
 <body>
-  <div class="app-bar" role="navigation" aria-label="Lessons">
+  <div class="app-bar" role="navigation" aria-label="Visual arts foundations lessons">
+    <div class="app-brand">
+      <span id="app-brand-title" class="app-brand-title">Visual arts foundations</span>
+      <span id="app-brand-tag" class="app-brand-tag">Core for HKDSE appreciation</span>
+    </div>
     <select id="lesson-select" aria-label="Choose lesson"></select>
     <div class="lesson-header" id="lesson-header-block">
       <span id="lesson-header-title" class="lesson-header-title"></span>

@@ -1,0 +1,62 @@
+{
+  "bat wash": {
+    "meaning": {
+      "en": "Bat wash is a protective coating brushed onto kiln bats (shelf boards) before glaze firing. It stops glazed pots from sticking to the shelf so feet and bases lift cleanly. In ceramics appreciation, mention bat wash when you explain kiln marks, clean foot rings or studio firing practice.",
+      "zh": "窯板保護劑：燒製前涂在窯板上的保護層，避免器物釉底與板面黏結。（陶藝）"
+    },
+    "example": {
+      "en": "Description: \"Bat wash was brushed onto the bat before loading; after the glaze firing, the foot ring lifted without tearing shelf marks into the base.\"",
+      "zh": "描寫：「裝窯前在窯板涂保護劑，釉燒後足圈完整離板，底部未撕起板面痕。」"
+    }
+  },
+  "aesthetic taste": {
+    "meaning": {
+      "en": "Aesthetic taste has two linked meanings in appreciation: (1) standards for judging what counts as beautiful in art; (2) the viewer's cultivated sensitivity and interest — not the same as saying you merely \"like\" something. In exhibition or critical writing, show taste through specific visual evidence (spacing, lighting, choice of works), not vague praise.",
+      "zh": "（1）美的品味——判斷何謂「美」的標準；（2）審美趣味——觀者對視覺作品的賞玩與品味感受。"
+    },
+    "example": {
+      "en": "Judgement: \"The hang shows refined aesthetic taste: generous spacing and soft lighting let subtle texture read before spectacle.\"",
+      "zh": "評論：「展覽排布與柔和燈光反映精練品味，觀者先讀到細緻質感，而非誇張效果。」"
+    }
+  },
+  "composition": {
+    "meaning": {
+      "en": "Composition is how the artist arranges line, shape, colour and space on the picture plane. Strong composition guides where your eye travels first, whether the image feels balanced or tense, and how separate parts read as one work. When appreciating a painting or photograph, name specific placements (e.g. rule of thirds, diagonal, framing) and explain the effect — do not only write the word “composition”.",
+      "zh": "構圖：畫面元素（線、形、色、空間）的編排，影響視線與整體統一或張力。學習提示：寫作時寫清楚具體位置與視覺效果，不要只寫「構圖」二字。"
+    },
+    "example": {
+      "en": "Description: \"Composition sets the tallest figure on the golden section; diagonal roofs pull the eye toward the distant temple.\"",
+      "zh": "描寫：「人物最高點落在黃金分割位，屋頂斜線把視線帶向遠處廟宇。」"
+    }
+  },
+  "alum paper": {
+    "meaning": {
+      "en": "Alum paper (礬紙) is paper treated with papermaker's alum (aluminium sulfate). The alum helps sizing or ink cling to the fibres so brush lines stay crisp instead of bleeding. A second glossary sense, 熟紙, is sized paper already prepared for painting or calligraphy. Do not confuse this with foil-backed \"aluminium paper\" sold commercially — that is a different product.",
+      "zh": "（1）礬紙：以明礬（硫酸鋁）處理，使膠料或墨料固著於纖維；（2）熟紙：經施膠、適合書畫的紙。"
+    },
+    "example": {
+      "en": "Description: \"On alum-sized xuan paper, ink sits crisp on the surface without bleeding — evidence the fibres were treated before brushing.\"",
+      "zh": "描寫：「礬紙承墨而不暈，可見紙纖維經明礬處理，適合工筆或書法線條。」"
+    }
+  },
+  "overexposure": {
+    "meaning": {
+      "en": "Overexposure (過度曝光) is when too much light reaches the film or sensor. Bright areas lose detail and look washed out or pure white. In your answer, point to blown-out highlights (e.g. a white sky) and say whether it feels deliberate or accidental.",
+      "zh": "過度曝光：光線過多，明亮部分失去層次，呈死白或極淺色。評賞時宜指出高光位置（如天空），並說明是否為刻意效果。"
+    },
+    "example": {
+      "en": "Example: \"The sky is overexposed — cloud detail is gone and the clouds read as flat white, which makes the figure below feel harshly backlit.\"",
+      "zh": "例句：「天空過度曝光，雲層細節消失，人物像強烈逆光下的剪影。」"
+    }
+  },
+  "chiaroscuro": {
+    "meaning": {
+      "en": "Chiaroscuro is the use of strong light–dark contrast to model three-dimensional form and heighten drama. It is central to Renaissance and Baroque painting (e.g. Caravaggio): faces and objects emerge from shadow, directing attention and mood. In appreciation, point to where highlight turns into shadow on the figure or object, not only the word \"chiaroscuro\".",
+      "zh": "明暗法：以強烈光影對比塑造立體感與戲劇效果。"
+    },
+    "example": {
+      "en": "Analysis: \"Chiaroscuro models the cheek: a sharp highlight fades into deep jaw shadow, isolating the face from the dark ground.\"",
+      "zh": "分析：「顴骨高光漸入下顎深陰影，面部從深色背景中突顯，呈現明暗造形。」"
+    }
+  }
+}

@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VA 辭彙</title>
+  <style>
+    :root { --text: #111; --muted: #9ca3af; --line: #eee; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--text);
+      background: #fff;
+      line-height: 1.45;
+    }
+    body.pop-open { overflow: hidden; }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      padding: 0;
+    }
+    .toolbar {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid var(--line);
+    }
+    #search {
+      flex: 1;
+      min-width: 0;
+      margin: 0;
+      border: none;
+      padding: 12px 16px;
+      font-size: 15px;
+      outline: none;
+    }
+    #search::placeholder { color: #c4c4c4; }
+    #filter-btn {
+      flex-shrink: 0;
+      border: none;
+      border-left: 1px solid var(--line);
+      background: #fff;
+      padding: 0 14px;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+    }
+    #filter-btn.on { color: #111; font-weight: 600; }
+    #filters {
+      display: none;
+      padding: 4px 8px 6px;
+      border-bottom: 1px solid var(--line);
+      max-height: 36vh;
+      overflow: auto;
+    }
+    #filters.open { display: block; }
+    .filter-source {
+      margin: 6px 4px 2px;
+      padding-top: 6px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      color: #888;
+      line-height: 1.4;
+    }
+    .filter-source a { color: #555; }
+    .chip-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin: 0 0 3px;
+    }
+    .chip-row:last-child { margin-bottom: 0; }
+    .chip-label {
+      flex: 0 0 52px;
+      font-size: 9px;
+      font-weight: 600;
+      color: #bbb;
+      letter-spacing: 0.04em;
+      margin: 0;
+      padding: 3px 0 0;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    .chips {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 11px;
+      color: #555;
+      cursor: pointer;
+      line-height: 1.25;
+    }
+    .chip.on {
+      border-color: #111;
+      background: #111;
+      color: #fff;
+    }
+    .pop-hashtags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 6px;
+    }
+    .pop-hashtags span {
+      font-size: 11px;
+      color: #888;
+      border: 1px solid #eee;
+      border-radius: 999px;
+      padding: 2px 8px;
+    }
+    main {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 16px 48px;
+    }
+    section { margin-top: 18px; }
+    section h2 {
+      margin: 0 0 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+    ul { list-style: none; margin: 0; padding: 0; }
+    li { border-bottom: 1px solid #f5f5f5; }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 16px;
+      padding: 8px 0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .row:active { opacity: 0.65; }
+    .zh { color: #444; }
+    mark { background: #fef9c3; padding: 0 1px; }
+
+    .pop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .pop[hidden] { display: none; }
+    .pop-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.32);
+    }
+    .pop-card {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      max-height: 78vh;
+      overflow: auto;
+      background: #fff;
+      border-radius: 16px 16px 0 0;
+      padding: 14px 16px 22px;
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+    }
+    .pop-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding-right: 28px;
+      margin-bottom: 12px;
+    }
+    .pop-head h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .pop-head .sub {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #555;
+      font-weight: 400;
+    }
+    .pop-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      border: none;
+      background: none;
+      font-size: 22px;
+      line-height: 1;
+      color: #999;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .pop-lang + .pop-lang {
+      border-top: 1px solid #f0f0f0;
+      margin-top: 12px;
+      padding-top: 12px;
+    }
+    .pop-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: #bbb;
+      margin-bottom: 6px;
+    }
+    .pop-mean { margin: 0 0 8px; font-size: 14px; color: #222; }
+    .pop-ex { margin: 0; font-size: 13px; color: #666; }
+
+    @media (min-width: 560px) {
+      .pop { align-items: center; padding: 20px; }
+      .pop-card { border-radius: 14px; max-height: 82vh; }
+      .row { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 559px) {
+      .row { grid-template-columns: 1fr; gap: 2px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="🔍" autocomplete="off" spellcheck="false" aria-label="搜尋" />
+      <button type="button" id="filter-btn" aria-expanded="false" aria-controls="filters">#</button>
+    </div>
+    <div id="filters" aria-label="標籤篩選"></div>
+  </header>
+  <main id="app"></main>
+
+  <div id="pop" class="pop" hidden>
+    <div class="pop-backdrop" data-close></div>
+    <div class="pop-card" role="dialog" aria-modal="true" aria-labelledby="pop-title">
+      <button type="button" class="pop-close" data-close aria-label="關閉">×</button>
+      <div class="pop-head">
+        <div>
+          <h3 id="pop-title"></h3>
+          <p class="sub" id="pop-sub"></p>
+        </div>
+      </div>
+      <div id="pop-body"></div>
+    </div>
+  </div>
+
+  <script src="vocab.js"></script>
+  <script src="vocab-notes.js"></script>
+  <script src="vocab-tags.js"></script>
+  <script>
+    const app = document.getElementById("app");
+    const search = document.getElementById("search");
+    const filterBtn = document.getElementById("filter-btn");
+    const filtersEl = document.getElementById("filters");
+    const pop = document.getElementById("pop");
+    const popTitle = document.getElementById("pop-title");
+    const popSub = document.getElementById("pop-sub");
+    const popBody = document.getElementById("pop-body");
+
+    const ENTRY_BY_KEY = {};
+    for (const sec of VOCAB_SECTIONS) {
+      for (const e of sec.entries) {
+        ENTRY_BY_KEY[e.en.toLowerCase()] = e;
+      }
+    }
+
+    const TAG_BY_ID = Object.fromEntries(VOCAB_TAG_META.map((t) => [t.id, t]));
+    let selectedTag = null;
+    const GROUP_ORDER = ["movement", "culture", "medium", "style", "formal"];
+    const SOURCE_URL =
+      "https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/arts-edu/resources/va-curri/visual_arts_glossary20171206.pdf";
+
+    function buildFilterUI() {
+      const groups = {};
+      for (const t of VOCAB_TAG_META) {
+        (groups[t.group] ||= []).push(t);
+      }
+      filtersEl.innerHTML = GROUP_ORDER.filter((g) => groups[g])
+        .map(
+          (g) =>
+            `<div class="chip-row"><div class="chip-label">${g}</div><div class="chips">` +
+            groups[g]
+              .map(
+                (t) =>
+                  `<button type="button" class="chip" data-tag="${t.id}">#${escapeHtml(t.label)}</button>`
+              )
+              .join("") +
+            `</div></div>`
+        )
+        .join("") +
+        `<p class="filter-source">Keywords: <a href="${SOURCE_URL}" target="_blank" rel="noopener noreferrer">EDB Visual Arts Glossary (PDF)</a></p>`;
+    }
+
+    function entryTags(entry) {
+      return getEntryTags(entry.en);
+    }
+
+    function matchesTags(entry) {
+      if (!selectedTag) return true;
+      return entryTags(entry).includes(selectedTag);
+    }
+
+    function updateFilterBtn() {
+      filterBtn.classList.toggle("on", !!selectedTag);
+      filterBtn.setAttribute("aria-expanded", filtersEl.classList.contains("open"));
+    }
+
+    function tagLabel(id) {
+      return TAG_BY_ID[id]?.label || id;
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function highlight(text, q) {
+      if (!q) return escapeHtml(text);
+      const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+      let out = "", last = 0, m;
+      while ((m = re.exec(text)) !== null) {
+        out += escapeHtml(text.slice(last, m.index)) + "<mark>" + escapeHtml(m[0]) + "</mark>";
+        last = m.index + m[0].length;
+      }
+      return out + escapeHtml(text.slice(last));
+    }
+
+    function langBlock(tag, mean, ex) {
+      return (
+        `<section class="pop-lang">` +
+        `<div class="pop-tag">${tag}</div>` +
+        `<p class="pop-mean">${escapeHtml(mean)}</p>` +
+        `<p class="pop-ex">${escapeHtml(ex)}</p>` +
+        `</section>`
+      );
+    }
+
+    function openPopup(entry) {
+      const note = getVocabNote(entry);
+      if (!note) return;
+      const tags = entryTags(entry);
+      popTitle.textContent = entry.en.split(",")[0].trim();
+      popSub.textContent = entry.zh;
+      const hashHtml = tags.length
+        ? `<div class="pop-hashtags">${tags.map((t) => `<span>#${escapeHtml(tagLabel(t))}</span>`).join("")}</div>`
+        : "";
+      popBody.innerHTML =
+        hashHtml +
+        langBlock("EN", note.meaning.en, note.example.en) +
+        langBlock("中文", note.meaning.zh, note.example.zh);
+      pop.hidden = false;
+      document.body.classList.add("pop-open");
+    }
+
+    function closePopup() {
+      pop.hidden = true;
+      document.body.classList.remove("pop-open");
+    }
+
+    function renderList() {
+      const q = search.value.trim().toLowerCase();
+      const parts = [];
+
+      for (const sec of VOCAB_SECTIONS) {
+        const items = sec.entries
+          .filter((e) => matchesTags(e) && (!q || `${e.en} ${e.zh}`.toLowerCase().includes(q)))
+          .map(
+            (e) =>
+              `<li data-key="${encodeURIComponent(e.en.toLowerCase())}">` +
+              `<div class="row"><span class="en">${highlight(e.en, q)}</span><span class="zh">${highlight(e.zh, q)}</span></div>` +
+              `</li>`
+          );
+        if (items.length) parts.push(`<section><h2>${sec.letter}</h2><ul>${items.join("")}</ul></section>`);
+      }
+
+      app.innerHTML = parts.join("");
+    }
+
+    app.addEventListener("click", (ev) => {
+      const row = ev.target.closest(".row");
+      if (!row) return;
+      const key = decodeURIComponent(row.closest("li").dataset.key);
+      const entry = ENTRY_BY_KEY[key];
+      if (entry) openPopup(entry);
+    });
+
+    pop.addEventListener("click", (ev) => {
+      if (ev.target.closest("[data-close]")) closePopup();
+    });
+
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && !pop.hidden) closePopup();
+    });
+
+    filterBtn.addEventListener("click", () => {
+      filtersEl.classList.toggle("open");
+      updateFilterBtn();
+    });
+
+    filtersEl.addEventListener("click", (ev) => {
+      const chip = ev.target.closest(".chip");
+      if (!chip) return;
+      const id = chip.dataset.tag;
+      selectedTag = selectedTag === id ? null : id;
+      filtersEl.querySelectorAll(".chip").forEach((c) => {
+        c.classList.toggle("on", c.dataset.tag === selectedTag);
+      });
+      filtersEl.classList.remove("open");
+      updateFilterBtn();
+      renderList();
+    });
+
+    search.addEventListener("input", () => {
+      closePopup();
+      renderList();
+    });
+
+    buildFilterUI();
+    renderList();
+  </script>
+</body>
+</html>
