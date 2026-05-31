@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DSE VA · SBA &amp; exam · True / False</title>
+  <title>Integrated Science · True / False</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -71,6 +71,17 @@
       cursor: pointer;
     }
     header.bar a.home { text-decoration: none; }
+    header.bar select.topic-select {
+      flex: 1;
+      min-width: 0;
+      max-width: 12rem;
+      padding: 0.12rem 0.3rem;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+      font: inherit;
+      font-size: 0.72rem;
+    }
     header.bar button.lang-btn.active { background: #fef3c7; border-color: #f59e0b; }
     header.bar .meta {
       flex: 1;
@@ -100,11 +111,6 @@
       max-width: none;
       margin: 0;
     }
-    .card {
-      display: block;
-      width: 100%;
-    }
-    .card.hidden { display: none; }
     .answer-marks {
       display: flex;
       justify-content: center;
@@ -199,6 +205,21 @@
       padding: 1rem 0.5rem;
     }
     .done-msg.visible { display: block; }
+    .idle-msg {
+      display: none;
+      text-align: center;
+      padding: 2.5rem 0.75rem;
+      color: var(--muted);
+      font-size: clamp(1.1rem, 4.5vw, 1.45rem);
+      line-height: 1.45;
+    }
+    .idle-msg.visible { display: block; }
+    .idle-msg strong { color: var(--text); }
+    .card {
+      display: block;
+      width: 100%;
+    }
+    .card.hidden { display: none; }
     .timer-panel {
       position: fixed;
       inset: 0;
@@ -272,20 +293,26 @@
     }
   </style>
 </head>
-<body class="lang-en">
+<body class="lang-both">
   <div class="progress-track" aria-hidden="true">
     <div class="progress-fill" id="progressFill"></div>
   </div>
 
   <header class="bar">
-    <a class="home" href="../../index.html" aria-label="Home">🏠</a>
-    <button type="button" id="langToggle" class="lang-btn active" aria-label="Language: English only" title="EN only">📝</button>
-    <span class="meta">DSE VA · SBA · 甲/乙部 · <span id="counter">1/48</span></span>
-    <span class="timer" id="timer" aria-live="polite">15</span>
+    <a class="home" href="../index.html" aria-label="Home">🏠</a>
+    <select id="topicSelect" class="topic-select" aria-label="Topic">
+      <option value="" selected>Topic… · 選擇課題</option>
+      <option value="acid-alkali">Acid &amp; alkali · 酸與鹼</option>
+      <option value="senses">Senses &amp; eye · 感官與眼</option>
+      <option value="forces">Forces · 力</option>
+    </select>
+    <button type="button" id="langToggle" class="lang-btn active" aria-label="Language: bilingual (EN + 中文)" title="EN + 中文">📝</button>
+    <span class="meta"><span id="counter">—</span></span>
+    <span class="timer" id="timer" aria-live="polite"></span>
   </header>
 
   <main>
-    <div class="card" id="card">
+    <div class="card hidden" id="card">
       <div class="answer-marks" id="answerMarks" aria-hidden="true">
         <span class="mark-swap" id="markSwap" aria-live="polite">✔️</span>
       </div>
@@ -300,9 +327,13 @@
         </div>
       </div>
     </div>
+    <div class="idle-msg" id="idleMsg">
+      <p><strong>Choose a topic above</strong></p>
+      <p>請在上方選擇課題</p>
+    </div>
     <div class="done-msg" id="doneMsg">
-      <p><strong>完成 · Done</strong> — 48 題</p>
-      <p style="margin:0.35rem 0 0;font-size:0.9rem;color:var(--muted)"><a href="dseva-sba-tf.html">再玩</a> · <a href="f5dseva.html">F5 指南</a> · <a href="../../index.html">主頁</a></p>
+      <p><strong>完成 · Done</strong> — <span id="doneTotal">60</span> 題</p>
+      <p style="margin:0.35rem 0 0;font-size:0.9rem;color:var(--muted)"><a href="tf-quiz.html">再玩</a> · <a href="../index.html">主頁</a></p>
     </div>
   </main>
 
@@ -326,10 +357,20 @@
     </div>
   </div>
 
-  <script src="dseva-sba-tf-data.js"></script>
+  <script src="acid-alkali-tf-data.js"></script>
+  <script src="senses-tf-data.js"></script>
+  <script src="forces-tf-data.js"></script>
   <script>
     (function () {
-      var ITEMS = window.VA_DSE_SBA_TF || [];
+      var TOPICS = {
+        "": { label: "IS · TF", title: "Integrated Science · True / False" },
+        "acid-alkali": { label: "酸與鹼", title: "Acid & alkali · True / False", global: "IS_ACID_ALKALI_TF" },
+        "senses": { label: "感官·眼", title: "Senses & eye · True / False", global: "IS_SENSES_TF" },
+        "forces": { label: "力", title: "Forces · True / False", global: "IS_FORCES_TF" }
+      };
+
+      var topicId = "";
+      var ITEMS = [];
       var QUESTION_MS = 15000;
       var REVEAL_MS = 10000;
       var LANG_CYCLE = ["both", "en", "zh"];
@@ -339,7 +380,7 @@
         zh: { aria: "Language: Chinese only (中文)", title: "中文 only", body: "lang-zh" }
       };
 
-      var langMode = "en";
+      var langMode = "both";
       var index = 0;
       var phase = "question";
       var phaseEnd = 0;
@@ -358,6 +399,9 @@
       var correctionZh = document.getElementById("correctionZh");
       var card = document.getElementById("card");
       var doneMsg = document.getElementById("doneMsg");
+      var idleMsg = document.getElementById("idleMsg");
+      var doneTotalEl = document.getElementById("doneTotal");
+      var topicSelect = document.getElementById("topicSelect");
       var langToggle = document.getElementById("langToggle");
       var timerPanel = document.getElementById("timerPanel");
       var questionSecInput = document.getElementById("questionSec");
@@ -529,6 +573,68 @@
         setRotatedText(correctionZh, item.correctionZh || "", (seed + 7919) >>> 0, false, false);
       }
 
+      function loadItemsForTopic(id) {
+        var t = TOPICS[id];
+        if (!t || !t.global) return [];
+        return window[t.global] || [];
+      }
+
+      function updateMeta() {
+        var t = TOPICS[topicId] || TOPICS[""];
+        document.title = t.title || TOPICS[""].title;
+      }
+
+      function showIdle() {
+        idleMsg.classList.add("visible");
+        card.classList.add("hidden");
+        doneMsg.classList.remove("visible");
+        cancelTick();
+        paused = false;
+        timerEl.classList.remove("paused");
+        timerEl.textContent = "";
+        counterEl.textContent = "—";
+        setBar(0, false);
+        currentItem = null;
+        index = 0;
+        statementEn.textContent = "";
+        statementZh.textContent = "";
+        correctionEn.textContent = "";
+        correctionZh.textContent = "";
+        updateMeta();
+      }
+
+      function startTopic(id) {
+        topicId = id;
+        topicSelect.value = id;
+        ITEMS = loadItemsForTopic(id);
+        index = 0;
+        idleMsg.classList.remove("visible");
+        if (!ITEMS.length) {
+          showIdle();
+          return;
+        }
+        doneTotalEl.textContent = String(ITEMS.length);
+        updateMeta();
+        card.classList.remove("hidden");
+        showItem();
+      }
+
+      function selectTopic(id) {
+        cancelTick();
+        if (!id) {
+          topicId = "";
+          ITEMS = [];
+          topicSelect.value = "";
+          showIdle();
+          return;
+        }
+        startTopic(id);
+      }
+
+      topicSelect.addEventListener("change", function () {
+        selectTopic(topicSelect.value);
+      });
+
       function applyLangMode() {
         var info = LANG_LABELS[langMode];
         document.body.className = info.body;
@@ -582,6 +688,7 @@
       }
 
       function togglePause() {
+        if (!ITEMS.length || !currentItem) return;
         if (paused) unpauseCountdown();
         else pauseCountdown();
       }
@@ -624,11 +731,14 @@
         answerBlock.classList.add("visible");
         lockMark(currentItem.answer);
         renderCorrections(currentItem);
+        requestAnimationFrame(function () {
+          answerBlock.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
         startPhase("reveal");
       }
 
       function revealNow() {
-        if (!currentItem || index >= ITEMS.length || timerPanelOpen) return;
+        if (!ITEMS.length || !currentItem || index >= ITEMS.length || timerPanelOpen) return;
         if (phase === "question") showReveal();
         else if (phase === "reveal") nextItem();
       }
@@ -646,7 +756,7 @@
 
       function loadTimerSettings() {
         try {
-          var saved = JSON.parse(localStorage.getItem("vaDseSbaTfTimers") || "null");
+          var saved = JSON.parse(localStorage.getItem("isAcidAlkaliTfTimers") || "null");
           if (saved && saved.q) QUESTION_MS = clampSec(saved.q, 15) * 1000;
           if (saved && saved.r) REVEAL_MS = clampSec(saved.r, 10) * 1000;
         } catch (e) { /* ignore */ }
@@ -657,7 +767,7 @@
 
       function saveTimerSettings() {
         try {
-          localStorage.setItem("vaDseSbaTfTimers", JSON.stringify({
+          localStorage.setItem("isAcidAlkaliTfTimers", JSON.stringify({
             q: QUESTION_MS / 1000,
             r: REVEAL_MS / 1000
           }));
@@ -762,13 +872,14 @@
         }
       });
 
-      if (!ITEMS.length) {
-        statementEn.textContent = "No statements loaded.";
-        return;
-      }
       loadTimerSettings();
       applyLangMode();
-      showItem();
+      var initTopic = new URLSearchParams(location.search).get("topic") || "";
+      if (initTopic && TOPICS[initTopic] && loadItemsForTopic(initTopic).length) {
+        startTopic(initTopic);
+      } else {
+        showIdle();
+      }
     })();
   </script>
 </body>
