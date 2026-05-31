@@ -12,35 +12,27 @@
       --accent: #1d4ed8;
       --soft: #f5f5f4;
       --warn: #b45309;
-      --header-h: 2rem;
-      --footer-h: 2.1rem;
     }
     * { box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      overflow: hidden;
-    }
     body {
       margin: 0;
-      display: flex;
-      flex-direction: column;
       font: 15px/1.55 ui-sans-serif, system-ui, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
       color: var(--text);
       background: #fff;
     }
     a { color: var(--accent); }
-    header {
-      flex-shrink: 0;
+    header.bar {
+      position: sticky;
+      top: 0;
       z-index: 10;
       display: flex;
       align-items: center;
       gap: 0.35rem;
-      height: var(--header-h);
-      padding: 0 0.5rem;
+      padding: 0.25rem 0.5rem;
       border-bottom: 1px solid var(--line);
       background: #fff;
     }
-    header a.home {
+    header.bar a.home {
       flex-shrink: 0;
       width: 1.55rem;
       height: 1.55rem;
@@ -51,137 +43,76 @@
       border-radius: 6px;
       text-decoration: none;
       font-size: 0.85rem;
-      line-height: 1;
     }
-    header select {
+    header.bar select {
       flex: 1;
       min-width: 0;
-      margin: 0;
-      padding: 0.15rem 0.35rem;
+      padding: 0.2rem 0.35rem;
       border: 1px solid var(--line);
       border-radius: 6px;
       background: #fff;
       font: inherit;
-      font-size: 0.76rem;
-      color: var(--text);
+      font-size: 0.78rem;
     }
     main {
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
       max-width: 42rem;
       width: 100%;
       margin: 0 auto;
-      padding: 0.5rem 0.75rem 0.65rem;
+      padding: 0.75rem 0.85rem 2rem;
     }
     section {
       display: none;
       margin: 0;
       padding: 0;
     }
-    section.active {
-      display: block;
-    }
-    .ebook-nav {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      height: var(--footer-h);
-      padding: 0 0.5rem;
-      border-top: 1px solid var(--line);
-      background: #fff;
-    }
-    .ebook-nav button {
-      flex-shrink: 0;
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 6px;
-      padding: 0.15rem 0.5rem;
-      font: inherit;
-      font-size: 0.74rem;
-      line-height: 1.3;
-      cursor: pointer;
-      color: var(--text);
-    }
-    .ebook-nav button:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-    }
-    .page-indicator {
-      flex: 1;
-      min-width: 0;
-      text-align: center;
-      font-size: 0.74rem;
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    section.active { display: block; }
     section > h2 {
-      margin: 0 0 0.65rem;
-      font-size: 1.05rem;
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
       line-height: 1.3;
-      color: #0f172a;
     }
+    .meta { font-size: 0.82rem; color: var(--muted); margin: 0.25rem 0 0; }
     h3 {
-      margin: 1rem 0 0.35rem;
-      font-size: 0.92rem;
+      margin: 1.1rem 0 0.35rem;
+      font-size: 0.95rem;
+      line-height: 1.35;
       color: #334155;
+    }
+    h4 {
+      margin: 0.85rem 0 0.3rem;
+      font-size: 0.88rem;
+      color: #475569;
     }
     p { margin: 0.45rem 0; }
     .lede { color: var(--muted); font-size: 0.88rem; }
     .pill {
       display: inline-block;
       margin-right: 0.35rem;
-      padding: 0.12rem 0.45rem;
+      padding: 0.1rem 0.45rem;
       border-radius: 999px;
       background: var(--soft);
       font-size: 0.72rem;
       font-weight: 600;
-      letter-spacing: 0.02em;
       color: #44403c;
       vertical-align: middle;
     }
     ul, ol { margin: 0.35rem 0 0.5rem; padding-left: 1.15rem; }
     li { margin: 0.2rem 0; }
     li ul { margin-top: 0.15rem; }
-    .links { margin: 0.35rem 0; padding-left: 0; list-style: none; }
-    .links li { margin: 0.25rem 0; }
-    .grid2 {
-      display: grid;
-      gap: 0.65rem;
-      margin: 0.65rem 0;
+    .grade-list { padding-left: 0; list-style: none; }
+    .grade-list > li {
+      margin: 0.75rem 0;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--line);
     }
-    @media (min-width: 34rem) {
-      .grid2 { grid-template-columns: 1fr 1fr; }
-    }
-    .card {
-      padding: 0.65rem 0.75rem;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-    }
-    .card h3 { margin-top: 0; }
+    .grade-list > li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .grade-list h3 { margin-top: 0; font-size: 0.92rem; }
     .acronym {
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.08em;
       color: #64748b;
       margin-bottom: 0.35rem;
-    }
-    dl.compact { margin: 0.35rem 0; }
-    dl.compact dt {
-      font-weight: 600;
-      font-size: 0.88rem;
-      margin-top: 0.35rem;
-    }
-    dl.compact dd {
-      margin: 0.1rem 0 0;
-      color: var(--muted);
-      font-size: 0.88rem;
     }
     table {
       width: 100%;
@@ -203,29 +134,8 @@
       font-size: 0.88rem;
       margin: 0.5rem 0;
     }
-    .tip-num {
-      display: inline-block;
-      min-width: 1.35rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-    .meta { font-size: 0.82rem; color: var(--muted); }
-    .pdf-dl {
-      display: inline-block;
-      margin-top: 0.35rem;
-      font-size: 0.85rem;
-    }
-    .callout {
-      margin: 0.5rem 0;
-      padding: 0.5rem 0.65rem;
-      border-left: 3px solid var(--accent);
-      background: #eff6ff;
-      font-size: 0.88rem;
-      line-height: 1.45;
-    }
-    .callout p { margin: 0; }
     .footnote {
-      margin-top: 0.65rem;
+      margin-top: 0.5rem;
       font-size: 0.82rem;
       color: var(--muted);
       font-style: italic;
@@ -238,71 +148,57 @@
     }
     .exam-rule {
       margin: 0.35rem 0;
-      padding-left: 0.15rem;
       font-size: 0.88rem;
       line-height: 1.45;
     }
   </style>
 </head>
 <body>
-  <header>
+  <header class="bar">
     <a class="home" href="../../index.html" aria-label="Home"><span aria-hidden="true">🏠</span></a>
-    <select id="jump" aria-label="Section">
-      <option value="overview" selected>Overview</option>
-      <option value="part-a">P1 Part A · 10%</option>
-      <option value="part-b">P1 Part B · 40%</option>
-      <option value="sba-art">SBA artworks · 30%</option>
-      <option value="sba-book">SBA workbook · 20%</option>
-      <option value="exam-rules">Exam rules</option>
+    <select id="jump" aria-label="Jump to section">
+      <option value="overview" selected>Overview · grade breakdown</option>
+      <option value="part-a">Part A · appreciation &amp; DAIJ</option>
+      <option value="part-b">Part B · practical exam tips</option>
+      <option value="sba">SBA · artworks &amp; workbook</option>
+      <option value="exam-rules">Exam rules &amp; materials</option>
     </select>
   </header>
 
   <main>
     <section id="overview" class="active">
-      <h2>Overview</h2>
-      <p class="meta">Digital version: <a href="f5dseva.pdf" target="_blank" rel="noopener">f5dseva.pdf</a></p>
+      <h2>Overview — what counts in VA</h2>
+      <p class="lede">Paper 1 (50%) + SBA (50%).</p>
 
-      <h3><span class="pill">Paper 1A</span> Art appreciation · 10% · 45 min</h3>
-      <p>In HKDSE VA paper 1 part A, art appreciation, you have 45 min to choose and answer one question, which is worth 10% of your overall grade. It is recommended to do 4 paragraphs, each with 5 keypoints featuring relevant keywords, following the <strong>D A I J</strong> structure. Some students do 5 paragraphs with the first as an intro.</p>
-      <div class="callout">
-        <p>To learn more about the DAIJ structure and the keywords under the CSSFLTV and MCUBEPP frameworks, go to <a href="#part-a">page 1</a>.</p>
-        <p>To learn how to better prepare for Part A, see <a href="#part-b">page 2</a> (tip 6).</p>
-        <p><a href="../foundations/">Foundations — fill-in-blank keyword practice</a><br />
-        <a href="../appreciation/">Appreciation guide — past paper demo</a></p>
-      </div>
-
-      <h3><span class="pill">Paper 1B</span> Practical · 40% · 3 hr 15 min</h3>
-      <p>In HKDSE VA paper 1 part B, you have 3 hr 15 min to visually express a given theme clearly, in a personal and creative way, which is worth 40% of your overall grade. It is recommended to use time-efficient techniques to establish mid tone on the canvas quickly, define perspective, foreground, main focus, background of the composition, and present the symbolic elements that signify the theme both literally and figuratively.</p>
-      <div class="callout">
-        <p>To learn more about time-management and level 5+ tips for part B, go to <a href="#part-b">page 2</a>. <a href="../bg/background5">Background video</a></p>
-        <p>To see what materials or tools you can or cannot bring to the exam for part B, go to <a href="#exam-rules">page 5</a>.</p>
-      </div>
-
-      <h3><span class="pill">SBA artworks</span> 30%</h3>
-      <p>When making HKDSE VA SBA artworks, you need to visually express your theme clearly, in a personal and creative way, which is worth 30% of your overall grade. It is important that you make good use of the unique qualities of your chosen medium to relate to the social, historical, or cultural context of your theme.</p>
-      <div class="callout">
-        <p>To see level 5+ tips for SBA artworks, go to <a href="#sba-art">page 3</a>.</p>
-        <p>For inspiration: <a href="https://artslideshow.netlify.app/" target="_blank" rel="noopener">Art slideshows</a> · <a href="../bg/">Background videos</a></p>
-      </div>
-
-      <h3><span class="pill">SBA workbook</span> 20%</h3>
-      <p>When making the HKDSE VA SBA workbook, which is worth 20% of your overall grade, you need to commit to the 4 key assessment areas: Inspiration &amp; research, Artist references, Experimentation, and Reflection &amp; evaluation.</p>
-      <div class="callout">
-        <p>To see level 5+ tips for the 4 key assessment areas, go to <a href="#sba-art">page 3</a> and <a href="#sba-book">page 4</a>.</p>
-        <p><a href="../../sba/general-guide.html">SBA general guide</a> · <a href="../../sba/page-directions.html">Page directions</a></p>
-      </div>
+      <ul class="grade-list">
+        <li>
+          <h3><span class="pill">10%</span> Paper 1 Part A — art appreciation · 45 min</h3>
+          <p>Choose one question. Write about four paragraphs (five if you add a short intro), each with roughly five keyword-rich mark points, using <strong>D A I J</strong> — Description, Analysis, Interpretation, Judgement.</p>
+        </li>
+        <li>
+          <h3><span class="pill">40%</span> Paper 1 Part B — practical · 3 hr 15 min</h3>
+          <p>Express the given theme clearly and personally. Establish mid tone quickly, plan perspective and composition, and use symbolic elements that fit the theme literally and figuratively.</p>
+        </li>
+        <li>
+          <h3><span class="pill">30%</span> SBA artworks</h3>
+          <p>Four pieces (artwork and/or critical studies) showing theme, medium skills, context, creativity, and progression across S5–S6.</p>
+        </li>
+        <li>
+          <h3><span class="pill">20%</span> SBA workbook</h3>
+          <p>Research workbook covering inspiration, artist references, experimentation, and reflection — all four areas matter for marks.</p>
+        </li>
+      </ul>
     </section>
 
     <section id="part-a">
-      <h2>Part A — DAIJ &amp; keywords <span class="pill">Page 1</span></h2>
-      <p class="lede">HKDSE VA Exam Paper 1 (50% in total): Part A 10% (Art Appreciation) 45 min — Tips for Part A, referencing Ms Cho’s notes</p>
+      <h2>Part A — appreciation &amp; DAIJ</h2>
+      <p class="lede">45 min · 10% · referencing Ms Cho’s notes</p>
 
       <h3>The answering framework</h3>
       <p class="daij-letters">D &nbsp; A &nbsp; I &nbsp; J</p>
-      <p><strong>Description</strong> → <strong>Analysis</strong> → <strong>Interpretation</strong> → <strong>Judgement</strong>. Full sentence templates and a past-paper demo are on the <a href="../appreciation/">appreciation guide</a>.</p>
+      <p><strong>Description</strong> → <strong>Analysis</strong> → <strong>Interpretation</strong> → <strong>Judgement</strong>.</p>
 
-      <h3>Key concepts and vocab — The 7 Elements of Art</h3>
-      <p class="acronym">C &nbsp; S &nbsp; S &nbsp; F &nbsp; L &nbsp; T &nbsp; V</p>
+      <h3>7 Elements of Art <span class="acronym">C S S F L T V</span></h3>
       <ul>
         <li><strong>Color:</strong> hue, intensity, value; for symbolism, pattern and contrast.</li>
         <li><strong>Space:</strong> positive/negative space, ? point perspective, isometric/orthographic format, foreground/middle/background.</li>
@@ -313,8 +209,7 @@
         <li><strong>Value:</strong> light-dark range; contrast drives mood and focus.</li>
       </ul>
 
-      <h3>Key concepts and vocab — The 7 Principles of Art / Design</h3>
-      <p class="acronym">M &nbsp; C &nbsp; U &nbsp; B &nbsp; E &nbsp; P &nbsp; P</p>
+      <h3>7 Principles of Art / Design <span class="acronym">M C U B E P P</span></h3>
       <ul>
         <li><strong>Movement &amp; Rhythm:</strong> eye path and repetition flow.</li>
         <li><strong>Contrast:</strong> differences in size, value, color, etc.</li>
@@ -324,432 +219,207 @@
         <li><strong>Proportion:</strong> scale relationship between parts.</li>
         <li><strong>Pattern &amp; Repetition:</strong> repeated units that build order.</li>
       </ul>
-
-      <div class="callout">
-        <p>To familiarise yourself with those keywords, go to <a href="../foundations/index.html">foundations</a> for fill-in-blank examples, and <a href="../appreciation/index.html">appreciation</a> to do the past paper demo.</p>
-      </div>
-      <p class="meta">Google ‘HKEAA VA’ to read Samples of Candidates' Performance and Level Descriptors — <a href="https://www.hkeaa.edu.hk/en/hkdse/hkdse_subj.html?A2&2&25" target="_blank" rel="noopener">HKEAA subject page</a></p>
     </section>
 
     <section id="part-b">
-      <h2>Part B — exam tips <span class="pill">Page 2</span></h2>
-      <p class="lede">DSE VA Public Exam Tips, referencing <a href="https://www.youtube.com/watch?v=ie0gk3InCzI" target="_blank" rel="noopener">artsyjujube</a>, who achieved an overall level 5* in her DSE VA exam</p>
+      <h2>Part B — practical exam tips</h2>
+      <p class="lede">Tips from artsyjujube (overall level 5* in DSE VA)</p>
 
-      <article class="card">
-        <h3>1️⃣ What is the "Image Bank / Visual Library" and why is it important?</h3>
-        <p>It's a binder or folder where you collect different types of images for reference during the exam.</p>
-        <p><strong>Includes:</strong></p>
-        <ul>
-          <li>Photos</li>
-          <li>Other people's artworks (to show the difference between photos and drawings)</li>
-        </ul>
-        <p><strong>Categories to collect:</strong></p>
-        <ul>
-          <li>Animals</li>
-          <li>Plants</li>
-          <li>People</li>
-          <li>Different types of Chinese New Year couplets / decorations</li>
-          <li>Famous people (you never know what the exam will ask)</li>
-          <li>Common objects – e.g., feathers, everyday items from Central Asia</li>
-        </ul>
-        <p><strong>Purpose:</strong></p>
-        <ul>
-          <li>If you forget how to draw something during the exam, you can flip to that section immediately.</li>
-          <li>Saves time and reduces panic.</li>
-          <li>Organize by category – each category = 2–4 images.</li>
-        </ul>
-        <p><strong>Extra tip:</strong> Also collect compositions from other artists (how they arrange the picture, foreground/midground/background). This helps you plan your layout quickly.</p>
-      </article>
+      <h3>1️⃣ Image bank / visual library</h3>
+      <p>A binder or folder of reference images for the exam — photos and other artists’ work (to see how drawing differs from photos).</p>
+      <p><strong>Collect by category</strong> (2–4 images each): animals, plants, people, festive decorations, famous faces, everyday objects, etc.</p>
+      <p><strong>Why it helps:</strong> if you forget how to draw something, flip to that section — saves time and panic. Also collect composition examples (foreground / midground / background) to plan layout fast.</p>
 
-      <article class="card">
-        <h3>5️⃣ How important is it to finish the drawing? 👍👍👍👍👍</h3>
-        <p>Extremely important. Running out of time is the biggest disaster.</p>
-        <p>The speaker has never failed to finish.</p>
-        <p><strong>Strict time discipline:</strong></p>
-        <ul>
-          <li>Set a timer for each stage (e.g., 10 min for sketching – stop exactly at 10 min).</li>
-          <li>If 10 minutes is up, move on anyway.</li>
-          <li>Example: 1 hour for main character, 30 min for background, 1 hour for highlights.</li>
-        </ul>
-        <p>You must master this time control before DSE. ⏰ TRY speed run techniques! IYKYK</p>
-      </article>
+      <h3>2️⃣ Time management during the exam</h3>
+      <ul>
+        <li><strong>Sketch / draft:</strong> 10–15 min — composition and layout only, not detail</li>
+        <li><strong>Colouring:</strong> remaining time minus the final hour</li>
+        <li><strong>Final detailing:</strong> last 1–1.5 hr — highlights, linework on a fully coloured piece</li>
+        <li><strong>Last 15 min:</strong> artist’s statement, sign name, attach any extra sketches</li>
+      </ul>
+      <p class="warn">⚠️ Do not skip the written reflection — markers read it. Explain materials, story, and what you drew.</p>
 
-      <article class="card">
-        <h3>2️⃣ How should I manage time during the HKDSE VA exam?</h3>
-        <p><strong>This YouTuber’s personal method:</strong></p>
-        <ul>
-          <li><strong>Sketching / draft:</strong> 10–15 minutes (not too detailed – just composition and basic layout)</li>
-          <li><strong>Coloring:</strong> All remaining time except last 1 hour</li>
-          <li><strong>Final detailing:</strong> Last 1–1.5 hours (add details like highlights or lineworks to a fully colored picture)</li>
-          <li><strong>Last 15 minutes:</strong>
-            <ul>
-              <li>Write the artist's statement / reflection</li>
-              <li>Sign your name</li>
-              <li>Add any sketches or drafts (even if done after the artwork)</li>
-            </ul>
-          </li>
-        </ul>
-        <p class="warn">⚠️ Don't skip the written reflection – markers read it. Explain your materials, story, what you drew. They might not understand your drawing otherwise.</p>
-      </article>
+      <h3>3️⃣ How to practise before the exam</h3>
+      <p><strong>Past papers:</strong> 6–7 years’ worth (often done in class with teacher).</p>
+      <p><strong>At home:</strong> less often full 4-hour papers; more often repeat the same reference to master colour, brushwork, and detail on familiar subjects — so you do not waste thinking time in the exam.</p>
 
-      <article class="card">
-        <h3>3️⃣ How did this YouTuber practice before the exam?</h3>
-        <p><strong>Past papers (HKDSE VA papers):</strong> Did 6–7 years' worth, but at school (teacher did them in class regularly).</p>
-        <p><strong>At home:</strong></p>
-        <ul>
-          <li>Did not do full 4-hour past papers often.</li>
-          <li>Instead, practiced specific skills repeatedly – e.g., drawing the same reference image many times to master:
-            <ul>
-              <li>Color application</li>
-              <li>Brushstrokes</li>
-              <li>Details</li>
-            </ul>
-          </li>
-        </ul>
-        <p><strong>Goal:</strong> Become extremely familiar with drawing certain subjects so you don't waste time thinking during the exam.</p>
-      </article>
+      <h3>4️⃣ Techniques for Level 5+</h3>
+      <ul>
+        <li><strong>Repeat the same subject</strong> until you can draw it fast and well (people, animals, etc.).</li>
+        <li><strong>Develop a consistent, readable style</strong> — exaggerated drama and expression often reads well to markers.</li>
+        <li><strong>Creative storytelling:</strong> most candidates pick the same obvious story; ask who, when, where, why for a unique angle. Show the story in the drawing and state it in the reflection. A bad story is worse than a simple safe one.</li>
+      </ul>
 
-      <p class="meta"><strong>On-site Exam Paper 1 (50%):</strong> Part A 10% (Art Appreciation) 45 min · Part B 40% (practical art) 3 hr 15 min</p>
+      <h3>5️⃣ Finishing the drawing on time 👍👍👍👍👍</h3>
+      <p>Running out of time is the biggest disaster. Use strict stage timers (e.g. 10 min sketch — then stop). Example split: 1 hr main figure, 30 min background, 1 hr highlights. Master this before DSE. ⏰ Speed-run practice helps.</p>
 
-      <article class="card">
-        <h3>4️⃣ What techniques help you get Level 5 or above?</h3>
-        <p><strong>Repetition of the same subject:</strong></p>
-        <ul>
-          <li>Example: If you draw an "old lady" the same way every time, you get faster and better.</li>
-          <li>Apply the same approach to animals, children, gangsters, etc.</li>
-        </ul>
-        <p><strong>Develop a consistent style:</strong></p>
-        <ul>
-          <li>Markers seem to like exaggerated, dramatic styles (exaggerated stories, exaggerated character expressions).</li>
-        </ul>
-        <p><strong>Creative storytelling:</strong></p>
-        <ul>
-          <li>Most candidates think of the same story for a given prompt.</li>
-          <li>To stand out, think of something unique and creative.</li>
-          <li>Example: "Water pipe bursts during class" → ask yourself:
-            <ul>
-              <li>What class?</li>
-              <li>Why did it burst?</li>
-              <li>Who caused it?</li>
-            </ul>
-          </li>
-          <li>Write this story in your reflection and show it clearly in your drawing (who, when, where).</li>
-        </ul>
-        <p>A bad story is worse than a simple, safe story.</p>
-      </article>
-
-      <article class="card">
-        <h3>6️⃣ Is doing past papers useful for the theory / appreciation section?</h3>
-        <ul>
-          <li>Yes, past papers are useful.</li>
-          <li>But if the exam is very close and you haven't done many, cramming won't help much.</li>
-          <li>Better to:
-            <ul>
-              <li>Look at high-scoring student answers (HKEAA site Level 5 examples)</li>
-              <li>Focus on technique</li>
-            </ul>
-          </li>
-          <li><strong>Writing speed is critical:</strong> There is no time to stop and think. You write non-stop from the moment you see the question.</li>
-        </ul>
-        <p class="footnote">*This YouTuber scored ~15–16 out of ~20 in the English appreciation paper (normally got 18–20 at school). Still considered okay.</p>
-      </article>
+      <h3>6️⃣ Part A (appreciation) — past papers &amp; writing speed</h3>
+      <ul>
+        <li>Past papers help, but last-minute cramming has limited value.</li>
+        <li>Better: read high-scoring HKEAA examples and focus on technique.</li>
+        <li><strong>Writing speed is critical</strong> — write continuously from the moment you see the question.</li>
+      </ul>
+      <p class="footnote">*This YouTuber scored ~15–16 / ~20 on the English appreciation paper (normally 18–20 at school).</p>
+      <p class="meta"><strong>Paper 1 timing:</strong> Part A 45 min · Part B 3 hr 15 min</p>
     </section>
 
-    <section id="sba-art">
-      <h2>SBA — artworks &amp; workbook intro <span class="pill">Page 3</span></h2>
-      <p class="lede"><a href="../../sba/general-guide.html">School-based assessment (50%)</a> · Research Workbook (20%) · <a href="https://youtu.be/9kx5zfGDWGA" target="_blank" rel="noopener">artsyjujube SBA tips</a> (96/100)</p>
-      <p>Four pieces of Artwork / Critical Studies for your theme(s) (30%), with at least one piece as artwork. Work spans S5 and S6.</p>
+    <section id="sba">
+      <h2>SBA — artworks &amp; workbook</h2>
+      <p class="lede">School-based assessment (50%) · artsyjujube SBA tips (96/100)</p>
+      <p>Four artwork / critical-study pieces (30%) plus research workbook (20%). Work spans S5 and S6; at least one piece should be practical artwork.</p>
 
-      <h3>30% from your 4 pieces of artwork</h3>
-      <table>
-        <thead>
-          <tr><th>Area</th><th>What markers look for</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Media, skills and techniques</td><td>Demonstrates excellence in manipulating media, skills and techniques / writing skills</td></tr>
-          <tr><td>Visual presentation / analysis</td><td>Demonstrates an exceptional use / analysis of visual elements and principles of organisation relevant to the theme</td></tr>
-          <tr><td>Relationship with context</td><td>Indicates deep knowledge of personal, aesthetic or cultural context(s) in relation to the theme</td></tr>
-          <tr><td>Creativity and imagination / critical thinking skills</td><td>Demonstrates imagination, creative and complete ideas / Expresses informed personal view(s) with evidence support or insight</td></tr>
-          <tr><td>Overall presentation and communication of theme</td><td>Communicates the theme or message in an innovative way with a coherent and complete presentation</td></tr>
-          <tr><td>Progression of all 4 pieces of work</td><td>Shows substantial progression</td></tr>
-        </tbody>
-      </table>
-
-      <h3>20% from your workbook</h3>
-      <p>See <a href="#sba-book">page 4</a> for the full workbook rubric and page-by-page guidance.</p>
-
-      <h3>What NOT to do in your workbook</h3>
-      <table>
-        <thead>
-          <tr><th>❌ Bad practice</th><th>✅ Good practice</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Paste large images just to fill space (unless you write over it)</td><td>Paste small, meaningful images to the side</td></tr>
-          <tr><td>Draw random decorative things</td><td>Every drawing should serve a purpose / show learning</td></tr>
-          <tr><td>Copy long passages from books (boring)</td><td>Write your own thoughts and applications</td></tr>
-          <tr><td>Ignore one of the 4 checkpoint areas</td><td>Develop all 4 areas equally</td></tr>
-        </tbody>
-      </table>
-
-      <h3>The 4 key assessment areas</h3>
-      <table>
-        <thead>
-          <tr><th>Area</th><th>Focus</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>Inspiration</strong></td><td>Where ideas came from, personal experiences, how inspiration led to your concept</td></tr>
-          <tr><td><strong>Artist references</strong></td><td>Artist's style (brief), skills you learned, how you applied them (detailed) + small copy</td></tr>
-          <tr><td><strong>Experimentation</strong></td><td>Different media, techniques, compositions – compare results, choose one</td></tr>
-          <tr><td><strong>Reflection</strong></td><td>Problems discovered, changes made, before/after photos, what you learned</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Final tips</h3>
-      <ul>
-        <li>Quality over quantity: Better to make excellent pages than many average pages.</li>
-        <li>Every page should have a purpose – no "filler" just to look pretty.</li>
-        <li>Take progress photos – you'll need them for the reflection section.</li>
-        <li>There are no limits – if you can think of it, you can try it in your SBA.</li>
-        <li>Describe your ideas in effective or poetic terms.</li>
-        <li>Have reflections and analysis.</li>
-      </ul>
-    </section>
-
-    <section id="sba-book">
-      <h2>SBA — workbook in detail <span class="pill">Page 4</span></h2>
-      <p class="lede">HKDSE VA SBA Tips, referencing <a href="https://youtu.be/9kx5zfGDWGA" target="_blank" rel="noopener">artsyjujube</a>, who scored 96 out of 100 in her SBA</p>
-
-      <h3>What are the 4 key assessment areas?</h3>
-      <table>
-        <thead>
-          <tr><th>#</th><th>Area</th><th>What to show</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>1</td><td>Inspiration &amp; research</td><td>How you generate ideas, do research, collect references</td></tr>
-          <tr><td>2</td><td>Artist references</td><td>Artists or artworks you studied and learned from</td></tr>
-          <tr><td>3</td><td>Experimentation</td><td>Trying different colors, media, compositions</td></tr>
-          <tr><td>4</td><td>Reflection &amp; evaluation</td><td>Challenges faced, changes made, what you learned</td></tr>
-        </tbody>
-      </table>
-      <p>Teachers check whether your SBA portfolio covers all four areas – that's how they give marks.</p>
-
-      <h3>What should each page include? (Writing + Drawing + Pasted items)</h3>
-      <p><strong>General principle:</strong> Each page should have a mix of writing, drawing, and pasted items.</p>
-      <p><strong>Bad example (low score):</strong></p>
-      <ul>
-        <li>Pasting a large image that takes up 1/3 of the page – teacher said this was just "taking up space" with no meaning (it's ok if you write over it).</li>
-        <li>Drawing random "decorative" things just to make the page look pretty. 😡😡😡</li>
-      </ul>
-      <p><strong>Good example (high score):</strong></p>
-      <ul>
-        <li>Small, relevant pasted images placed neatly to the side.</li>
-        <li>Write your thoughts, feelings, and how it inspired your work.</li>
-        <li>One page may have no drawing at all – just writing and pasting items is fine.</li>
-      </ul>
-
-      <h3>The 4 assessment areas – in detail</h3>
-
-      <article class="card">
-        <h3>#1: Inspiration &amp; Research</h3>
-        <ul>
-          <li>Write how your initial inspiration guided your direction.</li>
-          <li>Show the connection between your inspiration and your final idea.</li>
-          <li>Example: If your theme is "elderly people"…
-            <ul>
-              <li>Why did you choose a clock as a symbol?</li>
-              <li>What did you see in a documentary / article?</li>
-              <li>Cut and paste relevant images, then write your thoughts.</li>
-            </ul>
-          </li>
-        </ul>
-        <p><strong>Use personal experience:</strong> Write about your own life examples that relate to the theme. How did that experience inspire your artwork?</p>
-        <p><strong>If you watch a video / talk:</strong> Write down key quotes. Explain how it inspired your imagery, expression, or materials.</p>
-      </article>
-
-      <article class="card">
-        <h3>#2: Artist References (Artists &amp; Artworks)</h3>
-        <ul>
-          <li>Introduce the artist – their style, techniques.</li>
-          <li>But don't spend too long copying facts (that's not your own work).</li>
-          <li><strong>Main focus (write more here):</strong>
-            <ul>
-              <li>What skills and techniques did you learn from this artist?</li>
-              <li>How did you apply what you learned to your own work?</li>
-            </ul>
-          </li>
-          <li><strong>Include a copy / study:</strong> Do a small copy of one of their works. Or recreate a detail / section of their work.</li>
-        </ul>
-        <p><strong>Examples of artists:</strong> This YouTuber chose 3 artists who work with pen drawing (same medium as their own final piece).</p>
-      </article>
-
-      <article class="card">
-        <h3>#3: Experimentation</h3>
-        <table>
-          <thead>
-            <tr><th>Type</th><th>Example</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Different media</td><td>Pen on white paper vs. white pen on black paper</td></tr>
-            <tr><td>Different techniques</td><td>3 ways to draw tree bark</td></tr>
-            <tr><td>Different compositions</td><td>Vertical split vs. horizontal split vs. diagonal / rotating layout</td></tr>
-          </tbody>
-        </table>
-        <p><strong>How to present experiments:</strong></p>
-        <ul>
-          <li>Show side-by-side comparisons.</li>
-          <li>Write your observations after testing.</li>
-          <li>Compare pros and cons of each method.</li>
-          <li>Explain which one you chose and why.</li>
-        </ul>
-        <p><strong>Example from this YouTuber:</strong> Drew a tree using 3 different strokes / shading methods. Compared the results. Selected one for the final piece.</p>
-        <p><strong>Bonus tip:</strong> You can even experiment with composition layouts – not just drawing techniques.</p>
-      </article>
-
-      <article class="card">
-        <h3>#4: Reflection &amp; Evaluation</h3>
-        <ul>
-          <li>Take photos of your work-in-progress – especially parts you are unhappy with.</li>
-          <li>Don't erase or paint over immediately – take a photo first for your SBA.</li>
-          <li>Show before vs. after comparisons.</li>
-          <li>Write:
-            <ul>
-              <li>What problem did you discover?</li>
-              <li>How did you improve it?</li>
-              <li>What changes did you make?</li>
-            </ul>
-          </li>
-          <li>Also include: challenges and difficulties you faced; what you learned from solving them; short reflections – not a long story, just key learning points.</li>
-        </ul>
-        <p><strong>Example from this YouTuber:</strong> Experimented with using dots / stippling to create a "flying" effect. Wrote a short reflection on that experiment.</p>
-      </article>
-
-      <h3>20% workbook rubric</h3>
+      <h3>Artworks (30%) — what markers look for</h3>
       <table>
         <thead>
           <tr><th>Area</th><th>Strong performance</th></tr>
         </thead>
         <tbody>
-          <tr><td>Exploration and development of theme or ideas</td><td>Uses materials from diverse sources; selects, transforms and integrates the materials in development of theme or ideas; substantially investigates and inputs materials to produce original ideas</td></tr>
-          <tr><td>Interpretation of artworks and its articulation with artmaking / critical studies</td><td>Recognises multiple contexts and formal qualities of the artwork; expresses informed personal view(s) with support of evidence and/or insight; articulates or translates contextual and formal knowledge to artwork / critical studies</td></tr>
-          <tr><td>Experimentation of media and skills, and exploration of ways of expression</td><td>Demonstrates abundant and thorough experiments of media and skills; demonstrates abundant and thorough exploration of ways of expression</td></tr>
-          <tr><td>Reflection and progression in learning</td><td>Continuously and thoroughly reflects on the portfolio from diverse perspectives; shows substantial progression in learning</td></tr>
+          <tr><td>Media, skills and techniques</td><td>Excellence in manipulating media, skills and techniques / writing skills</td></tr>
+          <tr><td>Visual presentation / analysis</td><td>Exceptional use / analysis of visual elements and principles relevant to the theme</td></tr>
+          <tr><td>Relationship with context</td><td>Deep knowledge of personal, aesthetic or cultural context(s)</td></tr>
+          <tr><td>Creativity / critical thinking</td><td>Imaginative, complete ideas / informed personal views with evidence</td></tr>
+          <tr><td>Theme communication</td><td>Innovative, coherent presentation of the theme or message</td></tr>
+          <tr><td>Progression</td><td>Substantial progression across all four pieces</td></tr>
         </tbody>
       </table>
+
+      <h3>Workbook (20%) — four assessment areas</h3>
+      <table>
+        <thead>
+          <tr><th>Area</th><th>What to show</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Inspiration &amp; research</strong></td><td>Where ideas came from; research and references that shaped your concept</td></tr>
+          <tr><td><strong>Artist references</strong></td><td>Artists studied; skills learned; how you applied them (+ small copies)</td></tr>
+          <tr><td><strong>Experimentation</strong></td><td>Trying media, techniques, compositions — compare and choose</td></tr>
+          <tr><td><strong>Reflection &amp; evaluation</strong></td><td>Problems found, changes made, before/after evidence, what you learned</td></tr>
+        </tbody>
+      </table>
+      <p>Teachers mark whether your portfolio covers all four areas evenly.</p>
+
+      <h3>Workbook pages — do &amp; don’t</h3>
+      <table>
+        <thead>
+          <tr><th>❌ Avoid</th><th>✅ Prefer</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Large pasted images just to fill space</td><td>Small, meaningful images to the side (OK if you write over them)</td></tr>
+          <tr><td>Random decorative drawing</td><td>Every mark shows learning or decision-making</td></tr>
+          <tr><td>Long copied textbook passages</td><td>Your own thoughts and how ideas apply to your work</td></tr>
+          <tr><td>Neglecting one of the four areas</td><td>Develop all four throughout the portfolio</td></tr>
+        </tbody>
+      </table>
+      <p>Each page can mix writing, drawing, and pasted items — a page with no drawing is fine if the content is purposeful.</p>
+
+      <h3>Area 1 — Inspiration &amp; research</h3>
+      <ul>
+        <li>Explain how initial inspiration guided your direction and final idea.</li>
+        <li>Example (theme: elderly people): why a clock? what from a documentary or article? paste images and respond in writing.</li>
+        <li>Use personal experience linked to the theme; note quotes from talks/videos and how they shaped imagery or materials.</li>
+      </ul>
+
+      <h3>Area 2 — Artist references</h3>
+      <ul>
+        <li>Brief style intro — do not copy long biographies.</li>
+        <li>Focus on skills/techniques learned and how you applied them in your work.</li>
+        <li>Include a small copy or detail study (e.g. three pen artists if your final piece is pen).</li>
+      </ul>
+
+      <h3>Area 3 — Experimentation</h3>
+      <table>
+        <thead><tr><th>Type</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Media</td><td>Pen on white vs white pen on black paper</td></tr>
+          <tr><td>Technique</td><td>Three ways to render tree bark</td></tr>
+          <tr><td>Composition</td><td>Vertical vs horizontal vs diagonal layout</td></tr>
+        </tbody>
+      </table>
+      <p>Show comparisons, note pros/cons, state what you chose and why. Layout experiments count too.</p>
+
+      <h3>Area 4 — Reflection &amp; evaluation</h3>
+      <ul>
+        <li>Photograph work-in-progress before fixing mistakes.</li>
+        <li>Before/after comparisons; what went wrong, what you changed, what you learned.</li>
+        <li>Short, focused reflections — not a long essay.</li>
+      </ul>
+
+      <h3>Workbook rubric (20%)</h3>
+      <table>
+        <thead>
+          <tr><th>Area</th><th>Strong performance</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Exploration and development of theme or ideas</td><td>Diverse sources; transforms and integrates material into original ideas</td></tr>
+          <tr><td>Interpretation of artworks &amp; link to artmaking / critical studies</td><td>Multiple contexts and formal qualities; informed personal views with evidence</td></tr>
+          <tr><td>Experimentation of media and skills</td><td>Abundant, thorough experiments and exploration of expression</td></tr>
+          <tr><td>Reflection and progression</td><td>Continuous reflection from diverse angles; substantial progression</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Final SBA tips</h3>
+      <ul>
+        <li>Quality over quantity — excellent pages beat many filler pages.</li>
+        <li>Take progress photos for reflection sections.</li>
+        <li>Describe ideas clearly; include analysis and reflection throughout.</li>
+      </ul>
     </section>
 
     <section id="exam-rules">
-      <h2>HKEAA exam rules <span class="pill">Page 5</span></h2>
+      <h2>Exam rules &amp; materials</h2>
       <p class="meta"><a href="https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Candidate_Handbook/5_26Instructions_on_Individual_Subjects_E.pdf" target="_blank" rel="noopener">HKEAA Instructions for Individual Subjects: HKDSE VA (PDF)</a></p>
 
-      <p class="exam-rule">◆ For Part A, candidates must write their answers in the answer book which will be collected 45 minutes after the start of the examination. (about 10 mins for each paragraph)</p>
-      <p class="exam-rule">◆ For Part B, candidates must draw on the appropriate side of the white cartridge paper or Xuanzhi provided by the HKEAA. Candidates who draw on unauthorised stationery other than the cartridge paper or Xuanzhi provided by the HKEAA will result in their scripts not being accepted. Normally zero marks will be given to the part/paper concerned.</p>
-      <p class="exam-rule">◆ Candidates must not write their names or identification document numbers on the cartridge paper or bond paper.</p>
-      <p class="exam-rule">◆ For Paper 1, candidates must not cover the cartridge paper using any paper or materials which are approximately A2-size. Answers on these papers or materials will not be marked. (NOT applicable to Paper 2) 😆 LOL</p>
-      <p class="exam-rule">◆ Candidates must not cut the cartridge paper in any way. Candidates who are found to have not used the cartridge paper provided or to have cut the paper will receive a mark penalty.</p>
-      <p class="exam-rule">◆ Candidates who are found to have used the ‘Materials NOT Allowed’ as described below will receive a mark penalty. Candidates who bring dangerous materials and smoking devices will be disqualified from the examination.</p>
+      <h3>Key rules</h3>
+      <p class="exam-rule">◆ Part A: answers in the answer book; collected 45 minutes after the exam starts (~10 min per paragraph).</p>
+      <p class="exam-rule">◆ Part B: draw only on HKEAA white cartridge paper or Xuanzhi — other paper normally means zero for that part.</p>
+      <p class="exam-rule">◆ Do not write your name or ID on cartridge or bond paper.</p>
+      <p class="exam-rule">◆ Do not cover cartridge paper with extra A2-size sheets (Paper 1 only; not Paper 2).</p>
+      <p class="exam-rule">◆ Do not cut cartridge paper — penalty if paper is cut or not the paper provided.</p>
+      <p class="exam-rule">◆ “Materials NOT Allowed” → mark penalty; dangerous materials / smoking devices → disqualification.</p>
+      <p class="exam-rule">◆ Reference materials are for reference only; invigilators may inspect what you bring. No cutting boards at centres.</p>
 
-      <h3>Materials NOT Allowed</h3>
-      <p>English and Chinese dictionaries (including excerpts from dictionaries), slow drying materials (e.g. oil paint), retarder, dangerous materials (e.g. aerosol paints, air-brushes, aerosol fixatives, etc.) and burning and smoking devices.</p>
+      <h3>Materials NOT allowed</h3>
+      <p>English and Chinese dictionaries (including excerpts), slow-drying materials (e.g. oil paint), retarder, dangerous materials (aerosol paints, air-brushes, aerosol fixatives, etc.), burning and smoking devices.</p>
 
-      <h3>Materials Allowed 👍</h3>
-      <p><strong>Paper 1</strong> Painting materials and instruments (e.g. pencils, paint brushes, colours, palettes, drawing boards, clips, pins, erasers, adhesive tapes, paper, etc.), small quantity of materials for collage, and reference materials (e.g. books, magazines, art dictionaries, etc.).</p>
-      <p><strong>Paper 2</strong> Design materials, drawing instruments and aids (e.g. pencils, paint brushes, colours, palettes, rulers, drawing boards, clips, pins, compasses, eraser, colour paper/adhesive paper, ready-made transfer letters, stencil devices, etc.), materials for cutting, sticking and collage materials, reference materials (e.g. books, type specimen books, magazines, scrap books, art dictionaries, etc.).</p>
-
-      <p class="exam-rule">◆ Candidates are reminded that reference materials should be used for reference only.</p>
-      <p class="exam-rule">◆ During the examination, invigilation staff may examine the materials which candidates have brought into the examination centre. ◆ Cutting boards are not provided at the examination centres.</p>
+      <h3>Materials allowed 👍</h3>
+      <p><strong>Paper 1:</strong> painting tools (pencils, brushes, colours, palettes, boards, clips, pins, erasers, tape, paper, etc.), small collage materials, reference books/magazines/dictionaries.</p>
+      <p><strong>Paper 2:</strong> design/drawing tools (rulers, compasses, colour/adhesive paper, transfer letters, stencils, etc.), cutting/sticking/collage materials, reference books/specimens/magazines/scrapbooks/dictionaries.</p>
     </section>
   </main>
 
-  <footer class="ebook-nav" aria-label="Page navigation">
-    <button type="button" id="prevPage" aria-label="Previous page">‹ Prev</button>
-    <span class="page-indicator" id="pageIndicator">1 / 6 · Overview</span>
-    <button type="button" id="nextPage" aria-label="Next page">Next ›</button>
-  </footer>
-
   <script>
     (function () {
-      var pages = ["overview", "part-a", "part-b", "sba-art", "sba-book", "exam-rules"];
-      var pageTitles = {
-        overview: "Overview",
-        "part-a": "Part A · DAIJ",
-        "part-b": "Part B · Tips",
-        "sba-art": "SBA · Artworks",
-        "sba-book": "SBA · Workbook",
-        "exam-rules": "Exam rules"
-      };
+      var sections = ["overview", "part-a", "part-b", "sba", "exam-rules"];
       var sel = document.getElementById("jump");
-      var prevBtn = document.getElementById("prevPage");
-      var nextBtn = document.getElementById("nextPage");
-      var indicator = document.getElementById("pageIndicator");
-      if (!sel || !prevBtn || !nextBtn || !indicator) return;
+      if (!sel) return;
 
-      function pageIndex(id) {
-        var i = pages.indexOf(id);
-        return i >= 0 ? i : 0;
-      }
+      function showView(id, updateHash) {
+        if (sections.indexOf(id) < 0) id = "overview";
 
-      function showPage(id, updateHash) {
-        if (!document.getElementById(id)) id = "overview";
-        var idx = pageIndex(id);
-
-        pages.forEach(function (pid) {
-          var sec = document.getElementById(pid);
-          if (sec) sec.classList.toggle("active", pid === id);
+        sections.forEach(function (sid) {
+          var sec = document.getElementById(sid);
+          if (sec) sec.classList.toggle("active", sid === id);
         });
 
         sel.value = id;
-        prevBtn.disabled = idx === 0;
-        nextBtn.disabled = idx === pages.length - 1;
-        indicator.textContent = (idx + 1) + " / " + pages.length + " · " + (pageTitles[id] || id);
+        window.scrollTo(0, 0);
 
-        var main = document.querySelector("main");
-        if (main) main.scrollTop = 0;
-
-        if (updateHash !== false && location.hash.slice(1) !== id) {
-          history.replaceState(null, "", "#" + id);
+        if (updateHash !== false) {
+          history.replaceState(null, "", id === "overview" ? location.pathname : "#" + id);
         }
-      }
-
-      function goRelative(delta) {
-        var idx = pageIndex(sel.value);
-        var next = idx + delta;
-        if (next < 0 || next >= pages.length) return;
-        showPage(pages[next], true);
       }
 
       sel.addEventListener("change", function () {
-        showPage(sel.value, true);
+        showView(sel.value, true);
       });
-
-      prevBtn.addEventListener("click", function () { goRelative(-1); });
-      nextBtn.addEventListener("click", function () { goRelative(1); });
 
       window.addEventListener("hashchange", function () {
-        showPage(location.hash.slice(1) || "overview", false);
-      });
-
-      document.addEventListener("click", function (e) {
-        var a = e.target.closest('a[href^="#"]');
-        if (!a || !a.hash) return;
-        var id = a.hash.slice(1);
-        if (!document.getElementById(id)) return;
-        e.preventDefault();
-        showPage(id, true);
-      });
-
-      document.addEventListener("keydown", function (e) {
-        if (e.target.closest("select, input, textarea")) return;
-        if (e.key === "ArrowLeft" || e.key === "PageUp") {
-          e.preventDefault();
-          goRelative(-1);
-        } else if (e.key === "ArrowRight" || e.key === "PageDown") {
-          e.preventDefault();
-          goRelative(1);
-        }
+        var id = location.hash.slice(1) || "overview";
+        showView(id, false);
       });
 
       var start = location.hash.slice(1) || "overview";
-      showPage(document.getElementById(start) ? start : "overview", false);
+      if (!document.getElementById(start)) start = "overview";
+      showView(start, false);
     })();
   </script>
 </body>
