@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2025 VA Level 5 exemplars</title>
+  <style>
+    :root { --text: #1c1917; --muted: #57534e; --line: #e7e5e4; --accent: #1d4ed8; --soft: #f5f5f4; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.55 ui-sans-serif, system-ui, "Segoe UI", sans-serif; color: var(--text); background: #fff; }
+    a { color: var(--accent); }
+    header.bar {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.25rem 0.5rem; border-bottom: 1px solid var(--line); background: #fff;
+    }
+    header.bar a.home,
+    header.bar button.quiz-btn,
+    header.bar button.palette-btn {
+      width: 1.55rem; height: 1.55rem; display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid var(--line); border-radius: 6px; font-size: 0.85rem;
+      background: #fff; cursor: pointer; padding: 0; flex-shrink: 0;
+    }
+    header.bar a.home { text-decoration: none; }
+    header.bar button.quiz-btn.active { background: #fef3c7; border-color: #f59e0b; }
+    header.bar button.palette-btn.active { background: #ede9fe; border-color: #a78bfa; }
+    header.bar select {
+      flex: 1; min-width: 0; padding: 0.2rem 0.35rem;
+      border: 1px solid var(--line); border-radius: 6px; font: inherit; font-size: 0.78rem;
+    }
+    main { max-width: 48rem; margin: 0 auto; padding: 0.75rem 0.85rem 2rem; }
+    section { display: none; }
+    section.active { display: block; }
+    h2 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+    h3 { margin: 1rem 0 0.35rem; font-size: 0.95rem; color: #334155; }
+    p { margin: 0.45rem 0; }
+    .lede { color: var(--muted); font-size: 0.88rem; }
+    .step { margin-top: 0.85rem; }
+    .step-ob, .step-el, .step-cmp, .step-ij, .step-jg {
+      display: inline-block; padding: 0.12rem 0.45rem; border-radius: 4px;
+      font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .step-ob { background: #e2e8f0; color: #475569; }
+    .step-el { background: #dbeafe; color: #1d4ed8; }
+    .step-cmp { background: #ffedd5; color: #9a3412; }
+    .step-ij { background: #d1fae5; color: #047857; }
+    .step-jg { background: #ffe4e6; color: #be123c; }
+    .step-sep { color: var(--muted); font-weight: 600; text-transform: none; letter-spacing: 0; }
+    .ans [class^="kw-"] { padding: 0 0.1em; border-radius: 3px; font-weight: 600; }
+    .ans .kw-cmp { background: #ffedd5; color: #9a3412; }
+    .ans .kw-el  { background: #dbeafe; color: #1d4ed8; }
+    .ans .kw-pr  { background: #ede9fe; color: #6d28d9; }
+    .ans .kw-ij  { background: #d1fae5; color: #047857; }
+    .ans .kw-jg  { background: #ffe4e6; color: #be123c; }
+    .ans .kw-ob  { background: #e2e8f0; color: #475569; }
+    .ans .kw-eff { background: #fef3c7; color: #b45309; }
+    /* Quiz mode */
+    .quiz-blank {
+      display: inline-block; min-width: 2.4em; min-height: 1.35em;
+      padding: 0 0.25em; margin: 0 0.05em; border-radius: 4px;
+      border: 1px dashed currentColor; vertical-align: baseline;
+      cursor: pointer; text-align: center; font-weight: 600; line-height: 1.35;
+      position: relative;
+    }
+    .quiz-blank:not(.filled)::after { content: "\00a0"; }
+    .quiz-blank.kw-cmp { background: #ffedd5; color: #9a3412; border-color: #fdba74; }
+    .quiz-blank.kw-el  { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+    .quiz-blank.kw-pr  { background: #ede9fe; color: #6d28d9; border-color: #c4b5fd; }
+    .quiz-blank.kw-ij  { background: #d1fae5; color: #047857; border-color: #6ee7b7; }
+    .quiz-blank.kw-jg  { background: #ffe4e6; color: #be123c; border-color: #fda4af; }
+    .quiz-blank.kw-ob  { background: #e2e8f0; color: #475569; border-color: #cbd5e1; }
+    .quiz-blank.kw-eff { background: #fef3c7; color: #b45309; border-color: #fcd34d; }
+    .quiz-blank.selected-slot { outline: 1px solid var(--accent); outline-offset: 1px; }
+    .quiz-blank.correct { border-style: solid; border-width: 1px; border-color: #16a34a; }
+    .quiz-blank.correct::after { content: "✓"; color: #16a34a; font-size: 0.85em; margin-left: 0.15em; }
+    .quiz-blank.wrong { border-style: solid; border-width: 1px; border-color: #dc2626; }
+    .quiz-blank.wrong::after { content: "✗"; color: #dc2626; font-size: 0.85em; margin-left: 0.15em; }
+    .quiz-bank {
+      display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.35rem 0 0.85rem;
+      padding: 0.45rem 0.5rem; background: var(--soft); border-radius: 6px;
+      border: 1px solid var(--line);
+    }
+    .quiz-word {
+      padding: 0.2rem 0.45rem; border-radius: 5px; border: 1px solid transparent;
+      font: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      touch-action: manipulation;
+    }
+    .quiz-word.kw-cmp { background: #ffedd5; color: #9a3412; }
+    .quiz-word.kw-el  { background: #dbeafe; color: #1d4ed8; }
+    .quiz-word.kw-pr  { background: #ede9fe; color: #6d28d9; }
+    .quiz-word.kw-ij  { background: #d1fae5; color: #047857; }
+    .quiz-word.kw-jg  { background: #ffe4e6; color: #be123c; }
+    .quiz-word.kw-ob  { background: #e2e8f0; color: #475569; }
+    .quiz-word.kw-eff { background: #fef3c7; color: #b45309; }
+    .quiz-word.selected { outline: 1px solid var(--accent); outline-offset: 1px; }
+    .quiz-word.used { opacity: 0.35; pointer-events: none; text-decoration: line-through; }
+    .art-note {
+      margin: 0.65rem 0; padding: 0.55rem 0.65rem;
+      border-left: 3px solid var(--line); background: var(--soft); font-size: 0.88rem; color: var(--muted);
+    }
+    .plates { margin: 0.75rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--line); }
+    .plates h3 { margin-top: 0; }
+    figure { margin: 0.75rem 0; }
+    figure img { max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; }
+    figcaption { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+    /* Colour key popup */
+    .color-key-backdrop {
+      position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,0.25);
+    }
+    .color-key-backdrop[hidden], .color-key-popup[hidden] { display: none; }
+    .color-key-popup {
+      position: fixed; z-index: 21; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(22rem, calc(100vw - 1.5rem));
+      max-height: calc(100vh - 2rem); overflow: auto;
+    }
+    .color-key-panel {
+      background: #fff; border: 1px solid var(--line); border-radius: 10px;
+      padding: 0.85rem 0.9rem 0.75rem; box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    .color-key-panel h2 {
+      margin: 0 0 0.6rem; font-size: 0.95rem;
+    }
+    .color-key-list { list-style: none; margin: 0; padding: 0; }
+    .color-key-list li {
+      display: flex; gap: 0.55rem; align-items: flex-start;
+      margin: 0.45rem 0; font-size: 0.82rem; line-height: 1.45;
+    }
+    .color-key-list .chip {
+      flex-shrink: 0; padding: 0.1rem 0.4rem; border-radius: 4px;
+      font-weight: 600; font-size: 0.76rem; white-space: nowrap;
+    }
+    .color-key-list .desc { color: var(--muted); }
+    .color-key-list .desc em { color: var(--text); font-style: normal; font-weight: 500; }
+    .color-key-note {
+      margin: 0.65rem 0 0; padding-top: 0.55rem; border-top: 1px solid var(--line);
+      font-size: 0.78rem; color: var(--muted);
+    }
+    .chip.kw-cmp { background: #ffedd5; color: #9a3412; }
+    .chip.kw-el  { background: #dbeafe; color: #1d4ed8; }
+    .chip.kw-pr  { background: #ede9fe; color: #6d28d9; }
+    .chip.kw-eff { background: #fef3c7; color: #b45309; }
+    .chip.kw-ij  { background: #d1fae5; color: #047857; }
+    .chip.kw-jg  { background: #ffe4e6; color: #be123c; }
+    .chip.kw-ob  { background: #e2e8f0; color: #475569; }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <a class="home" href="../index.html" aria-label="Appreciation guide">🏠</a>
+    <button type="button" id="quiz-toggle" class="quiz-btn" aria-label="Fill-in practice" aria-pressed="false">✏️</button>
+    <button type="button" id="palette-toggle" class="palette-btn" aria-label="Keyword colours" aria-expanded="false" aria-controls="color-key">🎨</button>
+    <select id="jump" aria-label="Section">
+      <option value="ex1-a" selected>Exemplar 1 · Paper 1 Q1 Part A</option>
+      <option value="ex1-b">Exemplar 1 · Part B (artwork)</option>
+      <option value="ex2-a">Exemplar 2 · Paper 1 Q5 Part A</option>
+      <option value="ex3-a">Exemplar 3 · Paper 1 Q2 Part A</option>
+      <option value="ex3-b">Exemplar 3 · Part B (artwork)</option>
+      <option value="ex4-a">Exemplar 4 · Paper 2 Q1 Part A</option>
+      <option value="ex4-b">Exemplar 4 · Part B (design)</option>
+      <option value="ex5-a">Exemplar 5 · Paper 2 Q3 Part A</option>
+      <option value="ex5-b">Exemplar 5 · Part B (design)</option>
+    </select>
+  </header>
+
+  <main>
+    <section id="ex1-a" class="active">
+      <h2>Level 5 exemplar (1) — Paper ONE · Question 1 · Part A</h2>
+      <p class="lede">Transcribed from handwritten HKEAA sample (2025). Spelling and wording kept as written.</p>
+
+      <div class="plates">
+        <h3>2025 exam plates</h3>
+        <figure>
+          <img src="plates/2025A_Q1a.webp" alt="Plate 1a — Pieter Bruegel the Elder, Children's Games" loading="lazy" />
+          <figcaption>Plate (1a) Pieter Bruegel the Elder, <em>Children's Games</em>, 1560. Oil on panel, 118 × 161 cm.</figcaption>
+        </figure>
+        <figure>
+          <img src="plates/2025A_Q1b.webp" alt="Plate 1b — Engraved Moon and Unfolding Clouds" loading="lazy" />
+          <figcaption>Plate (1b) Anonymous, <em>Engraved Moon and Unfolding Clouds</em> (Qing, ca. 1821 or later). Album leaf, ink and colours on paper, 61.5 × 77.5 cm.</figcaption>
+        </figure>
+      </div>
+
+      <p class="step step-ob">Describe</p>
+      <p class="ans">Plate 1a is titled <em>Children's games</em> by Pieter Bruegel the Elder. The <span class="kw-ob">large-scale</span> painting uses <span class="kw-el">oil paints</span> to <span class="kw-ob">depict</span> a <span class="kw-ob">medieval scene</span> in a city. The <span class="kw-el">rough texture</span> of the painting brings a <span class="kw-eff">dirty, patchy appearance</span> to the art. Throughout the painting, many different people, young and old, male and female, are fighting, playing games or fooling around, bringing the <span class="kw-eff">illusion of a festival</span>. The buildings are <span class="kw-el">geometrical</span>; the painting is heavy in little details like fallen hats, <span class="kw-el">multicoloured</span> clothes, etc. The painting itself is mainly <span class="kw-el">brownish</span>, giving it a <span class="kw-eff">rustic feeling</span>. It is a <span class="kw-ob">landscape</span> of an old village, <span class="kw-eff">crowded</span> and lived in.</p>
+      <p class="ans">Plate 1b is titled <em>Engraved Moon and Unfolding Clouds &amp; Everlasting on the Abode of the immortals</em>, made in the Qing dynasty. This Chinese-style painting shows a Chinese palace in the middle of low hills and blossoming trees. <span class="kw-cmp">Both</span> the rocks and hills and trees have a very <span class="kw-el">organic look</span>. There is no human in sight, but it focuses on a <span class="kw-el">colourful</span> lived house in the <span class="kw-el">foreground</span>. <span class="kw-cmp">Unlike</span> 1(a), 1(b) has no humans; instead an <span class="kw-el">empty courtyard</span> and <span class="kw-ob">grassland</span> by nature, <span class="kw-eff">vast and undirted</span>. The dots on the leaves and hills create a <span class="kw-el">texture akin to moss</span>, making the scenery feel <span class="kw-eff">more lively</span>. <span class="kw-el">Multicoloured</span> flowers and trees surround the palace, like <span class="kw-el">white, red, even blue</span> trees.</p>
+
+      <p class="step step-el">Analyze</p>
+      <p class="ans"><span class="kw-cmp">In terms of colour</span>, 1a has a more <span class="kw-el">unified palette</span>, mainly using <span class="kw-el">dark brown</span> and <span class="kw-el">warmer colours</span>, allowing <span class="kw-el">cool colours</span> like green clothes and grass to <span class="kw-eff">stick out</span>, <span class="kw-eff">making it more clear</span> to see the humans. <span class="kw-cmp">Compared to</span> 1(b), which uses a more <span class="kw-pr">balanced</span> combination of <span class="kw-el">green and light brown</span>, <span class="kw-pr">contrasting with</span> the <span class="kw-el">blue tiled roofs</span>. The <span class="kw-el">vibrant</span> <span class="kw-el">purples, pinks, yellows and reds</span> of the flowers <span class="kw-eff">pop out</span> just like they do in real life; its palette overall is <span class="kw-eff">more varied</span> than 1(a).</p>
+      <p class="ans"><span class="kw-cmp">In terms of shape</span>, 1a uses more <span class="kw-el">geometric shapes</span> for buildings, <span class="kw-el">sharp edges</span> and <span class="kw-el">straight lines</span>, <span class="kw-cmp">while</span> 1b uses <span class="kw-el">rounded corners</span>, <span class="kw-el">organic freeform shapes</span> for the trunks of trees, hills and rocks. Both have a <span class="kw-ob">realistic depiction</span> of the buildings, but a more <span class="kw-ob">stylised depiction</span> of the humans and nature, with <span class="kw-el">rounder</span> human heads and <span class="kw-el">wavy tree trunks</span>.</p>
+      <p class="ans"><span class="kw-cmp">In terms of space</span>, 1a leaves <span class="kw-el">little space</span> between each group of humans, creating a <span class="kw-eff">chaotic feeling</span>; the <span class="kw-pr">focus</span> of the painting being entirely the people and the village. 1b instead puts the palace in the middle, having <span class="kw-el">empty spaces</span> to give the palace the most attention.</p>
+      <p class="ans">1a uses much <span class="kw-pr">repetition</span> and human gestures to <span class="kw-pr">lead your eye</span> from one group to another, while 1b uses the <span class="kw-el">multicoloured roof house</span> as the <span class="kw-pr">eye-catcher</span>, the start of the painting.</p>
+
+      <p class="step step-ij">Interpret</p>
+      <p class="ans">1a is a <span class="kw-ij">depiction</span> of a western village having a festival; this is seen through many game-like activities, bull riding, barrel riding, playing with sticks and hoops. Everyone is engaged. <span class="kw-cmp">However</span> there are bits of trading, <span class="kw-ij">hinting at</span> a reward or prize in these games, possibly <span class="kw-ij">referencing</span> the famine or similar issue that leads to the villagers fighting over money, playing games to trade or win property so they can survive. The <span class="kw-el">brown of the painting</span> gives a <span class="kw-eff">poor feeling</span>, watching a scuffle of peasants from a <span class="kw-el">high perspective</span>, like we are the <span class="kw-ij">royalty or higher class</span>, watching a <span class="kw-ij">revolution unfold</span>.</p>
+      <p class="ans">1b is an appreciation of nature. The <span class="kw-eff">seamless blend</span> of nature and human infrastructure shows the ability for humans and nature to <span class="kw-ij">coexist</span>. The hills and trees are drawn with <span class="kw-ob">detail and care</span>, showing the artist's appreciation for nature. The trees do not grow into the walls, instead supporting it, growing alongside it. The village palace is well kept, <span class="kw-eff">clean and neat</span>. The eastern style is simplistic but direct, able to <span class="kw-ij">represent the beauty of nature</span>. It is mainly <span class="kw-el">brown and green</span>, common colours of nature as well.</p>
+      <p class="ans"><span class="kw-cmp">Both</span> paintings use different, <span class="kw-cmp">even opposing</span> <span class="kw-ij">themes</span> of nature and humans.</p>
+
+      <p class="step step-jg">Judge</p>
+      <p class="ans"><span class="kw-jg">I prefer</span> 2a more. The <span class="kw-el">visual elements</span> of 2a are very <span class="kw-ob">detailed</span> and take a long time to notice every small detail. I appreciate the many different activities the humans are seen doing; it brings a painting that tells many little stories in one big story, making it <span class="kw-jg">more entertaining</span> than 2b.</p>
+      <p class="ans">I also like their use of colours. Despite the blues, reds, yellows and greens all being different <span class="kw-el">hues</span>, the colours are <span class="kw-pr">united</span> to <span class="kw-eff">blend well together</span>, making it look <span class="kw-el">colourful</span> while making it look like it all <span class="kw-eff">belongs together</span>.</p>
+      <p class="ans">2a is also quite <span class="kw-jg">impactful</span>. Despite its many interpretations, it could be a <span class="kw-ij">commentary</span> on the greed of upper classes, or a <span class="kw-ij">playful depiction</span> of children having fun. It is a <span class="kw-jg">thought-provoking</span> piece that is suitable no matter the age or gender of the public.</p>
+      <p class="ans">I think it is also a great <span class="kw-jg">inspiration</span>. The many different scenes happening <span class="kw-eff">vary so much</span> that it allows many other artists to take inspiration or use as reference.</p>
+      <p class="ans">I also admire the artist's ability to create <span class="kw-el">texture</span>: the dirt roads are <span class="kw-el">patchy</span>, the brick buildings are <span class="kw-eff">dirty and old</span>, and the trees are <span class="kw-ob">realistic</span>.</p>
+      <p class="ans"><span class="kw-jg">Overall</span>, <span class="kw-jg">I think</span> 2a is <span class="kw-jg">better</span> at relaying a <span class="kw-ij">theme</span> and <span class="kw-eff">invoking conversation</span>, as well as attracting more people to look at it.</p>
+    </section>
+
+    <section id="ex1-b">
+      <h2>Level 5 exemplar (1) — Part B</h2>
+      <p class="art-note">Part B is a practical artwork. See the original scan below; brief notes from the creative brief page are transcribed.</p>
+      <figure>
+        <img src="2025-Sample-VA-Level5-E-V831_page-0005.jpg" alt="Part B artwork — student at desk studying at night" loading="lazy" />
+        <figcaption>Page 5 — finished Part B work (theme: study / university admissions pressure)</figcaption>
+      </figure>
+      <h3>Creative briefs (page 6)</h3>
+      <p>Looking up at the sky from a brightly lit city.</p>
+      <p>The girl looks up at the sky from her apartment in a bright vibrant city, taking a break from her studies to gaze upon the moon. The lights of the buildings illuminate her room.</p>
+      <figure>
+        <img src="2025-Sample-VA-Level5-E-V831_page-0006.jpg" alt="Creative brief sketches" loading="lazy" />
+        <figcaption>Page 6 — thumbnail sketches</figcaption>
+      </figure>
+    </section>
+
+    <section id="ex2-a">
+      <h2>Level 5 exemplar (2) — Paper ONE · Question 5 · Part A</h2>
+
+      <div class="plates">
+        <h3>2025 exam plates</h3>
+        <figure>
+          <img src="plates/2025A_Q5a.webp" alt="Plate 5a" loading="lazy" />
+          <figcaption>Plate (5a) — 2025 HKDSE paper image.</figcaption>
+        </figure>
+        <figure>
+          <img src="plates/2025A_Q5b.webp" alt="Plate 5b — Rover's Garden Grows" loading="lazy" />
+          <figcaption>Plate (5b) Dale Chihuly &amp; Italo Scanga, <em>Rover's Garden Grows</em>, 1991. Mixed media, 174.6 × 169.2 × 55.2 cm.</figcaption>
+        </figure>
+        <figure>
+          <img src="plates/2025A_Q5b1.webp" alt="Plate 5b detail 1" loading="lazy" />
+          <figcaption>Plate (5b.1) Detail 1.</figcaption>
+        </figure>
+        <figure>
+          <img src="plates/2025A_Q5b2.webp" alt="Plate 5b detail 2" loading="lazy" />
+          <figcaption>Plate (5b.2) Detail 2.</figcaption>
+        </figure>
+      </div>
+
+      <p class="step step-ob">Describe</p>
+      <p class="ans">5A) The two plates are both <span class="kw-ij">interpretations</span> of animals, with <span class="kw-el">modified shapes</span> and <span class="kw-el">vibrant colours</span>. <span class="kw-cmp">However</span> they are drastically different in terms of <span class="kw-ob">dimensions</span> of the work, and the <span class="kw-ij">message</span> to be delivered.</p>
+      <p class="ans">Plate 5A is a <span class="kw-el">two-dimensional</span> <span class="kw-el">oil on canvas</span>, <span class="kw-el">horizontal</span>, <span class="kw-ob">depicting</span> the living of animals in <span class="kw-el">geometric shapes</span> in a countryside. The <span class="kw-el">background</span> of the painting is divided into four colour areas but unevenly: <span class="kw-el">pale light green</span>, <span class="kw-el">pale yellow</span> (rather in a <span class="kw-el">warm tone</span>) in major, and <span class="kw-el">dark purple and red</span> with black <span class="kw-el">horizontal line patterns</span>. About the <span class="kw-el">foreground</span>, there is no major subject; animals and plants are <span class="kw-el">evenly distributed</span> in this work, <span class="kw-el">colourfully</span>. A tree whose body is in long geometric shape with circle flatly as its top, representing its leaves. There is an eye intricately drawn with <span class="kw-el">rainbows of colour</span>. Animals like the horse in the middle, the chicken at the right corner, the snail, the rabbit at the sides are all depicted in geometric shapes, which is <span class="kw-ob">unrealistic</span>. There is an ear on the tree's body as well. The river painted in orange, yellow and black is simplified into <span class="kw-el">wavy curves</span>. The trees at the back are holding a national flag. All elements are <span class="kw-ob">surrealistically drawn</span>, with some of them added with human body parts. There is <span class="kw-el">shading</span> inside each animal and plant with <span class="kw-el">complementary colours</span> but not between the division of each object. The painting hardly shows <span class="kw-el">depth</span> or real-world distance but <span class="kw-el">flatly represents</span> each animal in <span class="kw-el">multiple perspectives</span>.</p>
+      <p class="ans">Plate 5B is a <span class="kw-el">three-dimensional</span> <span class="kw-el">installation</span> of a modified table with colourful elements of <span class="kw-el">transparent glassy sculpture</span> added on the face of the table (showing its <span class="kw-eff">coldness</span>). The table is dominated with <span class="kw-el">gold</span> (light reflected), black, <span class="kw-el">bronze</span>, cold, <span class="kw-el">metallic</span>. There is a dog-shaped half body under the table which is detailedly sculptured; its skin and face is clearly shown. The <span class="kw-el">vibrant colours</span> of the glassy objects on the table <span class="kw-pr">contrast with</span> the <span class="kw-el">dull</span>, <span class="kw-el">monochromatic</span> colour of the dog under the table.</p>
+
+      <p class="step step-ij">Interpret</p>
+      <p class="ans"><span class="kw-cmp">Both</span> plates are showing the modification of nature: plate 5A combines plants and human parts, while plate 5B combines animals and objects. Plate 5A seems to <span class="kw-ij">imply</span> a world in general of what if plants become human and live like humans. The ears on the tree <span class="kw-ij">suggest</span> a clear sense of <span class="kw-eff">unrealism</span> and show the artist is trying to <span class="kw-ij">humanise</span> the plants. The tree seems interacting with the animals, showing a <span class="kw-ij">fantasy</span> of animal in nature that viewers cannot feel in real life. This shows that the artist seems trying to tell the viewers about <span class="kw-ij">imagery</span> of trees and animals connection. <span class="kw-cmp">In depth</span>, this may also <span class="kw-ij">imply our lack of connection</span> or <span class="kw-ij">empathy</span> towards nature and animals in nowadays society.</p>
+      <p class="ans">Plate 5B seems to blend a table with dog, <span class="kw-ij">suggesting</span> that the dog's body or legs are the legs of the table. Many objects in <span class="kw-el">abstract shapes</span> are put on the table. This may suggest the labour work of the dog or simply the function of the table. <span class="kw-cmp">However</span>, combining them together shows the artist is trying to <span class="kw-ij">convey a message</span> of the <span class="kw-ij">mistreatment</span> of animals and disrespect of humans to them, whereas some people may treat their pets as labour, to order them to work instead of giving them love and care. <span class="kw-cmp">Therefore</span>, both plates seem trying to remind people the proper way to treat animals through different <span class="kw-ob">media and representation</span>.</p>
+
+      <p class="step"><span class="step-el">Analyze</span><span class="step-sep"> · </span><span class="step-cmp">compare</span></p>
+      <p class="ans"><span class="kw-cmp">In terms of colour</span> use, both plates use <span class="kw-el">vibrant colours</span> in overall works. <span class="kw-cmp">However</span>, <span class="kw-jg">I believe</span> plate 5B has better delivery of its message of taking care of pets or to remind people to identify the proper way to treat pets, with the construct of thousands of objects on the table, colourfully, and the <span class="kw-el">monochromatic</span> bronze dog under the table. The colourful element seems to <span class="kw-ij">symbolise</span> the burden of dog when being mistreated but in our eyes those are colourful, which shows our <span class="kw-eff">misunderstanding</span> and <span class="kw-ij">lack of empathy</span> toward the pets.</p>
+      <p class="ans"><span class="kw-cmp">In terms of</span> object arrangement overall, <span class="kw-jg">I believe</span> plate 5A does better to <span class="kw-ij">convey its message</span> of the connection of animals and nature. As the addition of ear on tree's body parts and holding flags and the <span class="kw-el">joyful colours</span> in overall <span class="kw-el">palette</span> which is rather <span class="kw-el">warm</span>, showing the <span class="kw-pr">harmony</span> of them together in a <span class="kw-eff">big picture</span>, while plate 5B is rather focusing on one animal and one object interpretation. <span class="kw-cmp">Hence</span>, plate 5A seems to deliver its message <span class="kw-jg">more all-rounded</span> as showing the <span class="kw-eff">atmosphere</span> through a <span class="kw-el">two-dimensional medium</span> and the general picture of the artist's <span class="kw-ij">fantasy world</span> with such approaches, allowing viewers to deeply think about the <span class="kw-ij">relationship</span> between animals/plants and reflecting on the destruction humans had done to the world.</p>
+
+      <p class="step step-jg">Judge</p>
+      <p class="ans"><span class="kw-cmp">Both</span> plates are craftily made and <span class="kw-jg">successfully</span> developed their own <span class="kw-ij">message</span> in terms of different realms.</p>
+    </section>
+
+    <section id="ex3-a">
+      <h2>Level 5 exemplar (3) — Paper ONE · Question 2 · Part A</h2>
+
+      <div class="plates">
+        <h3>2025 exam plates</h3>
+        <figure>
+          <img src="plates/2025A_Q2a.webp" alt="Plate 2a — Anticipation" loading="lazy" />
+          <figcaption>Plate (2a) Inges Idee, <em>Anticipation</em>, 2018. Stainless steel circular bend pipes, wood, plastic composites, sandblast ground, LED light, 273 × 1148 × 850 cm.</figcaption>
+        </figure>
+        <figure>
+          <img src="plates/2025A_Q2a12.webp" alt="Plate 2a side and top views" loading="lazy" />
+          <figcaption>Plate (2a.1) Side view; Plate (2a.2) Top view.</figcaption>
+        </figure>
+        <figure>
+          <img src="plates/2025A_Q2b.webp" alt="Plate 2b — The Travellers J4" loading="lazy" />
+          <figcaption>Plate (2b) Bruno Catalano, <em>The Travellers J4</em>, 2022. Bronze, 310 × 120 × 110 cm.</figcaption>
+        </figure>
+        <figure>
+          <img src="plates/2025A_Q2b1.webp" alt="Plate 2b side view" loading="lazy" />
+          <figcaption>Plate (2b.1) Side view.</figcaption>
+        </figure>
+        <figure>
+          <img src="plates/2025A_Q2b2.webp" alt="Plate 2b back view" loading="lazy" />
+          <figcaption>Plate (2b.2) Back view.</figcaption>
+        </figure>
+      </div>
+
+      <p class="step step-ob">Describe</p>
+      <p class="ans"><span class="kw-cmp">Both</span> plate 2a and 2b are <span class="kw-el">installations</span> featuring a humanoid with an item in their hand and <span class="kw-ob">displayed in public</span>.</p>
+      <p class="ans">For plate 2a, it is named <em>Anticipation</em>, made in <span class="kw-ob">stainless steel</span> circular bend pipes, wood, <span class="kw-ob">plastic composites</span>, <span class="kw-ob">sandblast ground</span> and <span class="kw-ob">LED light</span>, <span class="kw-ob">size</span> 273 × 1148 × 850 cm, by Inges Idee in 2018.</p>
+      <p class="ans">Plate 2a features a <span class="kw-ob">cartoonised</span> humanoid child; the body part and face are not clearly visible. The <span class="kw-el">ratio</span> of its <span class="kw-ob">anatomy</span> is <span class="kw-ob">unrealistic</span> since its head is round and big and its arms and legs are shaped <span class="kw-el">cylinder</span>, making it a cartoonised feature. With addition the use of <span class="kw-el">bright warm colour</span> such as <span class="kw-el">yellow, orange, light green</span>, or <span class="kw-el">sky blue and purple</span>, gave a <span class="kw-eff">lively, playful mood</span>. It is believed that the installation is featuring a child as the humanoid is dressed in green cap, short shirt and holding a toy car — those features usually <span class="kw-ij">representing child</span>, giving <span class="kw-eff">effect of childish</span>. And as it was standing straight in a <span class="kw-ob">public place</span>, seems the kid was lost and don't know where to go.</p>
+      <p class="ans">For plate 2b, it is named <em>The Travellers J4</em>, made in <span class="kw-ob">bronze</span>, size 310 × 120 × 110 cm, by Bruno Catalano in 2022. <span class="kw-cmp">As similarity</span>, it also features a standing humanoid as plate 2a. <span class="kw-cmp">However</span>, the style of this humanoid is <span class="kw-ob">realistic</span> as the <span class="kw-ob">facial features</span>, <span class="kw-ob">body parts</span> and even <span class="kw-ob">folds of his clothes</span> are similar as a real person. The most expressive feature in this artwork is the humanoid had his <span class="kw-el">torso empty</span>, making the installation <span class="kw-eff">unstable</span> like it was erased suddenly. The floating features also gave an idea of <span class="kw-eff">emptiness</span> as the erased part gave chance for audience to take a look at his body interior. No organs shown, showing his <span class="kw-eff">numbness</span> as same as his facial expression. The artwork is named The Travellers J4; <span class="kw-cmp">however</span>, the man does not seem like he is enjoying the travel but looks like a zombie walking aimlessly, issuing the common mental state of modern people as people nowadays are numb and have <span class="kw-ij">loss of faith</span>.</p>
+
+      <p class="step step-el">Analyze</p>
+      <p class="ans">For artwork media, plate 2a made use of stainless steel circular bend pipes and plastic composites, which are unusual as most statues are usually made in bronze as plate 2b traditionally to avoid physical damage such as acid rain. <span class="kw-cmp">However</span>, it is also <span class="kw-jg">creative and successful</span> as the plastic composites gave <span class="kw-el">bright colour</span> which bronze can't achieve. Use of <span class="kw-el">bright colours</span> and <span class="kw-ob">LED lights</span> help the installation <span class="kw-eff">stand out</span> from the environment's <span class="kw-el">dull colours</span> and visible during light time, successfully to <span class="kw-ij">express</span> child is difference from city space occupied by adults. Child's views are usually more <span class="kw-eff">optimistic</span> than adults but unfortunately they might easily get lost in adult's world once they grow up, making a <span class="kw-pr">great contrast</span> <span class="kw-cmp">compared to</span> plate 2b as plate 2b is exactly the adult with no joy. The traditional use of bronze of production also gave the installation a <span class="kw-el">monotone</span> of brown which the colour is <span class="kw-el">less saturated</span>, gave effect of <span class="kw-eff">negative mood</span>. And the installation have a similar <span class="kw-el">colortone</span> as the environment — for example, the <span class="kw-el">light yellow tone</span> of his needle shirt is as same as those housed behind him, <span class="kw-ij">gave a message</span> that actually this man is already part of an environment. He might experienced <span class="kw-ij">limitations from social</span>, was expected to act like what people think an adult should be. Lastly, he turned into a <span class="kw-eff">numb person</span> with his heart empty, could only <span class="kw-ij">escape from reality</span> by travelling.</p>
+
+      <p class="step"><span class="step-ij">Interpret</span><span class="step-sep"> · </span><span class="step-jg">judge</span></p>
+      <p class="ans"><span class="kw-cmp">Despite</span> the <span class="kw-pr">great contrast</span> of both plates presented visually, <span class="kw-jg">I think</span> both plates have an extra similarity of <span class="kw-ij">theme</span> expressed. For plate 2a, it is <span class="kw-ij">expressing</span> a child who didn't fit the adult's environment, getting lost but never lost his childish. And for plate 2b, expressing a man travelling — although he knew his way of travelling, actually he is losing his mind once he turned into an adult. <span class="kw-ij">Both artworks express</span> the theme of 'lost' but in <span class="kw-cmp">different perspective</span> as 2a is child while 2b is an adult. Both plates gave a remarkable expression to tell message to audience but <span class="kw-jg">personally I think</span> plate 2a is <span class="kw-jg">more creative</span> as the art style is <span class="kw-jg">more unique</span> and also aware people to take care of their children not to get lost in public space, while plate 2b, the expression of showing emptiness by erasing part of the artwork is actually quite common in art-making but also <span class="kw-jg">expressive</span>.</p>
+    </section>
+
+    <section id="ex3-b">
+      <h2>Level 5 exemplar (3) — Part B</h2>
+      <figure>
+        <img src="2025-Sample-VA-Level5-E-V831_page-0012.jpg" alt="Part B VR animal party artwork" loading="lazy" />
+        <figcaption>Page 12 — Part B finished work (virtual-world animal party)</figcaption>
+      </figure>
+      <p><strong>Creative brief:</strong> An animal party in the virtual world.</p>
+      <figure>
+        <img src="2025-Sample-VA-Level5-E-V831_page-0013.jpg" alt="Creative brief sketches" loading="lazy" />
+        <figcaption>Page 13 — brief sketches</figcaption>
+      </figure>
+      <figure>
+        <img src="2025-Sample-VA-Level5-E-V831_page-0020.jpg" alt="Part B officer on train artwork" loading="lazy" />
+        <figcaption>Page 20 — second Part B theme (officer / child on train)</figcaption>
+      </figure>
+      <h3>Creative brief (page 21)</h3>
+      <p>Man → child. Head and body → physical and spiritual. Playful → basketball. Home → home door, door ring, key ring. Officer → running home. Broken shirt and shoe is missing. Run straight to train → dark tone, depressive (going home).</p>
+      <p><strong>Statement:</strong> This drawing features an officer running home via train. Although his body is an adult, his mind is still a child. The only happiness he could gain is back home to enjoy playtime, so he can't wait to send his head back to home. The fantasy is that most officers are out of head because their mind is empty too.</p>
+    </section>
+
+    <section id="ex4-a">
+      <h2>Level 5 exemplar (4) — Paper TWO Design · Question 1 · Part A</h2>
+
+      <div class="plates">
+        <h3>2025 exam plates</h3>
+        <figure>
+          <img src="plates/2025B_Q1a.webp" alt="Plate 1a — Noir Kei Ninomiya Fall 2022" loading="lazy" />
+          <figcaption>Plate (1a) Noir Kei Ninomiya. Womenswear. Fall 2022. (Includes details 1a.1–1a.2 on exam page.)</figcaption>
+        </figure>
+        <figure>
+          <img src="plates/2025B_Q1b.webp" alt="Plate 1b — Loewe Spring Summer 2023" loading="lazy" />
+          <figcaption>Plate (1b) Loewe. Womenswear. Spring Summer 2023. (Includes details 1b.1–1b.3 on exam page.)</figcaption>
+        </figure>
+      </div>
+
+      <p class="step step-ob">Describe</p>
+      <p class="ans">Plate 1a is a <span class="kw-ob">womenswear</span> look from Noir Kei Ninomiya Fall 2022 collection, <span class="kw-cmp">while</span> plate 1b is a womenswear look from Loewe Spring Summer 2023 collection.</p>
+      <p class="ans"><span class="kw-cmp">In terms of visual effect</span>, plate 1a has a more <span class="kw-eff">huge visual effect</span>. In plate 1a, the upper body is formed by a <span class="kw-el">white mask</span>. The <span class="kw-el">pattern</span> of the mask is like <span class="kw-el">irregular grids</span> so the mask looks like a bird net. Besides, there is a short jacket which has a zip in the middle. There are some <span class="kw-el">3D spikes</span> on the jacket which sizes vary. The spikes are shown in <span class="kw-el">purple, grey, silver and sky blue</span> colour and in a <span class="kw-el">metallic effect</span>. At the lower body, there is a <span class="kw-el">yarn dress</span> with <span class="kw-el">many layers</span>. The dress is shown in <span class="kw-el">black colour</span>. As the material used is <span class="kw-el">semi-transparent</span>, the white inner layer of the dress is <span class="kw-eff">visible</span> and also the lower part of the jacket can be seen. There is also a pair of <span class="kw-el">black leather boots</span>.</p>
+      <p class="ans">In plate 1b, there is a minidress; the <span class="kw-el">silhouette</span> is tighter than plate 1a — plate 1b has an <span class="kw-el">X-line silhouette</span>. At the collar, there are three buttons and also a <span class="kw-el">blue collar</span>. At the upper part of the dress, there are <span class="kw-el">blue-and-white stripes</span> which are <span class="kw-el">vertical</span>. The stripes are thin and long and are <span class="kw-el">closely packed</span>. There are also <span class="kw-el">cap-shape sleeves</span> which are short. At the 'skirt' part of the dress, there are also stripes which are in <span class="kw-el">sky blue-and-white colours</span>; however, the stripes are <span class="kw-el">thicker and less dense</span>. Also, the dress is folded so there are <span class="kw-el">drapings</span> at the bottom of the dress. At the lower body, there is a pair of shoes presented like a bunch of <span class="kw-el">loose balloons</span> packed together. The size of the shoes is <span class="kw-eff">exaggeration</span>. <span class="kw-cmp">In terms of background</span>, both plates 1a and 1b are shown in a <span class="kw-el">plain colour background</span> — plate 1a is <span class="kw-el">black</span> and plate 1b is sky blue.</p>
+
+      <p class="step step-el">Analyze</p>
+      <p class="ans"><span class="kw-cmp">In terms of visual design principle</span>, <span class="kw-pr">balance</span> is shown in both plates. As all elements in the plates are placed and arranged equally side by side, the plates look <span class="kw-pr">symmetrically balanced</span> and it gives a <span class="kw-eff">pleasing feel</span> to the viewers. In addition, both plates show <span class="kw-pr">contrast</span>. Plate 1a uses <span class="kw-el">different materials</span> in the upper and lower body. The jacket is more solid due to its <span class="kw-el">metallic appearances</span> while the lower body has a <span class="kw-eff">floaty and lighter feeling</span> due to its <span class="kw-el">light material</span>. Therefore, a <span class="kw-pr">strong contrast</span> is shown in terms of <span class="kw-el">texture</span>. In plate 1b, the <span class="kw-el">different size of pattern</span> between the upper and the lower part of the dress creates <span class="kw-eff">different visual effect</span> which makes the dress <span class="kw-eff">more fun</span>. The <span class="kw-el">tighter silhouette</span> at the upper part of the dress and the <span class="kw-el">loose silhouette</span> on the lower part of the dress also <span class="kw-pr">creates contrast</span>.</p>
+      <p class="ans"><span class="kw-cmp">Also</span>, plates 1a and 1b create a sense of <span class="kw-pr">rhythm</span>. The spikes in plate 1a appear as <span class="kw-pr">repeated mass</span> and the <span class="kw-pr">variety in their sizes</span> <span class="kw-pr">generates movement</span> like the spikes are popping out. In plate 1b, the stripes' size extend from high to low, created a <span class="kw-pr">waterfall-like pattern</span>, seems like the stripe is moving from high to low, <span class="kw-pr">guiding the viewer's eyes</span> from looking at the upper part of the dress to the lower part of the dress. Moreover, plate 1a has the <span class="kw-pr">focal point</span> in the jacket because the pattern on it is <span class="kw-eff">unusual</span> from the ordinary jacket. Plate 1b has the focal point in the shoes because the <span class="kw-eff">exaggeration</span> of their size is shown. Furthermore, plate 1b generates <span class="kw-pr">unity</span> because the patterns are the same in the dress which makes it look <span class="kw-pr">unified</span>.</p>
+
+      <p class="step step-ij">Interpret</p>
+      <p class="ans"><span class="kw-cmp">In terms of design concept</span> and <span class="kw-ij">message</span>, plates 1a and 1b portray different kinds of people and deliver different <span class="kw-ij">beliefs</span>. In plate 1a, Noir Kei Ninomiya inherited the <span class="kw-ij">rebellious</span> and revolutionary spirit from Rei Kawakubo and created a look that is <span class="kw-eff">not traditional</span>. The sense of femininity is <span class="kw-pr">not emphasized</span> in this look because the spikes on the jacket look <span class="kw-eff">aggressive</span>. The silhouette is also in a <span class="kw-el">bell shape</span> which the body of the female model is not emphasized. It <span class="kw-ij">symbolizes</span> the <span class="kw-ij">liberation</span> of women's body and the white mask blurs the face of the model, <span class="kw-ij">delivering a message</span> that women do not need to show their beauty just relying on their faces. The look <span class="kw-ij">can be read as</span> <span class="kw-ij">women empowerment</span>.</p>
+      <p class="ans">In plate 1b, the designer Jonathan Anderson aligns with his <span class="kw-ij">playful design concepts</span> which the shoes are shown in a <span class="kw-el">balloon shape</span>. The dress is also in a very small size. It reminds the viewers about their <span class="kw-ij">childhood</span>, like the model is wearing her childhood clothing again, and is willing to try on everything as a child, including balloons. The look replicate the <span class="kw-ij">fun and exploration</span> people have in their childhood.</p>
+      <p class="ans">Besides, the creation of the shoes also aligns with the spirit of the old Spanish House of Loewe, which is the <span class="kw-pr">emphasis</span> of exceptional leather <span class="kw-jg">craftsmanship</span>. The idea of both plate 1a and 1b is <span class="kw-jg">innovative</span> and the message sent is <span class="kw-ij">meaningful</span> — plate 1a lets people <span class="kw-ij">rethink</span> about women status in society and plate 1b <span class="kw-ij">provokes</span> people's memories of childhood and the fun to wear beautiful clothing.</p>
+
+      <p class="step step-jg">Judge</p>
+      <p class="ans"><span class="kw-cmp">In comparison</span>, <span class="kw-jg">I like</span> plate 1b more. Both plates 1a and 1b have high level of <span class="kw-jg">craftsmanship</span>; the spikes in plate 1a and the balloon shoes in plate 1b show excellent <span class="kw-jg">savoir-faire</span>. Besides, both designers <span class="kw-ij">deliver their message clearly</span> because the elements emphasising that are <span class="kw-eff">obvious and deliberate</span>. Plate 1b is a plate I can <span class="kw-jg">resonate with</span> because it reminds me of my childhood, the desire to dress myself beautifully. The communication skill of the plate is good. Both plates also use different <span class="kw-pr">design principles</span> and include the <span class="kw-ij">brand DNA</span> to <span class="kw-pr">emphasize</span> the identity of the brand and enrich the looks. The plates also have <span class="kw-jg">deep meaning</span>.</p>
+    </section>
+
+    <section id="ex4-b">
+      <h2>Level 5 exemplar (4) — Part B</h2>
+      <figure>
+        <img src="2025-Sample-VA-Level5-E-V831_page-0027.jpg" alt="Bridal and bridesmaid fashion sketches" loading="lazy" />
+        <figcaption>Page 27 — bridal gown and bridesmaid dress designs</figcaption>
+      </figure>
+      <p>Bridal gown: camellia-shaped sleeves; flower blossom embroidery; material silk; leather heels. Headdress width 45 cm; height 155 cm. Deep V-back with three buttons.</p>
+      <p>Bridesmaid dress: knee length; black belt; same embroidery motif; headdress width 18 cm; dress length 85 cm.</p>
+      <p>The camellia flower shape sleeves symbolise flower blossoms in early spring, and represent new life, energetic love and marriage. The embroideries represent care and promise indoctrinated in a marriage.</p>
+      <p class="art-note">Page 28: printed note — “No Design Briefs for this Exemplar”.</p>
+    </section>
+
+    <section id="ex5-a">
+      <h2>Level 5 exemplar (5) — Paper TWO Design · Question 3 · Part A</h2>
+
+      <div class="plates">
+        <h3>2025 exam plates</h3>
+        <figure>
+          <img src="plates/2025B_Q3a.webp" alt="Plate 3a — HRUM&amp;HRUM hazelnut packaging" loading="lazy" />
+          <figcaption>Plate (3a) HRUM&amp;HRUM hazelnut packaging (squirrel). Paper and cloth. (Includes back view and unfolded layout on exam page.)</figcaption>
+        </figure>
+        <figure>
+          <img src="plates/2025B_Q3b.webp" alt="Plate 3b — RICEMAN Japanese white rice packaging" loading="lazy" />
+          <figcaption>Plate (3b) RICEMAN. Japanese white rice packaging. Cloth and straw. (Includes details 3b.1–3b.2 on exam page.)</figcaption>
+        </figure>
+      </div>
+
+      <p class="step step-ob">Describe</p>
+      <p class="ans"><span class="kw-cmp">Both</span> plate 3a and 3b are <span class="kw-ob">package design</span> for food. In plate 3a it is a "nuts" design with a <span class="kw-el">shape of squirrel</span>. The package of the product hazelnut is in <span class="kw-el">white package</span> which create a <span class="kw-eff">chubby face</span> for the squirrel. While in plate 3b, there are some riceman wearing hats — it is Japanese traditional farmman. The colour of these farm man are white, and they are in different <span class="kw-el">body shapes</span> ranging from tall, short, fat and slim. The <span class="kw-el">typography</span> of plate 3a is <span class="kw-el">sans serif</span> which is a <span class="kw-el">modern typography</span> but plate 3b is in Japanese, which is <span class="kw-el">traditional typography</span>.</p>
+      <p class="ans">The colour in plate 3a is <span class="kw-el">warm and saturated</span> which create <span class="kw-eff">vitality and enthusiasm</span> and <span class="kw-eff">grab audience's attention</span>. While in plate 3b, the colour is <span class="kw-el">dull and low-key</span>, simply <span class="kw-el">white and brown</span> which feels like <span class="kw-eff">relax and soft</span>, <span class="kw-eff">affinity and comfortable</span>.</p>
+      <p class="step step-el">Analyze</p>
+      <p class="ans">In plate 3a it used <span class="kw-pr">symmetrical balance</span>; it creates a <span class="kw-eff">sense of stability</span> and <span class="kw-eff">visual consistency</span> and enhance <span class="kw-eff">readability</span>. The face of the squirrel is symmetrical balance. In plate 3b it used <span class="kw-el">blank space</span> which give people <span class="kw-eff">unlimited imagination</span> which is more interesting than a full design and <span class="kw-eff">interact with viewer</span> instead of making viewers passively accept information. Plate 3b also used symmetrical balance as the face of white riceman are symmetrical balance. In plate 3b, it used <span class="kw-pr">emphasis</span> as it highlight the key point which create certain elements like 'rice' <span class="kw-eff">stands out</span> in the design and <span class="kw-pr">guide audiences' attention</span>. In plate 3a it also used emphasis as the facial features of the squirrel stands out and enhance <span class="kw-eff">visual appeal</span> and make it easier to notice the element which the package of the nuts.</p>
+      <p class="step step-ij">Interpret</p>
+      <p class="ans">Regarding the <span class="kw-ij">functions</span>, in plate 3a it encourage customers to <span class="kw-ij">purchase the product</span>, while in plate 3b it also invite audience to purchase the product as they are product designs.</p>
+      <p class="ans">Regarding <span class="kw-ij">symbolic meanings</span>, in plate 3a the squirrel <span class="kw-ij">represent</span> their habit to eat nuts therefore audience might <span class="kw-ij">resonate with</span> the product and <span class="kw-ij">evoke</span> their passion to eat nuts, while in plate 3b, three riceman <span class="kw-ij">represent rice</span> and audience can directly think about rice as it obviously show the <span class="kw-ij">key feature</span> of rice.</p>
+      <p class="ans">Regarding <span class="kw-ij">audience</span>, in plate 3a, audience are mainly youngsters and children as the design is <span class="kw-eff">cute and adorable</span> associated with <span class="kw-eff">happiness and joy</span>. In plate 3b, audience are mainly housewife or adults as it is <span class="kw-ij">daily necessity</span>. Most likely only housewife or domestic helper will buy these product so the colour of the design will be more dull and blank which create a sense of <span class="kw-eff">reassurance and credibility</span> for consumers.</p>
+      <p class="step step-jg">Judge</p>
+      <p class="ans"><span class="kw-jg">I prefer</span> plate 3a, as the design is more <span class="kw-jg">user friendly</span>, and audience can easier understand how to use the product. I think plate 3a is a <span class="kw-jg">successful design</span> as I can <span class="kw-jg">resonate more</span> about the elements like squirrel and nuts; they are <span class="kw-jg">relevant and make sense</span>. And the design is convenience for audience to touch the product and feel the <span class="kw-el">shape and texture</span> of nuts.</p>
+      <p class="ans"><span class="kw-cmp">However</span>, in plate 3b, it is hard to realize how to use the product as the picture didn't show how to open the product. And the package of rice man is used cotton canvas which is <span class="kw-el">soft material</span> easily to be wet or dirty or even the rice will falling out if the user didn't seal the package carefully. <span class="kw-jg">I think</span> the designer should change the package into another materials like acrylic plastic or other material which is <span class="kw-jg">more stable</span> to hold the rice.</p>
+    </section>
+
+    <section id="ex5-b">
+      <h2>Level 5 exemplar (5) — Part B</h2>
+      <figure>
+        <img src="2025-Sample-VA-Level5-E-V831_page-0033.jpg" alt="FURRY yarn packaging designs" loading="lazy" />
+        <figcaption>Page 33 — product packaging designs (FURRY yarn)</figcaption>
+      </figure>
+      <p>Leaf-shaped baskets with purple egg-shaped contents; bases labelled FURRY. Dimensions noted: heights 12–15 cm, widths 17 cm. Materials: plastic lid, cotton cloth base. Flower-shaped lid variant (Yarn 1 / Yarn 2).</p>
+      <figure>
+        <img src="2025-Sample-VA-Level5-E-V831_page-0034.jpg" alt="Design brief sketches" loading="lazy" />
+        <figcaption>Page 34 — design brief sketches and colour tests</figcaption>
+      </figure>
+      <p>Sketch notes: plants; colour swatches; form explorations for basket / yarn packaging.</p>
+    </section>
+  </main>
+
+  <div id="color-key-backdrop" class="color-key-backdrop" hidden></div>
+  <div id="color-key" class="color-key-popup" role="dialog" aria-labelledby="color-key-title" aria-modal="true" hidden>
+    <div class="color-key-panel">
+      <h2 id="color-key-title">Keyword colours</h2>
+      <ul class="color-key-list">
+        <li>
+          <span class="chip kw-ob">Describe</span>
+          <span class="desc">What you see — medium, subject, features. <em>e.g. oil paints, realistic, installation</em></span>
+        </li>
+        <li>
+          <span class="chip kw-el">Elements</span>
+          <span class="desc">Visual building blocks. <em>e.g. colour, texture, shape, line, space</em></span>
+        </li>
+        <li>
+          <span class="chip kw-pr">Principles</span>
+          <span class="desc">How elements are arranged. <em>e.g. balance, contrast, rhythm, unity, emphasis</em></span>
+        </li>
+        <li>
+          <span class="chip kw-eff">Effect</span>
+          <span class="desc">Mood, feeling or result created. <em>e.g. rustic feeling, lively, chaotic, pleasing</em></span>
+        </li>
+        <li>
+          <span class="chip kw-cmp">Compare</span>
+          <span class="desc">Link or contrast plates. <em>e.g. Unlike, However, Both, In terms of…</em></span>
+        </li>
+        <li>
+          <span class="chip kw-ij">Interpret</span>
+          <span class="desc">Meaning, message or theme. <em>e.g. suggest, symbolize, theme, represent</em></span>
+        </li>
+        <li>
+          <span class="chip kw-jg">Judge</span>
+          <span class="desc">Your opinion or evaluation. <em>e.g. I prefer, better, successful, thought-provoking</em></span>
+        </li>
+      </ul>
+      <p class="color-key-note">Answer structure: <strong>Describe → Analyze → Interpret → Judge</strong>. Tap ✏️ to practise fill-in blanks.</p>
+    </div>
+  </div>
+
+  <script src="exemplar-quiz.js"></script>
+  <script>
+    (function () {
+      var paletteBtn = document.getElementById("palette-toggle");
+      var popup = document.getElementById("color-key");
+      var backdrop = document.getElementById("color-key-backdrop");
+
+      function setPaletteOpen(open) {
+        if (!paletteBtn || !popup || !backdrop) return;
+        paletteBtn.classList.toggle("active", open);
+        paletteBtn.setAttribute("aria-expanded", open ? "true" : "false");
+        popup.hidden = !open;
+        backdrop.hidden = !open;
+        document.body.style.overflow = open ? "hidden" : "";
+        if (open) popup.focus();
+      }
+
+      function togglePalette() {
+        setPaletteOpen(popup.hidden);
+      }
+
+      if (paletteBtn) paletteBtn.addEventListener("click", togglePalette);
+      if (backdrop) backdrop.addEventListener("click", function () { setPaletteOpen(false); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && popup && !popup.hidden) setPaletteOpen(false);
+      });
+      if (popup) popup.setAttribute("tabindex", "-1");
+    })();
+  </script>
+  <script>
+    (function () {
+      var sections = ["ex1-a","ex1-b","ex2-a","ex3-a","ex3-b","ex4-a","ex4-b","ex5-a","ex5-b"];
+      var sel = document.getElementById("jump");
+      function show(id) {
+        if (sections.indexOf(id) < 0) id = "ex1-a";
+        var activeEl = null;
+        sections.forEach(function (s) {
+          var el = document.getElementById(s);
+          if (el) {
+            var on = s === id;
+            el.classList.toggle("active", on);
+            if (on) activeEl = el;
+          }
+        });
+        sel.value = id;
+        window.scrollTo(0, 0);
+        history.replaceState(null, "", id === "ex1-a" ? location.pathname : "#" + id);
+        if (window.ExemplarQuiz && window.ExemplarQuiz.isOn() && activeEl) {
+          window.ExemplarQuiz.onSectionChange(activeEl);
+        }
+      }
+      sel.addEventListener("change", function () { show(sel.value); });
+      window.addEventListener("hashchange", function () {
+        show(location.hash.slice(1) || "ex1-a");
+      });
+      var start = location.hash.slice(1);
+      show(document.getElementById(start) ? start : "ex1-a");
+    })();
+  </script>
+</body>
+</html>

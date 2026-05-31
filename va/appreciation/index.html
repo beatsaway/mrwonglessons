@@ -121,7 +121,10 @@
       display: grid;
       gap: 5px;
     }
-    nav button {
+    nav button,
+    nav a.nav-link {
+      display: block;
+      width: 100%;
       text-align: left;
       border: 0;
       background: transparent;
@@ -130,8 +133,11 @@
       padding: 8px 10px;
       font-size: 14px;
       cursor: pointer;
+      text-decoration: none;
+      font-family: inherit;
     }
-    nav button:hover { background: #f3f4f6; }
+    nav button:hover,
+    nav a.nav-link:hover { background: #f3f4f6; }
     nav button.active {
       background: var(--brand-soft);
       color: var(--brand);
@@ -591,6 +597,7 @@
         pageTitle: "HKDSE VA Appreciation Guide",
         subtitle: "",
         menuLabel: "Sections",
+        exemplar2025: "2025 Level 5 exemplars",
         nav: {
           steps: "4-Step Method",
           template: "Writing Templates",
@@ -749,6 +756,7 @@ The most convincing visual decision is ______.</blockquote>
         pageTitle: "HKDSE VA 評賞導讀",
         subtitle: "",
         menuLabel: "章節",
+        exemplar2025: "2025 Level 5 示範答案",
         nav: {
           steps: "四步法",
           template: "答題模板",
@@ -919,7 +927,11 @@ The most convincing visual decision is ______.</blockquote>
     function renderNav() {
       navEl.innerHTML = sectionIds.map((id) => {
         const active = id === currentSection ? "active" : "";
-        return `<button class="${active}" data-target="${id}">${i18n[currentLang].nav[id]}</button>`;
+        let html = `<button type="button" class="${active}" data-target="${id}">${i18n[currentLang].nav[id]}</button>`;
+        if (id === "pastpaper") {
+          html += `<a class="nav-link" href="./2025level5/index.html">${i18n[currentLang].exemplar2025}</a>`;
+        }
+        return html;
       }).join("");
     }
 
