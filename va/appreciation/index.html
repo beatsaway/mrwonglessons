@@ -6,7 +6,7 @@
   <title>HKDSE VA Appreciation Guide</title>
   <style>
     :root {
-      --bg: #f7f8fa;
+      --bg: #ffffff;
       --panel: #ffffff;
       --text: #1f2937;
       --muted: #6b7280;
@@ -38,10 +38,8 @@
       gap: 6px;
       padding: 0 10px;
     }
-    .lang-actions {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .lang-bar .lang-btn:first-of-type {
+      margin-left: auto;
     }
     .home-link {
       border: 1px solid var(--line);
@@ -163,16 +161,15 @@
 
     main {
       margin-left: var(--nav-w);
-      padding: 18px;
+      padding: 18px 24px 32px;
       max-width: 980px;
+      background: #fff;
+      min-height: calc(100vh - var(--langbar-h));
     }
     .panel {
       display: none;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
+      padding: 0;
+      margin: 0;
     }
     .panel.active { display: block; }
     h2 {
@@ -186,93 +183,84 @@
     li { margin: 5px 0; }
     .hint { color: var(--muted); }
 
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .chips span {
+    .tag {
+      display: inline-block;
       border: 1px solid var(--line);
       border-radius: 999px;
       background: #f9fafb;
-      font-size: 13px;
-      padding: 3px 9px;
+      font-size: 12px;
+      padding: 2px 8px;
+      margin: 2px 0 2px 4px;
+      vertical-align: baseline;
     }
-    .example .chips span.tag-desc {
+    #examples .tag.tag-desc {
       background: #ccfbf1;
       color: #115e59;
       border-color: #99f6e4;
       font-weight: 600;
     }
-    .example .chips span.tag-elements {
+    #examples .tag.tag-elements {
       background: #dbeafe;
       color: #1e40af;
       border-color: #bfdbfe;
       font-weight: 600;
     }
-    .example .chips span.tag-principles {
+    #examples .tag.tag-principles {
       background: #fef3c7;
       color: #92400e;
       border-color: #fde68a;
       font-weight: 600;
     }
-    .example .chips span.tag-other {
+    #examples .tag.tag-other {
       background: #f3f4f6;
       color: #4b5563;
       border-color: #e5e7eb;
     }
-    /* Past paper demo: smaller tags for denser reading */
-    #past-paper-demo-root .example .chips {
-      gap: 6px;
-      margin-top: 6px;
-    }
-    #past-paper-demo-root .example .chips span {
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 999px;
-    }
-    #past-paper-demo-root .pastpaper-gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    #pastpaper.panel.active {
+      display: flex;
+      flex-wrap: wrap;
       gap: 10px;
-      margin: 10px 0 12px;
+      align-content: flex-start;
     }
-    #past-paper-demo-root .pastpaper-figure.is-wide {
-      grid-column: span 2;
+    #pastpaper > .pp-select,
+    #pastpaper > p,
+    #pastpaper > .pp-bank {
+      flex: 1 1 100%;
+      margin: 6px 0;
     }
-    #past-paper-demo-root .example.pastpaper-answer {
-      border: 0;
-      background: transparent;
-      border-radius: 0;
-      padding: 0;
-      margin: 0;
+    #pastpaper > .pp-select {
+      margin-bottom: 4px;
     }
-    #past-paper-demo-root .pastpaper-figure {
+    #pastpaper .pastpaper-figure {
+      flex: 1 1 240px;
+      max-width: 100%;
       margin: 0;
       border: 1px solid var(--line);
       border-radius: 10px;
       overflow: hidden;
       background: #fff;
     }
-    #past-paper-demo-root .pastpaper-figure img {
+    #pastpaper .pastpaper-figure.is-wide {
+      flex-basis: 100%;
+    }
+    #pastpaper .pastpaper-figure img {
       width: 100%;
       height: auto;
       display: block;
       background: #f8fafc;
     }
-    #past-paper-demo-root .pastpaper-figure figcaption {
+    #pastpaper .pastpaper-figure figcaption {
       font-size: 12px;
       color: var(--muted);
       padding: 6px 8px;
     }
-    #past-paper-demo-root .pp-bank {
+    #pastpaper .pp-bank {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
       margin: 6px 0 8px;
     }
-    #past-paper-demo-root .pp-keyword {
+    #pastpaper .pp-keyword {
       border: 1px solid #cbd5e1;
       background: #f8fafc;
       color: #0f172a;
@@ -281,33 +269,21 @@
       padding: 3px 8px;
       cursor: pointer;
     }
-    #past-paper-demo-root .pp-keyword.selected {
+    #pastpaper .pp-keyword.selected {
       border-color: #2563eb;
       background: #dbeafe;
       color: #1e3a8a;
     }
-    #past-paper-demo-root .pp-keyword.used {
+    #pastpaper .pp-keyword.used {
       opacity: 0.45;
       cursor: not-allowed;
     }
-    #past-paper-demo-root .pp-blank-wrap {
-      display: inline-flex;
-      align-items: center;
-      vertical-align: middle;
-      gap: 3px;
-      margin: 0 2px;
-    }
-    #past-paper-demo-root .pp-blank-icon {
-      font-size: 0.9em;
-      line-height: 1;
-      opacity: 0.9;
-    }
-    #past-paper-demo-root .pp-blank {
+    #pastpaper .pp-blank {
       display: inline-flex;
       min-width: 82px;
       min-height: 30px;
       padding: 2px 6px;
-      margin: 0;
+      margin: 0 2px;
       border: 2px solid #cbd5e1;
       border-radius: 5px;
       background: #ffffff;
@@ -317,34 +293,28 @@
       justify-content: center;
       cursor: pointer;
       line-height: 1.25;
-      position: relative;
-      top: 1px;
+      vertical-align: middle;
     }
-    #past-paper-demo-root .pp-blank.is-filled {
+    #pastpaper .pp-blank::before {
+      content: attr(data-emoji);
+      margin-right: 3px;
+      font-size: 0.9em;
+      line-height: 1;
+      opacity: 0.9;
+    }
+    #pastpaper .pp-blank.is-filled {
       background: #dcfce7;
       color: #14532d;
       border-color: #16a34a;
     }
-    #past-paper-demo-root .pp-blank.is-wrong {
+    #pastpaper .pp-blank.is-wrong {
       background: #fee2e2;
       color: #991b1b;
       border-color: #ef4444;
     }
-    #past-paper-demo-root .pp-blank.is-revealed {
+    #pastpaper .pp-blank.is-revealed {
       background: #fef9c3;
       color: #854d0e;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px 11px;
-      background: #fff;
     }
     .template {
       border: 1px solid #dbe5ff;
@@ -354,46 +324,47 @@
       margin: 8px 0;
       white-space: pre-line;
     }
-    .helper {
-      border: 1px solid #dbe5ff;
-      background: #f8faff;
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin: 8px 0 12px;
+    blockquote.template {
+      margin: 8px 0;
     }
-    .helper .hint { margin-bottom: 6px; }
-    .daj-grid {
-      display: grid;
-      gap: 8px;
-      margin-top: 8px;
+    .kw-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+      padding: 0;
+      margin: 8px 0 0 1.55rem;
+      font-size: inherit;
+      line-height: 1.4;
     }
-    .daj-step {
+    .pp-select {
+      width: 100%;
+      padding: 8px 10px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 8px 10px;
-      background: #fafafa;
+      background: #fff;
+      margin-bottom: 10px;
     }
-    .daj-step-head {
+    .daj-steps {
+      list-style: none;
+      margin: 8px 0 0;
+      padding: 0;
+    }
+    .daj-steps > li {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .daj-steps > li:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+    .daj-step-title {
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 2px;
-    }
-    .daj-step-num {
-      flex-shrink: 0;
-      width: 1.35rem;
-      height: 1.35rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      background: var(--brand-soft);
-      color: var(--brand);
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .daj-step-title {
-      margin: 0;
+      margin: 0 0 2px;
       font-size: 14px;
       font-weight: 700;
     }
@@ -410,30 +381,38 @@
       line-height: 1.42;
     }
     .daj-qs li { margin: 2px 0; }
-    .daj-step .helper {
-      margin: 6px 0 0;
-      padding: 5px 7px;
+    .daj-step-num {
+      flex-shrink: 0;
+      width: 1.35rem;
+      height: 1.35rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 6px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 700;
     }
-    .daj-step .chips { gap: 4px; margin-top: 0; }
-    .daj-step .chips .kw {
+    .daj-steps .kw-bank .kw {
       font-size: 11px;
       padding: 1px 6px;
       border-radius: 999px;
       border: 0;
     }
-    .example {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: #fff;
-      padding: 12px;
-      margin: 10px 0;
-    }
-    .example h3 {
-      margin: 0 0 6px;
+    .example-q {
+      margin: 1.25rem 0 0.35rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
       font-size: 17px;
+      line-height: 1.35;
     }
-    .example p {
+    #examples .example-q:first-of-type {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+    #examples p {
       margin: 6px 0;
       font-size: 14px;
     }
@@ -469,8 +448,8 @@
       body.menu-open .overlay { display: block; }
       main { margin-left: 0; padding: 12px; }
       h2 { font-size: 22px; }
-      #past-paper-demo-root .pastpaper-figure.is-wide {
-        grid-column: span 1;
+      #pastpaper .pastpaper-figure.is-wide {
+        flex-basis: 100%;
       }
     }
   </style>
@@ -478,10 +457,8 @@
 <body>
   <header class="lang-bar">
     <a class="home-link" href="../../index.html" aria-label="Home"><span aria-hidden="true">🏠</span></a>
-    <div class="lang-actions">
-      <button class="lang-btn active" id="btnEn" type="button">English</button>
-      <button class="lang-btn" id="btnZh" type="button">中文</button>
-    </div>
+    <button class="lang-btn active" id="btnEn" type="button">English</button>
+    <button class="lang-btn" id="btnZh" type="button">中文</button>
   </header>
 
   <header class="mobile-bar">
@@ -513,140 +490,100 @@
       <h2>Mock DSE Format: Model Answers</h2>
       <p class="hint">These models follow DSE command words: <strong>analyze + compare + interpret + evaluate</strong>. Each step includes concept tags.</p>
 
-      <article class="example">
-        <h3>Q1: Compare style features of Figure 1 and Figure 2, then interpret and evaluate their meanings.</h3>
+      
+        <h3 class="example-q">Q1: Compare style features of Figure 1 and Figure 2, then interpret and evaluate their meanings.</h3>
         <p><strong>Reference artworks:</strong> Vincent van Gogh, <em>The Starry Night</em> (1889) vs Claude Monet, <em>Impression, Sunrise</em> (1872).</p>
-        <p><strong>Description:</strong> Both are <strong>2D paintings</strong> with landscape imagery, but Figure 1 shows a more ordered <strong>composition</strong>, while Figure 2 appears more spontaneous.</p>
-        <p><span class="chips"><span>media</span><span>subject matter</span><span>composition</span><span>comparison</span></span></p>
-        <p><strong>Analysis:</strong> Figure 1 uses controlled <strong>line</strong> and restrained <strong>color</strong>; Figure 2 uses visible <strong>texture</strong>, stronger <strong>contrast</strong>, and faster visual <strong>rhythm</strong>. Their different <strong>unity/variety</strong> balance defines style difference.</p>
-        <p><span class="chips"><span>line</span><span>color</span><span>texture</span><span>contrast</span><span>rhythm</span><span>unity/variety</span></span></p>
-        <p><strong>Interpretation:</strong> Figure 1 suggests <strong>reflection</strong> and <strong>order</strong>; Figure 2 suggests <strong>emotional immediacy</strong> and <strong>instability</strong>.</p>
-        <p><span class="chips"><span>mood</span><span>symbolic reading</span><span>artist intention</span></span></p>
-        <p><strong>Judgement:</strong> Both works are <strong>successful</strong>: Figure 1 is formally <strong>coherent</strong>, while Figure 2 is more emotionally <strong>direct</strong> and <strong>memorable</strong>.</p>
-        <p><span class="chips"><span>effectiveness</span><span>coherence</span><span>comparative evaluation</span></span></p>
-      </article>
+        <p class="ex-d"><strong>Description:</strong> Both are <strong>2D paintings</strong> with landscape imagery, but Figure 1 shows a more ordered <strong>composition</strong>, while Figure 2 appears more spontaneous. <span class="tag">media</span><span class="tag">subject matter</span><span class="tag">composition</span><span class="tag">comparison</span></p>
+        <p class="ex-a"><strong>Analysis:</strong> Figure 1 uses controlled <strong>line</strong> and restrained <strong>color</strong>; Figure 2 uses visible <strong>texture</strong>, stronger <strong>contrast</strong>, and faster visual <strong>rhythm</strong>. Their different <strong>unity/variety</strong> balance defines style difference. <span class="tag">line</span><span class="tag">color</span><span class="tag">texture</span><span class="tag">contrast</span><span class="tag">rhythm</span><span class="tag">unity/variety</span></p>
+        <p class="ex-i"><strong>Interpretation:</strong> Figure 1 suggests <strong>reflection</strong> and <strong>order</strong>; Figure 2 suggests <strong>emotional immediacy</strong> and <strong>instability</strong>. <span class="tag">mood</span><span class="tag">symbolic reading</span><span class="tag">artist intention</span></p>
+        <p class="ex-j"><strong>Judgement:</strong> Both works are <strong>successful</strong>: Figure 1 is formally <strong>coherent</strong>, while Figure 2 is more emotionally <strong>direct</strong> and <strong>memorable</strong>. <span class="tag">effectiveness</span><span class="tag">coherence</span><span class="tag">comparative evaluation</span></p>
+      
 
-      <article class="example">
-        <h3>Q2: Compare space representation of Figure 3 and Figure 4, then interpret and evaluate their meanings.</h3>
+      
+        <h3 class="example-q">Q2: Compare space representation of Figure 3 and Figure 4, then interpret and evaluate their meanings.</h3>
         <p><strong>Reference artworks:</strong> Leonardo da Vinci, <em>The Last Supper</em> (1495-1498) vs Pablo Picasso, <em>Les Demoiselles d'Avignon</em> (1907).</p>
-        <p><strong>Description:</strong> Figure 3 creates depth through <strong>one-point perspective</strong>; Figure 4 compresses depth and emphasizes the surface plane.</p>
-        <p><span class="chips"><span>space</span><span>viewpoint</span><span>comparison</span></span></p>
-        <p><strong>Analysis:</strong> Figure 3 uses <strong>overlap</strong>, <strong>value gradation</strong>, and directional perspective lines. Figure 4 uses fractured <strong>shape</strong>, compressed <strong>space</strong>, and repeated motifs to create planar tension.</p>
-        <p><span class="chips"><span>space</span><span>value</span><span>shape</span><span>perspective</span><span>pattern</span></span></p>
-        <p><strong>Interpretation:</strong> Figure 3 supports <strong>narrative order</strong>; Figure 4 challenges <strong>stable perception</strong> and emphasizes <strong>psychological space</strong>.</p>
-        <p><span class="chips"><span>meaning</span><span>psychological reading</span><span>viewer impact</span></span></p>
-        <p><strong>Judgement:</strong> Figure 3 is stronger in <strong>spatial realism</strong>; Figure 4 is stronger in <strong>conceptual innovation</strong> and <strong>modern expression</strong>.</p>
-        <p><span class="chips"><span>criteria-based judgement</span><span>innovation</span><span>strength comparison</span></span></p>
-      </article>
+        <p class="ex-d"><strong>Description:</strong> Figure 3 creates depth through <strong>one-point perspective</strong>; Figure 4 compresses depth and emphasizes the surface plane. <span class="tag">space</span><span class="tag">viewpoint</span><span class="tag">comparison</span></p>
+        <p class="ex-a"><strong>Analysis:</strong> Figure 3 uses <strong>overlap</strong>, <strong>value gradation</strong>, and directional perspective lines. Figure 4 uses fractured <strong>shape</strong>, compressed <strong>space</strong>, and repeated motifs to create planar tension. <span class="tag">space</span><span class="tag">value</span><span class="tag">shape</span><span class="tag">perspective</span><span class="tag">pattern</span></p>
+        <p class="ex-i"><strong>Interpretation:</strong> Figure 3 supports <strong>narrative order</strong>; Figure 4 challenges <strong>stable perception</strong> and emphasizes <strong>psychological space</strong>. <span class="tag">meaning</span><span class="tag">psychological reading</span><span class="tag">viewer impact</span></p>
+        <p class="ex-j"><strong>Judgement:</strong> Figure 3 is stronger in <strong>spatial realism</strong>; Figure 4 is stronger in <strong>conceptual innovation</strong> and <strong>modern expression</strong>. <span class="tag">criteria-based judgement</span><span class="tag">innovation</span><span class="tag">strength comparison</span></p>
+      
 
-      <article class="example">
-        <h3>Q3: Compare human figure representation in Figure 5 and Figure 6, then interpret and evaluate meanings.</h3>
+      
+        <h3 class="example-q">Q3: Compare human figure representation in Figure 5 and Figure 6, then interpret and evaluate meanings.</h3>
         <p><strong>Reference artworks:</strong> Frida Kahlo, <em>Self-Portrait with Thorn Necklace and Hummingbird</em> (1940) vs Pablo Picasso, <em>Weeping Woman</em> (1937).</p>
-        <p><strong>Description:</strong> Both works focus on <strong>human figure subject matter</strong>; Figure 5 keeps recognizable anatomy, while Figure 6 deliberately distorts it.</p>
-        <p><span class="chips"><span>subject matter</span><span>form treatment</span><span>comparison</span></span></p>
-        <p><strong>Analysis:</strong> Figure 5 models <strong>form</strong> with subtle <strong>value</strong> and detailed <strong>texture</strong>; Figure 6 intensifies emotion with angular <strong>line</strong>, exaggerated <strong>shape</strong>, and strong <strong>emphasis</strong>.</p>
-        <p><span class="chips"><span>form</span><span>value</span><span>texture</span><span>line</span><span>shape</span><span>emphasis</span></span></p>
-        <p><strong>Interpretation:</strong> Figure 5 suggests <strong>personal identity</strong> and <strong>resilience</strong>; Figure 6 externalizes <strong>grief</strong> and <strong>social trauma</strong>.</p>
-        <p><span class="chips"><span>identity</span><span>emotion</span><span>social context</span></span></p>
-        <p><strong>Judgement:</strong> Figure 5 is <strong>persuasive</strong> in psychological realism, while Figure 6 is stronger in <strong>expressive force</strong>; both communicate <strong>effectively</strong>.</p>
-        <p><span class="chips"><span>persuasiveness</span><span>impact</span><span>comparative evaluation</span></span></p>
-      </article>
+        <p class="ex-d"><strong>Description:</strong> Both works focus on <strong>human figure subject matter</strong>; Figure 5 keeps recognizable anatomy, while Figure 6 deliberately distorts it. <span class="tag">subject matter</span><span class="tag">form treatment</span><span class="tag">comparison</span></p>
+        <p class="ex-a"><strong>Analysis:</strong> Figure 5 models <strong>form</strong> with subtle <strong>value</strong> and detailed <strong>texture</strong>; Figure 6 intensifies emotion with angular <strong>line</strong>, exaggerated <strong>shape</strong>, and strong <strong>emphasis</strong>. <span class="tag">form</span><span class="tag">value</span><span class="tag">texture</span><span class="tag">line</span><span class="tag">shape</span><span class="tag">emphasis</span></p>
+        <p class="ex-i"><strong>Interpretation:</strong> Figure 5 suggests <strong>personal identity</strong> and <strong>resilience</strong>; Figure 6 externalizes <strong>grief</strong> and <strong>social trauma</strong>. <span class="tag">identity</span><span class="tag">emotion</span><span class="tag">social context</span></p>
+        <p class="ex-j"><strong>Judgement:</strong> Figure 5 is <strong>persuasive</strong> in psychological realism, while Figure 6 is stronger in <strong>expressive force</strong>; both communicate <strong>effectively</strong>. <span class="tag">persuasiveness</span><span class="tag">impact</span><span class="tag">comparative evaluation</span></p>
+      
 
-      <article class="example">
-        <h3>Q4: Compare artistic expression in Figure 7 and Figure 8, then interpret and evaluate meanings.</h3>
+      
+        <h3 class="example-q">Q4: Compare artistic expression in Figure 7 and Figure 8, then interpret and evaluate meanings.</h3>
         <p><strong>Reference artworks:</strong> Henri Matisse, <em>The Dance</em> (1910) vs Wassily Kandinsky, <em>Composition VIII</em> (1923).</p>
-        <p><strong>Description:</strong> Both are modernist works, but Figure 7 is simplified figurative expression, while Figure 8 is geometry-based abstraction.</p>
-        <p><span class="chips"><span>style</span><span>subject handling</span><span>comparison</span></span></p>
-        <p><strong>Analysis:</strong> Figure 7 uses limited <strong>color</strong>, circular <strong>movement</strong>, and clear <strong>balance</strong>; Figure 8 uses intersecting <strong>lines</strong>, repeated <strong>shapes</strong>, and strong <strong>contrast</strong> to build analytic rhythm.</p>
-        <p><span class="chips"><span>color</span><span>movement</span><span>balance</span><span>line</span><span>shape</span><span>contrast</span></span></p>
-        <p><strong>Interpretation:</strong> Figure 7 can be read as <strong>collective vitality</strong>; Figure 8 can be read as <strong>rational order</strong> and <strong>modern abstraction</strong> of thought.</p>
-        <p><span class="chips"><span>symbolic meaning</span><span>abstraction</span><span>conceptual reading</span></span></p>
-        <p><strong>Judgement:</strong> Figure 7 is emotionally <strong>accessible</strong>; Figure 8 is intellectually <strong>rigorous</strong>. Each is <strong>successful</strong> in a different expressive mode.</p>
-        <p><span class="chips"><span>accessibility</span><span>rigor</span><span>mode-specific success</span></span></p>
-      </article>
+        <p class="ex-d"><strong>Description:</strong> Both are modernist works, but Figure 7 is simplified figurative expression, while Figure 8 is geometry-based abstraction. <span class="tag">style</span><span class="tag">subject handling</span><span class="tag">comparison</span></p>
+        <p class="ex-a"><strong>Analysis:</strong> Figure 7 uses limited <strong>color</strong>, circular <strong>movement</strong>, and clear <strong>balance</strong>; Figure 8 uses intersecting <strong>lines</strong>, repeated <strong>shapes</strong>, and strong <strong>contrast</strong> to build analytic rhythm. <span class="tag">color</span><span class="tag">movement</span><span class="tag">balance</span><span class="tag">line</span><span class="tag">shape</span><span class="tag">contrast</span></p>
+        <p class="ex-i"><strong>Interpretation:</strong> Figure 7 can be read as <strong>collective vitality</strong>; Figure 8 can be read as <strong>rational order</strong> and <strong>modern abstraction</strong> of thought. <span class="tag">symbolic meaning</span><span class="tag">abstraction</span><span class="tag">conceptual reading</span></p>
+        <p class="ex-j"><strong>Judgement:</strong> Figure 7 is emotionally <strong>accessible</strong>; Figure 8 is intellectually <strong>rigorous</strong>. Each is <strong>successful</strong> in a different expressive mode. <span class="tag">accessibility</span><span class="tag">rigor</span><span class="tag">mode-specific success</span></p>
+      
 
-      <article class="example">
-        <h3>Q5: Compare artistic expression in Figure 9 and Figure 10, then interpret and evaluate meanings.</h3>
+      
+        <h3 class="example-q">Q5: Compare artistic expression in Figure 9 and Figure 10, then interpret and evaluate meanings.</h3>
         <p><strong>Reference artworks:</strong> Lui Shou-kwan, <em>Zen Painting series</em> vs Wucius Wong, <em>In Search of Mountains</em> series.</p>
-        <p><strong>Description:</strong> Both works engage Chinese cultural language, but Figure 9 is meditative and ink-oriented, while Figure 10 is design-structured and layered.</p>
-        <p><span class="chips"><span>media language</span><span>style orientation</span><span>comparison</span></span></p>
-        <p><strong>Analysis:</strong> Figure 9 relies on restrained <strong>value</strong>, open <strong>space</strong>, and simplified <strong>form</strong>; Figure 10 emphasizes denser <strong>pattern</strong>, controlled <strong>proportion</strong>, and stronger compositional <strong>rhythm</strong>.</p>
-        <p><span class="chips"><span>value</span><span>space</span><span>form</span><span>pattern</span><span>proportion</span><span>rhythm</span></span></p>
-        <p><strong>Interpretation:</strong> Together they construct two dimensions of "Hong Kong feeling": <strong>spiritual inwardness</strong> and <strong>urban-visual complexity</strong>.</p>
-        <p><span class="chips"><span>cultural identity</span><span>duality</span><span>meaning synthesis</span></span></p>
-        <p><strong>Judgement:</strong> The stronger exam response links <strong>formal evidence</strong> to <strong>layered cultural meaning</strong> consistently across both works.</p>
-        <p><span class="chips"><span>evidence-based judgement</span><span>consistency</span><span>exam relevance</span></span></p>
-      </article>
+        <p class="ex-d"><strong>Description:</strong> Both works engage Chinese cultural language, but Figure 9 is meditative and ink-oriented, while Figure 10 is design-structured and layered. <span class="tag">media language</span><span class="tag">style orientation</span><span class="tag">comparison</span></p>
+        <p class="ex-a"><strong>Analysis:</strong> Figure 9 relies on restrained <strong>value</strong>, open <strong>space</strong>, and simplified <strong>form</strong>; Figure 10 emphasizes denser <strong>pattern</strong>, controlled <strong>proportion</strong>, and stronger compositional <strong>rhythm</strong>. <span class="tag">value</span><span class="tag">space</span><span class="tag">form</span><span class="tag">pattern</span><span class="tag">proportion</span><span class="tag">rhythm</span></p>
+        <p class="ex-i"><strong>Interpretation:</strong> Together they construct two dimensions of "Hong Kong feeling": <strong>spiritual inwardness</strong> and <strong>urban-visual complexity</strong>. <span class="tag">cultural identity</span><span class="tag">duality</span><span class="tag">meaning synthesis</span></p>
+        <p class="ex-j"><strong>Judgement:</strong> The stronger exam response links <strong>formal evidence</strong> to <strong>layered cultural meaning</strong> consistently across both works. <span class="tag">evidence-based judgement</span><span class="tag">consistency</span><span class="tag">exam relevance</span></p>
+      
     `;
 
     const EXAMPLES_HTML_ZH = `
       <h2>模擬 DSE 題型：示範答案</h2>
       <p class="hint">以下示範對應 DSE 指令語：<strong>分析＋比較＋詮釋＋評價</strong>。每一步附上概念標籤。</p>
 
-      <article class="example">
-        <h3>第1題：分析及比較圖1與圖2的風格特色，並詮釋及評價其意義。</h3>
+      
+        <h3 class="example-q">第1題：分析及比較圖1與圖2的風格特色，並詮釋及評價其意義。</h3>
         <p><strong>參考作品：</strong>Vincent van Gogh《The Starry Night》(1889) vs Claude Monet《Impression, Sunrise》(1872)。</p>
-        <p><strong>Description：</strong>兩作皆為<strong>平面繪畫</strong>且帶景觀意象；圖1<strong>構圖</strong>較有秩序，圖2筆觸更即興。</p>
-        <p><span class="chips"><span>媒介</span><span>題材</span><span>構圖</span><span>比較</span></span></p>
-        <p><strong>Analysis：</strong>圖1以克制<strong>線條</strong>與<strong>色彩</strong>建立風格；圖2以明顯<strong>質感</strong>、強<strong>對比</strong>和視覺<strong>節奏</strong>形成張力，呈現不同<strong>統一/變化</strong>關係。</p>
-        <p><span class="chips"><span>線條</span><span>色彩</span><span>質感</span><span>對比</span><span>節奏</span><span>統一/變化</span></span></p>
-        <p><strong>Interpretation：</strong>圖1偏向<strong>沉澱與內省</strong>；圖2偏向<strong>情緒即時性</strong>與<strong>不安</strong>。</p>
-        <p><span class="chips"><span>情緒</span><span>象徵閱讀</span><span>創作意圖</span></span></p>
-        <p><strong>Judgement：</strong>兩者都<strong>成功</strong>：圖1強於<strong>形式整合</strong>，圖2強於<strong>情感穿透力</strong>。</p>
-        <p><span class="chips"><span>有效性</span><span>整合度</span><span>比較評價</span></span></p>
-      </article>
+        <p class="ex-d"><strong>Description：</strong> 兩作皆為<strong>平面繪畫</strong>且帶景觀意象；圖1<strong>構圖</strong>較有秩序，圖2筆觸更即興。 <span class="tag">媒介</span><span class="tag">題材</span><span class="tag">構圖</span><span class="tag">比較</span></p>
+        <p class="ex-a"><strong>Analysis：</strong>圖1以克制<strong>線條</strong>與<strong>色彩</strong>建立風格；圖2以明顯<strong>質感</strong>、強<strong>對比</strong>和視覺<strong>節奏</strong>形成張力，呈現不同<strong>統一/變化</strong>關係。 <span class="tag">線條</span><span class="tag">色彩</span><span class="tag">質感</span><span class="tag">對比</span><span class="tag">節奏</span><span class="tag">統一/變化</span></p>
+        <p class="ex-i"><strong>Interpretation：</strong>圖1偏向<strong>沉澱與內省</strong>；圖2偏向<strong>情緒即時性</strong>與<strong>不安</strong>。 <span class="tag">情緒</span><span class="tag">象徵閱讀</span><span class="tag">創作意圖</span></p>
+        <p class="ex-j"><strong>Judgement：</strong>兩者都<strong>成功</strong>：圖1強於<strong>形式整合</strong>，圖2強於<strong>情感穿透力</strong>。 <span class="tag">有效性</span><span class="tag">整合度</span><span class="tag">比較評價</span></p>
+      
 
-      <article class="example">
-        <h3>第2題：分析及比較圖3與圖4的空間表現，並詮釋及評價其意義。</h3>
+      
+        <h3 class="example-q">第2題：分析及比較圖3與圖4的空間表現，並詮釋及評價其意義。</h3>
         <p><strong>參考作品：</strong>Leonardo da Vinci《The Last Supper》(1495-1498) vs Pablo Picasso《Les Demoiselles d'Avignon》(1907)。</p>
-        <p><strong>Description：</strong>圖3以<strong>單點透視</strong>建立深度；圖4壓平空間，強調平面。</p>
-        <p><span class="chips"><span>空間</span><span>視角</span><span>比較</span></span></p>
-        <p><strong>Analysis：</strong>圖3透過<strong>重疊</strong>、<strong>明暗層次</strong>和透視線導視；圖4以破碎<strong>形狀</strong>、壓縮<strong>空間</strong>與重複單位形成平面張力。</p>
-        <p><span class="chips"><span>空間</span><span>明暗</span><span>形狀</span><span>透視</span><span>圖案</span></span></p>
-        <p><strong>Interpretation：</strong>圖3偏<strong>敘事秩序</strong>；圖4偏<strong>心理空間</strong>與<strong>感知挑戰</strong>。</p>
-        <p><span class="chips"><span>意義</span><span>心理閱讀</span><span>觀者反應</span></span></p>
-        <p><strong>Judgement：</strong>圖3在<strong>寫實空間</strong>上更強；圖4在<strong>觀念創新</strong>上更突出。</p>
-        <p><span class="chips"><span>準則評價</span><span>創新性</span><span>強弱比較</span></span></p>
-      </article>
+        <p class="ex-d"><strong>Description：</strong> 圖3以<strong>單點透視</strong>建立深度；圖4壓平空間，強調平面。 <span class="tag">空間</span><span class="tag">視角</span><span class="tag">比較</span></p>
+        <p class="ex-a"><strong>Analysis：</strong>圖3透過<strong>重疊</strong>、<strong>明暗層次</strong>和透視線導視；圖4以破碎<strong>形狀</strong>、壓縮<strong>空間</strong>與重複單位形成平面張力。 <span class="tag">空間</span><span class="tag">明暗</span><span class="tag">形狀</span><span class="tag">透視</span><span class="tag">圖案</span></p>
+        <p class="ex-i"><strong>Interpretation：</strong>圖3偏<strong>敘事秩序</strong>；圖4偏<strong>心理空間</strong>與<strong>感知挑戰</strong>。 <span class="tag">意義</span><span class="tag">心理閱讀</span><span class="tag">觀者反應</span></p>
+        <p class="ex-j"><strong>Judgement：</strong>圖3在<strong>寫實空間</strong>上更強；圖4在<strong>觀念創新</strong>上更突出。 <span class="tag">準則評價</span><span class="tag">創新性</span><span class="tag">強弱比較</span></p>
+      
 
-      <article class="example">
-        <h3>第3題：分析及比較圖5與圖6的人物表現，並詮釋及評價其意義。</h3>
+      
+        <h3 class="example-q">第3題：分析及比較圖5與圖6的人物表現，並詮釋及評價其意義。</h3>
         <p><strong>參考作品：</strong>Frida Kahlo《Self-Portrait with Thorn Necklace and Hummingbird》(1940) vs Pablo Picasso《Weeping Woman》(1937)。</p>
-        <p><strong>Description：</strong>兩作皆為<strong>人物題材</strong>；圖5保留較可辨識解剖，圖6採取明顯變形。</p>
-        <p><span class="chips"><span>題材</span><span>形體處理</span><span>比較</span></span></p>
-        <p><strong>Analysis：</strong>圖5以細膩<strong>形體</strong>、柔和<strong>明暗</strong>和精細<strong>質感</strong>建構人物；圖6以銳利<strong>線條</strong>、誇張<strong>形狀</strong>與強<strong>重點</strong>放大情緒。</p>
-        <p><span class="chips"><span>形體</span><span>明暗</span><span>質感</span><span>線條</span><span>形狀</span><span>重點</span></span></p>
-        <p><strong>Interpretation：</strong>圖5偏<strong>身份與韌性</strong>；圖6偏<strong>痛苦</strong>與<strong>社會創傷外化</strong>。</p>
-        <p><span class="chips"><span>身份</span><span>情緒</span><span>社會脈絡</span></span></p>
-        <p><strong>Judgement：</strong>圖5在心理寫實上具<strong>說服力</strong>；圖6在<strong>表現性衝擊</strong>上更強，兩者皆達到<strong>清晰表意</strong>。</p>
-        <p><span class="chips"><span>說服力</span><span>衝擊力</span><span>比較評價</span></span></p>
-      </article>
+        <p class="ex-d"><strong>Description：</strong> 兩作皆為<strong>人物題材</strong>；圖5保留較可辨識解剖，圖6採取明顯變形。 <span class="tag">題材</span><span class="tag">形體處理</span><span class="tag">比較</span></p>
+        <p class="ex-a"><strong>Analysis：</strong>圖5以細膩<strong>形體</strong>、柔和<strong>明暗</strong>和精細<strong>質感</strong>建構人物；圖6以銳利<strong>線條</strong>、誇張<strong>形狀</strong>與強<strong>重點</strong>放大情緒。 <span class="tag">形體</span><span class="tag">明暗</span><span class="tag">質感</span><span class="tag">線條</span><span class="tag">形狀</span><span class="tag">重點</span></p>
+        <p class="ex-i"><strong>Interpretation：</strong>圖5偏<strong>身份與韌性</strong>；圖6偏<strong>痛苦</strong>與<strong>社會創傷外化</strong>。 <span class="tag">身份</span><span class="tag">情緒</span><span class="tag">社會脈絡</span></p>
+        <p class="ex-j"><strong>Judgement：</strong>圖5在心理寫實上具<strong>說服力</strong>；圖6在<strong>表現性衝擊</strong>上更強，兩者皆達到<strong>清晰表意</strong>。 <span class="tag">說服力</span><span class="tag">衝擊力</span><span class="tag">比較評價</span></p>
+      
 
-      <article class="example">
-        <h3>第4題：分析及比較圖7與圖8的藝術表現，並詮釋及評價其意義。</h3>
+      
+        <h3 class="example-q">第4題：分析及比較圖7與圖8的藝術表現，並詮釋及評價其意義。</h3>
         <p><strong>參考作品：</strong>Henri Matisse《The Dance》(1910) vs Wassily Kandinsky《Composition VIII》(1923)。</p>
-        <p><strong>Description：</strong>兩作同屬現代主義語言；圖7偏簡化具象，圖8偏幾何抽象。</p>
-        <p><span class="chips"><span>風格</span><span>題材處理</span><span>比較</span></span></p>
-        <p><strong>Analysis：</strong>圖7以有限<strong>色彩</strong>與環形<strong>動勢</strong>建立<strong>平衡</strong>；圖8以交錯<strong>線條</strong>、重複<strong>形狀</strong>和高<strong>對比</strong>形成分析性節奏。</p>
-        <p><span class="chips"><span>色彩</span><span>動勢</span><span>平衡</span><span>線條</span><span>形狀</span><span>對比</span></span></p>
-        <p><strong>Interpretation：</strong>圖7可讀為<strong>集體生命力</strong>；圖8可讀為<strong>理性秩序</strong>與<strong>抽象思維</strong>。</p>
-        <p><span class="chips"><span>象徵意義</span><span>抽象思維</span><span>概念閱讀</span></span></p>
-        <p><strong>Judgement：</strong>圖7<strong>情感可達性</strong>較高；圖8<strong>理性建構</strong>更嚴密，兩者<strong>成功模式</strong>不同。</p>
-        <p><span class="chips"><span>可達性</span><span>嚴密性</span><span>成功模式</span></span></p>
-      </article>
+        <p class="ex-d"><strong>Description：</strong> 兩作同屬現代主義語言；圖7偏簡化具象，圖8偏幾何抽象。 <span class="tag">風格</span><span class="tag">題材處理</span><span class="tag">比較</span></p>
+        <p class="ex-a"><strong>Analysis：</strong>圖7以有限<strong>色彩</strong>與環形<strong>動勢</strong>建立<strong>平衡</strong>；圖8以交錯<strong>線條</strong>、重複<strong>形狀</strong>和高<strong>對比</strong>形成分析性節奏。 <span class="tag">色彩</span><span class="tag">動勢</span><span class="tag">平衡</span><span class="tag">線條</span><span class="tag">形狀</span><span class="tag">對比</span></p>
+        <p class="ex-i"><strong>Interpretation：</strong>圖7可讀為<strong>集體生命力</strong>；圖8可讀為<strong>理性秩序</strong>與<strong>抽象思維</strong>。 <span class="tag">象徵意義</span><span class="tag">抽象思維</span><span class="tag">概念閱讀</span></p>
+        <p class="ex-j"><strong>Judgement：</strong>圖7<strong>情感可達性</strong>較高；圖8<strong>理性建構</strong>更嚴密，兩者<strong>成功模式</strong>不同。 <span class="tag">可達性</span><span class="tag">嚴密性</span><span class="tag">成功模式</span></p>
+      
 
-      <article class="example">
-        <h3>第5題：分析及比較圖9與圖10的藝術表現，並詮釋及評價其意義。</h3>
+      
+        <h3 class="example-q">第5題：分析及比較圖9與圖10的藝術表現，並詮釋及評價其意義。</h3>
         <p><strong>參考作品：</strong>呂壽琨 Lui Shou-kwan《Zen Painting》系列 vs 王無邪 Wucius Wong《In Search of Mountains》系列。</p>
-        <p><strong>Description：</strong>兩作都借用中國文化語彙；圖9偏禪意與水墨性，圖10偏設計化與結構化。</p>
-        <p><span class="chips"><span>媒介語言</span><span>風格取向</span><span>比較</span></span></p>
-        <p><strong>Analysis：</strong>圖9以克制<strong>明暗</strong>、留白<strong>空間</strong>和簡化<strong>形體</strong>營造內斂；圖10以較密<strong>圖案</strong>、穩定<strong>比例</strong>和強<strong>節奏</strong>建立都會視覺性。</p>
-        <p><span class="chips"><span>明暗</span><span>空間</span><span>形體</span><span>圖案</span><span>比例</span><span>節奏</span></span></p>
-        <p><strong>Interpretation：</strong>兩者共同回應「香港情」：一者偏<strong>精神內觀</strong>，一者偏<strong>城市複合經驗</strong>。</p>
-        <p><span class="chips"><span>文化身份</span><span>雙重面向</span><span>意義整合</span></span></p>
-        <p><strong>Judgement：</strong>較高水平答案應持續把<strong>形式證據</strong>連接到<strong>文化意義</strong>，而非只停留主觀喜好。</p>
-        <p><span class="chips"><span>證據導向評價</span><span>一致性</span><span>考試導向</span></span></p>
-      </article>
+        <p class="ex-d"><strong>Description：</strong> 兩作都借用中國文化語彙；圖9偏禪意與水墨性，圖10偏設計化與結構化。 <span class="tag">媒介語言</span><span class="tag">風格取向</span><span class="tag">比較</span></p>
+        <p class="ex-a"><strong>Analysis：</strong>圖9以克制<strong>明暗</strong>、留白<strong>空間</strong>和簡化<strong>形體</strong>營造內斂；圖10以較密<strong>圖案</strong>、穩定<strong>比例</strong>和強<strong>節奏</strong>建立都會視覺性。 <span class="tag">明暗</span><span class="tag">空間</span><span class="tag">形體</span><span class="tag">圖案</span><span class="tag">比例</span><span class="tag">節奏</span></p>
+        <p class="ex-i"><strong>Interpretation：</strong>兩者共同回應「香港情」：一者偏<strong>精神內觀</strong>，一者偏<strong>城市複合經驗</strong>。 <span class="tag">文化身份</span><span class="tag">雙重面向</span><span class="tag">意義整合</span></p>
+        <p class="ex-j"><strong>Judgement：</strong>較高水平答案應持續把<strong>形式證據</strong>連接到<strong>文化意義</strong>，而非只停留主觀喜好。 <span class="tag">證據導向評價</span><span class="tag">一致性</span><span class="tag">考試導向</span></p>
+      
     `;
 
     const i18n = {
@@ -700,21 +637,19 @@
           elements: `
             <h2>🧰 The 7 Elements of Art</h2>
             <p class="hint">The core building blocks for making and analyzing artworks.</p>
-            <div class="chips"><span>Color</span><span>Space</span><span>Shape</span><span>Form</span><span>Line</span><span>Texture</span><span>Value</span></div>
-            <div class="grid">
-              <article class="card"><strong>Color</strong>: hue, intensity, value; for symbolism, pattern and contrast.</article>
-              <article class="card"><strong>Space</strong>: positive/negative space, foreground/middle/background.</article>
-              <article class="card"><strong>Shape</strong>: closed, flat forms; geometric or organic.</article>
-              <article class="card"><strong>Form</strong>: 3D form, real or illusion through perspective/shading.</article>
-              <article class="card"><strong>Line</strong>: continuous, broken, jagged, vertical, horizontal, diagonal.</article>
-              <article class="card"><strong>Texture</strong>: real or implied surface quality (rough/smooth/etc.).</article>
-              <article class="card"><strong>Value</strong>: light-dark range; contrast drives mood and focus.</article>
-            </div>
+            <ul>
+              <li><strong>Color</strong>: hue, intensity, value; for symbolism, pattern and contrast.</li>
+              <li><strong>Space</strong>: positive/negative space, foreground/middle/background.</li>
+              <li><strong>Shape</strong>: closed, flat forms; geometric or organic.</li>
+              <li><strong>Form</strong>: 3D form, real or illusion through perspective/shading.</li>
+              <li><strong>Line</strong>: continuous, broken, jagged, vertical, horizontal, diagonal.</li>
+              <li><strong>Texture</strong>: real or implied surface quality (rough/smooth/etc.).</li>
+              <li><strong>Value</strong>: light-dark range; contrast drives mood and focus.</li>
+            </ul>
           `,
           principles: `
             <h2>🧰 The 7 Principles of Art / Design</h2>
             <p class="hint">How artists organize elements into a meaningful composition.</p>
-            <div class="chips"><span>Movement & Rhythm</span><span>Contrast</span><span>Unity & Variety</span><span>Balance</span><span>Emphasis</span><span>Proportion</span><span>Pattern & Repetition</span></div>
             <ul>
               <li><strong>Movement & Rhythm</strong>: eye path and repetition flow.</li>
               <li><strong>Contrast</strong>: differences in size, value, colour, etc.</li>
@@ -728,9 +663,9 @@
           steps: `
             <h2>Part A: 4-Step Method</h2>
             <p class="hint">Work through the five mini questions in each step — one answer ≈ one mark point. Aim for D 25–30% · A 35–40% · I 20–25% · J 10–15%.</p>
-            <div class="daj-grid">
-              <section class="daj-step">
-                <div class="daj-step-head"><span class="daj-step-num">1</span><p class="daj-step-title">Description</p></div>
+            <ol class="daj-steps">
+              <li>
+                <h3 class="daj-step-title"><span class="daj-step-num">1</span> Description</h3>
                 <p class="daj-step-tip">Facts only — title, artist, medium, what you see. No opinion yet.</p>
                 <ol class="daj-qs">
                   <li>What is the <strong>medium</strong> (e.g. oil paint, ink, photograph, sculpture)?</li>
@@ -739,10 +674,10 @@
                   <li>What do <strong>both</strong> plates have in common?</li>
                   <li>What is one clear <strong>difference</strong> between plate (a) and plate (b)?</li>
                 </ol>
-                <div class="helper"><div class="chips" data-wordlist-step="description"></div></div>
-              </section>
-              <section class="daj-step">
-                <div class="daj-step-head"><span class="daj-step-num">2</span><p class="daj-step-title">Analysis</p></div>
+                <p class="kw-bank" data-wordlist-step="description"></p>
+              </li>
+              <li>
+                <h3 class="daj-step-title"><span class="daj-step-num">2</span> Analysis</h3>
                 <p class="daj-step-tip">Use elements + principles — explain how the picture is organised and what effect that creates.</p>
                 <ol class="daj-qs">
                   <li>Name one <strong>element</strong> you notice (colour, space, shape, form, line, texture, value).</li>
@@ -751,10 +686,10 @@
                   <li>In plate (a), the artist uses ___ to ___ — fill in with a visual detail.</li>
                   <li>In plate (b), how is that handled <strong>differently</strong>?</li>
                 </ol>
-                <div class="helper"><div class="chips" data-wordlist-step="analysis"></div></div>
-              </section>
-              <section class="daj-step">
-                <div class="daj-step-head"><span class="daj-step-num">3</span><p class="daj-step-title">Interpretation</p></div>
+                <p class="kw-bank" data-wordlist-step="analysis"></p>
+              </li>
+              <li>
+                <h3 class="daj-step-title"><span class="daj-step-num">3</span> Interpretation</h3>
                 <p class="daj-step-tip">What message, idea or emotion might the artist communicate? Always link back to what you see.</p>
                 <ol class="daj-qs">
                   <li>What <strong>mood</strong> or feeling does each plate give you?</li>
@@ -763,10 +698,10 @@
                   <li>Link to evidence: “This is suggested by ___.”</li>
                   <li>Can you mention a <strong>social or cultural</strong> idea (identity, tradition, change, power…)?</li>
                 </ol>
-                <div class="helper"><div class="chips" data-wordlist-step="interpretation"></div></div>
-              </section>
-              <section class="daj-step">
-                <div class="daj-step-head"><span class="daj-step-num">4</span><p class="daj-step-title">Judgement</p></div>
+                <p class="kw-bank" data-wordlist-step="interpretation"></p>
+              </li>
+              <li>
+                <h3 class="daj-step-title"><span class="daj-step-num">4</span> Judgement</h3>
                 <p class="daj-step-tip">Say if each work succeeds, which you prefer, and why — use reasons, not just “I like it”.</p>
                 <ol class="daj-qs">
                   <li>Is plate (a) <strong>successful</strong>? Give one reason.</li>
@@ -775,39 +710,39 @@
                   <li>What is the <strong>strongest visual choice</strong> in either work?</li>
                   <li>In one sentence: which work is <strong>stronger overall</strong>, and why?</li>
                 </ol>
-                <div class="helper"><div class="chips" data-wordlist-step="judgement"></div></div>
-              </section>
-            </div>
+                <p class="kw-bank" data-wordlist-step="judgement"></p>
+              </li>
+            </ol>
           `,
           template: `
             <h2>Ready-to-Use Writing Templates</h2>
             <p class="hint"><strong>Recommended writing proportion:</strong> Description <strong>25-30%</strong>, Analysis <strong>35-40%</strong>, Interpretation <strong>20-25%</strong>, Judgement <strong>10-15%</strong>.</p>
-            <div class="template"><strong>Description</strong>
+            <blockquote class="template"><strong>Description</strong>
 The commonalities of plate (a) and plate (b) is that both are ______.
 In plate (a), I can see ______.
 In plate (b), there is / there are ______.
 Both artworks present ______ in different ways.
-A key visual feature in both works is ______.</div>
-            <div class="template"><strong>Analysis</strong>
+A key visual feature in both works is ______.</blockquote>
+            <blockquote class="template"><strong>Analysis</strong>
 In plate (a), the artist uses ______ to show ______.
 In plate (b), the artist uses ______, creating a ______ feeling.
 The contrast between ______ and ______ strengthens ______.
-This arrangement creates a sense of ______ through ______.</div>
-            <div class="template"><strong>Interpretation</strong>
+This arrangement creates a sense of ______ through ______.</blockquote>
+            <blockquote class="template"><strong>Interpretation</strong>
 In plate (a), I think the artist wants to show ______.
 In plate (b), I think the artist wants to show ______.
 _____ may symbolize ______ in the social/cultural context.
-The ______ mood suggests ideas of ______ and ______, hinted by ______.</div>
-            <div class="template"><strong>Judgement</strong>
+The ______ mood suggests ideas of ______ and ______, hinted by ______.</blockquote>
+            <blockquote class="template"><strong>Judgement</strong>
 I think plate (a) is a success because ______.
 I think plate (b) is / is not successful because ______.
 I like plate (__) more because ______.
 Overall, the stronger work is plate (__) because ______.
-The most convincing visual decision is ______.</div>
+The most convincing visual decision is ______.</blockquote>
           `,
           examples: EXAMPLES_HTML_EN
           ,
-          pastpaper: `<div id="past-paper-demo-root"></div>`
+          pastpaper: ``
         }
       },
       zh: {
@@ -860,21 +795,19 @@ The most convincing visual decision is ______.</div>
           elements: `
             <h2>🧰 七大藝術元素（The 7 Elements of Art）</h2>
             <p class="hint">創作與分析的基本 building blocks。</p>
-            <div class="chips"><span>Color</span><span>Space</span><span>Shape</span><span>Form</span><span>Line</span><span>Texture</span><span>Value</span></div>
-            <div class="grid">
-              <article class="card"><strong>Color</strong>：色相、飽和度、明暗，可做象徵、對比和圖案。</article>
-              <article class="card"><strong>Space</strong>：正空間/負空間，前中後景。</article>
-              <article class="card"><strong>Shape</strong>：平面封閉形，可幾何或有機。</article>
-              <article class="card"><strong>Form</strong>：立體形，可真實或透視陰影造成錯覺。</article>
-              <article class="card"><strong>Line</strong>：連續、斷裂、垂直、水平、斜線等。</article>
-              <article class="card"><strong>Texture</strong>：真實或視覺質感，如粗糙/光滑。</article>
-              <article class="card"><strong>Value</strong>：明暗階調，黑白對比影響氣氛與焦點。</article>
-            </div>
+            <ul>
+              <li><strong>Color</strong>：色相、飽和度、明暗，可做象徵、對比和圖案。</li>
+              <li><strong>Space</strong>：正空間/負空間，前中後景。</li>
+              <li><strong>Shape</strong>：平面封閉形，可幾何或有機。</li>
+              <li><strong>Form</strong>：立體形，可真實或透視陰影造成錯覺。</li>
+              <li><strong>Line</strong>：連續、斷裂、垂直、水平、斜線等。</li>
+              <li><strong>Texture</strong>：真實或視覺質感，如粗糙/光滑。</li>
+              <li><strong>Value</strong>：明暗階調，黑白對比影響氣氛與焦點。</li>
+            </ul>
           `,
           principles: `
             <h2>🧰 七大設計原理（The 7 Principles of Design）</h2>
             <p class="hint">把元素組織成完整作品的方法。</p>
-            <div class="chips"><span>Movement & Rhythm</span><span>Contrast</span><span>Unity & Variety</span><span>Balance</span><span>Emphasis</span><span>Proportion</span><span>Pattern & Repetition</span></div>
             <ul>
               <li><strong>Movement & Rhythm</strong>：視線移動與重複節奏。</li>
               <li><strong>Contrast</strong>：大小、顏色、明暗等差異安排。</li>
@@ -888,9 +821,9 @@ The most convincing visual decision is ______.</div>
           steps: `
             <h2>Part A 四步法</h2>
             <p class="hint">每步回答下面五個小問題 — 一題約一個得分點。建議篇幅：D 25–30% · A 35–40% · I 20–25% · J 10–15%。</p>
-            <div class="daj-grid">
-              <section class="daj-step">
-                <div class="daj-step-head"><span class="daj-step-num">1</span><p class="daj-step-title">Description</p></div>
+            <ol class="daj-steps">
+              <li>
+                <h3 class="daj-step-title"><span class="daj-step-num">1</span> Description</h3>
                 <p class="daj-step-tip">只寫客觀事實 — 名稱、藝術家、媒介、看見什麼。不要評價。</p>
                 <ol class="daj-qs">
                   <li><strong>媒介</strong>是什麼？（油彩、水墨、照片、雕塑等）</li>
@@ -899,10 +832,10 @@ The most convincing visual decision is ______.</div>
                   <li>兩幅 plate 有什麼<strong>相同</strong>之處？</li>
                   <li>plate (a) 和 plate (b) 有什麼<strong>明顯不同</strong>？</li>
                 </ol>
-                <div class="helper"><div class="chips" data-wordlist-step="description"></div></div>
-              </section>
-              <section class="daj-step">
-                <div class="daj-step-head"><span class="daj-step-num">2</span><p class="daj-step-title">Analysis</p></div>
+                <p class="kw-bank" data-wordlist-step="description"></p>
+              </li>
+              <li>
+                <h3 class="daj-step-title"><span class="daj-step-num">2</span> Analysis</h3>
                 <p class="daj-step-tip">用元素 + 原理解釋畫面如何組織，以及造成什麼視覺效果。</p>
                 <ol class="daj-qs">
                   <li>指出一個<strong>元素</strong>（色彩、空間、形狀、形體、線條、質感、明暗）。</li>
@@ -911,10 +844,10 @@ The most convincing visual decision is ______.</div>
                   <li>在 plate (a)，藝術家運用 ___ 去 ___ — 用畫面細節填寫。</li>
                   <li>在 plate (b)，這方面如何<strong>不同</strong>？</li>
                 </ol>
-                <div class="helper"><div class="chips" data-wordlist-step="analysis"></div></div>
-              </section>
-              <section class="daj-step">
-                <div class="daj-step-head"><span class="daj-step-num">3</span><p class="daj-step-title">Interpretation</p></div>
+                <p class="kw-bank" data-wordlist-step="analysis"></p>
+              </li>
+              <li>
+                <h3 class="daj-step-title"><span class="daj-step-num">3</span> Interpretation</h3>
                 <p class="daj-step-tip">推測藝術家想傳達什麼 — 必須連回你看到的證據。</p>
                 <ol class="daj-qs">
                   <li>每幅 plate 給你什麼<strong>情緒</strong>或感覺？</li>
@@ -923,10 +856,10 @@ The most convincing visual decision is ______.</div>
                   <li>連回證據：「這可從 ___ 看出。」</li>
                   <li>能否提到<strong>社會或文化</strong>角度（身份、傳統、改變、權力…）？</li>
                 </ol>
-                <div class="helper"><div class="chips" data-wordlist-step="interpretation"></div></div>
-              </section>
-              <section class="daj-step">
-                <div class="daj-step-head"><span class="daj-step-num">4</span><p class="daj-step-title">Judgement</p></div>
+                <p class="kw-bank" data-wordlist-step="interpretation"></p>
+              </li>
+              <li>
+                <h3 class="daj-step-title"><span class="daj-step-num">4</span> Judgement</h3>
                 <p class="daj-step-tip">判斷是否成功、你較喜歡哪一幅 — 要寫理由，不只寫「我喜歡」。</p>
                 <ol class="daj-qs">
                   <li>plate (a) 是否<strong>成功</strong>？寫一個理由。</li>
@@ -935,39 +868,39 @@ The most convincing visual decision is ______.</div>
                   <li>哪一個<strong>視覺選擇</strong>最有說服力？</li>
                   <li>用一句話：哪一幅<strong>整體較強</strong>，為什麼？</li>
                 </ol>
-                <div class="helper"><div class="chips" data-wordlist-step="judgement"></div></div>
-              </section>
-            </div>
+                <p class="kw-bank" data-wordlist-step="judgement"></p>
+              </li>
+            </ol>
           `,
           template: `
             <h2>可直接套用的答題模板</h2>
             <p class="hint"><strong>建議篇幅比例：</strong>Description <strong>25-30%</strong>、Analysis <strong>35-40%</strong>、Interpretation <strong>20-25%</strong>、Judgement <strong>10-15%</strong>。</p>
-            <div class="template"><strong>Description</strong>
+            <blockquote class="template"><strong>Description</strong>
 The commonalities of plate (a) and plate (b) is that both are ______.
 In plate (a), I can see ______.
 In plate (b), there is / there are ______.
 Both artworks present ______ in different ways.
-A key visual feature in both works is ______.</div>
-            <div class="template"><strong>Analysis</strong>
+A key visual feature in both works is ______.</blockquote>
+            <blockquote class="template"><strong>Analysis</strong>
 In plate (a), the artist uses ______ to show ______.
 In plate (b), the artist uses ______, creating a ______ feeling.
 The contrast between ______ and ______ strengthens ______.
-This arrangement creates a sense of ______ through ______.</div>
-            <div class="template"><strong>Interpretation</strong>
+This arrangement creates a sense of ______ through ______.</blockquote>
+            <blockquote class="template"><strong>Interpretation</strong>
 In plate (a), I think the artist wants to show ______.
 In plate (b), I think the artist wants to show ______.
 _____ may symbolize ______ in the social/cultural context.
-The ______ mood suggests ideas of ______ and ______, hinted by ______.</div>
-            <div class="template"><strong>Judgement</strong>
+The ______ mood suggests ideas of ______ and ______, hinted by ______.</blockquote>
+            <blockquote class="template"><strong>Judgement</strong>
 I think plate (a) is a success because ______.
 I think plate (b) is / is not successful because ______.
 I like plate (__) more because ______.
 Overall, the stronger work is plate (__) because ______.
-The most convincing visual decision is ______.</div>
+The most convincing visual decision is ______.</blockquote>
           `,
           examples: EXAMPLES_HTML_ZH
           ,
-          pastpaper: `<div id="past-paper-demo-root"></div>`
+          pastpaper: ``
         }
       }
     };
@@ -1010,7 +943,7 @@ The most convincing visual decision is ______.</div>
     }
 
     function renderPastPaperDemo() {
-      const slot = contentEl.querySelector("#past-paper-demo-root");
+      const slot = contentEl.querySelector("#pastpaper");
       if (!slot) return;
       const demoPack = currentLang === "zh" ? PAST_PAPER_DEMO.zh : PAST_PAPER_DEMO.en;
       const options = Array.isArray(demoPack?.options) ? demoPack.options : [];
@@ -1025,12 +958,10 @@ The most convincing visual decision is ______.</div>
       const selected = options.find((opt) => opt.id === currentPastPaperId) || options[0];
 
       slot.innerHTML = `
-        <div class="helper">
-          <select id="pastPaperSelect" aria-label="${demoPack.selectLabel || "Choose question"}" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;">
-            ${options.map((opt) => `<option value="${opt.id}" ${opt.id === selected.id ? "selected" : ""}>${opt.label}</option>`).join("")}
-          </select>
-        </div>
-        <div id="past-paper-demo-content">${selected.html || ""}</div>
+        <select id="pastPaperSelect" class="pp-select" aria-label="${demoPack.selectLabel || "Choose question"}">
+          ${options.map((opt) => `<option value="${opt.id}" ${opt.id === selected.id ? "selected" : ""}>${opt.label}</option>`).join("")}
+        </select>
+        ${selected.html || ""}
       `;
 
       const selectEl = slot.querySelector("#pastPaperSelect");
@@ -1129,7 +1060,7 @@ The most convincing visual decision is ______.</div>
     }
 
     function revealPastPaperAnswers() {
-      const root = contentEl.querySelector("#past-paper-demo-root");
+      const root = contentEl.querySelector("#pastpaper");
       if (!root) return;
       const blanks = root.querySelectorAll(".pp-blank");
       blanks.forEach((blank) => {
@@ -1148,7 +1079,7 @@ The most convincing visual decision is ______.</div>
     }
 
     function syncPastPaperDetailHeights() {
-      const galleries = contentEl.querySelectorAll("#past-paper-demo-root .pastpaper-gallery");
+      const galleries = contentEl.querySelectorAll("#pastpaper.panel.active");
       galleries.forEach((gallery) => {
         const mainHeightByBase = {};
         const figures = gallery.querySelectorAll(".pastpaper-figure");
@@ -1262,7 +1193,7 @@ The most convincing visual decision is ______.</div>
         "平衡", "對比", "重點", "比例", "動勢", "節奏", "圖案", "統一/變化"
       ].map(normalizeTagText));
 
-      const tags = contentEl.querySelectorAll(".example .chips span");
+      const tags = contentEl.querySelectorAll("#examples .tag");
       tags.forEach((tag) => {
         const key = normalizeTagText(tag.textContent);
         tag.classList.remove("tag-desc", "tag-elements", "tag-principles", "tag-other");

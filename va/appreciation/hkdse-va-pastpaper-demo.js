@@ -22,20 +22,16 @@
 
   function renderImages(images) {
     if (!Array.isArray(images) || !images.length) return "";
-    return `
-      <div class="pastpaper-gallery">
-        ${images.map((img) => {
-          const meta = plateMetaFromCaption(img.caption);
-          const wide = img.wide ? " is-wide" : "";
-          return `
+    return images.map((img) => {
+      const meta = plateMetaFromCaption(img.caption);
+      const wide = img.wide ? " is-wide" : "";
+      return `
           <figure class="pastpaper-figure${wide}" data-plate-base="${meta.base}" data-plate-detail="${meta.isDetail ? "1" : "0"}">
             <img src="${img.src}" alt="${img.alt}" loading="lazy" />
             <figcaption>${img.caption || ""}</figcaption>
           </figure>
           `;
-        }).join("")}
-      </div>
-    `;
+    }).join("");
   }
 
   function escapeRegex(text) {
@@ -139,15 +135,15 @@
 
     let html = escapeHtml(working);
     blanks.forEach((b, idx) => {
-      const blankHtml = `<span class="pp-blank-wrap"><span class="pp-blank-icon" aria-hidden="true">${escapeHtml(b.emoji || "✍️")}</span><span class="pp-blank" data-answer="${escapeAttr(b.answer)}" data-answer-norm="${escapeAttr(b.norm)}" data-filled="0" tabindex="0" aria-label="Blank ${idx + 1}"></span></span>`;
+      const blankHtml = `<span class="pp-blank" data-emoji="${escapeHtml(b.emoji || "✍️")}" data-answer="${escapeAttr(b.answer)}" data-answer-norm="${escapeAttr(b.norm)}" data-filled="0" tabindex="0" aria-label="Blank ${idx + 1}"></span>`;
       html = html.split(b.token).join(blankHtml);
     });
 
     const bankWords = shuffle(blanks.map((b) => b.answer));
     const bankHtml = bankWords.length
-      ? `<div class="pp-bank" data-step="${stepId}">
+      ? `<p class="pp-bank" data-step="${stepId}">
           ${bankWords.map((w, i) => `<button type="button" class="pp-keyword" data-word="${escapeAttr(w)}" data-word-norm="${escapeAttr(normalizeWord(w))}" aria-label="Keyword ${i + 1}: ${escapeAttr(w)}">${escapeHtml(w)}</button>`).join("")}
-        </div>`
+        </p>`
       : "";
 
     return { sentenceHtml: html, bankHtml };
@@ -164,28 +160,24 @@
   function buildArticle(model) {
     const qid = model.id;
     return `
-      <article class="example pastpaper-answer">
         ${model.reference ? `<p><strong>${model.refLabel}</strong> ${model.reference}</p>` : ""}
         ${renderImages(model.images)}
         ${renderStep("Description", model.description, model.tags1, "en", qid, "d", ":")}
         ${renderStep("Analysis", model.analysis, model.tags2, "en", qid, "a", ":")}
         ${renderStep("Interpretation", model.interpretation, model.tags3, "en", qid, "i", ":")}
         ${renderStep("Judgement", model.judgement, model.tags4, "en", qid, "j", ":")}
-      </article>
     `;
   }
 
   function buildArticleZh(model) {
     const qid = model.id;
     return `
-      <article class="example pastpaper-answer">
         ${model.reference ? `<p><strong>${model.refLabel}</strong> ${model.reference}</p>` : ""}
         ${renderImages(model.images)}
         ${renderStep("Description", model.description, model.tags1, "zh", qid, "d", "：")}
         ${renderStep("Analysis", model.analysis, model.tags2, "zh", qid, "a", "：")}
         ${renderStep("Interpretation", model.interpretation, model.tags3, "zh", qid, "i", "：")}
         ${renderStep("Judgement", model.judgement, model.tags4, "zh", qid, "j", "：")}
-      </article>
     `;
   }
 

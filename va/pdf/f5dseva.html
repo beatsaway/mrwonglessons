@@ -12,63 +12,113 @@
       --accent: #1d4ed8;
       --soft: #f5f5f4;
       --warn: #b45309;
+      --header-h: 2rem;
+      --footer-h: 2.1rem;
     }
     * { box-sizing: border-box; }
-    html {
-      scroll-padding-top: var(--header-h, 2.75rem);
+    html, body {
+      height: 100%;
+      overflow: hidden;
     }
     body {
       margin: 0;
+      display: flex;
+      flex-direction: column;
       font: 15px/1.55 ui-sans-serif, system-ui, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
       color: var(--text);
       background: #fff;
     }
     a { color: var(--accent); }
     header {
-      position: sticky;
-      top: 0;
+      flex-shrink: 0;
       z-index: 10;
       display: flex;
       align-items: center;
-      gap: 0.45rem;
-      padding: 0.35rem 0.65rem;
+      gap: 0.35rem;
+      height: var(--header-h);
+      padding: 0 0.5rem;
       border-bottom: 1px solid var(--line);
       background: #fff;
     }
     header a.home {
       flex-shrink: 0;
-      width: 2rem;
-      height: 2rem;
+      width: 1.55rem;
+      height: 1.55rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 6px;
       text-decoration: none;
-      font-size: 1rem;
+      font-size: 0.85rem;
       line-height: 1;
     }
     header select {
       flex: 1;
       min-width: 0;
       margin: 0;
-      padding: 0.35rem 0.5rem;
+      padding: 0.15rem 0.35rem;
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 6px;
       background: #fff;
       font: inherit;
-      font-size: 0.84rem;
+      font-size: 0.76rem;
       color: var(--text);
     }
     main {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
       max-width: 42rem;
+      width: 100%;
       margin: 0 auto;
-      padding: 0.65rem 0.75rem 2rem;
+      padding: 0.5rem 0.75rem 0.65rem;
     }
     section {
-      margin: 1rem 0 0;
-      padding-top: 0.2rem;
-      scroll-margin-top: var(--header-h, 2.75rem);
+      display: none;
+      margin: 0;
+      padding: 0;
+    }
+    section.active {
+      display: block;
+    }
+    .ebook-nav {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      height: var(--footer-h);
+      padding: 0 0.5rem;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+    .ebook-nav button {
+      flex-shrink: 0;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 6px;
+      padding: 0.15rem 0.5rem;
+      font: inherit;
+      font-size: 0.74rem;
+      line-height: 1.3;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .ebook-nav button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .page-indicator {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+      font-size: 0.74rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     section > h2 {
       margin: 0 0 0.65rem;
@@ -208,7 +258,7 @@
   </header>
 
   <main>
-    <section id="overview">
+    <section id="overview" class="active">
       <h2>Overview</h2>
       <p class="meta">Digital version: <a href="f5dseva.pdf" target="_blank" rel="noopener">f5dseva.pdf</a></p>
 
@@ -609,38 +659,73 @@
       <p class="exam-rule">◆ During the examination, invigilation staff may examine the materials which candidates have brought into the examination centre. ◆ Cutting boards are not provided at the examination centres.</p>
     </section>
   </main>
+
+  <footer class="ebook-nav" aria-label="Page navigation">
+    <button type="button" id="prevPage" aria-label="Previous page">‹ Prev</button>
+    <span class="page-indicator" id="pageIndicator">1 / 6 · Overview</span>
+    <button type="button" id="nextPage" aria-label="Next page">Next ›</button>
+  </footer>
+
   <script>
     (function () {
-      var header = document.querySelector("header");
+      var pages = ["overview", "part-a", "part-b", "sba-art", "sba-book", "exam-rules"];
+      var pageTitles = {
+        overview: "Overview",
+        "part-a": "Part A · DAIJ",
+        "part-b": "Part B · Tips",
+        "sba-art": "SBA · Artworks",
+        "sba-book": "SBA · Workbook",
+        "exam-rules": "Exam rules"
+      };
       var sel = document.getElementById("jump");
-      if (!header || !sel) return;
+      var prevBtn = document.getElementById("prevPage");
+      var nextBtn = document.getElementById("nextPage");
+      var indicator = document.getElementById("pageIndicator");
+      if (!sel || !prevBtn || !nextBtn || !indicator) return;
 
-      function setHeaderOffset() {
-        document.documentElement.style.setProperty("--header-h", header.offsetHeight + "px");
+      function pageIndex(id) {
+        var i = pages.indexOf(id);
+        return i >= 0 ? i : 0;
       }
 
-      function scrollToSection(id, smooth) {
-        var el = document.getElementById(id);
-        if (!el) return;
-        setHeaderOffset();
-        var top = el.getBoundingClientRect().top + window.pageYOffset - header.offsetHeight - 6;
-        window.scrollTo({ top: top, behavior: smooth ? "smooth" : "auto" });
-      }
-
-      function go(id, smooth) {
+      function showPage(id, updateHash) {
         if (!document.getElementById(id)) id = "overview";
+        var idx = pageIndex(id);
+
+        pages.forEach(function (pid) {
+          var sec = document.getElementById(pid);
+          if (sec) sec.classList.toggle("active", pid === id);
+        });
+
         sel.value = id;
-        scrollToSection(id, smooth);
+        prevBtn.disabled = idx === 0;
+        nextBtn.disabled = idx === pages.length - 1;
+        indicator.textContent = (idx + 1) + " / " + pages.length + " · " + (pageTitles[id] || id);
+
+        var main = document.querySelector("main");
+        if (main) main.scrollTop = 0;
+
+        if (updateHash !== false && location.hash.slice(1) !== id) {
+          history.replaceState(null, "", "#" + id);
+        }
+      }
+
+      function goRelative(delta) {
+        var idx = pageIndex(sel.value);
+        var next = idx + delta;
+        if (next < 0 || next >= pages.length) return;
+        showPage(pages[next], true);
       }
 
       sel.addEventListener("change", function () {
-        var id = sel.value;
-        if (location.hash.slice(1) !== id) location.hash = id;
-        else go(id, true);
+        showPage(sel.value, true);
       });
 
+      prevBtn.addEventListener("click", function () { goRelative(-1); });
+      nextBtn.addEventListener("click", function () { goRelative(1); });
+
       window.addEventListener("hashchange", function () {
-        go(location.hash.slice(1) || "overview", true);
+        showPage(location.hash.slice(1) || "overview", false);
       });
 
       document.addEventListener("click", function (e) {
@@ -649,15 +734,22 @@
         var id = a.hash.slice(1);
         if (!document.getElementById(id)) return;
         e.preventDefault();
-        if (location.hash.slice(1) !== id) location.hash = id;
-        else go(id, true);
+        showPage(id, true);
       });
 
-      window.addEventListener("resize", setHeaderOffset);
-      setHeaderOffset();
+      document.addEventListener("keydown", function (e) {
+        if (e.target.closest("select, input, textarea")) return;
+        if (e.key === "ArrowLeft" || e.key === "PageUp") {
+          e.preventDefault();
+          goRelative(-1);
+        } else if (e.key === "ArrowRight" || e.key === "PageDown") {
+          e.preventDefault();
+          goRelative(1);
+        }
+      });
+
       var start = location.hash.slice(1) || "overview";
-      sel.value = document.getElementById(start) ? start : "overview";
-      if (location.hash) go(start, false);
+      showPage(document.getElementById(start) ? start : "overview", false);
     })();
   </script>
 </body>
