@@ -89,6 +89,7 @@
       flex-shrink: 0;
     }
     header.bar .timer.reveal-phase { color: #0369a1; }
+    header.bar .timer.paused { opacity: 0.5; }
     main {
       flex: 1;
       display: flex;
@@ -370,6 +371,8 @@
       var showingTick = true;
       var lastMarkSwap = 0;
       var tiltRefresh = 0;
+      var paused = false;
+      var pauseLeft = 0;
 
       function cancelTick() {
         if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
@@ -545,6 +548,7 @@
       }
 
       function tick() {
+        if (paused) return;
         var left = Math.max(0, phaseEnd - Date.now());
         var total = phase === "question" ? QUESTION_MS : REVEAL_MS;
         setBar(left / total, phase === "reveal");
@@ -558,7 +562,30 @@
         rafId = requestAnimationFrame(tick);
       }
 
+      function pauseCountdown() {
+        if (paused || !currentItem || index >= ITEMS.length) return;
+        pauseLeft = Math.max(0, phaseEnd - Date.now());
+        paused = true;
+        cancelTick();
+        timerEl.classList.add("paused");
+      }
+
+      function unpauseCountdown() {
+        if (!paused) return;
+        paused = false;
+        phaseEnd = Date.now() + pauseLeft;
+        timerEl.classList.remove("paused");
+        rafId = requestAnimationFrame(tick);
+      }
+
+      function togglePause() {
+        if (paused) unpauseCountdown();
+        else pauseCountdown();
+      }
+
       function startPhase(nextPhase) {
+        paused = false;
+        timerEl.classList.remove("paused");
         phase = nextPhase;
         phaseEnd = Date.now() + (phase === "question" ? QUESTION_MS : REVEAL_MS);
         cancelTick();
@@ -571,6 +598,8 @@
           card.classList.add("hidden");
           doneMsg.classList.add("visible");
           cancelTick();
+          paused = false;
+          timerEl.classList.remove("paused");
           timerEl.textContent = "";
           setBar(0, false);
           currentItem = null;
@@ -705,6 +734,11 @@
         if (e.key === "t" || e.key === "T") {
           e.preventDefault();
           toggleTimerPanel();
+          return;
+        }
+        if (e.key === "p" || e.key === "P") {
+          e.preventDefault();
+          togglePause();
           return;
         }
         if (timerPanelOpen) return;
