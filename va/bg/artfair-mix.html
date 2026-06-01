@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Art fair mix</title>
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+        font-family: system-ui, sans-serif;
+      }
+      .section {
+        padding: 24px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .wrap {
+        width: min(1100px, 92vw);
+        margin: 0 auto;
+      }
+      .video {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        background: #000;
+        overflow: hidden;
+        border-radius: 12px;
+      }
+      .video iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+      #countdown {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        z-index: 9999;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        line-height: 1.2;
+        user-select: none;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+      .timing-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+      }
+      .timing-overlay[hidden] {
+        display: none;
+      }
+      .timing-overlay__box {
+        width: min(22rem, 100%);
+        padding: 1rem 1.15rem 1.1rem;
+        border-radius: 14px;
+        background: rgba(22, 22, 26, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+      }
+      .timing-overlay__box label {
+        display: block;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 13px;
+        margin-bottom: 0.45rem;
+      }
+      .timing-overlay__box input[type="range"] {
+        width: 100%;
+        margin: 0 0 0.35rem;
+      }
+      #gap-readout {
+        display: block;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 12px;
+      }
+      .timing-overlay__hint {
+        margin: 0.65rem 0 0;
+        font-size: 11px;
+        line-height: 1.35;
+        color: rgba(255, 255, 255, 0.42);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="countdown">--</div>
+    <div id="timing-panel" class="timing-overlay" hidden>
+      <div class="timing-overlay__box">
+        <label for="gap-slider">Time between clips (default)</label>
+        <input id="gap-slider" type="range" min="15" max="90" step="5" value="45" />
+        <span id="gap-readout">30-60 s</span>
+        <p class="timing-overlay__hint">
+          Any <code style="color: rgba(255, 255, 255, 0.55)">.section</code> with
+          <code style="color: rgba(255, 255, 255, 0.55)">data-gap-min-sec</code> and
+          <code style="color: rgba(255, 255, 255, 0.55)">data-gap-max-sec</code> uses its own
+          random dwell time instead of this range.
+        </p>
+      </div>
+    </div>
+    <script>
+      window.__BG_ROTATOR_EXTERNAL__ = true;
+    </script>
+    <script src="background-rotator.js"></script>
+    <script>
+      (() => {
+        if (window.__BG_ROTATOR_EXTERNAL__) return;
+        let minMs = 30_000;
+        let maxMs = 60_000;
+        const SPREAD_SEC = 15;
+        const countdownEl = document.getElementById("countdown");
+        const timingPanel = document.getElementById("timing-panel");
+        const gapSlider = document.getElementById("gap-slider");
+        const gapReadout = document.getElementById("gap-readout");
+        let sections = [];
+
+        const applyGapFromSlider = () => {
+          const avg = Number(gapSlider?.value ?? 45);
+          let lo = (avg - SPREAD_SEC) * 1000;
+          let hi = (avg + SPREAD_SEC) * 1000;
+          lo = Math.max(3000, lo);
+          hi = Math.min(180000, hi);
+          if (hi <= lo) hi = lo + 1000;
+          minMs = lo;
+          maxMs = hi;
+          if (gapReadout) {
+            gapReadout.textContent = `${Math.round(minMs / 1000)}-${Math.round(maxMs / 1000)} s`;
+          }
+        };
+
+        applyGapFromSlider();
+
+        let activeIndex = 0;
+        const players = [];
+        let unvisited = new Set();
+
+        const refillUnvisited = () => {
+          unvisited = new Set(sections.map((_, idx) => idx));
+        };
+
+        const pickNextIndex = () => {
+          const n = sections.length;
+          if (n <= 1) return 0;
+
+          if (unvisited.size === 0) {
+            refillUnvisited();
+            unvisited.delete(activeIndex);
+          }
+
+          let pool = [...unvisited];
+          if (pool.length > 1) {
+            const skipCur = pool.filter((idx) => idx !== activeIndex);
+            if (skipCur.length) pool = skipCur;
+          }
+          const j = pool[Math.floor(Math.random() * pool.length)];
+          unvisited.delete(j);
+          return j;
+        };
+
+        const delayRangeMsForSection = (idx) => {
+          const el = sections[idx];
+          if (!el) return { lo: minMs, hi: maxMs };
+          const aMin = el.getAttribute("data-gap-min-sec");
+          const aMax = el.getAttribute("data-gap-max-sec");
+          if (aMin == null || aMin === "" || aMax == null || aMax === "") {
+            return { lo: minMs, hi: maxMs };
+          }
+          let lo = parseFloat(aMin) * 1000;
+          let hi = parseFloat(aMax) * 1000;
+          if (!Number.isFinite(lo) || !Number.isFinite(hi)) return { lo: minMs, hi: maxMs };
+          lo = Math.max(3000, lo);
+          hi = Math.min(180000, hi);
+          if (hi <= lo) hi = lo + 1000;
+          return { lo, hi };
+        };
+
+        const nextDelayMs = () => {
+          const { lo, hi } = delayRangeMsForSection(activeIndex);
+          return lo + Math.floor(Math.random() * (hi - lo + 1));
+        };
+
+        const setCountdownText = (msLeft) => {
+          if (!countdownEl) return;
+          const sec = Math.max(0, Math.ceil(msLeft / 1000));
+          countdownEl.textContent = String(sec);
+        };
+
+        const setActive = (idx) => {
+          if (!Number.isFinite(idx)) return;
+          if (!sections.length) return;
+          const next = ((idx % sections.length) + sections.length) % sections.length;
+          if (next === activeIndex && players.length) return;
+          activeIndex = next;
+
+          players.forEach((p, pi) => {
+            if (!p || typeof p.pauseVideo !== "function") return;
+            if (pi === activeIndex) return;
+            try {
+              p.pauseVideo();
+            } catch (e) {}
+          });
+
+          const p = players[activeIndex];
+          if (p && typeof p.playVideo === "function") {
+            try {
+              p.mute();
+              p.playVideo();
+            } catch (e) {}
+          }
+        };
+
+        let nextAt = 0;
+        let timeoutId = 0;
+        let tickerId = 0;
+
+        const scheduleNext = () => {
+          if (timeoutId) window.clearTimeout(timeoutId);
+          timeoutId = 0;
+
+          const delay = nextDelayMs();
+          nextAt = Date.now() + delay;
+          setCountdownText(delay);
+
+          timeoutId = window.setTimeout(() => {
+            const nextIdx = pickNextIndex();
+            sections[nextIdx].scrollIntoView({ behavior: "smooth", block: "start" });
+            setActive(nextIdx);
+            scheduleNext();
+          }, delay);
+
+          if (!tickerId) {
+            tickerId = window.setInterval(() => setCountdownText(nextAt - Date.now()), 100);
+          }
+        };
+
+        window.addEventListener(
+          "load",
+          () => {
+            sections = Array.from(document.querySelectorAll(".section"));
+            if (sections.length === 0) {
+              if (countdownEl) countdownEl.textContent = "No videos found";
+              return;
+            }
+
+            const io = new IntersectionObserver(
+              (entries) => {
+                let best = null;
+                for (const e of entries) {
+                  if (!e.isIntersecting) continue;
+                  if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+                }
+                if (!best) return;
+                const idx = sections.indexOf(best.target);
+                if (idx >= 0) setActive(idx);
+              },
+              { threshold: [0.6, 0.75, 0.9] }
+            );
+            sections.forEach((s) => io.observe(s));
+
+            queueMicrotask(() => {
+              refillUnvisited();
+              if (sections.length > 1) unvisited.delete(activeIndex);
+            });
+
+            scheduleNext();
+          },
+          { once: true }
+        );
+
+        if (gapSlider) {
+          gapSlider.addEventListener("input", () => {
+            applyGapFromSlider();
+            if (sections.length) scheduleNext();
+          });
+        }
+
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "m" || e.key === "M") {
+            if (!timingPanel) return;
+            if (timingPanel.hidden) {
+              const t = e.target;
+              const tag = t && t.tagName;
+              if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+            }
+            e.preventDefault();
+            timingPanel.hidden = !timingPanel.hidden;
+          }
+          if (e.key === "Escape" && timingPanel && !timingPanel.hidden) {
+            timingPanel.hidden = true;
+            e.preventDefault();
+          }
+        });
+
+        if (timingPanel) {
+          timingPanel.addEventListener("click", (e) => {
+            if (e.target === timingPanel) timingPanel.hidden = true;
+          });
+        }
+
+        const attachEarlyLoop = (player, endSec, startSec = 0) => {
+          if (!player || typeof player.getCurrentTime !== "function") return;
+          const end = Number(endSec);
+          const start = Number(startSec);
+          if (!Number.isFinite(end) || end <= 0) return;
+          const s = Number.isFinite(start) && start >= 0 ? start : 0;
+          window.setInterval(() => {
+            try {
+              if (player.getPlayerState() !== 1) return;
+              if (player.getCurrentTime() >= end) player.seekTo(s, true);
+            } catch (e) {}
+          }, 150);
+        };
+
+        window.onYouTubeIframeAPIReady = () => {
+          const iframes = Array.from(document.querySelectorAll("iframe[data-video-id]"));
+          if (!iframes.length) return;
+
+          iframes.forEach((el, idx) => {
+            const id = el.getAttribute("data-video-id");
+            if (!id) return;
+
+            const loopEndSec = el.getAttribute("data-loop-end-sec");
+            const loopStartSec = el.getAttribute("data-loop-start-sec");
+
+            players[idx] = new YT.Player(el, {
+              events: {
+                onReady: (ev) => {
+                  try {
+                    ev.target.mute();
+                  } catch (e) {}
+                  if (idx === activeIndex) {
+                    try {
+                      ev.target.playVideo();
+                    } catch (e) {}
+                  } else {
+                    try {
+                      ev.target.pauseVideo();
+                    } catch (e) {}
+                  }
+
+                  if (loopEndSec != null && loopEndSec !== "") {
+                    const end = parseFloat(loopEndSec);
+                    const start =
+                      loopStartSec != null && loopStartSec !== "" ? parseFloat(loopStartSec) : 0;
+                    attachEarlyLoop(ev.target, end, start);
+                  }
+                },
+              },
+            });
+          });
+        };
+      })();
+    </script>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="-01vee3p_7I"
+            src="https://www.youtube.com/embed/-01vee3p_7I?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=-01vee3p_7I&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="Siyx66E9TXs"
+            src="https://www.youtube.com/embed/Siyx66E9TXs?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=Siyx66E9TXs&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="dSxnOC-pUeM"
+            src="https://www.youtube.com/embed/dSxnOC-pUeM?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=dSxnOC-pUeM&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="kzpVycTSqzM"
+            src="https://www.youtube.com/embed/kzpVycTSqzM?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=kzpVycTSqzM&start=36&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="hAoOOOMAkHs"
+            src="https://www.youtube.com/embed/hAoOOOMAkHs?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=hAoOOOMAkHs&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="YKgwzswmkec"
+            src="https://www.youtube.com/embed/YKgwzswmkec?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=YKgwzswmkec&start=0&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="kzpVycTSqzM"
+            src="https://www.youtube.com/embed/kzpVycTSqzM?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=kzpVycTSqzM&start=28&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="qbLNIUkKdmQ"
+            src="https://www.youtube.com/embed/qbLNIUkKdmQ?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=qbLNIUkKdmQ&start=67&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="6R_MpSVc0Fg"
+            src="https://www.youtube.com/embed/6R_MpSVc0Fg?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=6R_MpSVc0Fg&start=5&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <div class="video">
+          <iframe
+            data-video-id="k6COVFJTua0"
+            src="https://www.youtube.com/embed/k6COVFJTua0?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=k6COVFJTua0&start=38&controls=0&modestbranding=1&playsinline=1&rel=0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

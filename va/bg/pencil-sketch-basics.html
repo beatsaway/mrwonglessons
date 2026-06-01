@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pencil sketch basics</title>
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+        font-family: system-ui, sans-serif;
+      }
+      .section {
+        padding: 24px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .wrap {
+        width: min(1100px, 92vw);
+        margin: 0 auto;
+      }
+      .video {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        background: #000;
+        overflow: hidden;
+        border-radius: 12px;
+      }
+      .video iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+      #countdown {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        z-index: 9999;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        line-height: 1.2;
+        user-select: none;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+      .timing-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+      }
+      .timing-overlay[hidden] {
+        display: none;
+      }
+      .timing-overlay__box {
+        width: min(22rem, 100%);
+        padding: 1rem 1.15rem 1.1rem;
+        border-radius: 14px;
+        background: rgba(22, 22, 26, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+      }
+      .timing-overlay__box label {
+        display: block;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 13px;
+        margin-bottom: 0.45rem;
+      }
+      .timing-overlay__box input[type="range"] {
+        width: 100%;
+        margin: 0 0 0.35rem;
+      }
+      #gap-readout {
+        display: block;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 12px;
+      }
+      .timing-overlay__hint {
+        margin: 0.65rem 0 0;
+        font-size: 11px;
+        line-height: 1.35;
+        color: rgba(255, 255, 255, 0.42);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="countdown">--</div>
+    <div id="timing-panel" class="timing-overlay" hidden>
+      <div class="timing-overlay__box">
+        <label for="gap-slider">Time between clips (default)</label>
+        <input id="gap-slider" type="range" min="15" max="90" step="5" value="45" />
+        <span id="gap-readout">30-60 s</span>
+        <p class="timing-overlay__hint">
+          Any <code style="color: rgba(255, 255, 255, 0.55)">.section</code> with
+          <code style="color: rgba(255, 255, 255, 0.55)">data-gap-min-sec</code> and
+          <code style="color: rgba(255, 255, 255, 0.55)">data-gap-max-sec</code> uses its own
+          random dwell time instead of this range.
+        </p>
+      </div>
+    </div>
+    <script>
+      window.__BG_ROTATOR_EXTERNAL__ = true;
+    </script>
+    <script src="lazybgrotator.js"></script>
+
+    <div class="section" data-video-id="ioEI9X_-9Yo" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="ojMuxF_4tUU" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="TFO3Oqam78k" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="yXefYdjhHPs" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="5-CitGxUbv8" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="fn0WjRVGWjE" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="Obj0Y7fntdE" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="CtXBoI7fuAI" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="VINHTLPmZ3A" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="ex0VlwXSvd4" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="4kr0tgRPJoc" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="JIUU94cmBTw" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="Elw-Z6jHYMU" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="mLS4eXTYGv4" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="VdpX48S1zoI" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="glylzYMYvTE" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="CqYQc3hVReU" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="-d_fL_F7uFU" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="JBXWF5Z_bCk" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="b3Y-IhPIDBs" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="nGipioMVrUE" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="mlgrJ8sK9xo" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="NwAxBnjr-IE" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="96x7zjH4Ofw" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="zTEJhaMEiLo" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="dfnRyGItr2A" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="OzXvl-DmFw4" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="lE1UOb4kJfI" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="9eI55I0dlcY" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="fPZ39Fz_B7Y" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="AySAqsq6uQI" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="_60y6HRyu_w" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="7Ar9HQ-cnwM" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="sYlvR2SGgiI" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="zXo3ZnK6-z8" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="Lph5M2rVv-I" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="evw64YpL3tE" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+    <div class="section" data-video-id="YIhGY5YLq2s" data-short>
+      <div class="wrap">
+        <div class="video" data-lazy-mount></div>
+      </div>
+    </div>
+
+  </body>
+</html>
