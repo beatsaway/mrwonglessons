@@ -466,6 +466,7 @@
     let typeDelayMs = 120;
     let holdDurationMs = 10000;
     let mcQuizDurationMs = 20000;
+    let mcQuizUnlocked = false;
     let languageOrderMode = "en-first";
     let enableCharRotate = true;
     let enableRotateAnimation = true;
@@ -1015,6 +1016,24 @@
         state.shownCharsEn = 0;
       };
 
+      const startTitleFlow = (nowMs) => {
+        state.segmentUntilMs = 0;
+        state.phase = languageOrderMode === "en-first" ? "titleEn" : "titleZh";
+        state.lastStepAtMs = nowMs;
+        state.lastStepAtMsEn = nowMs;
+      };
+
+      const startEntryFlow = (nowMs) => {
+        const entry = dailyReadEntries[state.currentEntryIndex];
+        const mc = entry?.mc;
+        const hasMcChoices = !!(mc && Array.isArray(mc.choices) && mc.choices.length);
+        if (mcQuizUnlocked && hasMcChoices) {
+          startMcQuiz(nowMs);
+          return;
+        }
+        startTitleFlow(nowMs);
+      };
+
       const startExplainDwell = (nowMs) => {
         const factText = String(state.currentFact || "").replace(/\s+/g, " ").trim();
         const factEnText = String(state.currentFactEn || "").replace(/\s+/g, " ").trim();
@@ -1377,7 +1396,7 @@
         state.shownCharsEn = 0;
         state.lastStepAtMs = nowMs;
         state.lastStepAtMsEn = nowMs;
-        startMcQuiz(nowMs);
+        startEntryFlow(nowMs);
       }
 
       function pushHistoryIndex(idx) {
@@ -1400,7 +1419,7 @@
           state.shownCharsEn = 0;
           state.lastStepAtMs = nowMs;
           state.lastStepAtMsEn = nowMs;
-          startMcQuiz(nowMs);
+          startTitleFlow(nowMs);
           return;
         }
         if (!state.deck.length) refillDeck();
@@ -1564,6 +1583,24 @@
         if (state.phase === "mcQuiz") {
           state.segmentUntilMs = nowMs + mcQuizDurationMs;
         }
+      };
+
+      state.toggleMcQuiz = (elapsedSec = 0) => {
+        const nowMs = Math.max(0, elapsedSec * 1000);
+        mcQuizUnlocked = !mcQuizUnlocked;
+        if (state.currentEntryIndex < 0) return mcQuizUnlocked;
+        if (!mcQuizUnlocked) {
+          if (state.phase === "mcQuiz" || state.phase === "mcReveal") {
+            startTitleFlow(nowMs);
+          }
+          return mcQuizUnlocked;
+        }
+
+        const entry = dailyReadEntries[state.currentEntryIndex];
+        const mc = entry?.mc;
+        const hasMcChoices = !!(mc && Array.isArray(mc.choices) && mc.choices.length);
+        if (hasMcChoices) startMcQuiz(nowMs);
+        return mcQuizUnlocked;
       };
 
       draw(DEFAULT_DAILY_READ_TITLE, DEFAULT_DAILY_READ_TITLE_EN, "", "", null, null, null, null);
@@ -2534,6 +2571,11 @@
       }
       if (event.key === "m" || event.key === "M") {
         toggleSpeedPanel();
+      }
+      if (event.key === "g" || event.key === "G") {
+        if (whiteboardRotator && typeof whiteboardRotator.toggleMcQuiz === "function") {
+          whiteboardRotator.toggleMcQuiz(animClock.elapsedTime);
+        }
       }
       if (event.code === "Space") {
         event.preventDefault();
