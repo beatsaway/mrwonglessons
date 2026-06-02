@@ -7,49 +7,54 @@
   <style>
     body {
       margin: 0;
-      padding: 16px;
+      padding: 0;
       font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
       background: #f7f9fc;
       color: #1f2937;
     }
 
     main {
-      max-width: 900px;
+      max-width: 1120px;
       margin: 0 auto;
+      padding-left: 8px;
+      padding-right: 8px;
+      padding-top: 44px;
     }
 
-    h1 {
-      margin: 0 0 10px;
-      font-size: 1.25rem;
-    }
-
-    .toolbar {
+    .topbar {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
-    button {
-      border: 0;
+      padding: 6px 10px;
+      border: 1px solid #e5e7eb;
       border-radius: 8px;
-      padding: 7px 12px;
-      background: #2563eb;
-      color: #fff;
-      cursor: pointer;
+      background: rgba(255, 255, 255, 0.93);
+      backdrop-filter: blur(4px);
+      margin-bottom: 8px;
+      font-size: 0.88rem;
+      line-height: 1.2;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      border-radius: 0;
+      margin: 0;
     }
 
-    button:hover {
-      background: #1d4ed8;
+    .title {
+      font-weight: 700;
+      color: #1e3a5f;
     }
 
     select {
       border: 1px solid #d1d5db;
-      border-radius: 8px;
-      padding: 6px 8px;
+      border-radius: 6px;
+      padding: 3px 6px;
       background: #fff;
       color: #1f2937;
+      font: inherit;
     }
 
     #studentList {
@@ -57,7 +62,7 @@
       margin: 0;
       padding: 0;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 8px;
     }
 
@@ -75,8 +80,19 @@
       background: #fff7e6;
     }
 
+    .student-name {
+      display: block;
+    }
+
+    .student-points {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
     #listMeta {
-      margin-top: 10px;
+      margin-top: 8px;
       font-size: 0.88rem;
       color: #4b5563;
     }
@@ -84,8 +100,8 @@
 </head>
 <body>
   <main>
-    <h1>2A 優點名單 by 代課黃老師</h1>
-    <p class="toolbar">
+    <p class="topbar">
+      <span class="title">2A 優點名單 by 代課黃老師</span>
       <label><input id="pointsOnlyCheckbox" type="checkbox" /> 只顯示有優點學生</label>
       <label>原因
         <select id="reasonFilter">
@@ -99,11 +115,11 @@
 
   <script>
     const students = [
-      "1 陳政延", "2 陳錦賢", "3 陳思涵", "4 莊曼妮", "5 封采", "6 郭君鵬", "7 何天恩",
-      "8 黃嘉樂", "9 黃詩茹", "10 蔣少涵", "11 簡愷佑", "12 梁柏宇", "13 李狄達", "14 李一航",
-      "15 李一鳴", "16 呂錦峰", "17 蘇紫瑜", "19 王復生", "20 吳國豪", "21 吴浣瑩", "22 肖辰臻",
-      "23 許繼耿", "24 許學臻", "25 楊星睿", "26 姚銘", "27 易容妃", "28 余嘉浠", "29 曾嘉欣",
-      "30 張梓萱", "31 鄭敬熹", "33 和仟惠", "34 林煜翔", "35 蔡子萱", "36 方紫瑜", "37 邱若曦"
+      "6 郭君鵬", "14 李一航", "11 簡愷佑", "35 蔡子萱", "7 何天恩", "36 方紫瑜", "30 張梓萱",
+      "33 和仟惠", "9 黃詩茹", "4 莊曼妮", "15 李一鳴", "10 蔣少涵", "21 吴浣瑩", "28 余嘉浠",
+      "12 梁柏宇", "22 肖辰臻", "29 曾嘉欣", "24 許學臻", "23 許繼耿", "5 封采", "37 邱若曦",
+      "19 王復生", "17 蘇紫瑜", "27 易容妃", "26 姚銘", "16 呂錦峰", "1 陳政延", "31 鄭敬熹",
+      "8 黃嘉樂", "3 陳思涵", "20 吳國豪", "2 陳錦賢", "13 李狄達", "34 林煜翔", "25 楊星睿"
     ];
 
     // 每一點都獨立存一筆，方便之後加入不同原因或時間。
@@ -116,6 +132,7 @@
       { owner: 8, reason: "飛躍卡" },
       { owner: 9, reason: "飛躍卡" },
       { owner: 9, reason: "飛躍卡" },
+      { owner: 10, reason: "飛躍卡" },
       { owner: 24, reason: "飛躍卡" },
       { owner: 27, reason: "飛躍卡" },
       { owner: 29, reason: "飛躍卡" },
@@ -181,7 +198,13 @@
         const studentNumber = getStudentNumber(student);
         const pointCount = studentNumber !== null ? (pointsByOwner[studentNumber] || 0) : 0;
         const item = document.createElement("li");
-        item.textContent = `${student}｜${pointCount} 優點`;
+        const nameEl = document.createElement("span");
+        nameEl.className = "student-name";
+        nameEl.textContent = student;
+        const pointsEl = document.createElement("span");
+        pointsEl.className = "student-points";
+        pointsEl.textContent = `${pointCount} 優點`;
+        item.append(nameEl, pointsEl);
         if (pointCount > 0) item.classList.add("has-point");
         studentList.appendChild(item);
       });
