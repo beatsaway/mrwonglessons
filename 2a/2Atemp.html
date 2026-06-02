@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2A 優點名單 by 代課黃老師</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: #f7f9fc;
+      color: #1f2937;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 1.25rem;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 7px 12px;
+      background: #2563eb;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    select {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 6px 8px;
+      background: #fff;
+      color: #1f2937;
+    }
+
+    #studentList {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 8px;
+    }
+
+    #studentList li {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    #studentList li.has-point {
+      border-color: #f59e0b;
+      background: #fff7e6;
+    }
+
+    #listMeta {
+      margin-top: 10px;
+      font-size: 0.88rem;
+      color: #4b5563;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>2A 優點名單 by 代課黃老師</h1>
+    <p class="toolbar">
+      <label><input id="pointsOnlyCheckbox" type="checkbox" /> 只顯示有優點學生</label>
+      <label>原因
+        <select id="reasonFilter">
+          <option value="">全部</option>
+        </select>
+      </label>
+    </p>
+    <ul id="studentList"></ul>
+    <p id="listMeta"></p>
+  </main>
+
+  <script>
+    const students = [
+      "1 陳政延", "2 陳錦賢", "3 陳思涵", "4 莊曼妮", "5 封采", "6 郭君鵬", "7 何天恩",
+      "8 黃嘉樂", "9 黃詩茹", "10 蔣少涵", "11 簡愷佑", "12 梁柏宇", "13 李狄達", "14 李一航",
+      "15 李一鳴", "16 呂錦峰", "17 蘇紫瑜", "19 王復生", "20 吳國豪", "21 吴浣瑩", "22 肖辰臻",
+      "23 許繼耿", "24 許學臻", "25 楊星睿", "26 姚銘", "27 易容妃", "28 余嘉浠", "29 曾嘉欣",
+      "30 張梓萱", "31 鄭敬熹", "33 和仟惠", "34 林煜翔", "35 蔡子萱", "36 方紫瑜", "37 邱若曦"
+    ];
+
+    // 每一點都獨立存一筆，方便之後加入不同原因或時間。
+    const achievementPoints = [
+      { owner: 1, reason: "飛躍卡" },
+      { owner: 2, reason: "飛躍卡" },
+      { owner: 2, reason: "飛躍卡" },
+      { owner: 8, reason: "飛躍卡" },
+      { owner: 8, reason: "飛躍卡" },
+      { owner: 9, reason: "飛躍卡" },
+      { owner: 24, reason: "飛躍卡" },
+      { owner: 27, reason: "飛躍卡" },
+      { owner: 29, reason: "飛躍卡" },
+      { owner: 29, reason: "飛躍卡" },
+      { owner: 29, reason: "飛躍卡" },
+      { owner: 34, reason: "飛躍卡" },
+      { owner: 8, reason: "班長" },
+      { owner: 28, reason: "班長" },
+      { owner: 3, reason: "運動會接力裁判" },
+      { owner: 5, reason: "運動會接力裁判" },
+      { owner: 31, reason: "運動會接力裁判" },
+      { owner: 12, reason: "運動會接力裁判" },
+      { owner: 13, reason: "運動會接力裁判" },
+      { owner: 13, reason: "運動會接力裁判" }
+    ];
+
+    const studentList = document.getElementById("studentList");
+    const listMeta = document.getElementById("listMeta");
+    const pointsOnlyCheckbox = document.getElementById("pointsOnlyCheckbox");
+    const reasonFilter = document.getElementById("reasonFilter");
+
+    function buildReasonOptions() {
+      const reasonSet = new Set(achievementPoints.map((point) => point.reason));
+      Array.from(reasonSet)
+        .sort((a, b) => a.localeCompare(b, "zh-HK"))
+        .forEach((reason) => {
+          const option = document.createElement("option");
+          option.value = reason;
+          option.textContent = reason;
+          reasonFilter.appendChild(option);
+        });
+    }
+
+    function countPointsByOwner(selectedReason) {
+      return achievementPoints.reduce((map, point) => {
+        if (selectedReason && point.reason !== selectedReason) return map;
+        map[point.owner] = (map[point.owner] || 0) + 1;
+        return map;
+      }, {});
+    }
+
+    function getStudentNumber(studentLabel) {
+      const match = studentLabel.match(/^(\d+)/);
+      return match ? Number(match[1]) : null;
+    }
+
+    function renderList() {
+      const showPointsOnly = pointsOnlyCheckbox.checked;
+      const selectedReason = reasonFilter.value;
+      const pointsByOwner = countPointsByOwner(selectedReason);
+      const selectedPoints = achievementPoints.filter(
+        (point) => !selectedReason || point.reason === selectedReason
+      );
+      const filtered = students.filter((student) => {
+        if (!showPointsOnly) return true;
+        const studentNumber = getStudentNumber(student);
+        return studentNumber !== null && (pointsByOwner[studentNumber] || 0) > 0;
+      });
+
+      studentList.innerHTML = "";
+      filtered.forEach((student) => {
+        const studentNumber = getStudentNumber(student);
+        const pointCount = studentNumber !== null ? (pointsByOwner[studentNumber] || 0) : 0;
+        const item = document.createElement("li");
+        item.textContent = `${student}｜${pointCount} 優點`;
+        if (pointCount > 0) item.classList.add("has-point");
+        studentList.appendChild(item);
+      });
+
+      const reasonText = selectedReason || "全部";
+      listMeta.textContent = `顯示 ${filtered.length} / ${students.length} 人（原因：${reasonText}，總優點：${selectedPoints.length}）`;
+    }
+
+    buildReasonOptions();
+    pointsOnlyCheckbox.addEventListener("change", renderList);
+    reasonFilter.addEventListener("change", renderList);
+    renderList();
+  </script>
+</body>
+</html>
