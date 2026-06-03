@@ -108,6 +108,12 @@
           <option value="">全部</option>
         </select>
       </label>
+      <label>排序
+        <select id="sortModeFilter">
+          <option value="seats">按座位</option>
+          <option value="points-asc">按優點(少至多)</option>
+        </select>
+      </label>
     </p>
     <ul id="studentList"></ul>
     <p id="listMeta"></p>
@@ -216,6 +222,7 @@
     const listMeta = document.getElementById("listMeta");
     const pointsOnlyCheckbox = document.getElementById("pointsOnlyCheckbox");
     const reasonFilter = document.getElementById("reasonFilter");
+    const sortModeFilter = document.getElementById("sortModeFilter");
 
     function buildReasonOptions() {
       const reasonSet = new Set(achievementPoints.map((point) => point.reason));
@@ -242,9 +249,18 @@
       return match ? Number(match[1]) : null;
     }
 
+    function formatStudentDisplay(studentLabel) {
+      const match = studentLabel.match(/^(\d+)\s*(.*)$/);
+      if (!match) return studentLabel.replace(/\s+/g, "");
+      const studentNo = match[1];
+      const name = String(match[2] || "").replace(/\s+/g, "");
+      return `${studentNo}${name}`;
+    }
+
     function renderList() {
       const showPointsOnly = pointsOnlyCheckbox.checked;
       const selectedReason = reasonFilter.value;
+      const sortMode = sortModeFilter ? sortModeFilter.value : "seats";
       const pointsByOwner = countPointsByOwner(selectedReason);
       const selectedPoints = achievementPoints.filter(
         (point) => !selectedReason || point.reason === selectedReason
@@ -255,14 +271,26 @@
         return studentNumber !== null && (pointsByOwner[studentNumber] || 0) > 0;
       });
 
+      const displayStudents = filtered.slice();
+      if (sortMode === "points-asc") {
+        displayStudents.sort((a, b) => {
+          const aNo = getStudentNumber(a) || 0;
+          const bNo = getStudentNumber(b) || 0;
+          const aPoints = pointsByOwner[aNo] || 0;
+          const bPoints = pointsByOwner[bNo] || 0;
+          if (aPoints !== bPoints) return aPoints - bPoints;
+          return aNo - bNo;
+        });
+      }
+
       studentList.innerHTML = "";
-      filtered.forEach((student) => {
+      displayStudents.forEach((student) => {
         const studentNumber = getStudentNumber(student);
         const pointCount = studentNumber !== null ? (pointsByOwner[studentNumber] || 0) : 0;
         const item = document.createElement("li");
         const nameEl = document.createElement("span");
         nameEl.className = "student-name";
-        nameEl.textContent = student;
+        nameEl.textContent = formatStudentDisplay(student);
         const pointsEl = document.createElement("span");
         pointsEl.className = "student-points";
         pointsEl.textContent = `${pointCount} 優點`;
@@ -272,12 +300,14 @@
       });
 
       const reasonText = selectedReason || "全部";
-      listMeta.textContent = `顯示 ${filtered.length} / ${students.length} 人（原因：${reasonText}，總優點：${selectedPoints.length}）`;
+      const sortText = sortMode === "points-asc" ? "優點少至多" : "座位";
+      listMeta.textContent = `顯示 ${displayStudents.length} / ${students.length} 人（原因：${reasonText}，排序：${sortText}，總優點：${selectedPoints.length}）`;
     }
 
     buildReasonOptions();
     pointsOnlyCheckbox.addEventListener("change", renderList);
     reasonFilter.addEventListener("change", renderList);
+    sortModeFilter.addEventListener("change", renderList);
     renderList();
   </script>
 </body>
