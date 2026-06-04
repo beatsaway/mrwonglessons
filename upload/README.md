@@ -117,7 +117,11 @@ wrangler r2 object get mrwong-student-uploads "student-name/1717491234567-file.p
 wrangler r2 object list mrwong-student-uploads
 ```
 
-For a teacher “inbox” UI, you would add a second Worker route with **admin login** (not included here — keep uploads student-only).
+### Teacher inbox (`forme.html`)
+
+1. Worker secret: **`ADMIN_TOKEN`** (your private password — not shared with students).
+2. Paste the latest `upload-handler.js` and **deploy**.
+3. Open `https://<your-pages-domain>/upload/forme.html` — list files, single download, or **一鍵下載 ZIP** (max ~50 MB / 200 files per zip).
 
 ---
 
@@ -158,7 +162,8 @@ Worker logs: Dashboard → **Workers** → your worker → **Logs** (or `wrangle
 | File | Purpose |
 |------|---------|
 | `index.html` | Student upload UI |
-| `worker/upload-handler.js` | Receives file, writes to R2 |
+| `forme.html` | Teacher: list uploads + ZIP download |
+| `worker/upload-handler.js` | Upload + admin list/zip |
 | `worker/wrangler.toml` | Worker name, R2 binding |
 | `README.md` | This guide |
 

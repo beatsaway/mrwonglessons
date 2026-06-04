@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>老師：已上傳檔案 · Mr Wong Lessons</title>
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --card: #fff;
+      --border: #e5e7eb;
+      --text: #1f2937;
+      --accent: #1e3a5f;
+      --ok: #059669;
+      --err: #dc2626;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      color: var(--accent);
+      margin: 0 0 8px;
+    }
+
+    .hint {
+      font-size: 0.88rem;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      max-width: 320px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font: inherit;
+      margin-bottom: 12px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    button.secondary {
+      background: #e5e7eb;
+      color: var(--text);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .status {
+      font-size: 0.9rem;
+      min-height: 1.4em;
+      margin-top: 8px;
+    }
+
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+
+    .meta {
+      font-size: 0.88rem;
+      color: #6b7280;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+
+    .key {
+      word-break: break-all;
+      font-family: Consolas, monospace;
+      font-size: 0.82rem;
+    }
+
+    a.dl {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    a.dl:hover { text-decoration: underline; }
+
+    .empty {
+      padding: 24px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    @media (max-width: 640px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tr {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 8px;
+        padding: 8px;
+      }
+      td {
+        border: none;
+        padding: 4px 0;
+      }
+      td::before {
+        content: attr(data-label) ": ";
+        font-weight: 600;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>老師：已上傳檔案</h1>
+    <p class="hint">需要 Worker 密碼 <code>ADMIN_TOKEN</code>。ZIP 上限約 50 MB、200 個檔案。</p>
+
+    <div class="card" id="loginCard">
+      <label for="adminToken">老師密碼</label>
+      <input type="password" id="adminToken" autocomplete="current-password" />
+      <button type="button" id="loginBtn">登入並載入</button>
+      <div class="status" id="loginStatus" aria-live="polite"></div>
+    </div>
+
+    <div class="card" id="listCard" hidden>
+      <div class="toolbar">
+        <button type="button" class="secondary" id="refreshBtn">重新整理</button>
+        <button type="button" id="zipBtn">一鍵下載 ZIP</button>
+        <span class="meta" id="countLabel"></span>
+      </div>
+      <div class="status" id="listStatus" aria-live="polite"></div>
+      <div id="tableWrap"></div>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = "https://mrwong-upload.kennethwongsd.workers.dev";
+    const STORAGE_KEY = "mrwong_admin_token";
+
+    const adminTokenInput = document.getElementById("adminToken");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginStatus = document.getElementById("loginStatus");
+    const listCard = document.getElementById("listCard");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const zipBtn = document.getElementById("zipBtn");
+    const countLabel = document.getElementById("countLabel");
+    const listStatus = document.getElementById("listStatus");
+    const tableWrap = document.getElementById("tableWrap");
+
+    function getToken() {
+      return adminTokenInput.value.trim() || sessionStorage.getItem(STORAGE_KEY) || "";
+    }
+
+    function setLoginStatus(msg, type) {
+      loginStatus.textContent = msg;
+      loginStatus.className = "status" + (type ? " " + type : "");
+    }
+
+    function setListStatus(msg, type) {
+      listStatus.textContent = msg;
+      listStatus.className = "status" + (type ? " " + type : "");
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    }
+
+    function formatTime(iso) {
+      if (!iso) return "—";
+      try {
+        return new Date(iso).toLocaleString("zh-HK");
+      } catch {
+        return iso;
+      }
+    }
+
+    function parseKey(key) {
+      const i = key.indexOf("/");
+      if (i === -1) return { folder: "—", file: key };
+      return { folder: key.slice(0, i), file: key.slice(i + 1) };
+    }
+
+    function adminFetch(path, options = {}) {
+      const token = getToken();
+      const headers = { ...(options.headers || {}), "X-Admin-Token": token };
+      return fetch(API_BASE + path, { ...options, headers });
+    }
+
+    function renderTable(items) {
+      if (!items.length) {
+        tableWrap.innerHTML = '<p class="empty">暫時沒有上傳的檔案。</p>';
+        return;
+      }
+
+      const rows = items
+        .map((item) => {
+          const { folder, file } = parseKey(item.key);
+          const fileUrl =
+            API_BASE +
+            "/admin/file?key=" +
+            encodeURIComponent(item.key);
+          return (
+            "<tr>" +
+            '<td data-label="學生">' +
+            escapeHtml(folder) +
+            "</td>" +
+            '<td data-label="檔案" class="key">' +
+            escapeHtml(file) +
+            "</td>" +
+            '<td data-label="大小">' +
+            formatSize(item.size) +
+            "</td>" +
+            '<td data-label="時間">' +
+            formatTime(item.uploaded) +
+            "</td>" +
+            '<td data-label="下載"><a class="dl" href="#" data-key="' +
+            escapeAttr(item.key) +
+            '">單檔</a></td>' +
+            "</tr>"
+          );
+        })
+        .join("");
+
+      tableWrap.innerHTML =
+        "<table><thead><tr>" +
+        "<th>學生</th><th>檔案</th><th>大小</th><th>時間</th><th>下載</th>" +
+        "</tr></thead><tbody>" +
+        rows +
+        "</tbody></table>";
+
+      tableWrap.querySelectorAll("a.dl").forEach((a) => {
+        a.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const key = a.getAttribute("data-key");
+          await downloadOne(key);
+        });
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function escapeAttr(s) {
+      return escapeHtml(s).replace(/'/g, "&#39;");
+    }
+
+    async function loadList() {
+      setListStatus("載入中…");
+      refreshBtn.disabled = true;
+      zipBtn.disabled = true;
+
+      try {
+        const res = await adminFetch("/admin/list");
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "載入失敗");
+        }
+        sessionStorage.setItem(STORAGE_KEY, getToken());
+        listCard.hidden = false;
+        countLabel.textContent = "共 " + data.count + " 個檔案";
+        renderTable(data.items);
+        setListStatus("", "");
+      } catch (err) {
+        setListStatus(err.message || "載入失敗", "err");
+        if ((err.message || "").includes("Unauthorized")) {
+          sessionStorage.removeItem(STORAGE_KEY);
+        }
+      } finally {
+        refreshBtn.disabled = false;
+        zipBtn.disabled = false;
+      }
+    }
+
+    async function downloadOne(key) {
+      setListStatus("下載中…");
+      try {
+        const res = await adminFetch("/admin/file?key=" + encodeURIComponent(key));
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "下載失敗");
+        }
+        const blob = await res.blob();
+        const name = key.split("/").pop() || "file";
+        saveBlob(blob, name);
+        setListStatus("已下載：" + name, "ok");
+      } catch (err) {
+        setListStatus(err.message || "下載失敗", "err");
+      }
+    }
+
+    async function downloadZip() {
+      setListStatus("正在打包 ZIP（檔案多時需等候）…");
+      zipBtn.disabled = true;
+      try {
+        const res = await adminFetch("/admin/zip");
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "ZIP 失敗");
+        }
+        const blob = await res.blob();
+        const date = new Date().toISOString().slice(0, 10);
+        saveBlob(blob, "uploads-" + date + ".zip");
+        setListStatus("ZIP 下載完成", "ok");
+      } catch (err) {
+        setListStatus(err.message || "ZIP 失敗", "err");
+      } finally {
+        zipBtn.disabled = false;
+      }
+    }
+
+    function saveBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    loginBtn.addEventListener("click", () => {
+      if (!getToken()) {
+        setLoginStatus("請輸入老師密碼。", "err");
+        return;
+      }
+      setLoginStatus("");
+      loadList();
+    });
+
+    refreshBtn.addEventListener("click", loadList);
+    zipBtn.addEventListener("click", downloadZip);
+
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      adminTokenInput.value = saved;
+      loadList();
+    }
+  </script>
+</body>
+</html>

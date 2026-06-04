@@ -13,3 +13,6 @@ bucket_name = "mrwong-student-uploads"
 
 # Set upload password (recommended):
 #   wrangler secret put UPLOAD_TOKEN
+#
+# Teacher inbox (forme.html) — required:
+#   wrangler secret put ADMIN_TOKEN
