@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2A 陶瓷 · 作品相簿</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: #f7f9fc;
+      color: #1f2937;
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 6px 32px;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      color: #1e3a5f;
+      margin: 0 0 6px;
+    }
+
+    .hint {
+      font-size: 0.88rem;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .gallery {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .gallery figure {
+      margin: 0;
+    }
+
+    .gallery a {
+      display: block;
+      border: none;
+      border-radius: 6px;
+      overflow: hidden;
+      background: transparent;
+      cursor: zoom-in;
+      text-decoration: none;
+    }
+
+    .thumb {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      background: #fafafa;
+    }
+
+    .gallery img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .gallery figcaption {
+      font-size: 0.76rem;
+      color: #6b7280;
+      padding: 3px 4px 5px;
+      text-align: center;
+      line-height: 1.25;
+    }
+
+    .gallery figcaption.named {
+      color: #1e3a5f;
+      font-weight: 600;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: min(100%, 1100px);
+      max-height: 90vh;
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1e3a5f;
+      font-size: 1.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .nav.prev { left: 12px; }
+    .nav.next { right: 12px; }
+    .nav:disabled { opacity: 0.35; cursor: default; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>2A 陶瓷作品</h1>
+    <p class="hint">共 <span id="count">0</span> 張 · 按 2A 座位排列（7 列）· 按圖放大 · <kbd>←</kbd> <kbd>→</kbd> 切換</p>
+    <div class="gallery" id="gallery"></div>
+  </main>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button type="button" class="nav prev" id="prevBtn" aria-label="上一張">‹</button>
+    <img id="lightboxImage" src="" alt="" />
+    <button type="button" class="nav next" id="nextBtn" aria-label="下一張">›</button>
+  </div>
+
+  <script>
+    // Same seat order as 2a/2Atemp.html (7 columns, left → right, top → bottom)
+    const STUDENTS = [
+      "郭君鵬", "李一航", "簡愷佑", "蔡子萱", "何天恩", "方紫瑜", "張梓萱",
+      "和仟惠", "黃詩茹", "莊曼妮", "李一鳴", "蔣少涵", "吴浣瑩", "余嘉浠",
+      "梁柏宇", "肖辰臻", "曾嘉欣", "許學臻", "許繼耿", "封采", "邱若曦",
+      "王復生", "蘇紫瑜", "易容妃", "姚銘", "呂錦峰", "陳政延", "鄭敬熹",
+      "黃嘉樂", "陳思涵", "吳國豪", "陳錦賢", "李狄達", "林煜翔", "楊星睿",
+    ];
+
+    const WORKS = STUDENTS.map((name) => encodeURI(name + ".webp"));
+
+    const gallery = document.getElementById("gallery");
+    const countEl = document.getElementById("count");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImage = document.getElementById("lightboxImage");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let currentIndex = 0;
+
+    countEl.textContent = String(WORKS.length);
+
+    WORKS.forEach((file, index) => {
+      const name = STUDENTS[index];
+      const fig = document.createElement("figure");
+      const link = document.createElement("a");
+      link.href = file;
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+      const img = document.createElement("img");
+      img.src = file;
+      img.alt = name + " 陶瓷作品";
+      img.loading = "lazy";
+      img.decoding = "async";
+      const cap = document.createElement("figcaption");
+      cap.textContent = name;
+      cap.classList.add("named");
+      thumb.appendChild(img);
+      link.appendChild(thumb);
+      fig.appendChild(link);
+      fig.appendChild(cap);
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        openAt(index);
+      });
+      gallery.appendChild(fig);
+    });
+
+    function openAt(index) {
+      currentIndex = index;
+      updateLightbox();
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      lightboxImage.removeAttribute("src");
+    }
+
+    function updateLightbox() {
+      const name = STUDENTS[currentIndex];
+      lightboxImage.src = WORKS[currentIndex];
+      lightboxImage.alt = name + " 陶瓷作品";
+      prevBtn.disabled = currentIndex <= 0;
+      nextBtn.disabled = currentIndex >= WORKS.length - 1;
+    }
+
+    function step(delta) {
+      const next = currentIndex + delta;
+      if (next < 0 || next >= WORKS.length) return;
+      currentIndex = next;
+      updateLightbox();
+    }
+
+    prevBtn.addEventListener("click", () => step(-1));
+    nextBtn.addEventListener("click", () => step(1));
+
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox.classList.contains("open")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") step(-1);
+      if (e.key === "ArrowRight") step(1);
+    });
+  </script>
+</body>
+</html>
