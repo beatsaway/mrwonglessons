@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>上傳檔案 · Mr Wong Lessons</title>
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --card: #fff;
+      --border: #e5e7eb;
+      --text: #1f2937;
+      --accent: #1e3a5f;
+      --ok: #059669;
+      --err: #dc2626;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      color: var(--accent);
+      margin: 0 0 8px;
+    }
+
+    .hint {
+      font-size: 0.88rem;
+      color: #6b7280;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font: inherit;
+      margin-bottom: 16px;
+    }
+
+    .dropzone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      margin-bottom: 16px;
+    }
+
+    .dropzone:hover,
+    .dropzone.dragover {
+      border-color: var(--accent);
+      background: #f0f4fa;
+    }
+
+    .dropzone input {
+      display: none;
+    }
+
+    .file-name {
+      font-size: 0.9rem;
+      color: var(--accent);
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font: inherit;
+      font-weight: 600;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    progress {
+      width: 100%;
+      height: 8px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 0.9rem;
+      min-height: 1.4em;
+    }
+
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+
+    .setup-note {
+      margin-top: 24px;
+      font-size: 0.82rem;
+      color: #6b7280;
+    }
+
+    .setup-note code {
+      font-size: 0.8rem;
+      background: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>上傳檔案</h1>
+    <p class="hint">選擇檔案後按「上傳」。檔案會送到 Cloudflare Worker，並儲存在 R2。</p>
+
+    <form class="card" id="uploadForm">
+      <label for="studentName">你的名字（選填）</label>
+      <input type="text" id="studentName" name="name" placeholder="例如：陳大文" autocomplete="name" />
+
+      <label for="uploadToken">上傳密碼（如老師有設定）</label>
+      <input type="password" id="uploadToken" name="token" placeholder="老師提供的密碼" autocomplete="off" />
+
+      <label>檔案</label>
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="選擇檔案">
+        <input type="file" id="fileInput" name="file" required />
+        <div>按此選擇檔案，或拖放到這裡</div>
+        <div class="file-name" id="fileLabel"></div>
+      </div>
+
+      <button type="submit" id="submitBtn">上傳</button>
+      <progress id="progress" max="100" value="0"></progress>
+      <div class="status" id="status" aria-live="polite"></div>
+    </form>
+
+    <p class="setup-note">
+      老師：請在下方設定 Worker 網址，並閱讀 <code>upload/README.md</code> 完成 Cloudflare 設定。
+    </p>
+  </main>
+
+  <script>
+    // === 設定：部署 Worker 後，把網址貼在這裡 ===
+    // 例：https://mrwong-upload.your-subdomain.workers.dev
+    const UPLOAD_API_URL = "https://mrwong-upload.kennethwongsd.workers.dev";
+
+    const form = document.getElementById("uploadForm");
+    const fileInput = document.getElementById("fileInput");
+    const dropzone = document.getElementById("dropzone");
+    const fileLabel = document.getElementById("fileLabel");
+    const statusEl = document.getElementById("status");
+    const submitBtn = document.getElementById("submitBtn");
+    const progressEl = document.getElementById("progress");
+
+    function setStatus(message, type) {
+      statusEl.textContent = message;
+      statusEl.className = "status" + (type ? " " + type : "");
+    }
+
+    function showFile(file) {
+      fileLabel.textContent = file
+        ? file.name + " (" + formatSize(file.size) + ")"
+        : "";
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    }
+
+    dropzone.addEventListener("click", () => fileInput.click());
+    dropzone.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+
+    fileInput.addEventListener("change", () => {
+      showFile(fileInput.files[0]);
+    });
+
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        showFile(fileInput.files[0]);
+      }
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const file = fileInput.files[0];
+      if (!file) {
+        setStatus("請先選擇檔案。", "err");
+        return;
+      }
+      if (!UPLOAD_API_URL) {
+        setStatus("尚未設定 UPLOAD_API_URL。請老師依 README 部署 Worker 後填入網址。", "err");
+        return;
+      }
+
+      const body = new FormData();
+      body.append("file", file);
+      body.append("name", document.getElementById("studentName").value.trim() || "anonymous");
+
+      const token = document.getElementById("uploadToken").value;
+      const headers = {};
+      if (token) headers["X-Upload-Token"] = token;
+
+      submitBtn.disabled = true;
+      progressEl.style.display = "block";
+      progressEl.value = 0;
+      setStatus("上傳中…");
+
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", UPLOAD_API_URL);
+        Object.entries(headers).forEach(([k, v]) => xhr.setRequestHeader(k, v));
+
+        xhr.upload.onprogress = (ev) => {
+          if (ev.lengthComputable) {
+            progressEl.value = Math.round((ev.loaded / ev.total) * 100);
+          }
+        };
+
+        const result = await new Promise((resolve, reject) => {
+          xhr.onload = () => resolve({ status: xhr.status, text: xhr.responseText });
+          xhr.onerror = () => reject(new Error("網絡錯誤"));
+          xhr.send(body);
+        });
+
+        let data;
+        try {
+          data = JSON.parse(result.text);
+        } catch {
+          data = { message: result.text };
+        }
+
+        if (result.status >= 200 && result.status < 300 && data.ok) {
+          setStatus("上傳成功！檔案已儲存。", "ok");
+          form.reset();
+          showFile(null);
+        } else {
+          setStatus(data.error || data.message || "上傳失敗（" + result.status + "）", "err");
+        }
+      } catch (err) {
+        setStatus(err.message || "上傳失敗", "err");
+      } finally {
+        submitBtn.disabled = false;
+        progressEl.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>

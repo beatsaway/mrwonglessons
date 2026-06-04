@@ -1,0 +1,15 @@
+name = "mrwong-upload"
+main = "upload-handler.js"
+compatibility_date = "2024-06-01"
+
+# Create the bucket first: wrangler r2 bucket create mrwong-student-uploads
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "mrwong-student-uploads"
+
+# Optional: restrict browser origin to your site (no trailing slash)
+# [vars]
+# ALLOWED_ORIGIN = "https://mrwonglessons.pages.dev"
+
+# Set upload password (recommended):
+#   wrangler secret put UPLOAD_TOKEN
