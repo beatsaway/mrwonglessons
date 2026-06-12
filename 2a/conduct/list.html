@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>伯特利中學 · 整體評語代碼表</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --card: #fff;
+      --border: #dde1e6;
+      --text: #1a1a1a;
+      --muted: #5c6670;
+      --accent: #1e4d8c;
+      --accent-soft: #e8f0fa;
+      --code-bg: #eef2f7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      background: var(--accent);
+      color: #fff;
+      padding: 1.25rem 1.5rem;
+    }
+    header h1 { margin: 0 0 .25rem; font-size: 1.35rem; }
+    header p { margin: 0; opacity: .9; font-size: .95rem; }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: .85rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      align-items: center;
+    }
+    .toolbar input {
+      flex: 1 1 240px;
+      padding: .55rem .75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .toolbar select {
+      padding: .55rem .75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: .95rem;
+    }
+    .count { color: var(--muted); font-size: .9rem; white-space: nowrap; }
+    main { padding: 1rem 1.5rem 2rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    thead { background: var(--accent-soft); }
+    th, td {
+      padding: .65rem .85rem;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border);
+    }
+    th { font-size: .85rem; color: var(--accent); }
+    tbody tr:hover { background: #fafbfc; }
+    tbody tr:last-child td { border-bottom: none; }
+    .code {
+      font-family: Consolas, monospace;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--code-bg);
+      padding: .15rem .45rem;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .code:hover { background: #dce6f2; }
+    .en { font-size: .92rem; }
+    .zh { font-size: .95rem; }
+    .empty {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+    }
+    @media (max-width: 720px) {
+      th:nth-child(2), td:nth-child(2) { display: none; }
+      header, .toolbar, main { padding-left: 1rem; padding-right: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>伯特利中學 · 整體評語代碼表</h1>
+    <p>Bethel High School Overall Comment Code Table · 03/01/2024 · R-ASR006-C</p>
+  </header>
+
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="搜尋代碼、英文或中文… Search code, English or Chinese" autofocus>
+    <select id="group">
+      <option value="">全部 All</option>
+      <option value="A">A — 優異 Excellent</option>
+      <option value="B">B — 品行 Conduct</option>
+      <option value="C">C — 成績 Results</option>
+      <option value="D">D — 勤學 Diligent</option>
+      <option value="E">E — 品性 Character</option>
+      <option value="F">F — 進步 Progress</option>
+      <option value="G">G — 一般 Average+</option>
+      <option value="H">H — 操守 Conduct avg</option>
+      <option value="I">I — 須努力 Needs effort</option>
+      <option value="J">J — 欠專心 Inattentive</option>
+      <option value="K">K — 紀律 Discipline</option>
+      <option value="L">L — 學業差 Poor study</option>
+      <option value="M">M — 混合 Mixed</option>
+      <option value="N">N — 守規 Obedient</option>
+      <option value="O">O — 做事 Work habits</option>
+      <option value="P">P — 升留級 Promotion</option>
+      <option value="R">R — 曠課 Truant</option>
+    </select>
+    <span class="count" id="count"></span>
+  </div>
+
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:6rem">評語代碼</th>
+          <th>整體評語 (英文)</th>
+          <th>整體評語 (中文)</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </main>
+
+  <script src="commentCodes.js"></script>
+  <script>
+    const tbody = document.getElementById("tbody");
+    const search = document.getElementById("search");
+    const group = document.getElementById("group");
+    const countEl = document.getElementById("count");
+
+    function render(rows) {
+      countEl.textContent = `${rows.length} / ${COMMENT_CODES.length} 項`;
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="3" class="empty">沒有符合的結果 No matches</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(({ code, en, zh }) => `
+        <tr>
+          <td><span class="code" title="Click to copy">${code}</span></td>
+          <td class="en">${escapeHtml(en)}</td>
+          <td class="zh">${escapeHtml(zh)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function filter() {
+      const q = search.value.trim().toLowerCase();
+      const g = group.value;
+      const rows = COMMENT_CODES.filter(({ code, en, zh }) => {
+        if (g && !code.startsWith(g)) return false;
+        if (!q) return true;
+        return code.toLowerCase().includes(q) ||
+          en.toLowerCase().includes(q) ||
+          zh.includes(q);
+      });
+      render(rows);
+    }
+
+    tbody.addEventListener("click", (e) => {
+      const el = e.target.closest(".code");
+      if (!el) return;
+      navigator.clipboard.writeText(el.textContent).then(() => {
+        const orig = el.textContent;
+        el.textContent = "✓";
+        setTimeout(() => { el.textContent = orig; }, 600);
+      });
+    });
+
+    search.addEventListener("input", filter);
+    group.addEventListener("change", filter);
+    render(COMMENT_CODES);
+  </script>
+</body>
+</html>
