@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IB Design Technology</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 1rem;
+        line-height: 1.45;
+        color: #0f172a;
+        background: #f1f5f9;
+      }
+      .wrap {
+        width: min(22rem, 92vw);
+        margin: 0 auto;
+        padding: clamp(1.5rem, 4vw, 2.5rem) 1rem;
+      }
+      h1 {
+        margin: 0 0 0.35rem;
+        font-size: 1.25rem;
+        font-weight: 650;
+        color: #1e3a5f;
+        letter-spacing: -0.02em;
+      }
+      .lead {
+        margin: 0 0 1.25rem;
+        font-size: 0.92rem;
+        color: #64748b;
+      }
+      .links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        margin: 0 0 1.5rem;
+      }
+      .links a {
+        display: block;
+        padding: 0.85rem 1rem;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #1e3a5f;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .links a:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.07);
+      }
+      .links a .note {
+        display: block;
+        margin-top: 0.2rem;
+        font-size: 0.82rem;
+        font-weight: 400;
+        color: #64748b;
+      }
+      .back a {
+        color: #3b6d9e;
+        font-size: 0.9rem;
+        text-decoration: none;
+      }
+      .back a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>IB Design Technology</h1>
+      <p class="lead">Syllabus guides, topic readings, and vocabulary practice.</p>
+      <div class="links">
+        <a href="discussion/index.html">
+          Learn topics
+          <span class="note">Search topics, readings, and key vocab</span>
+        </a>
+        <a href="discussion/subjectbrief.html">
+          Subject brief
+          <span class="note">Course overview and assessment</span>
+        </a>
+        <a href="discussion/dtsl.html">
+          Standard Level (SL)
+          <span class="note">Topics 1–6 · 150 hours</span>
+        </a>
+        <a href="discussion/dthl.html">
+          Higher Level (HL)
+          <span class="note">Topics 1–10 · 240 hours</span>
+        </a>
+        <a href="discussion/design-project-sl.html">
+          Design project (SL)
+          <span class="note">Internal assessment · Criteria A–D</span>
+        </a>
+        <a href="discussion/design-project-hl.html">
+          Design project (HL)
+          <span class="note">Internal assessment · Criteria A–F</span>
+        </a>
+      </div>
+      <p class="back"><a href="../index.html">← Back to lessons</a></p>
+    </div>
+  </body>
+</html>

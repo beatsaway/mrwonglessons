@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IB Design Technology SL</title>
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body>
+  <nav class="guide-nav">
+    <a href="subjectbrief.html">Subject Brief</a>
+    <a href="dtsl.html" class="active">SL</a>
+    <a href="dthl.html">HL</a>
+    <a href="design-project-sl.html">Project SL</a>
+    <a href="design-project-hl.html">Project HL</a>
+    <a href="index.html" class="learn-link">Learn topics →</a>
+  </nav>
+
+  <div class="guide-wrap">
+    <h1>Standard Level</h1>
+    <span class="guide-badge sl">SL · 150 hours</span>
+    <p class="guide-lead">Core syllabus topics 1–6, plus practical work including the design project and Group 4 project.</p>
+
+    <div class="guide-section">
+      <h2>Teaching hours</h2>
+      <table class="guide-table">
+        <tr><th>Component</th><th>Hours</th></tr>
+        <tr><td>1. Human factors and ergonomics</td><td>12</td></tr>
+        <tr><td>2. Resource management and sustainable production</td><td>22</td></tr>
+        <tr><td>3. Modelling</td><td>12</td></tr>
+        <tr><td>4. Raw material to final product</td><td>23</td></tr>
+        <tr><td>5. Innovation and design</td><td>13</td></tr>
+        <tr><td>6. Classic design</td><td>8</td></tr>
+        <tr><td><strong>Core total</strong></td><td><strong>90</strong></td></tr>
+        <tr><td>Design project</td><td>40</td></tr>
+        <tr><td>Group 4 project</td><td>10</td></tr>
+        <tr><td>Teacher-directed activities</td><td>10</td></tr>
+      </table>
+    </div>
+
+    <div class="guide-section">
+      <h2>Topics — click to learn</h2>
+      <div id="topicIndex"></div>
+    </div>
+
+    <div class="guide-callout">
+      HL students study the same topics 1–6 in more depth, then add topics 7–10. See the <a href="dthl.html">HL guide</a>. For the internal assessment, see <a href="design-project-sl.html">Design project (SL)</a>.
+    </div>
+  </div>
+
+  <script src="topics-registry.js"></script>
+  <script>
+    const el = document.getElementById("topicIndex");
+    window.ibTopicRegistry.sections
+      .filter((s) => s.level === "SL")
+      .forEach((section) => {
+        const block = document.createElement("div");
+        block.className = "topic-block";
+        block.innerHTML = `<h3>Topic ${section.num}. ${section.title}</h3>`;
+        const ul = document.createElement("ul");
+        ul.className = "topic-links";
+        section.topics.forEach((t) => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = "index.html?topic=" + t.slug;
+          a.textContent = t.name;
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+        block.appendChild(ul);
+        el.appendChild(block);
+      });
+  </script>
+</body>
+</html>

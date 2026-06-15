@@ -1,0 +1,64 @@
+IB Design Tech v2 — Learning Flow
+==================================
+
+Inspired by 6 Hats Discussion (learn/6hats/6hatsdiscussion). Standalone IB DT
+curriculum app — no links to external legacy folders.
+
+Recommended order for each topic:
+
+  1. Read the passage (articleText)
+  2. Do the fill-in-the-blank exercise (vocabex)
+  3. Answer the 6 thinking-lens questions
+
+Why this works
+--------------
+
+Reading first gives learners context — facts, design ideas, and vocabulary in
+full sentences. Fill-in-the-blank checks recall of key DT terms. The 6
+questions push deeper thinking from different angles:
+
+  - White  — facts & definitions (syllabus recall)
+  - Red    — user feelings & experience
+  - Yellow — benefits & advantages
+  - Black  — problems, risks & limitations
+  - Green  — design ideas & innovation
+  - Blue   — process, planning & next steps
+
+Flow: input → recall → application & discussion.
+
+What each topic contains
+------------------------
+
+  - articleText   — reading passage (handcrafted or generated)
+  - vocablist     — key terms with short Chinese hints
+  - vocabex       — fill-in-the-blank sentences
+  - questions     — 6 lens-tagged discussion prompts
+  - Wikipedia     — supplementary reading link per topic
+
+Topic tiers
+-----------
+
+  - Full topics (topics/*.js) — hand-crafted reading, blanks, and questions
+  - Vocab topics (auto-built) — generated from keyvocab-data.js
+  - Overview topics (topic-readings.js) — generated reading + Wikipedia link
+
+Navigation
+----------
+
+  - index.html — search bar only; loads Topic 1 (Human Factors) by default
+  - subjectbrief.html, dtsl.html, dthl.html — clean syllabus guides in ibv2/
+  - Guide pages link to index.html?topic=slug
+
+Vocab display
+-------------
+
+  - Click a key term to reveal Chinese (HK) translation
+  - English definitions stay in the reading passage only
+
+Suggested use in class
+----------------------
+
+  - Assign the reading before class or at the start of the lesson.
+  - Students complete blanks individually or in pairs.
+  - Use the 6 questions for pair work, oral practice, or design journal prompts.
+  - For HL topics, use the Wikipedia link and six questions for deeper discussion.

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IB Design Technology HL</title>
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body>
+  <nav class="guide-nav">
+    <a href="subjectbrief.html">Subject Brief</a>
+    <a href="dtsl.html">SL</a>
+    <a href="dthl.html" class="active">HL</a>
+    <a href="design-project-sl.html">Project SL</a>
+    <a href="design-project-hl.html">Project HL</a>
+    <a href="index.html" class="learn-link">Learn topics →</a>
+  </nav>
+
+  <div class="guide-wrap">
+    <h1>Higher Level</h1>
+    <span class="guide-badge hl">HL · 240 hours</span>
+    <p class="guide-lead">All SL core topics (1–6) plus four HL extension areas (topics 7–10). Deeper analysis and an extra exam paper.</p>
+
+    <div class="guide-section">
+      <h2>SL vs HL</h2>
+      <div class="compare-grid">
+        <div class="compare-box">
+          <h4>SL</h4>
+          <ul>
+            <li>150 hours</li>
+            <li>90 hrs core (topics 1–6)</li>
+            <li>2 exam papers</li>
+            <li>60% external</li>
+          </ul>
+        </div>
+        <div class="compare-box">
+          <h4>HL</h4>
+          <ul>
+            <li>240 hours</li>
+            <li>90 hrs core + 54 hrs HL extension</li>
+            <li>3 exam papers</li>
+            <li>70% external</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h2>HL extension hours</h2>
+      <table class="guide-table">
+        <tr><th>Topic</th><th>Hours</th></tr>
+        <tr><td>7. User-centred design</td><td>12</td></tr>
+        <tr><td>8. Sustainability</td><td>16</td></tr>
+        <tr><td>9. Innovation and markets</td><td>12</td></tr>
+        <tr><td>10. Commercial production</td><td>14</td></tr>
+        <tr><td><strong>HL extension total</strong></td><td><strong>54</strong></td></tr>
+      </table>
+    </div>
+
+    <div class="guide-section">
+      <h2>All topics — click to learn</h2>
+      <div id="topicIndex"></div>
+    </div>
+  </div>
+
+  <script src="topics-registry.js"></script>
+  <script>
+    const el = document.getElementById("topicIndex");
+    window.ibTopicRegistry.sections.forEach((section) => {
+      const block = document.createElement("div");
+      block.className = "topic-block";
+      const tag = section.level === "HL" ? " (HL)" : "";
+      block.innerHTML = `<h3>Topic ${section.num}. ${section.title}${tag}</h3>`;
+      const ul = document.createElement("ul");
+      ul.className = "topic-links";
+      section.topics.forEach((t) => {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = "index.html?topic=" + t.slug;
+        a.textContent = t.name;
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      block.appendChild(ul);
+      el.appendChild(block);
+    });
+  </script>
+</body>
+</html>

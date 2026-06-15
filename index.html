@@ -376,6 +376,7 @@
     <nav class="subject-panel" id="subject-sidebar" aria-label="Subject">
       <p class="panel-title">Subject</p>
       <button type="button" class="is-active" id="sub-va" data-subject="va" aria-pressed="true" aria-controls="panel-va">Visual Art</button>
+      <button type="button" id="sub-ibdt" data-subject="ibdt" aria-pressed="false" aria-controls="panel-ibdt">IBDT</button>
       <button type="button" id="sub-en" data-subject="en" aria-pressed="false" aria-controls="panel-en">English</button>
       <button type="button" id="sub-zh" data-subject="zh" aria-pressed="false" aria-controls="panel-zh">中文</button>
       <button type="button" id="sub-is" data-subject="is" aria-pressed="false" aria-controls="panel-is">Integrated Science</button>
@@ -477,6 +478,18 @@
           </li>
         </ul>
       </nav>
+      <nav id="panel-ibdt" hidden aria-labelledby="sub-ibdt">
+        <ul>
+          <li class="group">IB Design Technology</li>
+          <li><a href="ibdt/index.html">IBDT home</a></li>
+          <li><a href="ibdt/discussion/index.html">Learn topics</a></li>
+          <li><a href="ibdt/discussion/subjectbrief.html">Subject brief</a></li>
+          <li><a href="ibdt/discussion/dtsl.html">Standard Level (SL)</a></li>
+          <li><a href="ibdt/discussion/dthl.html">Higher Level (HL)</a></li>
+          <li><a href="ibdt/discussion/design-project-sl.html">Design project (SL)</a></li>
+          <li><a href="ibdt/discussion/design-project-hl.html">Design project (HL)</a></li>
+        </ul>
+      </nav>
       <nav id="panel-en" hidden aria-labelledby="sub-en">
         <ul>
           <li><a href="https://www.bbc.co.uk/learningenglish/features/the_reading_room" target="_blank" rel="noopener noreferrer">English Reading: Advanced</a></li>
@@ -518,6 +531,7 @@
 
     (function () {
       var panelVa = document.getElementById("panel-va");
+      var panelIbdt = document.getElementById("panel-ibdt");
       var panelEn = document.getElementById("panel-en");
       var panelZh = document.getElementById("panel-zh");
       var panelIs = document.getElementById("panel-is");
@@ -526,6 +540,7 @@
 
       function setSubject(which) {
         panelVa.hidden = which !== "va";
+        panelIbdt.hidden = which !== "ibdt";
         panelEn.hidden = which !== "en";
         panelZh.hidden = which !== "zh";
         panelIs.hidden = which !== "is";

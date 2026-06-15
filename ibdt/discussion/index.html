@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IB Design Tech</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <header>
+    <div class="header-search-container">
+      <input type="text" class="header-search" id="headerSearch" placeholder="Search IB DT topics…" autocomplete="off">
+      <div class="header-search-dropdown" id="headerSearchDropdown"></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container" id="content"></div>
+  </main>
+
+  <a href="subjectbrief.html" class="help-button" title="How to learn" aria-label="How to learn">?</a>
+
+  <div class="vocab-exercise-overlay" id="vocabExerciseOverlay" onclick="if(event.target===this) window.ibApp.closeVocabExercise()">
+    <div class="vocab-exercise-modal" onclick="event.stopPropagation()">
+      <button type="button" class="vocab-exercise-close" onclick="window.ibApp.closeVocabExercise()">×</button>
+      <div class="vocab-exercise-title" id="vocabExerciseTitle">Fill in the blanks</div>
+      <div id="vocabExerciseText"></div>
+    </div>
+  </div>
+
+  <script src="topics-registry.js"></script>
+  <script src="keyvocab-data.js"></script>
+  <script src="keyvocab-zh.js"></script>
+  <script src="topic-readings.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
