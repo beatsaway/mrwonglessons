@@ -4,7 +4,8 @@ window.ibTopicSets = [
     articleText:
       "<p>An <strong>invention</strong> is a new principle or idea that leads to a novel product. People invent for many reasons: personal interest, <strong>constructive discontent</strong> (wanting to fix something frustrating), money, scientific curiosity, or necessity.</p>" +
       "<p>A <strong>lone inventor</strong> may have full creative control but can struggle with funding, marketing, and teamwork. <strong>Intellectual property (IP)</strong> protects creations of the mind. Key forms include <strong>patents</strong> (inventions), <strong>copyright</strong> (creative works), and <strong>trademarks</strong> (brand symbols).</p>" +
-      "<p>When copyright expires, work enters the <strong>public domain</strong> and anyone may use it. Being <strong>first to market</strong> can bring major profit, but <strong>shelf technology</strong> — developed but not yet released — may appear later in a different product.</p>",
+      "<p>When copyright expires, work enters the <strong>public domain</strong> and anyone may use it. Being <strong>first to market</strong> can bring major profit, but <strong>shelf technology</strong> — developed but not yet released — may appear later in a different product.</p>" +
+      "<p><a href=\"https://en.wikipedia.org/wiki/Intellectual_property\" target=\"_blank\" rel=\"noopener\">Read more on Wikipedia →</a></p>",
     vocablist: [
       { word: "Invention", translation: "發明", emoji: "💡" },
       { word: "Intellectual property (IP)", translation: "知識產權", emoji: "⚖️" },

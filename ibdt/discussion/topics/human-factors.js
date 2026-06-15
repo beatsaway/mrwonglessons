@@ -5,7 +5,8 @@ window.ibTopicSets = [
       "<p>Great design plans for <strong>real people</strong>, not just the average user. In IB Design Technology, human factors and ergonomics ask: does this product fit the body, mind, and daily routines of the people who use it?</p>" +
       "<p><strong>Anthropometrics</strong> is the science of measuring the human body. Designers use measurements such as height, reach, and hand span so products fit most users. They often design between the <strong>5th and 95th percentiles</strong> so extreme sizes are not excluded.</p>" +
       "<p><strong>Static data</strong> is collected when the body is still (for example, standing height). <strong>Dynamic data</strong> is collected during movement (for example, how far someone can reach while seated). <strong>Primary data</strong> is collected by the designer; <strong>secondary data</strong> comes from existing databases.</p>" +
-      "<p><strong>Ergonomics</strong> focuses on comfort, safety, and efficiency. It includes physical fit, cognitive load, and the work environment. <strong>Inclusive design</strong> aims to make products usable by as many people as possible, including children, elderly users, and people with disabilities.</p>",
+      "<p><strong>Ergonomics</strong> focuses on comfort, safety, and efficiency. It includes physical fit, cognitive load, and the work environment. <strong>Inclusive design</strong> aims to make products usable by as many people as possible, including children, elderly users, and people with disabilities.</p>" +
+      "<p><a href=\"https://en.wikipedia.org/wiki/Human_factors_and_ergonomics\" target=\"_blank\" rel=\"noopener\">Read more on Wikipedia →</a></p>",
     vocablist: [
       { word: "Anthropometrics", translation: "人體測量學", emoji: "📏" },
       { word: "Ergonomics", translation: "人體工學", emoji: "🪑" },
@@ -34,7 +35,8 @@ window.ibTopicSets = [
     articleText:
       "<p>When you sit at a desk, everything you can comfortably reach forms your <strong>workspace envelope</strong>. Designers think about <strong>clearance</strong> (space between objects) and <strong>reach</strong> (how far you can stretch without strain).</p>" +
       "<p><strong>Biomechanics</strong> studies forces and movement in the body. It helps designers reduce injury and fatigue in products used repeatedly — from scissors to factory tools. <strong>Physiological factors</strong> include strength and stamina; <strong>psychological factors</strong> include attention, memory, and perception.</p>" +
-      "<p>Good human-factors design also considers <strong>usability</strong>: is the product easy to learn, efficient to use, and satisfying? Emergency controls are often large, red, and placed where users expect them because psychological factors matter as much as physical fit.</p>",
+      "<p>Good human-factors design also considers <strong>usability</strong>: is the product easy to learn, efficient to use, and satisfying? Emergency controls are often large, red, and placed where users expect them because psychological factors matter as much as physical fit.</p>" +
+      "<p><a href=\"https://en.wikipedia.org/wiki/Human_factors_and_ergonomics\" target=\"_blank\" rel=\"noopener\">Read more on Wikipedia →</a></p>",
     vocablist: [
       { word: "Biomechanics", translation: "生物力學", emoji: "🏋️" },
       { word: "Physiological factors", translation: "生理因素", emoji: "💪" },

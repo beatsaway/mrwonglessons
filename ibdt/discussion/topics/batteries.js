@@ -4,7 +4,8 @@ window.ibTopicSets = [
     articleText:
       "<p>A <strong>battery</strong> stores chemical energy and converts it into electrical energy through electrochemical reactions. Every battery has an <strong>anode</strong> (negative electrode), a <strong>cathode</strong> (positive electrode), and an <strong>electrolyte</strong> that allows ions to move between them.</p>" +
       "<p><strong>Primary batteries</strong> are single-use and cannot be recharged. <strong>Secondary batteries</strong> are rechargeable. A <strong>capacitor</strong> stores and releases electrical energy quickly, but is not the same as a chemical battery.</p>" +
-      "<p>Designers must choose battery types based on voltage, lifespan, weight, safety, and environmental impact. Common types include <strong>zinc carbon</strong> (cheap disposable AA/AAA), <strong>alkaline</strong> (longer-lasting disposable), <strong>lithium ion</strong> (phones, laptops, EVs), and <strong>lead acid</strong> (car engines).</p>",
+      "<p>Designers must choose battery types based on voltage, lifespan, weight, safety, and environmental impact. Common types include <strong>zinc carbon</strong> (cheap disposable AA/AAA), <strong>alkaline</strong> (longer-lasting disposable), <strong>lithium ion</strong> (phones, laptops, EVs), and <strong>lead acid</strong> (car engines).</p>" +
+      "<p><a href=\"https://en.wikipedia.org/wiki/Electric_battery\" target=\"_blank\" rel=\"noopener\">Read more on Wikipedia →</a></p>",
     vocablist: [
       { word: "Anode", translation: "負極", emoji: "➖" },
       { word: "Cathode", translation: "正極", emoji: "➕" },

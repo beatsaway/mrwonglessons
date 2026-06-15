@@ -13,6 +13,9 @@ window.ibSectionIntros = {
 };
 
 window.ibWikiLinks = {
+  "human-factors": "https://en.wikipedia.org/wiki/Human_factors_and_ergonomics",
+  "batteries": "https://en.wikipedia.org/wiki/Electric_battery",
+  "invention-and-intellectual-property": "https://en.wikipedia.org/wiki/Intellectual_property",
   "graphical-modeling": "https://en.wikipedia.org/wiki/Technical_drawing",
   "smart-materials": "https://en.wikipedia.org/wiki/Smart_material",
   "material-graphs": "https://en.wikipedia.org/wiki/Materials_selection",
