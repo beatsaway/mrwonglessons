@@ -429,6 +429,19 @@
   <script src="students-data.js"></script>
   <script src="marking-data.js"></script>
   <script>
+    (function () {
+      const PASSWORD = "1234567";
+      while (true) {
+        const input = window.prompt("Enter password to view Part A marking:");
+        if (input === null) {
+          location.href = "about:blank";
+          return;
+        }
+        if (input === PASSWORD) break;
+        window.alert("Incorrect password");
+      }
+    })();
+
     const IMG_BASE = "";
     const SCORE_KEY = "parta-marking-scores-v2";
     const ORDER = ["Aqsa", "Biraz", "Ibrahim", "Jaylee", "Junaid", "Mandip", "Mhavish", "Nikhil", "Soyal"];
