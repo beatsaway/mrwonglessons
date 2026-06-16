@@ -189,6 +189,7 @@
     .nav:disabled { opacity: 0.3; cursor: default; }
 
     .viewer-right {
+      position: relative;
       min-height: 0;
       overflow: auto;
       padding: 16px 20px 28px;
@@ -287,29 +288,50 @@
       font-style: normal;
     }
 
-    .comment-box {
-      margin-bottom: 14px;
-      padding: 10px 12px;
-      border: 1px solid #e5e7eb;
+    .comment-popup {
+      display: none;
+      position: absolute;
+      z-index: 20;
+      max-width: min(22rem, calc(100% - 24px));
+      padding: 10px 32px 10px 12px;
+      border: 1px solid #cbd5e1;
       border-radius: 8px;
-      background: #f8fafc;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
       font-size: 0.86rem;
       line-height: 1.5;
-      color: #475569;
-      min-height: 2.8em;
-    }
-
-    .comment-box.active {
-      border-color: #cbd5e1;
-      background: #fff;
       color: #1f2937;
+      pointer-events: auto;
     }
 
-    .comment-box strong {
+    .comment-popup.open { display: block; }
+
+    .comment-popup strong {
       display: block;
       margin-bottom: 4px;
       font-size: 0.78rem;
       font-weight: 650;
+      color: #1e3a5f;
+    }
+
+    .comment-popup-close {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: #64748b;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .comment-popup-close:hover {
+      background: #f1f5f9;
       color: #1e3a5f;
     }
 
@@ -367,7 +389,7 @@
   <main>
     <header>
       <h1>5C June 2026 Part A · Marking</h1>
-      <p class="meta">Click coloured text for feedback · scores saved in this browser</p>
+      <p class="meta">Click coloured text for feedback beside the phrase · scores saved in this browser</p>
     </header>
     <ul class="student-list" id="studentList"></ul>
   </main>
@@ -386,7 +408,7 @@
         <img id="viewerImage" src="" alt="" />
         <button type="button" class="nav next" id="nextBtn" aria-label="Next page">›</button>
       </div>
-      <div class="viewer-right">
+      <div class="viewer-right" id="viewerRight">
         <div class="grade-panel" id="gradePanel"></div>
         <div class="legend">
           <span><i class="hl-description"></i> Literal Description</span>
@@ -394,7 +416,11 @@
           <span><i class="hl-interpretation"></i> Interpretation</span>
           <span><i class="hl-judgement"></i> Value Judgement</span>
         </div>
-        <div class="comment-box" id="commentBox">Click a highlighted phrase for marker feedback.</div>
+        <div class="comment-popup" id="commentPopup" role="dialog" aria-hidden="true">
+          <button type="button" class="comment-popup-close" id="commentPopupClose" aria-label="Close feedback">×</button>
+          <strong id="commentPopupLabel"></strong>
+          <div id="commentPopupBody"></div>
+        </div>
         <div class="viewer-text-body" id="viewerTextBody"></div>
       </div>
     </div>
@@ -418,6 +444,7 @@
     let savedScores = {};
     let viewName = "";
     let viewIndex = 0;
+    let activeMark = null;
 
     const studentList = document.getElementById("studentList");
     const viewer = document.getElementById("viewer");
@@ -429,7 +456,11 @@
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
     const gradePanel = document.getElementById("gradePanel");
-    const commentBox = document.getElementById("commentBox");
+    const viewerRight = document.getElementById("viewerRight");
+    const commentPopup = document.getElementById("commentPopup");
+    const commentPopupClose = document.getElementById("commentPopupClose");
+    const commentPopupLabel = document.getElementById("commentPopupLabel");
+    const commentPopupBody = document.getElementById("commentPopupBody");
     const viewerTextBody = document.getElementById("viewerTextBody");
 
     function loadSavedScores() {
@@ -496,7 +527,10 @@
         .map((part) => "<p>" + applyHighlights(part, highlights) + "</p>")
         .join("");
       viewerTextBody.querySelectorAll("mark").forEach((el) => {
-        el.addEventListener("click", () => showComment(el));
+        el.addEventListener("click", (e) => {
+          e.stopPropagation();
+          showComment(el);
+        });
         el.addEventListener("keydown", (e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
@@ -506,18 +540,64 @@
       });
     }
 
+    function positionCommentPopup() {
+      if (!activeMark || !commentPopup.classList.contains("open")) return;
+
+      commentPopup.style.visibility = "hidden";
+      commentPopup.style.display = "block";
+
+      const markRect = activeMark.getBoundingClientRect();
+      const containerRect = viewerRight.getBoundingClientRect();
+      const scrollTop = viewerRight.scrollTop;
+      const scrollLeft = viewerRight.scrollLeft;
+      const popupH = commentPopup.offsetHeight;
+      const popupW = commentPopup.offsetWidth;
+      const gap = 8;
+
+      let top = markRect.bottom - containerRect.top + scrollTop + gap;
+      let left = markRect.left - containerRect.left + scrollLeft;
+
+      left = Math.max(8, Math.min(left, viewerRight.clientWidth - popupW - 8));
+
+      const visibleBottom = scrollTop + viewerRight.clientHeight;
+      if (top + popupH > visibleBottom - 8) {
+        top = markRect.top - containerRect.top + scrollTop - popupH - gap;
+      }
+      top = Math.max(scrollTop + 8, top);
+
+      commentPopup.style.top = top + "px";
+      commentPopup.style.left = left + "px";
+      commentPopup.style.visibility = "visible";
+    }
+
     function showComment(el) {
       viewerTextBody.querySelectorAll("mark.active").forEach((m) => m.classList.remove("active"));
       el.classList.add("active");
-      commentBox.classList.add("active");
-      commentBox.innerHTML =
-        "<strong>" + escapeHtml(el.dataset.label || "Feedback") + "</strong>" +
-        escapeHtml(el.dataset.comment || "");
+      activeMark = el;
+      commentPopupLabel.textContent = el.dataset.label || "Feedback";
+      commentPopupBody.textContent = el.dataset.comment || "";
+      commentPopup.classList.add("open");
+      commentPopup.setAttribute("aria-hidden", "false");
+      positionCommentPopup();
+
+      const visibleTop = markRectTop(el) - viewerRight.clientHeight * 0.35;
+      viewerRight.scrollTo({ top: Math.max(0, visibleTop), behavior: "smooth" });
+    }
+
+    function markRectTop(el) {
+      const markRect = el.getBoundingClientRect();
+      const containerRect = viewerRight.getBoundingClientRect();
+      return markRect.top - containerRect.top + viewerRight.scrollTop;
     }
 
     function clearComment() {
-      commentBox.classList.remove("active");
-      commentBox.textContent = "Click a highlighted phrase for marker feedback.";
+      activeMark = null;
+      commentPopup.classList.remove("open");
+      commentPopup.setAttribute("aria-hidden", "true");
+      commentPopup.style.display = "";
+      commentPopup.style.visibility = "";
+      commentPopupLabel.textContent = "";
+      commentPopupBody.textContent = "";
       viewerTextBody.querySelectorAll("mark.active").forEach((m) => m.classList.remove("active"));
     }
 
@@ -630,19 +710,35 @@
     }
 
     viewerClose.addEventListener("click", closeViewer);
+    commentPopupClose.addEventListener("click", clearComment);
     textToggle.addEventListener("click", () => setTextVisible(viewer.classList.contains("hide-text")));
     prevBtn.addEventListener("click", () => step(-1));
     nextBtn.addEventListener("click", () => step(1));
 
+    viewerRight.addEventListener("scroll", () => {
+      if (commentPopup.classList.contains("open")) positionCommentPopup();
+    }, { passive: true });
+
+    viewerTextBody.addEventListener("click", (e) => {
+      if (!e.target.closest("mark")) clearComment();
+    });
+
     document.addEventListener("keydown", (e) => {
       if (!viewer.classList.contains("open")) return;
-      if (e.key === "Escape") closeViewer();
+      if (e.key === "Escape") {
+        if (commentPopup.classList.contains("open")) {
+          clearComment();
+          return;
+        }
+        closeViewer();
+      }
       if (e.key === "ArrowLeft") step(-1);
       if (e.key === "ArrowRight") step(1);
     });
 
     window.addEventListener("resize", () => {
       if (window.innerWidth > 900) viewer.classList.remove("hide-text");
+      positionCommentPopup();
     });
 
     loadSavedScores();
