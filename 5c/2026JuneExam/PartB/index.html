@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5C HKDSE VA Mock · Part B</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: #fff;
+      color: #1f2937;
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 20px 40px;
+    }
+
+    header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.35rem;
+      font-weight: 650;
+      color: #1e3a5f;
+      letter-spacing: -0.02em;
+    }
+
+    .meta {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .theme-group {
+      margin-bottom: 28px;
+    }
+
+    .theme-group h2 {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e3a5f;
+      letter-spacing: -0.01em;
+    }
+
+    .students {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 700px) {
+      .students {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+    }
+
+    .student-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fafafa;
+      overflow: hidden;
+    }
+
+    .student-head {
+      padding: 10px 12px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .student-name {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1e3a5f;
+    }
+
+    .works {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: #e5e7eb;
+    }
+
+    .work {
+      margin: 0;
+      background: #fff;
+    }
+
+    .work a {
+      display: block;
+      cursor: zoom-in;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .thumb {
+      aspect-ratio: 5 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .work img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .work figcaption {
+      margin: 0;
+      padding: 6px 8px 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #6b7280;
+      text-align: center;
+      background: #fafafa;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 1000;
+    }
+
+    .lightbox.open {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lightbox-caption {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #fff;
+      text-align: center;
+    }
+
+    .lightbox img {
+      max-width: min(100%, 1100px);
+      max-height: calc(90vh - 2rem);
+      border-radius: 6px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      background: #fff;
+    }
+
+    .nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1e3a5f;
+      font-size: 1.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .nav.prev { left: 12px; }
+    .nav.next { right: 12px; }
+    .nav:disabled { opacity: 0.35; cursor: default; }
+
+    @media (max-width: 400px) {
+      .works {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>5C HKDSE VA Mock · Part B</h1>
+      <p class="meta">June 2026</p>
+    </header>
+    <div id="gallery"></div>
+  </main>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button type="button" class="nav prev" id="prevBtn" aria-label="Previous">‹</button>
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+    <img id="lightboxImage" src="" alt="" />
+    <button type="button" class="nav next" id="nextBtn" aria-label="Next">›</button>
+  </div>
+
+  <script>
+    (function () {
+      const PASSWORD = "1234567";
+      while (true) {
+        const input = window.prompt("Enter password to view Part B:");
+        if (input === null) {
+          location.href = "about:blank";
+          return;
+        }
+        if (input === PASSWORD) break;
+        window.alert("Incorrect password");
+      }
+    })();
+
+    const THEME_TITLES = {
+      1: "An Interpretation of a Chair",
+      2: "Take a Break",
+    };
+
+    const STUDENTS = [
+      { name: "Jaylee", theme: 1 },
+      { name: "Mandip", theme: 1 },
+      { name: "Aqsa", theme: 2 },
+      { name: "Biraz", theme: 2 },
+      { name: "Ibrahim", theme: 2 },
+      { name: "Junaid", theme: 2 },
+      { name: "Mhavish", theme: 2 },
+      { name: "Nikhil", theme: 2 },
+      { name: "Soyal", theme: 2 },
+    ];
+
+    function filesFor(student) {
+      const t = student.theme;
+      const n = student.name;
+      const finalBase = n + "_theme" + t;
+      const sketchBase = n + "_theme" + t + "sketch";
+      return {
+        final: encodeURI(finalBase + ".webp"),
+        finalThumb: encodeURI(finalBase + "_thumb.webp"),
+        sketch: encodeURI(sketchBase + ".webp"),
+        sketchThumb: encodeURI(sketchBase + "_thumb.webp"),
+      };
+    }
+
+    const IMAGES = [];
+    STUDENTS.forEach((s) => {
+      const f = filesFor(s);
+      IMAGES.push({ src: f.final, label: s.name + " · Final artwork" });
+      IMAGES.push({ src: f.sketch, label: s.name + " · Sketch" });
+    });
+
+    const gallery = document.getElementById("gallery");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImage = document.getElementById("lightboxImage");
+    const lightboxCaption = document.getElementById("lightboxCaption");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let currentIndex = 0;
+
+    function renderThemeGroup(theme, students) {
+      const section = document.createElement("section");
+      section.className = "theme-group";
+      section.innerHTML = "<h2>" + THEME_TITLES[theme] + "</h2>";
+      const grid = document.createElement("div");
+      grid.className = "students";
+
+      students.forEach((student) => {
+        const f = filesFor(student);
+        const card = document.createElement("article");
+        card.className = "student-card";
+        card.innerHTML =
+          '<div class="student-head">' +
+          '<h3 class="student-name">' + student.name + "</h3>" +
+          "</div>" +
+          '<div class="works"></div>';
+        const works = card.querySelector(".works");
+
+        [
+          { src: f.final, thumb: f.finalThumb, cap: "Final artwork", idx: IMAGES.findIndex((i) => i.src === f.final) },
+          { src: f.sketch, thumb: f.sketchThumb, cap: "Sketch", idx: IMAGES.findIndex((i) => i.src === f.sketch) },
+        ].forEach((work) => {
+          const fig = document.createElement("figure");
+          fig.className = "work";
+          const link = document.createElement("a");
+          link.href = work.src;
+          const thumb = document.createElement("div");
+          thumb.className = "thumb";
+          const img = document.createElement("img");
+          img.src = work.thumb;
+          img.alt = student.name + " " + work.cap;
+          img.loading = "lazy";
+          img.decoding = "async";
+          const cap = document.createElement("figcaption");
+          cap.textContent = work.cap;
+          thumb.appendChild(img);
+          link.appendChild(thumb);
+          fig.appendChild(link);
+          fig.appendChild(cap);
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            openAt(work.idx);
+          });
+          works.appendChild(fig);
+        });
+
+        grid.appendChild(card);
+      });
+
+      section.appendChild(grid);
+      gallery.appendChild(section);
+    }
+
+    renderThemeGroup(1, STUDENTS.filter((s) => s.theme === 1));
+    renderThemeGroup(2, STUDENTS.filter((s) => s.theme === 2));
+
+    function openAt(index) {
+      currentIndex = index;
+      updateLightbox();
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      lightboxImage.removeAttribute("src");
+      lightboxCaption.textContent = "";
+    }
+
+    function updateLightbox() {
+      const item = IMAGES[currentIndex];
+      lightboxImage.src = item.src;
+      lightboxImage.alt = item.label;
+      lightboxCaption.textContent = item.label;
+      prevBtn.disabled = currentIndex <= 0;
+      nextBtn.disabled = currentIndex >= IMAGES.length - 1;
+    }
+
+    function step(delta) {
+      const next = currentIndex + delta;
+      if (next < 0 || next >= IMAGES.length) return;
+      currentIndex = next;
+      updateLightbox();
+    }
+
+    prevBtn.addEventListener("click", () => step(-1));
+    nextBtn.addEventListener("click", () => step(1));
+
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox.classList.contains("open")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") step(-1);
+      if (e.key === "ArrowRight") step(1);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5C HKDSE VA Mock · Part A</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: #fff;
+      color: #1f2937;
+      line-height: 1.5;
+    }
+
+    body.viewer-open {
+      overflow: hidden;
+    }
+
+    main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    header {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.35rem;
+      font-weight: 650;
+      color: #1e3a5f;
+      letter-spacing: -0.02em;
+    }
+
+    .meta {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .student-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .student-row {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .student-row:last-child {
+      border-bottom: none;
+    }
+
+    .student-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      margin: 0;
+      padding: 14px 4px;
+      border: none;
+      background: none;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1e3a5f;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .student-btn:hover {
+      color: #2c5282;
+    }
+
+    .viewer {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: #f8fafc;
+      z-index: 1000;
+    }
+
+    .viewer.open {
+      display: flex;
+    }
+
+    .viewer-bar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      height: 44px;
+      padding: 0 8px 0 12px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #fff;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    .viewer-bar-title {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .viewer-bar-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .text-toggle {
+      display: none;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      color: #475569;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .text-toggle:hover {
+      background: #f1f5f9;
+      color: #1e3a5f;
+    }
+
+    .viewer-bar strong {
+      font-weight: 650;
+      color: #1e3a5f;
+    }
+
+    .viewer-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-size: 1.35rem;
+      line-height: 1;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .viewer-close:hover {
+      background: #f1f5f9;
+      color: #1e3a5f;
+    }
+
+    .viewer-content {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+    }
+
+    .viewer-left {
+      position: relative;
+      min-height: 0;
+      height: 100%;
+      padding: 12px 52px;
+      border-right: 1px solid #e5e7eb;
+      background: #eef2f7;
+      overflow: hidden;
+    }
+
+    .viewer-left img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid #e5e7eb;
+      background: rgba(255, 255, 255, 0.95);
+      color: #1e3a5f;
+      font-size: 1.4rem;
+      line-height: 1;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .nav.prev { left: 10px; }
+    .nav.next { right: 10px; }
+    .nav:disabled { opacity: 0.3; cursor: default; }
+
+    .viewer-right {
+      min-height: 0;
+      overflow: auto;
+      padding: 20px 28px 32px;
+      background: #fff;
+    }
+
+    .viewer-text-body {
+      margin: 0;
+      max-width: 42rem;
+    }
+
+    .viewer-text-body p {
+      margin: 0 0 1.1em;
+      white-space: pre-line;
+      font-size: 0.97rem;
+      line-height: 1.75;
+      color: #374151;
+    }
+
+    .viewer-text-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .viewer-text-body.empty {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    @media (max-width: 900px) {
+      .text-toggle {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .viewer-content {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      .viewer.hide-text .viewer-content {
+        grid-template-rows: 1fr;
+      }
+
+      .viewer.hide-text .viewer-right {
+        display: none;
+      }
+
+      .viewer-left {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 12px 44px;
+      }
+
+      .viewer.hide-text .viewer-left {
+        border-bottom: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>5C HKDSE VA Mock · Part A</h1>
+      <p class="meta">June 2026</p>
+    </header>
+    <ul class="student-list" id="studentList"></ul>
+  </main>
+
+  <div class="viewer" id="viewer" aria-hidden="true">
+    <div class="viewer-bar">
+      <span class="viewer-bar-title"><strong id="viewerName"></strong> · <span id="viewerPage"></span></span>
+      <div class="viewer-bar-actions">
+        <button type="button" class="text-toggle" id="textToggle" aria-pressed="false">Hide text</button>
+        <button type="button" class="viewer-close" id="viewerClose" aria-label="Close">×</button>
+      </div>
+    </div>
+    <div class="viewer-content">
+      <div class="viewer-left">
+        <button type="button" class="nav prev" id="prevBtn" aria-label="Previous page">‹</button>
+        <img id="viewerImage" src="" alt="" />
+        <button type="button" class="nav next" id="nextBtn" aria-label="Next page">›</button>
+      </div>
+      <div class="viewer-right" id="viewerTextWrap">
+        <div class="viewer-text-body" id="viewerTextBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="students-data.js"></script>
+  <script>
+    (function () {
+      const PASSWORD = "1234567";
+      while (true) {
+        const input = window.prompt("Enter password to view Part A:");
+        if (input === null) {
+          location.href = "about:blank";
+          return;
+        }
+        if (input === PASSWORD) break;
+        window.alert("Incorrect password");
+      }
+    })();
+
+    const ORDER = [
+      "Aqsa",
+      "Biraz",
+      "Ibrahim",
+      "Jaylee",
+      "Junaid",
+      "Mandip",
+      "Mhavish",
+      "Nikhil",
+      "Soyal",
+    ];
+
+    let students = {};
+    let viewName = "";
+    let viewIndex = 0;
+
+    const studentList = document.getElementById("studentList");
+    const viewer = document.getElementById("viewer");
+    const viewerName = document.getElementById("viewerName");
+    const viewerPage = document.getElementById("viewerPage");
+    const viewerImage = document.getElementById("viewerImage");
+    const viewerClose = document.getElementById("viewerClose");
+    const textToggle = document.getElementById("textToggle");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const viewerTextBody = document.getElementById("viewerTextBody");
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function renderText(text) {
+      const parts = text.split(/\n\n+/).map((part) => part.trim()).filter(Boolean);
+      if (!parts.length) {
+        viewerTextBody.innerHTML = "";
+        viewerTextBody.classList.add("empty");
+        viewerTextBody.textContent = "No text available.";
+        return;
+      }
+      viewerTextBody.classList.remove("empty");
+      viewerTextBody.innerHTML = parts
+        .map((part) => "<p>" + escapeHtml(part) + "</p>")
+        .join("");
+    }
+
+    function setTextVisible(visible) {
+      viewer.classList.toggle("hide-text", !visible);
+      textToggle.textContent = visible ? "Hide text" : "Show text";
+      textToggle.setAttribute("aria-pressed", String(!visible));
+    }
+
+    function openViewer(name, startIndex) {
+      viewName = name;
+      viewIndex = startIndex || 0;
+      const data = students[viewName];
+      renderText((data.text || "").trim());
+      setTextVisible(true);
+      updateViewer();
+      viewer.classList.add("open");
+      viewer.setAttribute("aria-hidden", "false");
+      document.body.classList.add("viewer-open");
+    }
+
+    function closeViewer() {
+      viewer.classList.remove("open");
+      viewer.classList.remove("hide-text");
+      viewer.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("viewer-open");
+      viewerImage.removeAttribute("src");
+      viewerTextBody.innerHTML = "";
+      viewerTextBody.classList.remove("empty");
+    }
+
+    function updateViewer() {
+      const data = students[viewName];
+      const page = data.pages[viewIndex];
+      viewerName.textContent = viewName;
+      viewerPage.textContent = "Page " + (viewIndex + 1) + " of " + data.pages.length;
+      viewerImage.src = page.file;
+      viewerImage.alt = viewName + " page " + (viewIndex + 1);
+      prevBtn.disabled = viewIndex <= 0;
+      nextBtn.disabled = viewIndex >= data.pages.length - 1;
+    }
+
+    function step(delta) {
+      const next = viewIndex + delta;
+      if (next < 0 || next >= students[viewName].pages.length) return;
+      viewIndex = next;
+      updateViewer();
+    }
+
+    function renderList() {
+      ORDER.forEach((name) => {
+        if (!students[name]) return;
+        const li = document.createElement("li");
+        li.className = "student-row";
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "student-btn";
+        btn.innerHTML = "<span>" + name + "</span>";
+        btn.addEventListener("click", () => openViewer(name, 0));
+
+        li.appendChild(btn);
+        studentList.appendChild(li);
+      });
+    }
+
+    viewerClose.addEventListener("click", closeViewer);
+    textToggle.addEventListener("click", () => setTextVisible(viewer.classList.contains("hide-text")));
+    prevBtn.addEventListener("click", () => step(-1));
+    nextBtn.addEventListener("click", () => step(1));
+
+    document.addEventListener("keydown", (e) => {
+      if (!viewer.classList.contains("open")) return;
+      if (e.key === "Escape") closeViewer();
+      if (e.key === "ArrowLeft") step(-1);
+      if (e.key === "ArrowRight") step(1);
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 900) viewer.classList.remove("hide-text");
+    });
+
+    students = window.PARTA_STUDENTS || {};
+    renderList();
+  </script>
+</body>
+</html>
