@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>評語分配 · Class Comments</title>
+  <style>
+    :root {
+      --bg: #eef1f5;
+      --panel: #fff;
+      --border: #d5dbe3;
+      --text: #182026;
+      --muted: #5f6b76;
+      --accent: #1e4d8c;
+      --accent-soft: #e7eef8;
+      --slot: #f8fafc;
+      --slot-hover: #edf4fc;
+      --danger: #b42318;
+      --bar-h: 32px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* thin top bar */
+    .topbar {
+      height: var(--bar-h);
+      min-height: var(--bar-h);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: 0 .55rem;
+      background: var(--accent);
+      color: #fff;
+      font-size: .75rem;
+      border-bottom: 1px solid #163a6b;
+    }
+    .topbar strong { font-weight: 600; white-space: nowrap; }
+    .topbar .sep { opacity: .35; }
+    .topbar label { display: flex; align-items: center; gap: .35rem; cursor: pointer; white-space: nowrap; }
+    .topbar input[type="radio"] { accent-color: #fff; }
+    .topbar .spacer { flex: 1; }
+    .topbar button {
+      border: 1px solid rgba(255,255,255,.35);
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      border-radius: 4px;
+      padding: .12rem .4rem;
+      font-size: .72rem;
+      cursor: pointer;
+    }
+    .topbar button:hover { background: rgba(255,255,255,.22); }
+
+    .layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 168px 1fr;
+      min-height: 0;
+    }
+
+    .bank.collapsed { width: 0; min-width: 0; overflow: hidden; border: none; }
+    .layout.bank-collapsed { grid-template-columns: 0 1fr; }
+
+    /* code bank */
+    .bank {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .bank-head {
+      padding: .35rem .4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .bank-head input {
+      width: 100%;
+      padding: .28rem .4rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: .75rem;
+    }
+    .bank-head p { display: none; }
+    .bank-list {
+      overflow: auto;
+      padding: .25rem;
+      flex: 1;
+    }
+    .code-chip {
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 4px;
+      padding: .2rem .35rem;
+      margin-bottom: .2rem;
+      cursor: grab;
+      font-size: .72rem;
+      line-height: 1.2;
+      min-height: 0;
+    }
+    .code-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .code-chip:active { cursor: grabbing; }
+    .code-chip .c {
+      font-family: Consolas, monospace;
+      font-weight: 700;
+      color: var(--accent);
+      flex: none;
+    }
+    .code-chip .preview {
+      color: var(--muted);
+      font-size: .68rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* students */
+    .main {
+      overflow: auto;
+      padding: .35rem .4rem .5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      table-layout: fixed;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: .68rem;
+      text-align: left;
+      padding: .28rem .35rem;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody td {
+      vertical-align: middle;
+      padding: .18rem .3rem;
+      border-bottom: 1px solid #e8ecf0;
+      font-size: .74rem;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:nth-child(even) { background: #fafbfc; }
+    tbody tr:hover { background: #f3f7fb; }
+    .student {
+      width: 4.6rem;
+      font-weight: 600;
+      white-space: nowrap;
+      color: var(--text);
+    }
+    .student .no {
+      display: inline-block;
+      width: 1.35rem;
+      color: var(--muted);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+    .slots-cell { min-width: 0; }
+
+    .slot-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .22rem;
+    }
+    .slot {
+      min-height: 1.55rem;
+      border: 1px dashed #c5ced8;
+      border-radius: 4px;
+      background: var(--slot);
+      padding: .1rem .2rem;
+      display: flex;
+      align-items: center;
+      gap: .15rem;
+      transition: background .15s, border-color .15s;
+    }
+    .slot.drag-over {
+      border-color: var(--accent);
+      background: var(--slot-hover);
+      border-style: solid;
+    }
+    .slot.empty::after {
+      content: "…";
+      color: #b0bac4;
+      font-size: .65rem;
+      padding: 0 .1rem;
+    }
+    .slot.full::after { content: none; }
+
+    .slot-input {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      border: none;
+      background: transparent;
+      font: inherit;
+      font-size: .7rem;
+      outline: none;
+      padding: .05rem;
+    }
+    .slot-input::placeholder { color: #aab4bf; }
+
+    .assigned {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: .1rem;
+    }
+    .assigned-text {
+      flex: 1;
+      min-width: 0;
+      font-size: .68rem;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .assigned-text .code-label {
+      font-family: Consolas, monospace;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    body.mode-code .assigned-text .stmt { display: none; }
+    body.mode-full .assigned-text .code-label { display: none; }
+    body.mode-both .assigned-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    body.mode-both .assigned-text .code-label {
+      display: inline;
+      margin-right: 0;
+    }
+    body.mode-both .assigned-text .code-label::after { content: " "; }
+    body.mode-both .assigned-text .stmt { display: inline; }
+
+    .rm {
+      flex: none;
+      width: .95rem;
+      height: .95rem;
+      border: none;
+      border-radius: 3px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: .78rem;
+      line-height: 1;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .rm:hover { background: #fde8e6; color: var(--danger); }
+
+    .suggest {
+      position: fixed;
+      z-index: 100;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.12);
+      max-height: 220px;
+      overflow: auto;
+      min-width: 220px;
+      display: none;
+    }
+    .suggest.show { display: block; }
+    .suggest button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: #fff;
+      padding: .45rem .6rem;
+      cursor: pointer;
+      font-size: .82rem;
+      border-bottom: 1px solid #f0f2f5;
+    }
+    .suggest button:hover, .suggest button.active { background: var(--accent-soft); }
+    .suggest button .s-code { font-family: Consolas, monospace; font-weight: 700; color: var(--accent); margin-right: .4rem; }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; grid-template-rows: 28vh 1fr; }
+      .layout.bank-collapsed { grid-template-rows: 0 1fr; }
+      .bank { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body class="mode-both">
+  <div class="topbar">
+    <strong>評語分配</strong>
+    <span class="sep">|</span>
+    <span>顯示:</span>
+    <label><input type="radio" name="display" value="code"> 代碼</label>
+    <label><input type="radio" name="display" value="full"> 評語</label>
+    <label><input type="radio" name="display" value="both" checked> 全部</label>
+    <button type="button" id="btnToggleBank" title="Toggle code panel">代碼表</button>
+    <span class="spacer"></span>
+    <button type="button" id="btnExport">匯出 Export</button>
+    <button type="button" id="btnClear">重設預設 Reset</button>
+  </div>
+
+  <div class="layout" id="layout">
+    <aside class="bank" id="bankPanel">
+      <div class="bank-head">
+        <input id="bankSearch" type="search" placeholder="搜尋…">
+      </div>
+      <div class="bank-list" id="bankList"></div>
+    </aside>
+
+    <div class="main">
+      <table>
+        <thead>
+          <tr>
+            <th>學生</th>
+            <th colspan="3">評語 1 · 2 · 3</th>
+          </tr>
+        </thead>
+        <tbody id="studentBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="suggest" id="suggest"></div>
+
+  <script src="commentCodes.js"></script>
+  <script>
+    const STUDENTS = [
+      { no: 1, name: "陳政延" },
+      { no: 2, name: "陳錦賢" },
+      { no: 3, name: "陳思涵" },
+      { no: 4, name: "莊曼妮" },
+      { no: 5, name: "封采" },
+      { no: 6, name: "郭君鵬" },
+      { no: 7, name: "何天恩" },
+      { no: 8, name: "黃嘉樂" },
+      { no: 9, name: "黃詩茹" },
+      { no: 10, name: "蔣少涵" },
+      { no: 11, name: "簡愷佑" },
+      { no: 12, name: "梁柏宇" },
+      { no: 13, name: "李狄達" },
+      { no: 14, name: "李一航" },
+      { no: 15, name: "李一鳴" },
+      { no: 16, name: "呂錦峰" },
+      { no: 17, name: "蘇紫瑜" },
+      { no: 19, name: "王復生" },
+      { no: 20, name: "吳國豪" },
+      { no: 21, name: "吴浣瑩" },
+      { no: 22, name: "肖辰臻" },
+      { no: 23, name: "許繼耿" },
+      { no: 24, name: "許學臻" },
+      { no: 25, name: "楊星睿" },
+      { no: 26, name: "姚銘" },
+      { no: 27, name: "易容妃" },
+      { no: 28, name: "余嘉浠" },
+      { no: 29, name: "曾嘉欣" },
+      { no: 30, name: "張梓萱" },
+      { no: 31, name: "鄭敬熹" },
+      { no: 33, name: "和仟惠" },
+      { no: 34, name: "林煜翔" },
+      { no: 35, name: "蔡子萱" },
+      { no: 36, name: "方紫瑜" },
+      { no: 37, name: "邱若曦" }
+    ];
+
+    /** Default codes per student (slot 1 · 2 · 3) */
+    const DEFAULT_ASSIGNMENTS = {
+      "1": ["H04", "G10", "G03"],
+      "2": ["N09", "G19", "G03"],
+      "3": ["B11", "B03", "C07"],
+      "4": ["B11", "B03", "D26"],
+      "5": ["H04", "F06", "C07"],
+      "6": ["N09", "J32", "J07"],
+      "7": ["B11", "G19", "G03"],
+      "8": ["B11", "G19", "G03"],
+      "9": ["B11", "B03", "G03"],
+      "10": ["N09", "G19", "J07"],
+      "11": ["N09", "G19", "J07"],
+      "12": ["N09", "G19", "J07"],
+      "13": ["N09", "G19", "G03"],
+      "14": ["N09", "G19", "G03"],
+      "15": ["N09", "G19", "G03"],
+      "16": ["N09", "H02", "G03"],
+      "17": ["B11", "B03", "G03"],
+      "19": ["B11", "B03", "G03"],
+      "20": ["B11", "B03", "G03"],
+      "21": ["A01", "B03", "C07"],
+      "22": ["H04", "G10", "G03"],
+      "23": ["N09", "G19", "G03"],
+      "24": ["N09", "G19", "G03"],
+      "25": ["M03", "F06", "G03"],
+      "26": ["N09", "G19", "G03"],
+      "27": ["N09", "G19", "G03"],
+      "28": ["D26", "B03", "C07"],
+      "29": ["A07", "A01", "C07"],
+      "30": ["H04", "G19", "G03"],
+      "31": ["N09", "G19", "G03"],
+      "33": ["B11", "B03", "C07"],
+      "34": ["N09", "G19", "G03"],
+      "35": ["H04", "G19", "G03"],
+      "36": ["H04", "B03", "G03"],
+      "37": ["B11", "G19", "G03"]
+    };
+
+    const STORAGE_KEY = "bethel-comment-assignments-v3";
+    const codeMap = Object.fromEntries(COMMENT_CODES.map(c => [c.code.toUpperCase(), c]));
+    const slotsPerStudent = 3;
+
+    let assignments = loadAssignments();
+    let pickedCode = null;
+    let suggestActive = -1;
+    let activeInput = null;
+
+    const bankList = document.getElementById("bankList");
+    const bankSearch = document.getElementById("bankSearch");
+    const studentBody = document.getElementById("studentBody");
+    const suggestEl = document.getElementById("suggest");
+
+    function loadAssignments() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (_) {}
+      const init = {};
+      STUDENTS.forEach(s => {
+        init[s.no] = DEFAULT_ASSIGNMENTS[String(s.no)]
+          ? [...DEFAULT_ASSIGNMENTS[String(s.no)]]
+          : ["", "", ""];
+      });
+      return init;
+    }
+
+    function saveAssignments() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(assignments));
+    }
+
+    function studentKey(no) {
+      return String(no);
+    }
+
+    function resolveCode(raw) {
+      const trimmed = raw.trim();
+      if (!trimmed) return "";
+
+      const upper = trimmed.toUpperCase();
+      if (codeMap[upper]) return upper;
+
+      const zhExact = COMMENT_CODES.filter(c => c.zh === trimmed);
+      if (zhExact.length === 1) return zhExact[0].code;
+
+      const enExact = COMMENT_CODES.filter(c => c.en.toLowerCase() === trimmed.toLowerCase());
+      if (enExact.length === 1) return enExact[0].code;
+
+      return "";
+    }
+
+    function normalizeCode(raw) {
+      return resolveCode(raw);
+    }
+
+    function commitSlotInput(input) {
+      const val = input.value.trim();
+      if (!val) return;
+      const no = +input.dataset.no;
+      const slot = +input.dataset.slot;
+      const code = resolveCode(val);
+      if (code) {
+        setCode(no, slot, code);
+        hideSuggest();
+      } else {
+        flashInvalid(no, slot);
+      }
+    }
+
+    function renderBank(filter = "") {
+      const q = filter.trim().toLowerCase();
+      const rows = COMMENT_CODES.filter(({ code, en, zh }) => {
+        if (!q) return true;
+        return code.toLowerCase().includes(q) || en.toLowerCase().includes(q) || zh.includes(q);
+      });
+      bankList.innerHTML = rows.map(({ code, zh }) => `
+        <button type="button" class="code-chip" draggable="true" data-code="${code}"
+          title="${escapeAttr(zh)}">
+          <span class="c">${code}</span>
+          <span class="preview">${escapeHtml(zh)}</span>
+        </button>
+      `).join("");
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+    function escapeAttr(s) {
+      return escapeHtml(s).replace(/"/g, "&quot;");
+    }
+
+    function renderSlotContent(no, slotIndex) {
+      const code = assignments[studentKey(no)][slotIndex] || "";
+      const entry = code ? codeMap[code] : null;
+      if (!entry) {
+        return `<input class="slot-input" type="text" placeholder="A01"
+          data-no="${no}" data-slot="${slotIndex}" autocomplete="off" spellcheck="false">`;
+      }
+      return `
+        <div class="assigned">
+          <div class="assigned-text" title="${escapeAttr(entry.zh + " / " + entry.en)}">
+            <span class="code-label">${entry.code}</span>
+            <span class="stmt">${escapeHtml(entry.zh)}</span>
+          </div>
+          <button type="button" class="rm" data-no="${no}" data-slot="${slotIndex}" title="Remove">×</button>
+        </div>`;
+    }
+
+    function getSlotEl(no, slotIndex) {
+      return document.querySelector(`.slot[data-no="${no}"][data-slot="${slotIndex}"]`);
+    }
+
+    function updateSlotUI(no, slotIndex) {
+      const el = getSlotEl(no, slotIndex);
+      if (!el) return;
+      const code = assignments[studentKey(no)][slotIndex] || "";
+      el.className = code ? "slot full" : "slot empty";
+      el.innerHTML = renderSlotContent(no, slotIndex);
+    }
+
+    function renderStudents() {
+      studentBody.innerHTML = STUDENTS.map(({ no, name }) => {
+        const slots = Array.from({ length: slotsPerStudent }, (_, i) => {
+          const code = assignments[studentKey(no)][i];
+          const cls = code ? "slot full" : "slot empty";
+          return `<div class="${cls}" data-no="${no}" data-slot="${i}">${renderSlotContent(no, i)}</div>`;
+        }).join("");
+        return `<tr>
+          <td class="student"><span class="no">${no}</span>${escapeHtml(name)}</td>
+          <td class="slots-cell" colspan="3"><div class="slot-row">${slots}</div></td>
+        </tr>`;
+      }).join("");
+    }
+
+    function setCode(no, slotIndex, rawCode) {
+      const code = normalizeCode(rawCode);
+      if (!code && rawCode.trim()) {
+        flashInvalid(no, slotIndex);
+        return false;
+      }
+      const key = studentKey(no);
+      if (!assignments[key]) assignments[key] = ["", "", ""];
+      assignments[key][slotIndex] = code;
+      saveAssignments();
+      updateSlotUI(no, slotIndex);
+      return true;
+    }
+
+    function removeCode(no, slotIndex) {
+      assignments[studentKey(no)][slotIndex] = "";
+      saveAssignments();
+      updateSlotUI(no, slotIndex);
+    }
+
+    function flashInvalid(no, slotIndex) {
+      const el = document.querySelector(`.slot[data-no="${no}"][data-slot="${slotIndex}"]`);
+      if (!el) return;
+      el.style.borderColor = "var(--danger)";
+      setTimeout(() => { el.style.borderColor = ""; }, 600);
+    }
+
+    function firstEmptySlot(no) {
+      const arr = assignments[studentKey(no)];
+      return arr.findIndex(c => !c);
+    }
+
+    function assignToStudent(no, code, preferredSlot = null) {
+      const normalized = normalizeCode(code);
+      if (!normalized) return false;
+      const arr = assignments[studentKey(no)];
+      if (arr.includes(normalized)) return true;
+      let slot = preferredSlot;
+      if (slot == null || arr[slot]) {
+        slot = firstEmptySlot(no);
+      }
+      if (slot < 0) return false;
+      arr[slot] = normalized;
+      saveAssignments();
+      updateSlotUI(no, slot);
+      return true;
+    }
+
+    function showSuggest(input, value) {
+      activeInput = input;
+      const q = value.trim().toUpperCase();
+      if (!q) {
+        hideSuggest();
+        return;
+      }
+      const matches = COMMENT_CODES.filter(c =>
+        c.code.startsWith(q) || c.zh.includes(value.trim()) || c.en.toLowerCase().includes(value.trim().toLowerCase())
+      ).slice(0, 12);
+
+      if (!matches.length) {
+        hideSuggest();
+        return;
+      }
+
+      suggestActive = -1;
+      suggestEl.innerHTML = matches.map((c, i) =>
+        `<button type="button" data-i="${i}" data-code="${c.code}"><span class="s-code">${c.code}</span>${escapeHtml(c.zh)}</button>`
+      ).join("");
+      const rect = input.getBoundingClientRect();
+      suggestEl.style.left = rect.left + "px";
+      suggestEl.style.top = rect.bottom + 4 + "px";
+      suggestEl.style.minWidth = Math.max(rect.width, 260) + "px";
+      suggestEl.classList.add("show");
+    }
+
+    function hideSuggest() {
+      suggestEl.classList.remove("show");
+      suggestActive = -1;
+      activeInput = null;
+    }
+
+    function pickSuggestion(code) {
+      if (!activeInput) return;
+      const no = +activeInput.dataset.no;
+      const slot = +activeInput.dataset.slot;
+      setCode(no, slot, code);
+      hideSuggest();
+    }
+
+    // drag from bank
+    bankList.addEventListener("dragstart", e => {
+      const chip = e.target.closest(".code-chip");
+      if (!chip) return;
+      e.dataTransfer.setData("text/plain", chip.dataset.code);
+      e.dataTransfer.effectAllowed = "copy";
+    });
+
+    bankList.addEventListener("click", e => {
+      const chip = e.target.closest(".code-chip");
+      if (!chip) return;
+      pickedCode = chip.dataset.code;
+      document.querySelectorAll(".code-chip").forEach(el => el.style.outline = "");
+      chip.style.outline = "2px solid var(--accent)";
+    });
+
+    studentBody.addEventListener("click", e => {
+      const rm = e.target.closest(".rm");
+      if (rm) {
+        removeCode(+rm.dataset.no, +rm.dataset.slot);
+        return;
+      }
+      const slot = e.target.closest(".slot");
+      if (slot && pickedCode) {
+        assignToStudent(+slot.dataset.no, pickedCode, +slot.dataset.slot);
+        pickedCode = null;
+        document.querySelectorAll(".code-chip").forEach(el => el.style.outline = "");
+      }
+    });
+
+    studentBody.addEventListener("dragover", e => {
+      const slot = e.target.closest(".slot");
+      if (!slot) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+      slot.classList.add("drag-over");
+    });
+
+    studentBody.addEventListener("dragleave", e => {
+      const slot = e.target.closest(".slot");
+      if (slot) slot.classList.remove("drag-over");
+    });
+
+    studentBody.addEventListener("drop", e => {
+      const slot = e.target.closest(".slot");
+      if (!slot) return;
+      e.preventDefault();
+      slot.classList.remove("drag-over");
+      const code = e.dataTransfer.getData("text/plain");
+      assignToStudent(+slot.dataset.no, code, +slot.dataset.slot);
+    });
+
+    studentBody.addEventListener("input", e => {
+      const input = e.target.closest(".slot-input");
+      if (!input) return;
+      showSuggest(input, input.value);
+    });
+
+    studentBody.addEventListener("focusout", e => {
+      const input = e.target.closest(".slot-input");
+      if (!input) return;
+      if (e.relatedTarget && e.relatedTarget.closest(".suggest")) return;
+
+      const tabToNext = e.relatedTarget && e.relatedTarget.closest(".slot-input");
+      setTimeout(() => {
+        if (document.activeElement === input) return;
+        if (document.activeElement && document.activeElement.closest(".suggest")) return;
+        commitSlotInput(input);
+      }, tabToNext ? 0 : 120);
+    });
+
+    studentBody.addEventListener("keydown", e => {
+      const input = e.target.closest(".slot-input");
+      if (!input) return;
+
+      const items = [...suggestEl.querySelectorAll("button")];
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        suggestActive = Math.min(suggestActive + 1, items.length - 1);
+        items.forEach((b, i) => b.classList.toggle("active", i === suggestActive));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        suggestActive = Math.max(suggestActive - 1, 0);
+        items.forEach((b, i) => b.classList.toggle("active", i === suggestActive));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (suggestActive >= 0 && items[suggestActive]) {
+          pickSuggestion(items[suggestActive].dataset.code);
+        } else {
+          setCode(+input.dataset.no, +input.dataset.slot, input.value);
+          hideSuggest();
+        }
+      } else if (e.key === "Escape") {
+        hideSuggest();
+      }
+    });
+
+    suggestEl.addEventListener("mousedown", e => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      e.preventDefault();
+      pickSuggestion(btn.dataset.code);
+    });
+
+    document.addEventListener("click", e => {
+      if (!e.target.closest(".suggest") && !e.target.closest(".slot-input")) hideSuggest();
+    });
+
+    document.querySelectorAll('input[name="display"]').forEach(r => {
+      r.addEventListener("change", () => {
+        document.body.className = "mode-" + r.value;
+      });
+    });
+
+    bankSearch.addEventListener("input", () => renderBank(bankSearch.value));
+
+    document.getElementById("btnToggleBank").addEventListener("click", () => {
+      document.getElementById("layout").classList.toggle("bank-collapsed");
+      document.getElementById("bankPanel").classList.toggle("collapsed");
+    });
+
+    document.getElementById("btnExport").addEventListener("click", () => {
+      const lines = STUDENTS.map(({ no, name }) => {
+        const codes = assignments[studentKey(no)].filter(Boolean);
+        const parts = codes.map(c => {
+          const e = codeMap[c];
+          return `${c}\t${e.zh}\t${e.en}`;
+        });
+        return `${no}\t${name}\t${parts.join(" | ") || "(none)"}`;
+      });
+      const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "comment-assignments.txt";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    document.getElementById("btnClear").addEventListener("click", () => {
+      if (!confirm("重設為預設評語？Reset to default assignments?")) return;
+      STUDENTS.forEach(s => {
+        assignments[studentKey(s.no)] = DEFAULT_ASSIGNMENTS[String(s.no)]
+          ? [...DEFAULT_ASSIGNMENTS[String(s.no)]]
+          : ["", "", ""];
+      });
+      saveAssignments();
+      renderStudents();
+    });
+
+    renderBank();
+    renderStudents();
+  </script>
+</body>
+</html>
