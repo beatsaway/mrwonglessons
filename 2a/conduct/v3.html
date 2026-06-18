@@ -417,6 +417,7 @@
       "37": ["E36", "E37", "C07"]
     };
 
+    const DEFAULTS_REVISION = 2;
     const STORAGE_KEY = "bethel-comment-assignments-v3";
     const codeMap = Object.fromEntries(COMMENT_CODES.map(c => [c.code.toUpperCase(), c]));
     const slotsPerStudent = 3;
@@ -431,11 +432,7 @@
     const studentBody = document.getElementById("studentBody");
     const suggestEl = document.getElementById("suggest");
 
-    function loadAssignments() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch (_) {}
+    function initFromDefaults() {
       const init = {};
       STUDENTS.forEach(s => {
         init[s.no] = DEFAULT_ASSIGNMENTS[String(s.no)]
@@ -445,8 +442,19 @@
       return init;
     }
 
+    function loadAssignments() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed.revision === DEFAULTS_REVISION && parsed.data) return parsed.data;
+        }
+      } catch (_) {}
+      return initFromDefaults();
+    }
+
     function saveAssignments() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(assignments));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ revision: DEFAULTS_REVISION, data: assignments }));
     }
 
     function studentKey(no) {
@@ -781,11 +789,7 @@
 
     document.getElementById("btnClear").addEventListener("click", () => {
       if (!confirm("重設為預設評語？Reset to default assignments?")) return;
-      STUDENTS.forEach(s => {
-        assignments[studentKey(s.no)] = DEFAULT_ASSIGNMENTS[String(s.no)]
-          ? [...DEFAULT_ASSIGNMENTS[String(s.no)]]
-          : ["", "", ""];
-      });
+      assignments = initFromDefaults();
       saveAssignments();
       renderStudents();
     });

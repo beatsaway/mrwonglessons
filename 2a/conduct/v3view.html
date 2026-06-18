@@ -213,25 +213,17 @@
       "37": ["E36", "E37", "C07"]
     };
 
-    const STORAGE_KEY = "bethel-comment-assignments-v3";
     const codeMap = Object.fromEntries(COMMENT_CODES.map(c => [c.code, c]));
     const listEl = document.getElementById("list");
 
-    function loadAssignments() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch (_) {}
-      const init = {};
-      STUDENTS.forEach(s => {
-        init[s.no] = DEFAULT_ASSIGNMENTS[String(s.no)]
+    const assignments = Object.fromEntries(
+      STUDENTS.map(s => [
+        s.no,
+        DEFAULT_ASSIGNMENTS[String(s.no)]
           ? [...DEFAULT_ASSIGNMENTS[String(s.no)]]
-          : ["", "", ""];
-      });
-      return init;
-    }
-
-    const assignments = loadAssignments();
+          : ["", "", ""]
+      ])
+    );
 
     function escapeHtml(s) {
       return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
