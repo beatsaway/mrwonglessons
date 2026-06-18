@@ -38,6 +38,133 @@
 
     .meta { margin: 0; font-size: 0.9rem; color: #6b7280; }
 
+    .example-panel {
+      margin-bottom: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fafafa;
+      overflow: hidden;
+    }
+
+    .example-panel summary {
+      padding: 10px 12px;
+      font-size: 0.86rem;
+      font-weight: 650;
+      color: #1e3a5f;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .example-panel summary::-webkit-details-marker { display: none; }
+
+    .example-panel summary::after {
+      content: "▾";
+      float: right;
+      color: #64748b;
+      font-size: 0.75rem;
+    }
+
+    .example-panel[open] summary::after { content: "▴"; }
+
+    .example-panel-body {
+      padding: 0 12px 12px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .guide-q {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #e5e7eb;
+    }
+
+    .guide-q:first-child {
+      margin-top: 0;
+      padding-top: 10px;
+      border-top: none;
+    }
+
+    .guide-q h3 {
+      margin: 0 0 6px;
+      font-size: 0.82rem;
+      font-weight: 650;
+      color: #1e3a5f;
+    }
+
+    .guide-block {
+      margin-bottom: 8px;
+    }
+
+    .guide-block:last-child { margin-bottom: 0; }
+
+    .guide-block h4 {
+      margin: 0 0 4px;
+      font-size: 0.78rem;
+      font-weight: 650;
+      color: #334155;
+    }
+
+    .guide-block h4 .tag-desc {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .guide-block h4 .tag-analysis {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .guide-block h4 .tag-interpretation {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .guide-block h4 .tag-judgement {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #ffe4e6;
+      color: #be123c;
+    }
+
+    .guide-block ul {
+      margin: 0;
+      padding-left: 1.1rem;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: #475569;
+    }
+
+    .guide-block li + li { margin-top: 3px; }
+
+    .viewer-example {
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: #475569;
+    }
+
+    .viewer-example h3 {
+      margin: 0 0 6px;
+      font-size: 0.82rem;
+      font-weight: 650;
+      color: #1e3a5f;
+    }
+
+    .viewer-example .guide-block { margin-bottom: 6px; }
+
     .list-toolbar {
       display: flex;
       align-items: center;
@@ -439,6 +566,10 @@
       <h1>5C June 2026 Part A · Marking</h1>
       <p class="meta">Click coloured text for feedback · scores saved in this browser</p>
     </header>
+    <details class="example-panel" id="examplePanel">
+      <summary>Sample answer · Q1 &amp; Q2</summary>
+      <div class="example-panel-body" id="examplePanelBody"></div>
+    </details>
     <div class="list-toolbar">
       <label for="sortSelect">Rank by</label>
       <select id="sortSelect" aria-label="Sort students by score">
@@ -467,6 +598,7 @@
         <button type="button" class="nav next" id="nextBtn" aria-label="Next page">›</button>
       </div>
       <div class="viewer-right" id="viewerRight">
+        <div class="viewer-example" id="viewerExample" hidden></div>
         <div class="grade-panel" id="gradePanel"></div>
         <div class="legend">
           <span><i class="hl-description"></i> Literal Description</span>
@@ -510,6 +642,93 @@
       { key: "judgement", label: "Value Judgement" },
     ];
 
+    const ANSWER_EXAMPLES = {
+      1: {
+        title: "Question 1 · Chair (1a Gris · 1b Van Gogh)",
+        blocks: [
+          {
+            tag: "desc",
+            label: "Describe",
+            items: [
+              "Start with what both plates share: still life, indoor chair scene, oil on canvas.",
+              "Then use the elements of art — colour, space, shape, form, line, texture, value — plate by plate.",
+              "For each plate, move from main subject (chair / guitar) → side objects (pipe, door) → background and floor.",
+            ],
+          },
+          {
+            tag: "analysis",
+            label: "Analysis",
+            items: [
+              "Compare formal differences: Gris uses geometric, fragmented shapes; Van Gogh uses more organic, observed forms.",
+              "Space: Gris breaks the scene into multiple viewpoints; Van Gogh keeps one clear middle perspective.",
+              "Texture and colour: Gris — sharp contrasts (yellow vs black); Van Gogh — smoother blending, brown tones linking subject and background.",
+            ],
+          },
+          {
+            tag: "interpretation",
+            label: "Interpretation",
+            items: [
+              "1a: Gris may suggest music, movement, or modern life — the guitar and chair feel active even without a player.",
+              "1b: Van Gogh may show a personal, intimate scene — his own chair and pipe suggest daily life, presence, or quiet absence.",
+              "Compare meaning: 1a feels abstract and energetic; 1b feels domestic, calm, and emotionally direct.",
+            ],
+          },
+          {
+            tag: "judgement",
+            label: "Judgement",
+            items: [
+              "State which plate you prefer and why, using formal evidence — not only personal feeling.",
+              "e.g. 1b is more successful at realistic depiction and harmonious colour; OR 1a is stronger for dynamic cubist design.",
+              "Judge how well each work communicates its still-life subject and indoor mood.",
+            ],
+          },
+        ],
+      },
+      2: {
+        title: "Question 2 · Bed (2a Kahlo · 2b Barnet)",
+        blocks: [
+          {
+            tag: "desc",
+            label: "Describe",
+            items: [
+              "Start with commonalities: one person on a bed, oil on canvas, two-dimensional painting.",
+              "2a: bunk bed, sleeping woman below, skeleton above, yellow blanket, bombs, grey sky background.",
+              "2b: woman reading in bed, white cat, red blanket, dark night-time background.",
+              "For each plate, describe colour on the figure, nearby objects, then background.",
+            ],
+          },
+          {
+            tag: "analysis",
+            label: "Analysis",
+            items: [
+              "Both use stable, balanced composition — 2a through horizontal symmetry, 2b through vertical symmetry.",
+              "Emphasis: yellow bed/blanket in 2a; bright red blanket and lipstick in 2b.",
+              "Contrast: in 2a, playful/active skeleton above vs peaceful resting sleeper below; in 2b, calm horizontal pose against dark empty space.",
+            ],
+          },
+          {
+            tag: "interpretation",
+            label: "Interpretation",
+            items: [
+              "2a: Kahlo may link sleep and dream with death or danger — peaceful rest below, skeleton, bombs, and flowers above suggest life is not always safe.",
+              "2b: Barnet may show a quiet night in — reading in bed with a cat as a gentle pause from daily pressure.",
+              "Both fit the theme \"Take a break\", but 2a is darker/surreal while 2b is calm and domestic.",
+            ],
+          },
+          {
+            tag: "judgement",
+            label: "Judgement",
+            items: [
+              "Say which plate answers the theme more convincingly and why.",
+              "Judge success using formal qualities already discussed — composition, emphasis, contrast, clarity of message.",
+              "e.g. 2a is stronger for visual complexity and emotional depth; OR 2b is stronger for a clear, peaceful rest scene.",
+              "Avoid judging only on story — link your preference back to what you see in the work.",
+            ],
+          },
+        ],
+      },
+    };
+
     let students = {};
     let marking = {};
     let savedScores = {};
@@ -535,6 +754,55 @@
     const commentPopupLabel = document.getElementById("commentPopupLabel");
     const commentPopupBody = document.getElementById("commentPopupBody");
     const viewerTextBody = document.getElementById("viewerTextBody");
+    const examplePanelBody = document.getElementById("examplePanelBody");
+    const viewerExample = document.getElementById("viewerExample");
+
+    function tagClassFor(tag) {
+      return "tag-" + (tag === "desc" ? "desc" : tag === "analysis" ? "analysis" : tag === "interpretation" ? "interpretation" : "judgement");
+    }
+
+    function renderGuideHtml(guide) {
+      if (!guide) return "";
+      let html = '<div class="guide-q"><h3>' + escapeHtml(guide.title) + "</h3>";
+      guide.blocks.forEach((block) => {
+        html += '<div class="guide-block"><h4><span class="' + tagClassFor(block.tag) + '">' + escapeHtml(block.label) + "</span></h4><ul>";
+        block.items.forEach((item) => {
+          html += "<li>" + escapeHtml(item) + "</li>";
+        });
+        html += "</ul></div>";
+      });
+      html += "</div>";
+      return html;
+    }
+
+    function renderAnswerExamples() {
+      examplePanelBody.innerHTML =
+        renderGuideHtml(ANSWER_EXAMPLES[1]) + renderGuideHtml(ANSWER_EXAMPLES[2]);
+    }
+
+    function detectQuestion(name) {
+      const text = ((students[name] && students[name].text) || "").trim();
+      if (/Question\s+No\.?\s*:?\s*1/i.test(text) || /\b1a\b|\b1b\b|plate\s*\(\s*1/i.test(text)) return 1;
+      if (/Question\s+No\.?\s*:?\s*2/i.test(text) || /\b2a\b|\b2b\b|plate\s*\(\s*2/i.test(text)) return 2;
+      return null;
+    }
+
+    function renderViewerExample(name) {
+      const q = detectQuestion(name);
+      if (!q || !ANSWER_EXAMPLES[q]) {
+        viewerExample.hidden = true;
+        viewerExample.innerHTML = "";
+        return;
+      }
+      viewerExample.hidden = false;
+      viewerExample.innerHTML =
+        "<h3>Sample answer · " + escapeHtml(ANSWER_EXAMPLES[q].title) + "</h3>" +
+        ANSWER_EXAMPLES[q].blocks.map((block) =>
+          '<div class="guide-block"><h4><span class="' + tagClassFor(block.tag) + '">' + escapeHtml(block.label) + "</span></h4><ul>" +
+          block.items.map((item) => "<li>" + escapeHtml(item) + "</li>").join("") +
+          "</ul></div>"
+        ).join("");
+    }
 
     function loadSavedScores() {
       try {
@@ -760,6 +1028,7 @@
       const data = students[viewName];
       renderText(viewName, (data.text || "").trim());
       renderGradePanel(viewName);
+      renderViewerExample(viewName);
       clearComment();
       setTextVisible(true);
       updateViewer();
@@ -775,6 +1044,8 @@
       viewerImage.removeAttribute("src");
       viewerTextBody.innerHTML = "";
       gradePanel.innerHTML = "";
+      viewerExample.hidden = true;
+      viewerExample.innerHTML = "";
       clearComment();
     }
 
@@ -836,6 +1107,7 @@
     loadSavedScores();
     students = window.PARTA_STUDENTS || {};
     marking = window.PARTA_MARKING || {};
+    renderAnswerExamples();
     renderList();
   </script>
 </body>
