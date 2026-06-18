@@ -24,8 +24,8 @@
     }
 
     header {
-      margin-bottom: 20px;
-      padding-bottom: 16px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
       border-bottom: 1px solid #e5e7eb;
     }
 
@@ -38,6 +38,41 @@
 
     .meta { margin: 0; font-size: 0.9rem; color: #6b7280; }
 
+    .list-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding: 8px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #f8fafc;
+      font-size: 0.84rem;
+      color: #475569;
+    }
+
+    .list-toolbar label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .list-toolbar select {
+      min-width: 0;
+      flex: 1;
+      max-width: 20rem;
+      padding: 5px 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: #fff;
+      font: inherit;
+      font-size: 0.84rem;
+      color: #1f2937;
+    }
+
     .student-list { list-style: none; margin: 0; padding: 0; }
 
     .student-row { border-bottom: 1px solid #e5e7eb; }
@@ -47,8 +82,7 @@
     .student-btn {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       width: 100%;
       margin: 0;
       padding: 14px 4px;
@@ -64,10 +98,24 @@
 
     .student-btn:hover { color: #2c5282; }
 
-    .student-score {
+    .student-rank {
+      flex-shrink: 0;
+      width: 1.6rem;
       font-size: 0.82rem;
-      font-weight: 600;
-      color: #6b7280;
+      font-weight: 650;
+      color: #94a3b8;
+    }
+
+    .student-name {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .student-score {
+      flex-shrink: 0;
+      font-size: 0.82rem;
+      font-weight: 650;
+      color: #1e3a5f;
     }
 
     .viewer {
@@ -389,8 +437,18 @@
   <main>
     <header>
       <h1>5C June 2026 Part A · Marking</h1>
-      <p class="meta">Click coloured text for feedback beside the phrase · scores saved in this browser</p>
+      <p class="meta">Click coloured text for feedback · scores saved in this browser</p>
     </header>
+    <div class="list-toolbar">
+      <label for="sortSelect">Rank by</label>
+      <select id="sortSelect" aria-label="Sort students by score">
+        <option value="total">Overall score</option>
+        <option value="description">Literal Description</option>
+        <option value="analysis">Formal Analysis</option>
+        <option value="interpretation">Interpretation of Meaning</option>
+        <option value="judgement">Value Judgement</option>
+      </select>
+    </div>
     <ul class="student-list" id="studentList"></ul>
   </main>
 
@@ -455,11 +513,13 @@
     let students = {};
     let marking = {};
     let savedScores = {};
+    let sortBy = "total";
     let viewName = "";
     let viewIndex = 0;
     let activeMark = null;
 
     const studentList = document.getElementById("studentList");
+    const sortSelect = document.getElementById("sortSelect");
     const viewer = document.getElementById("viewer");
     const viewerName = document.getElementById("viewerName");
     const viewerPage = document.getElementById("viewerPage");
@@ -499,6 +559,28 @@
       const vals = CRITERIA.map((c) => s[c.key]).filter((v) => v !== null && v !== undefined);
       if (vals.length !== 4) return null;
       return vals.reduce((a, b) => a + b, 0);
+    }
+
+    function scoreFor(name, key) {
+      const s = getScores(name);
+      if (key === "total") return totalFor(name) ?? -1;
+      const v = s[key];
+      return v !== null && v !== undefined ? v : -1;
+    }
+
+    function sortedNames() {
+      return ORDER.filter((name) => students[name]).sort((a, b) => {
+        const diff = scoreFor(b, sortBy) - scoreFor(a, sortBy);
+        if (diff !== 0) return diff;
+        return a.localeCompare(b);
+      });
+    }
+
+    function sortScoreLabel(name) {
+      const value = scoreFor(name, sortBy);
+      if (value < 0) return "";
+      if (sortBy === "total") return value + " / 20";
+      return value + " / 5";
     }
 
     function escapeHtml(value) {
@@ -641,17 +723,28 @@
           savedScores[viewName][key] = value;
           persistScores();
           renderGradePanel(viewName);
-          updateListScores();
+          renderList();
         });
       });
     }
 
-    function updateListScores() {
-      ORDER.forEach((name) => {
-        const el = document.getElementById("score-" + name);
-        if (!el) return;
-        const total = totalFor(name);
-        el.textContent = total !== null ? total + " / 20" : "";
+    function renderList() {
+      const names = sortedNames();
+      studentList.innerHTML = "";
+      names.forEach((name, index) => {
+        const li = document.createElement("li");
+        li.className = "student-row";
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "student-btn";
+        const scoreText = sortScoreLabel(name);
+        btn.innerHTML =
+          '<span class="student-rank">' + (index + 1) + ".</span>" +
+          '<span class="student-name">' + escapeHtml(name) + "</span>" +
+          (scoreText ? '<span class="student-score" id="score-' + name + '">' + scoreText + "</span>" : "");
+        btn.addEventListener("click", () => openViewer(name, 0));
+        li.appendChild(btn);
+        studentList.appendChild(li);
       });
     }
 
@@ -703,24 +796,10 @@
       updateViewer();
     }
 
-    function renderList() {
-      ORDER.forEach((name) => {
-        if (!students[name]) return;
-        const li = document.createElement("li");
-        li.className = "student-row";
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "student-btn";
-        const total = totalFor(name);
-        btn.innerHTML =
-          "<span>" + name + '</span><span class="student-score" id="score-' + name + '">' +
-          (total !== null ? total + " / 20" : "") +
-          "</span>";
-        btn.addEventListener("click", () => openViewer(name, 0));
-        li.appendChild(btn);
-        studentList.appendChild(li);
-      });
-    }
+    sortSelect.addEventListener("change", () => {
+      sortBy = sortSelect.value;
+      renderList();
+    });
 
     viewerClose.addEventListener("click", closeViewer);
     commentPopupClose.addEventListener("click", clearComment);
