@@ -1,6 +1,6 @@
 window.PARTA_MARKING = {
   Aqsa: {
-    scores: { description: 4, analysis: 4, interpretation: 3, judgement: 3 },
+    scores: { description: 4, analysis: 4, interpretation: 3, judgement: 4 },
     notes: "Best in class, but not flawless: interpretation for 2b is mis-labelled as 2a; some description drifts into mood; judgement could compare both plates more formally.",
     highlights: [
       { text: "The media of both artworks is oil on canvas", category: "description", comment: "Literal Description — correct shared medium stated clearly." },
@@ -19,7 +19,7 @@ window.PARTA_MARKING = {
     ],
   },
   Biraz: {
-    scores: { description: 2, analysis: 1, interpretation: 2, judgement: 0 },
+    scores: { description: 1, analysis: 1, interpretation: 2, judgement: 0 },
     notes: "Only plate 2b answered. No comparison with 2a, almost no formal analysis, no value judgement section.",
     highlights: [
       { text: "made by Will Barnet. It was made in 1965 and is Oil on canvas", category: "description", comment: "Literal Description — artist, date and medium correct for the one plate attempted." },
@@ -47,7 +47,7 @@ window.PARTA_MARKING = {
     ],
   },
   Jaylee: {
-    scores: { description: 4, analysis: 3, interpretation: 3, judgement: 3 },
+    scores: { description: 4, analysis: 3, interpretation: 3, judgement: 2 },
     notes: "Clear DIAC labels and strong exam technique. Analysis weakens when claiming Van Gogh did not use shapes/lines; judgement is good but repetitive.",
     highlights: [
       { text: "Artwork 1a is named \"Guitar on a Chair\". It was painted by Juan Gris in 1913, and is an oil on canvas artwork", category: "description", comment: "Literal Description — title, artist, date and medium for 1a." },
@@ -65,7 +65,7 @@ window.PARTA_MARKING = {
     ],
   },
   Junaid: {
-    scores: { description: 3, analysis: 2, interpretation: 1, judgement: 2 },
+    scores: { description: 3, analysis: 2, interpretation: 1, judgement: 1 },
     notes: "Lots of listing (colours, shapes, sizes) but little formal comparison or interpretation. Factual slips (86 years; 'he' for Kahlo).",
     highlights: [
       { text: "The name of this artwork is \"Dream\"", category: "description", comment: "Literal Description — identifies Kahlo work and title." },
@@ -83,7 +83,7 @@ window.PARTA_MARKING = {
     ],
   },
   Mandip: {
-    scores: { description: 2, analysis: 1, interpretation: 2, judgement: 1 },
+    scores: { description: 2, analysis: 1, interpretation: 2, judgement: 0 },
     notes: "Informal voice; mixes interpretation into description. Almost no formal analysis. No clear DIAC structure.",
     highlights: [
       { text: "Guitar on a chair made by Juan Gris 1913 oil on canvas 100 × 65 cm", category: "description", comment: "Literal Description — basic facts for 1a with dimensions." },
@@ -97,7 +97,7 @@ window.PARTA_MARKING = {
     ],
   },
   Mhavish: {
-    scores: { description: 3, analysis: 3, interpretation: 2, judgement: 3 },
+    scores: { description: 3, analysis: 3, interpretation: 3, judgement: 3 },
     notes: "Full DIAC attempt on both plates. Description and analysis are workable once the stray 1a/1b wording is treated as a typo. Interpretation for 2a still drifts (peasants/revolution), but 2b peace/domestic reading is fair. Judgement is among the stronger in the class.",
     highlights: [
       { text: "Dream the paint is on oil on canvas", category: "description", comment: "Literal Description — medium identified for 2a." },
@@ -116,7 +116,7 @@ window.PARTA_MARKING = {
     ],
   },
   Nikhil: {
-    scores: { description: 3, analysis: 2, interpretation: 2, judgement: 2 },
+    scores: { description: 3, analysis: 2, interpretation: 2, judgement: 1 },
     notes: "Engaging voice but sections blur together. Limited formal comparison between plates; judgement mostly personal liking.",
     highlights: [
       { text: "Dream it's drawn by Frida Kahlo in 1940, Oil on canvas 74 × 99 cm", category: "description", comment: "Literal Description — title, artist, date, medium and size for 2a." },

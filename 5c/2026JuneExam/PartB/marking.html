@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5C June 2026 Part B · Marking</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: #fff;
+      color: #1f2937;
+      line-height: 1.5;
+    }
+
+    body.viewer-open { overflow: hidden; }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px 16px 40px;
+    }
+
+    header {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.35rem;
+      font-weight: 650;
+      color: #1e3a5f;
+    }
+
+    .meta { margin: 0; font-size: 0.9rem; color: #6b7280; }
+
+    .list-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding: 8px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #f8fafc;
+      font-size: 0.84rem;
+      color: #475569;
+    }
+
+    .list-toolbar label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .list-toolbar select {
+      min-width: 0;
+      flex: 1;
+      max-width: 20rem;
+      padding: 5px 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: #fff;
+      font: inherit;
+      font-size: 0.84rem;
+      color: #1f2937;
+    }
+
+    .student-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 560px) {
+      .student-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 820px) {
+      .student-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .student-card {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fff;
+      overflow: hidden;
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+    }
+
+    .student-card:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    .student-thumb {
+      aspect-ratio: 5 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      background: #fafafa;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .student-thumb img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .student-body {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px 12px;
+    }
+
+    .student-rank {
+      flex-shrink: 0;
+      width: 1.6rem;
+      font-size: 0.82rem;
+      font-weight: 650;
+      color: #94a3b8;
+      line-height: 1.3;
+    }
+
+    .student-info { min-width: 0; flex: 1; }
+
+    .student-name {
+      margin: 0 0 2px;
+      font-size: 0.98rem;
+      font-weight: 650;
+      color: #1e3a5f;
+    }
+
+    .student-theme {
+      margin: 0;
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+
+    .student-score {
+      flex-shrink: 0;
+      font-size: 0.88rem;
+      font-weight: 650;
+      color: #1e3a5f;
+      line-height: 1.3;
+    }
+
+    .viewer {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: #f8fafc;
+      z-index: 1000;
+    }
+
+    .viewer.open { display: flex; }
+
+    .viewer-bar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      height: 44px;
+      padding: 0 8px 0 12px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #fff;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    .viewer-bar-title {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .viewer-bar-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .panel-toggle {
+      display: none;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      color: #475569;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .viewer-bar strong { font-weight: 650; color: #1e3a5f; }
+
+    .viewer-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-size: 1.35rem;
+      line-height: 1;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .viewer-close:hover { background: #f1f5f9; color: #1e3a5f; }
+
+    .viewer-content {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+    }
+
+    .viewer-left {
+      min-height: 0;
+      height: 100%;
+      padding: 16px;
+      border-right: 1px solid #e5e7eb;
+      background: #eef2f7;
+      overflow: hidden;
+    }
+
+    .viewer-left img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .viewer-right {
+      position: relative;
+      min-height: 0;
+      overflow: auto;
+      padding: 16px 20px 28px;
+      background: #fff;
+    }
+
+    .info-panel { margin-bottom: 16px; }
+
+    .info-panel h2 {
+      margin: 0 0 6px;
+      font-size: 0.92rem;
+      font-weight: 650;
+      color: #1e3a5f;
+    }
+
+    .info-theme {
+      margin: 0 0 8px;
+      font-size: 0.84rem;
+      color: #475569;
+    }
+
+    .grade-total {
+      margin: 10px 0 0;
+      font-size: 0.95rem;
+      font-weight: 650;
+      color: #1e3a5f;
+    }
+
+    .info-notes {
+      margin: 8px 0 0;
+      font-size: 0.84rem;
+      color: #6b7280;
+      line-height: 1.45;
+    }
+
+    .feedback-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feedback-card {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border-left: 4px solid #cbd5e1;
+      background: #f8fafc;
+    }
+
+    .feedback-card.material {
+      border-left-color: #7c3aed;
+      background: #f5f3ff;
+    }
+
+    .feedback-card.visual {
+      border-left-color: #1d4ed8;
+      background: #eff6ff;
+    }
+
+    .feedback-card.creativity {
+      border-left-color: #c2410c;
+      background: #fff7ed;
+    }
+
+    .feedback-card.communication {
+      border-left-color: #047857;
+      background: #ecfdf5;
+    }
+
+    .feedback-card h3 {
+      margin: 0 0 6px;
+      font-size: 0.78rem;
+      font-weight: 650;
+      color: #1e3a5f;
+      line-height: 1.35;
+    }
+
+    .feedback-score {
+      display: inline-block;
+      margin-bottom: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #1e3a5f;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 650;
+    }
+
+    .feedback-card p {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: #374151;
+    }
+
+    .feedback-part {
+      margin-bottom: 8px;
+    }
+
+    .feedback-part:last-child {
+      margin-bottom: 0;
+    }
+
+    .feedback-part-label {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.72rem;
+      font-weight: 650;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    @media (max-width: 900px) {
+      .panel-toggle { display: inline-flex; align-items: center; }
+
+      .viewer-content {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      .viewer.hide-panel .viewer-content { grid-template-rows: 1fr; }
+      .viewer.hide-panel .viewer-right { display: none; }
+
+      .viewer-left {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .viewer.hide-panel .viewer-left { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>5C June 2026 Part B · Marking</h1>
+      <p class="meta">Part B scores out of 80 · four criteria · June 2026</p>
+    </header>
+    <div class="list-toolbar">
+      <label for="sortSelect">Rank by</label>
+      <select id="sortSelect" aria-label="Sort students by score">
+        <option value="total">Overall score</option>
+        <option value="material">Material &amp; Techniques</option>
+        <option value="visual">Visual Elements &amp; Design</option>
+        <option value="creativity">Creativity &amp; Imagination</option>
+        <option value="communication">Communication of Theme</option>
+      </select>
+    </div>
+    <div class="student-grid" id="studentList"></div>
+  </main>
+
+  <div class="viewer" id="viewer" aria-hidden="true">
+    <div class="viewer-bar">
+      <span class="viewer-bar-title"><strong id="viewerName"></strong></span>
+      <div class="viewer-bar-actions">
+        <button type="button" class="panel-toggle" id="panelToggle" aria-pressed="false">Hide feedback</button>
+        <button type="button" class="viewer-close" id="viewerClose" aria-label="Close">×</button>
+      </div>
+    </div>
+    <div class="viewer-content">
+      <div class="viewer-left">
+        <img id="viewerImage" src="" alt="" />
+      </div>
+      <div class="viewer-right" id="viewerRight">
+        <div class="info-panel" id="infoPanel"></div>
+        <div class="feedback-list" id="feedbackList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="marking-data.js"></script>
+  <script>
+    (function () {
+      const PASSWORD = "1234567";
+      while (true) {
+        const input = window.prompt("Enter password to view Part B marking:");
+        if (input === null) {
+          location.href = "about:blank";
+          return;
+        }
+        if (input === PASSWORD) break;
+        window.alert("Incorrect password");
+      }
+    })();
+
+    const ORDER = ["Aqsa", "Biraz", "Ibrahim", "Jaylee", "Junaid", "Mandip", "Mhavish", "Nikhil", "Soyal"];
+    const CRITERIA = [
+      { key: "material", label: "Material & Techniques", max: 20 },
+      { key: "visual", label: "Visual Elements & Design", max: 20 },
+      { key: "creativity", label: "Creativity & Imagination", max: 20 },
+      { key: "communication", label: "Communication of Theme", max: 20 },
+    ];
+    const PARTB_MAX = 80;
+
+    const STUDENTS = {
+      Jaylee: { theme: 1 },
+      Mandip: { theme: 1 },
+      Aqsa: { theme: 2 },
+      Biraz: { theme: 2 },
+      Ibrahim: { theme: 2 },
+      Junaid: { theme: 2 },
+      Mhavish: { theme: 2 },
+      Nikhil: { theme: 2 },
+      Soyal: { theme: 2 },
+    };
+
+    function artworkFor(name) {
+      const t = STUDENTS[name].theme;
+      const base = name + "_theme" + t;
+      return {
+        full: encodeURI(base + ".webp"),
+        thumb: encodeURI(base + "_thumb.webp"),
+      };
+    }
+
+    let marking = {};
+    let sortBy = "total";
+    let viewName = "";
+
+    const studentList = document.getElementById("studentList");
+    const sortSelect = document.getElementById("sortSelect");
+    const viewer = document.getElementById("viewer");
+    const viewerName = document.getElementById("viewerName");
+    const viewerImage = document.getElementById("viewerImage");
+    const viewerClose = document.getElementById("viewerClose");
+    const panelToggle = document.getElementById("panelToggle");
+    const infoPanel = document.getElementById("infoPanel");
+    const feedbackList = document.getElementById("feedbackList");
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function totalFor(name) {
+      const s = marking[name] && marking[name].scores;
+      if (!s) return null;
+      const vals = CRITERIA.map((c) => s[c.key]).filter((v) => v !== null && v !== undefined);
+      if (vals.length !== 4) return null;
+      return vals.reduce((a, b) => a + b, 0);
+    }
+
+    function scoreFor(name, key) {
+      const s = marking[name] && marking[name].scores;
+      if (!s) return -1;
+      if (key === "total") return totalFor(name) ?? -1;
+      return s[key] ?? -1;
+    }
+
+    function sortedNames() {
+      return ORDER.filter((name) => STUDENTS[name] && marking[name]).sort((a, b) => {
+        const diff = scoreFor(b, sortBy) - scoreFor(a, sortBy);
+        if (diff !== 0) return diff;
+        return a.localeCompare(b);
+      });
+    }
+
+    function sortScoreLabel(name) {
+      const value = scoreFor(name, sortBy);
+      if (value < 0) return "";
+      if (sortBy === "total") return value + " / " + PARTB_MAX;
+      return value + " / 20";
+    }
+
+    function renderFeedback(name) {
+      const data = marking[name] || {};
+      const total = totalFor(name);
+      let html = "<h2>Part B marking</h2>";
+      html += '<p class="info-theme">' + escapeHtml(data.themeTitle || "") + "</p>";
+      if (total !== null) {
+        html += '<div class="grade-total">Part B total: ' + total + " / " + PARTB_MAX + "</div>";
+      }
+      if (data.notes) {
+        html += '<p class="info-notes">' + escapeHtml(data.notes) + "</p>";
+      }
+      infoPanel.innerHTML = html;
+
+      const scores = data.scores || {};
+      const items = data.feedback || [];
+      if (!items.length) {
+        feedbackList.innerHTML = "<p><em>No feedback recorded.</em></p>";
+        return;
+      }
+      feedbackList.innerHTML = items
+        .map((item) => {
+          const score = scores[item.key];
+          const scoreHtml =
+            score !== undefined && score !== null
+              ? '<span class="feedback-score">' + score + " / 20</span>"
+              : "";
+          const body = item.text
+            ? "<p>" + escapeHtml(item.text) + "</p>"
+            : '<div class="feedback-part"><span class="feedback-part-label">In this piece</span><p>' +
+              escapeHtml(item.descriptor || "") +
+              '</p></div><div class="feedback-part"><span class="feedback-part-label">To improve</span><p>' +
+              escapeHtml(item.advice || "") +
+              "</p></div>";
+          return (
+            '<article class="feedback-card ' + escapeHtml(item.key) + '">' +
+            "<h3>" + escapeHtml(item.label) + "</h3>" +
+            scoreHtml +
+            body +
+            "</article>"
+          );
+        })
+        .join("");
+    }
+
+    function setPanelVisible(visible) {
+      viewer.classList.toggle("hide-panel", !visible);
+      panelToggle.textContent = visible ? "Hide feedback" : "Show feedback";
+      panelToggle.setAttribute("aria-pressed", String(!visible));
+    }
+
+    function openViewer(name) {
+      viewName = name;
+      const art = artworkFor(name);
+      renderFeedback(name);
+      setPanelVisible(true);
+      viewerName.textContent = name;
+      viewerImage.src = art.full;
+      viewerImage.alt = name + " — final artwork";
+      viewer.classList.add("open");
+      viewer.setAttribute("aria-hidden", "false");
+      document.body.classList.add("viewer-open");
+    }
+
+    function closeViewer() {
+      viewer.classList.remove("open", "hide-panel");
+      viewer.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("viewer-open");
+      viewerImage.removeAttribute("src");
+      infoPanel.innerHTML = "";
+      feedbackList.innerHTML = "";
+    }
+
+    function renderList() {
+      const names = sortedNames();
+      studentList.innerHTML = "";
+      names.forEach((name, index) => {
+        const art = artworkFor(name);
+        const themeShort = marking[name].theme === 1 ? "Chair" : "Take a Break";
+        const scoreText = sortScoreLabel(name);
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "student-card";
+        card.innerHTML =
+          '<div class="student-thumb"><img src="' + art.thumb + '" alt="" loading="lazy" decoding="async" /></div>' +
+          '<div class="student-body">' +
+          '<span class="student-rank">' + (index + 1) + ".</span>" +
+          '<div class="student-info">' +
+          '<p class="student-name">' + escapeHtml(name) + "</p>" +
+          '<p class="student-theme">' + escapeHtml(themeShort) + "</p>" +
+          "</div>" +
+          (scoreText ? '<span class="student-score">' + scoreText + "</span>" : "") +
+          "</div>";
+        card.querySelector("img").alt = name + " — final artwork";
+        card.addEventListener("click", () => openViewer(name));
+        studentList.appendChild(card);
+      });
+    }
+
+    sortSelect.addEventListener("change", () => {
+      sortBy = sortSelect.value;
+      renderList();
+    });
+
+    viewerClose.addEventListener("click", closeViewer);
+    panelToggle.addEventListener("click", () => setPanelVisible(viewer.classList.contains("hide-panel")));
+
+    document.addEventListener("keydown", (e) => {
+      if (!viewer.classList.contains("open")) return;
+      if (e.key === "Escape") closeViewer();
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 900) viewer.classList.remove("hide-panel");
+    });
+
+    marking = window.PARTB_MARKING || {};
+    renderList();
+  </script>
+</body>
+</html>
