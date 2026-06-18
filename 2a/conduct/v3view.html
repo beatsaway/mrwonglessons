@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>2A 評語 · v3</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #fff;
+      --text: #1a2332;
+      --muted: #6b7785;
+      --accent: #1e4d8c;
+      --accent-soft: #e8eef7;
+      --border: #e2e8f0;
+      --slot1: #f0f7ff;
+      --slot2: #f5f3ff;
+      --slot3: #f0fdf4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      min-height: 36px;
+      padding: max(.35rem, env(safe-area-inset-top)) .75rem .35rem;
+      background: var(--accent);
+      color: #fff;
+      font-size: .85rem;
+      font-weight: 600;
+      border-bottom: 1px solid #163a6b;
+    }
+
+    main {
+      padding: .75rem .75rem 2rem;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      margin-bottom: .65rem;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      padding: .75rem .85rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #fafbfd 0%, #fff 100%);
+    }
+    .no {
+      flex: none;
+      width: 2.1rem;
+      height: 2.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: .9rem;
+      border-radius: 8px;
+    }
+    .name {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .comments {
+      list-style: none;
+      margin: 0;
+      padding: .5rem .85rem .75rem;
+    }
+    .comments li {
+      display: flex;
+      gap: .55rem;
+      padding: .55rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .95rem;
+    }
+    .comments li:last-child { border-bottom: none; padding-bottom: 0; }
+    .comments li:nth-child(1) { background: linear-gradient(90deg, var(--slot1) 0%, transparent 100%); margin: 0 -.85rem; padding-left: .85rem; padding-right: .85rem; border-radius: 0; }
+    .comments li:nth-child(2) { background: linear-gradient(90deg, var(--slot2) 0%, transparent 100%); margin: 0 -.85rem; padding-left: .85rem; padding-right: .85rem; }
+    .comments li:nth-child(3) { background: linear-gradient(90deg, var(--slot3) 0%, transparent 100%); margin: 0 -.85rem; padding-left: .85rem; padding-right: .85rem; }
+    .slot-label {
+      flex: none;
+      font-size: .7rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 4px;
+      padding: .15rem .35rem;
+      height: fit-content;
+      margin-top: .15rem;
+    }
+    .comment-text { flex: 1; }
+    .comment-text .zh { display: block; }
+    .comment-text .code {
+      display: block;
+      margin-top: .2rem;
+      font-size: .72rem;
+      color: var(--muted);
+      font-family: Consolas, monospace;
+    }
+    .missing {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    @media (min-width: 480px) {
+      main { padding: 1rem 1rem 2.5rem; }
+      .card { margin-bottom: .75rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">2A 班整體評語 · v3</header>
+
+  <main id="list"></main>
+
+  <script src="commentCodes.js"></script>
+  <script>
+    const STUDENTS = [
+      { no: 1, name: "陳政延" },
+      { no: 2, name: "陳錦賢" },
+      { no: 3, name: "陳思涵" },
+      { no: 4, name: "莊曼妮" },
+      { no: 5, name: "封采" },
+      { no: 6, name: "郭君鵬" },
+      { no: 7, name: "何天恩" },
+      { no: 8, name: "黃嘉樂" },
+      { no: 9, name: "黃詩茹" },
+      { no: 10, name: "蔣少涵" },
+      { no: 11, name: "簡愷佑" },
+      { no: 12, name: "梁柏宇" },
+      { no: 13, name: "李狄達" },
+      { no: 14, name: "李一航" },
+      { no: 15, name: "李一鳴" },
+      { no: 16, name: "呂錦峰" },
+      { no: 17, name: "蘇紫瑜" },
+      { no: 19, name: "王復生" },
+      { no: 20, name: "吳國豪" },
+      { no: 21, name: "吴浣瑩" },
+      { no: 22, name: "肖辰臻" },
+      { no: 23, name: "許繼耿" },
+      { no: 24, name: "許學臻" },
+      { no: 25, name: "楊星睿" },
+      { no: 26, name: "姚銘" },
+      { no: 27, name: "易容妃" },
+      { no: 28, name: "余嘉浠" },
+      { no: 29, name: "曾嘉欣" },
+      { no: 30, name: "張梓萱" },
+      { no: 31, name: "鄭敬熹" },
+      { no: 33, name: "和仟惠" },
+      { no: 34, name: "林煜翔" },
+      { no: 35, name: "蔡子萱" },
+      { no: 36, name: "方紫瑜" },
+      { no: 37, name: "邱若曦" }
+    ];
+
+    const DEFAULT_ASSIGNMENTS = {
+      "1": ["B06", "G10", "E16"],
+      "2": ["N09", "G19", "E16"],
+      "3": ["B28", "F02", "C07"],
+      "4": ["D11", "A09", "B24"],
+      "5": ["F01", "B16", "C07"],
+      "6": ["D52", "B10", "G03"],
+      "7": ["B23", "B26", "G11"],
+      "8": ["B28", "D06", "B08"],
+      "9": ["B07", "F02", "C07"],
+      "10": ["E13", "B18", "B02"],
+      "11": ["B18", "E16", "L20"],
+      "12": ["B24", "D28", "E16"],
+      "13": ["E21", "B18", "G03"],
+      "14": ["B16", "E24", "B02"],
+      "15": ["B16", "E24", "B02"],
+      "16": ["D20", "B01", "G03"],
+      "17": ["B27", "B03", "D52"],
+      "19": ["E36", "F06", "D20"],
+      "20": ["D77", "B03", "D20"],
+      "21": ["A01", "E42", "C07"],
+      "22": ["D46", "B16", "E26"],
+      "23": ["E26", "G19", "E16"],
+      "24": ["E24", "B18", "E16"],
+      "25": ["M03", "F06", "K39"],
+      "26": ["E01", "I05", "G03"],
+      "27": ["E37", "G03", "E16"],
+      "28": ["D26", "F09", "C07"],
+      "29": ["A07", "A01", "C07"],
+      "30": ["E01", "D36", "E25"],
+      "31": ["E22", "G19", "E16"],
+      "33": ["E36", "B03", "C07"],
+      "34": ["B13", "G19", "E16"],
+      "35": ["E24", "G11", "E11"],
+      "36": ["F10", "G11", "E16"],
+      "37": ["E36", "E37", "C07"]
+    };
+
+    const STORAGE_KEY = "bethel-comment-assignments-v3";
+    const codeMap = Object.fromEntries(COMMENT_CODES.map(c => [c.code, c]));
+    const listEl = document.getElementById("list");
+
+    function loadAssignments() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (_) {}
+      const init = {};
+      STUDENTS.forEach(s => {
+        init[s.no] = DEFAULT_ASSIGNMENTS[String(s.no)]
+          ? [...DEFAULT_ASSIGNMENTS[String(s.no)]]
+          : ["", "", ""];
+      });
+      return init;
+    }
+
+    const assignments = loadAssignments();
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function renderComment(code, slot) {
+      if (!code) {
+        return `<li><span class="slot-label">${slot}</span><span class="comment-text missing">（未設定）</span></li>`;
+      }
+      const entry = codeMap[code];
+      if (!entry) {
+        return `<li><span class="slot-label">${slot}</span><span class="comment-text missing">${escapeHtml(code)}</span></li>`;
+      }
+      return `<li>
+        <span class="slot-label">${slot}</span>
+        <span class="comment-text">
+          <span class="zh">${escapeHtml(entry.zh)}</span>
+          <span class="code">${escapeHtml(entry.code)}</span>
+        </span>
+      </li>`;
+    }
+
+    function render() {
+      listEl.innerHTML = STUDENTS.map(({ no, name }) => {
+        const codes = assignments[String(no)] || ["", "", ""];
+        const comments = [1, 2, 3].map(i => renderComment(codes[i - 1], i)).join("");
+        return `<article class="card">
+          <div class="card-head">
+            <span class="no">${no}</span>
+            <span class="name">${escapeHtml(name)}</span>
+          </div>
+          <ol class="comments">${comments}</ol>
+        </article>`;
+      }).join("");
+    }
+
+    render();
+  </script>
+</body>
+</html>
