@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5C Part B · Mr Wong Fix Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: #f8fafc;
+      color: #1f2937;
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 20px 16px 48px;
+    }
+
+    header {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+      font-weight: 650;
+      color: #1e3a5f;
+      letter-spacing: -0.02em;
+    }
+
+    .meta {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #64748b;
+      max-width: 52rem;
+    }
+
+    .steps-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .steps-legend span {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      color: #475569;
+    }
+
+    .steps-legend strong {
+      color: #1e3a5f;
+      font-weight: 650;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 980px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-head {
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 650;
+      color: #1e3a5f;
+    }
+
+    .theme {
+      margin: 2px 0 0;
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+
+    .stage {
+      padding: 10px 14px 0;
+    }
+
+    .stage-label {
+      margin: 0 0 2px;
+      font-size: 0.82rem;
+      font-weight: 650;
+      color: #334155;
+    }
+
+    .stage-note {
+      margin: 0 0 10px;
+      font-size: 0.76rem;
+      color: #64748b;
+      min-height: 2.4em;
+    }
+
+    .frame {
+      margin: 0 14px;
+      aspect-ratio: 4 / 3;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+
+    .frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 14px 14px;
+      margin-top: auto;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .dot.active { background: #1e4d8c; }
+
+    .nav-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    button.nav {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #334155;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button.nav:hover:not(:disabled) {
+      border-color: #1e4d8c;
+      color: #1e4d8c;
+      background: #eff6ff;
+    }
+
+    button.nav:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Part B · Mr Wong Fix Demo</h1>
+      <p class="meta">
+        Each student's final piece, then three demo steps showing how to strengthen theme and light rendering —
+        a stronger overall mid-tone, complementary colours as shades, then highlights.
+      </p>
+      <div class="steps-legend">
+        <span><strong>Original</strong> student work</span>
+        <span><strong>Step A</strong> stronger mid-tone</span>
+        <span><strong>Step B</strong> complementary shades</span>
+        <span><strong>Step C</strong> highlights &amp; balance</span>
+      </div>
+    </header>
+
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <script>
+    const THEME_TITLES = {
+      1: "An Interpretation of a Chair",
+      2: "Take a Break",
+    };
+
+    const STEPS = [
+      { label: "Original", note: "Student final artwork" },
+      { label: "Step A", note: "Stronger overall mid-tone" },
+      { label: "Step B", note: "Complementary colours as shades" },
+      { label: "Step C", note: "Highlights and final balance" },
+    ];
+
+    const STUDENTS = [
+      { name: "Jaylee", key: "jaylee", theme: 1 },
+      { name: "Mandip", key: "mandip", theme: 1 },
+      { name: "Aqsa", key: "aqsa", theme: 2 },
+      { name: "Biraz", key: "biraz", theme: 2 },
+      { name: "Ibrahim", key: "ibrahim", theme: 2 },
+      { name: "Junaid", key: "junaid", theme: 2 },
+      { name: "Mhavish", key: "mhavish", theme: 2 },
+      { name: "Nikhil", key: "nikhil", theme: 2 },
+      { name: "Soyal", key: "soyal", theme: 2 },
+    ];
+
+    function imagesFor(student) {
+      const t = student.theme;
+      const original = "../" + encodeURI(student.name + "_theme" + t + ".webp");
+      return [
+        original,
+        student.key + "_v2a.webp",
+        student.key + "_v2b.webp",
+        student.key + "_v2c.webp",
+      ];
+    }
+
+    const grid = document.getElementById("grid");
+
+    STUDENTS.forEach((student) => {
+      const images = imagesFor(student);
+      let step = 0;
+
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML =
+        '<div class="card-head">' +
+          '<h2>' + student.name + "</h2>" +
+          '<p class="theme">Theme ' + student.theme + " · " + THEME_TITLES[student.theme] + "</p>" +
+        "</div>" +
+        '<div class="stage">' +
+          '<p class="stage-label"></p>' +
+          '<p class="stage-note"></p>' +
+        "</div>" +
+        '<div class="frame"><img alt="" loading="lazy" decoding="async"></div>' +
+        '<div class="controls">' +
+          '<div class="dots"></div>' +
+          '<div class="nav-btns">' +
+            '<button type="button" class="nav prev">Prev</button>' +
+            '<button type="button" class="nav next">Next</button>' +
+          "</div>" +
+        "</div>";
+
+      const labelEl = card.querySelector(".stage-label");
+      const noteEl = card.querySelector(".stage-note");
+      const imgEl = card.querySelector("img");
+      const dotsEl = card.querySelector(".dots");
+      const prevBtn = card.querySelector(".prev");
+      const nextBtn = card.querySelector(".next");
+
+      STEPS.forEach((_, i) => {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "dot" + (i === 0 ? " active" : "");
+        dot.setAttribute("aria-label", STEPS[i].label);
+        dot.addEventListener("click", () => {
+          step = i;
+          render();
+        });
+        dotsEl.appendChild(dot);
+      });
+
+      function render() {
+        const s = STEPS[step];
+        labelEl.textContent = s.label;
+        noteEl.textContent = s.note;
+        imgEl.src = images[step];
+        imgEl.alt = student.name + " · " + s.label;
+        prevBtn.disabled = step === 0;
+        nextBtn.disabled = step === STEPS.length - 1;
+        dotsEl.querySelectorAll(".dot").forEach((d, i) => {
+          d.classList.toggle("active", i === step);
+        });
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (step > 0) {
+          step -= 1;
+          render();
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (step < STEPS.length - 1) {
+          step += 1;
+          render();
+        }
+      });
+
+      render();
+      grid.appendChild(card);
+    });
+  </script>
+</body>
+</html>
