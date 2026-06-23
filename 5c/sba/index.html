@@ -53,52 +53,29 @@
       color: #6b7280;
     }
 
-    .students {
+    .gallery {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 16px;
     }
 
-    @media (min-width: 700px) {
-      .students {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-      }
+    @media (min-width: 600px) {
+      .gallery { grid-template-columns: repeat(3, 1fr); }
     }
 
-    .student-card {
+    @media (min-width: 900px) {
+      .gallery { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .item {
+      margin: 0;
       border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      background: #fafafa;
+      border-radius: 8px;
       overflow: hidden;
+      background: #fafafa;
     }
 
-    .student-head {
-      padding: 10px 12px;
-      background: #fff;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .student-name {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #1e3a5f;
-    }
-
-    .works {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1px;
-      background: #e5e7eb;
-    }
-
-    .work {
-      margin: 0;
-      background: #fff;
-    }
-
-    .work button {
+    .item button {
       display: block;
       width: 100%;
       margin: 0;
@@ -108,7 +85,6 @@
       cursor: zoom-in;
       font: inherit;
       color: inherit;
-      text-align: center;
     }
 
     .thumb {
@@ -120,22 +96,26 @@
       background: #fff;
     }
 
-    .work img {
+    .item img {
       display: block;
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
 
-    .work figcaption {
+    .item figcaption {
+      display: none;
       margin: 0;
-      padding: 6px 8px 8px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #6b7280;
+      padding: 8px;
+      font-size: 1rem;
+      font-weight: 650;
+      color: #1e3a5f;
       text-align: center;
+      border-top: 1px solid #e5e7eb;
       background: #fafafa;
     }
+
+    body.show-names .item figcaption { display: block; }
 
     .lightbox {
       position: fixed;
@@ -154,12 +134,15 @@
     }
 
     .lightbox-caption {
+      display: none;
       margin: 0 0 10px;
       font-size: 0.95rem;
       font-weight: 500;
       color: #fff;
       text-align: center;
     }
+
+    body.show-names .lightbox-caption { display: block; }
 
     .lightbox img {
       max-width: min(100%, 1100px);
@@ -187,10 +170,6 @@
     .nav.prev { left: 12px; }
     .nav.next { right: 12px; }
     .nav:disabled { opacity: 0.35; cursor: default; }
-
-    @media (max-width: 400px) {
-      .works { grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body>
@@ -200,7 +179,7 @@
       <h1>5C · SBA Artworks</h1>
       <p class="meta">June 2026 · click thumbnail to enlarge</p>
     </header>
-    <div class="students" id="gallery"></div>
+    <div class="gallery" id="gallery"></div>
   </main>
 
   <div class="lightbox" id="lightbox" aria-hidden="true">
@@ -224,39 +203,22 @@
       }
     })();
 
-    const ORDER = [
-      "Aqsa",
-      "Biraz",
-      "Ibrahim",
-      "Junaid",
-      "Mandip",
-      "Mhavish",
-      "Nikhil",
-      "Soyal",
+    const FILES = [
+      "aqsa1.webp", "aqsa2.webp",
+      "biraz1.webp", "biraz2.webp",
+      "ibrahim1.webp", "ibrahim2.webp",
+      "junaid1.webp", "junaid2.webp", "junaid3.webp",
+      "mandip1.webp", "mandip2.webp",
+      "mhavish1.webp", "mhavish2.webp",
+      "nikhil1.webp", "nikhil2.webp", "nikhil3.webp", "nikhil4.webp", "nikhil5.webp", "nikhil6.webp",
+      "soyal1.webp",
     ];
 
-    const STUDENTS = {
-      Aqsa: ["aqsa1.webp", "aqsa2.webp"],
-      Biraz: ["biraz1.webp", "biraz2.webp"],
-      Ibrahim: ["ibrahim1.webp", "ibrahim2.webp"],
-      Junaid: ["junaid1.webp", "junaid2.webp", "junaid3.webp"],
-      Mandip: ["mandip1.webp", "mandip2.webp"],
-      Mhavish: ["mhavish1.webp", "mhavish2.webp"],
-      Nikhil: ["nikhil1.webp", "nikhil2.webp", "nikhil3.webp", "nikhil4.webp", "nikhil5.webp", "nikhil6.webp"],
-      Soyal: ["soyal1.webp"],
-    };
-
-    const IMAGES = [];
-    ORDER.forEach((name) => {
-      const files = STUDENTS[name];
-      if (!files) return;
-      files.forEach((file, i) => {
-        IMAGES.push({
-          src: file,
-          label: name + " · Artwork " + (i + 1),
-        });
-      });
-    });
+    const IMAGES = FILES.map((file) => ({
+      src: file,
+      thumb: file.replace(/\.webp$/i, "_thumb.webp"),
+      label: file.replace(/\.webp$/i, ""),
+    }));
 
     const gallery = document.getElementById("gallery");
     const lightbox = document.getElementById("lightbox");
@@ -267,41 +229,26 @@
 
     let currentIndex = 0;
 
-    ORDER.forEach((name) => {
-      const files = STUDENTS[name];
-      if (!files || !files.length) return;
-
-      const card = document.createElement("article");
-      card.className = "student-card";
-      card.innerHTML =
-        '<div class="student-head"><h2 class="student-name">' + name + "</h2></div>" +
-        '<div class="works"></div>';
-      const works = card.querySelector(".works");
-
-      files.forEach((file, i) => {
-        const idx = IMAGES.findIndex((img) => img.src === file);
-        const fig = document.createElement("figure");
-        fig.className = "work";
-        const btn = document.createElement("button");
-        btn.type = "button";
-        const thumb = document.createElement("div");
-        thumb.className = "thumb";
-        const img = document.createElement("img");
-        img.src = file;
-        img.alt = name + " artwork " + (i + 1);
-        img.loading = "lazy";
-        img.decoding = "async";
-        const cap = document.createElement("figcaption");
-        cap.textContent = "Artwork " + (i + 1);
-        thumb.appendChild(img);
-        btn.appendChild(thumb);
-        fig.appendChild(btn);
-        fig.appendChild(cap);
-        btn.addEventListener("click", () => openAt(idx));
-        works.appendChild(fig);
-      });
-
-      gallery.appendChild(card);
+    IMAGES.forEach((item, index) => {
+      const fig = document.createElement("figure");
+      fig.className = "item";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+      const img = document.createElement("img");
+      img.src = item.thumb;
+      img.alt = item.label;
+      img.loading = "lazy";
+      img.decoding = "async";
+      const cap = document.createElement("figcaption");
+      cap.textContent = item.label;
+      thumb.appendChild(img);
+      btn.appendChild(thumb);
+      fig.appendChild(btn);
+      fig.appendChild(cap);
+      btn.addEventListener("click", () => openAt(index));
+      gallery.appendChild(fig);
     });
 
     function openAt(index) {
@@ -344,6 +291,11 @@
     });
 
     document.addEventListener("keydown", (e) => {
+      if (e.key === "n" || e.key === "N") {
+        if (e.target.matches("input, textarea")) return;
+        document.body.classList.toggle("show-names");
+        return;
+      }
       if (!lightbox.classList.contains("open")) return;
       if (e.key === "Escape") closeLightbox();
       if (e.key === "ArrowLeft") step(-1);
