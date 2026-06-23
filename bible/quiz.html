@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bible Numbers Quiz</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #fff;
+      color: #0f172a;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      line-height: 1.5;
+      padding: 1.25rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 34rem;
+      padding-top: 0.5rem;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .counter {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    .lang {
+      display: flex;
+      gap: 0.25rem;
+      padding: 0.2rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f8fafc;
+    }
+
+    .lang button {
+      border: none;
+      background: transparent;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .lang button.active {
+      background: #fff;
+      color: #0f172a;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+
+    h1 {
+      font-size: 1.15rem;
+      font-weight: 650;
+      color: #0f172a;
+      margin-bottom: 0.35rem;
+    }
+
+    .subtitle {
+      font-size: 0.88rem;
+      color: #64748b;
+      margin-bottom: 1.25rem;
+    }
+
+    .question {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.4;
+      margin-bottom: 1rem;
+      min-height: 3.2rem;
+    }
+
+    .opts {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .opt {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #fff;
+      font: inherit;
+      font-size: 0.98rem;
+      font-weight: 500;
+      color: #0f172a;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+    }
+
+    .opt:hover:not(.blocked) {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+
+    .opt .tag {
+      flex: none;
+      width: 1.65rem;
+      height: 1.65rem;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .opt.correct {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .opt.correct .tag {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .opt.wrong {
+      border-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    .opt.wrong .tag {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .opt.blocked {
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    .opt.correct.blocked,
+    .opt.wrong.blocked {
+      opacity: 1;
+    }
+
+    .footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .fb {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #334155;
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn:hover:not(:disabled) {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .btn-primary {
+      background: #0f172a;
+      border-color: #0f172a;
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #1e293b;
+      border-color: #1e293b;
+    }
+
+    .ctx {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      font-size: 0.88rem;
+      color: #334155;
+      line-height: 1.55;
+    }
+
+    .ctx.show { display: block; }
+
+    .ctx-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      margin-bottom: 0.35rem;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 1rem; }
+      .question { font-size: 1.05rem; }
+      .footer { flex-direction: column; align-items: stretch; }
+      .actions { width: 100%; }
+      .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <span class="counter" id="counter">1 / 12</span>
+      <div class="lang">
+        <button type="button" id="langEn" class="active">EN</button>
+        <button type="button" id="langZh">中</button>
+      </div>
+    </div>
+
+    <h1>Bible Numbers</h1>
+    <p class="subtitle" id="subtitle">How well do you know the numbers in the Bible?</p>
+
+    <div class="question" id="qText"></div>
+    <div class="opts" id="opts"></div>
+
+    <div class="footer">
+      <span class="fb" id="fb">Choose an answer</span>
+      <div class="actions">
+        <button type="button" class="btn" id="hintBtn" disabled>Reference</button>
+        <button type="button" class="btn btn-primary" id="nextBtn" disabled>Next</button>
+      </div>
+    </div>
+
+    <div class="ctx" id="ctx">
+      <span class="ctx-label" id="ctxLabel">Scripture</span>
+      <span id="ctxContent"></span>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const qs = [
+        { en: { q: "How many days did God take to create the world?", opts: ["6", "7", "10", "12"], ans: 0, ctx: "Genesis 1 — six days, rested on the seventh." },
+          zh: { q: "上帝用多少天創造世界？", opts: ["6天", "7天", "10天", "12天"], ans: 0, ctx: "創世記 1 章 — 六天創造，第七天安息。" } },
+        { en: { q: "How many days and nights did it rain in Noah's flood?", opts: ["7", "30", "40", "100"], ans: 2, ctx: "Genesis 7:12 — 40 days and 40 nights." },
+          zh: { q: "挪亞洪水時，雨下了多少天多少夜？", opts: ["7天", "30天", "40天", "100天"], ans: 2, ctx: "創世記 7:12 — 四十天四十夜。" } },
+        { en: { q: "How many books are in the whole Bible?", opts: ["27", "39", "66", "73"], ans: 2, ctx: "66 total — 39 OT, 27 NT." },
+          zh: { q: "整本聖經共有多少卷？", opts: ["27卷", "39卷", "66卷", "73卷"], ans: 2, ctx: "共66卷 — 舊約39，新約27。" } },
+        { en: { q: "How many disciples did Jesus have?", opts: ["7", "10", "12", "14"], ans: 2, ctx: "Matthew 10:2-4 — twelve apostles." },
+          zh: { q: "耶穌有多少個門徒？", opts: ["7個", "10個", "12個", "14個"], ans: 2, ctx: "馬太福音 10:2-4 — 十二使徒。" } },
+        { en: { q: "How many plagues did God send to Egypt?", opts: ["7", "10", "12", "14"], ans: 1, ctx: "Exodus 7–12 — ten plagues." },
+          zh: { q: "上帝向埃及降了多少災？", opts: ["7災", "10災", "12災", "14災"], ans: 1, ctx: "出埃及記 7–12 — 十災。" } },
+        { en: { q: "How many of each clean animal went into the ark?", opts: ["2 pairs", "7 pairs", "1 pair", "5 pairs"], ans: 1, ctx: "Genesis 7:2 — seven pairs of clean animals." },
+          zh: { q: "每種潔淨動物有多少對進方舟？", opts: ["2對", "7對", "1對", "5對"], ans: 1, ctx: "創世記 7:2 — 七對潔淨動物。" } },
+        { en: { q: "How many days did Jesus fast in the wilderness?", opts: ["10", "20", "40", "50"], ans: 2, ctx: "Matthew 4:2 — 40 days." },
+          zh: { q: "耶穌在曠野禁食多少天？", opts: ["10天", "20天", "40天", "50天"], ans: 2, ctx: "馬太福音 4:2 — 四十天。" } },
+        { en: { q: "How many years did Israel wander in the desert?", opts: ["20", "40", "60", "80"], ans: 1, ctx: "Numbers 14:33 — 40 years." },
+          zh: { q: "以色列人在曠野漂流多少年？", opts: ["20年", "40年", "60年", "80年"], ans: 1, ctx: "民數記 14:33 — 四十年。" } },
+        { en: { q: "How many loaves did the boy have to feed 5,000?", opts: ["2", "5", "7", "10"], ans: 1, ctx: "John 6:9 — five loaves and two fish." },
+          zh: { q: "小孩有多少個餅餵飽五千人？", opts: ["2個", "5個", "7個", "10個"], ans: 1, ctx: "約翰福音 6:9 — 五餅二魚。" } },
+        { en: { q: "How many stones did David pick for Goliath?", opts: ["3", "5", "7", "10"], ans: 1, ctx: "1 Samuel 17:40 — five smooth stones." },
+          zh: { q: "大衛揀了幾塊石子迎戰歌利亞？", opts: ["3塊", "5塊", "7塊", "10塊"], ans: 1, ctx: "撒母耳記上 17:40 — 五塊光滑石子。" } },
+        { en: { q: "How many brothers did Joseph have?", opts: ["10", "11", "12", "7"], ans: 1, ctx: "Genesis 37 — 11 brothers." },
+          zh: { q: "約瑟有多少個兄弟？", opts: ["10個", "11個", "12個", "7個"], ans: 1, ctx: "創世記 37 章 — 十一個兄弟。" } },
+        { en: { q: "How many wise men visited baby Jesus?", opts: ["2", "3", "4", "7"], ans: 1, ctx: "Matthew 2:1-12 — traditionally 3 gifts, 3 wise men." },
+          zh: { q: "有多少位博士來拜訪嬰孩耶穌？", opts: ["2位", "3位", "4位", "7位"], ans: 1, ctx: "馬太福音 2:1-12 — 三件禮物，三位博士。" } }
+      ];
+
+      const UI = {
+        en: {
+          subtitle: "How well do you know the numbers in the Bible?",
+          choose: "Choose an answer",
+          correct: "Correct",
+          tryAgain: "Try again",
+          reference: "Reference",
+          next: "Next",
+          scripture: "Scripture",
+          done: "All done!",
+          great: "Well done!",
+        },
+        zh: {
+          subtitle: "你對聖經裡的數字認識多少？",
+          choose: "選一個答案",
+          correct: "答對了",
+          tryAgain: "再試一次",
+          reference: "經文",
+          next: "下一題",
+          scripture: "經文",
+          done: "全部完成！",
+          great: "做得好！",
+        },
+      };
+
+      let idx = 0;
+      let lang = "en";
+      let locked = false;
+      let done = false;
+
+      const counter = document.getElementById("counter");
+      const subtitle = document.getElementById("subtitle");
+      const qText = document.getElementById("qText");
+      const opts = document.getElementById("opts");
+      const fb = document.getElementById("fb");
+      const hintBtn = document.getElementById("hintBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const ctx = document.getElementById("ctx");
+      const ctxLabel = document.getElementById("ctxLabel");
+      const ctxContent = document.getElementById("ctxContent");
+      const langEn = document.getElementById("langEn");
+      const langZh = document.getElementById("langZh");
+
+      function t() { return UI[lang]; }
+      function getQ() { return qs[idx][lang]; }
+
+      function syncUiText() {
+        const u = t();
+        subtitle.textContent = u.subtitle;
+        hintBtn.textContent = u.reference;
+        nextBtn.textContent = u.next;
+        ctxLabel.textContent = u.scripture;
+      }
+
+      function render() {
+        const q = getQ();
+        const u = t();
+        locked = false;
+        done = false;
+        ctx.classList.remove("show");
+        hintBtn.disabled = true;
+        nextBtn.disabled = true;
+        fb.textContent = u.choose;
+        fb.style.color = "#64748b";
+        counter.textContent = (idx + 1) + " / " + qs.length;
+        qText.textContent = q.q;
+
+        opts.innerHTML = "";
+        const tags = ["A", "B", "C", "D"];
+        q.opts.forEach(function (txt, i) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "opt";
+          btn.innerHTML = '<span class="tag">' + tags[i] + "</span>" + txt;
+          btn.addEventListener("click", function () { clickOpt(btn, i, q); });
+          opts.appendChild(btn);
+        });
+      }
+
+      function clickOpt(btn, i, q) {
+        if (locked) return;
+        const all = document.querySelectorAll(".opt");
+        const correct = i === q.ans;
+        const u = t();
+
+        if (correct) {
+          locked = true;
+          done = true;
+          all.forEach(function (el, j) {
+            el.classList.add("blocked");
+            if (j === q.ans) el.classList.add("correct");
+          });
+          fb.textContent = u.correct;
+          fb.style.color = "#15803d";
+          hintBtn.disabled = false;
+          nextBtn.disabled = false;
+        } else {
+          btn.classList.add("wrong", "blocked");
+          fb.textContent = u.tryAgain;
+          fb.style.color = "#b91c1c";
+        }
+      }
+
+      function showCtx() {
+        if (!done) return;
+        ctxContent.textContent = getQ().ctx;
+        ctx.classList.add("show");
+      }
+
+      function next() {
+        if (!done) return;
+        const u = t();
+        if (idx < qs.length - 1) {
+          idx += 1;
+          render();
+        } else {
+          qText.textContent = u.done;
+          opts.innerHTML = "";
+          counter.textContent = qs.length + " / " + qs.length;
+          fb.textContent = u.great;
+          fb.style.color = "#15803d";
+          ctx.classList.remove("show");
+          hintBtn.disabled = true;
+          nextBtn.disabled = true;
+        }
+      }
+
+      function setLang(l) {
+        if (l === lang) return;
+        lang = l;
+        langEn.classList.toggle("active", l === "en");
+        langZh.classList.toggle("active", l === "zh");
+        syncUiText();
+        render();
+        if (ctx.classList.contains("show")) {
+          ctxContent.textContent = getQ().ctx;
+        }
+      }
+
+      hintBtn.addEventListener("click", showCtx);
+      nextBtn.addEventListener("click", next);
+      langEn.addEventListener("click", function () { setLang("en"); });
+      langZh.addEventListener("click", function () { setLang("zh"); });
+
+      syncUiText();
+      render();
+    })();
+  </script>
+</body>
+</html>
