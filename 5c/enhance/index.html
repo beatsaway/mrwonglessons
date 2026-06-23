@@ -141,11 +141,16 @@
     .frame img {
       display: block;
       object-fit: contain;
+      max-width: 100%;
+      max-height: min(520px, 72vh);
+      width: auto;
+      height: auto;
     }
 
     .frame.landscape img {
       width: 100%;
       height: auto;
+      max-height: none;
     }
 
     .frame.portrait img {
@@ -323,13 +328,17 @@
         const portrait = imgEl.naturalHeight > imgEl.naturalWidth;
         frameEl.classList.toggle("portrait", portrait);
         frameEl.classList.toggle("landscape", !portrait);
+        frameEl.style.minHeight = "";
       }
 
       imgEl.addEventListener("load", fitFrame);
 
       function render(skipSync) {
         labelEl.textContent = STEP_LABELS[step];
-        frameEl.classList.remove("portrait", "landscape");
+        const frameHeight = frameEl.offsetHeight;
+        if (frameHeight > 0) {
+          frameEl.style.minHeight = frameHeight + "px";
+        }
         imgEl.src = images[step];
         imgEl.alt = student.name + " · " + STEP_LABELS[step];
         if (imgEl.complete) fitFrame();
