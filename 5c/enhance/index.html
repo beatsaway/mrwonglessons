@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5C · Example Enhancements</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: #f8fafc;
+      color: #1f2937;
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 20px 16px 48px;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 12px;
+      font-size: 0.84rem;
+      color: #64748b;
+      text-decoration: none;
+    }
+
+    .back:hover { color: #1e3a5f; }
+
+    header {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+      font-weight: 650;
+      color: #1e3a5f;
+      letter-spacing: -0.02em;
+    }
+
+    .meta {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #64748b;
+      max-width: 52rem;
+    }
+
+    .macro-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .macro-bar button {
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #475569;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s, color 0.12s;
+    }
+
+    .macro-bar button:hover {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+
+    .macro-bar button.active {
+      background: #1e4d8c;
+      border-color: #1e4d8c;
+      color: #fff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 980px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-head {
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 650;
+      color: #1e3a5f;
+    }
+
+    .stage-label {
+      margin: 10px 14px 0;
+      font-size: 0.82rem;
+      font-weight: 650;
+      color: #334155;
+    }
+
+    .frame {
+      margin: 0 14px;
+      min-height: 120px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    .frame img {
+      display: block;
+      object-fit: contain;
+    }
+
+    .frame.landscape img {
+      width: 100%;
+      height: auto;
+    }
+
+    .frame.portrait img {
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      max-height: min(520px, 72vh);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 14px 14px;
+      margin-top: auto;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .dot.active { background: #1e4d8c; }
+
+    .nav-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    button.nav {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #334155;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button.nav:hover:not(:disabled) {
+      border-color: #1e4d8c;
+      color: #1e4d8c;
+      background: #eff6ff;
+    }
+
+    button.nav:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="../">← 5C</a>
+    <header>
+      <h1>SBA · Example Enhancements</h1>
+      <p class="meta">
+        Compare each student's artwork with enhancement stages.
+      </p>
+      <div class="macro-bar" id="macroBar" role="toolbar" aria-label="View all students">
+        <button type="button" class="active" data-step="0">Original student work</button>
+        <button type="button" data-step="1">Enhance 1</button>
+        <button type="button" data-step="2">Enhance 2</button>
+        <button type="button" data-step="3">Enhance 3</button>
+      </div>
+    </header>
+
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <script>
+    const STEP_LABELS = [
+      "Original student work",
+      "Enhance 1",
+      "Enhance 2",
+      "Enhance 3",
+    ];
+
+    const STUDENTS = [
+      { name: "Aqsa", key: "aqsa", maxStep: 3 },
+      { name: "Biraz", key: "biraz", maxStep: 2 },
+      { name: "Ibrahim", key: "ibrahim", maxStep: 3 },
+      { name: "Junaid", key: "junaid", maxStep: 3 },
+      { name: "Mandip", key: "mandip", maxStep: 3 },
+      { name: "Mhavish", key: "mhavish", maxStep: 3 },
+      { name: "Nikhil", key: "nikhil", maxStep: 3 },
+      { name: "Soyal", key: "soyal", maxStep: 3 },
+    ];
+
+    function imagesFor(student) {
+      const images = [];
+      for (let i = 0; i <= student.maxStep; i++) {
+        images.push(student.key + i + ".webp");
+      }
+      return images;
+    }
+
+    const grid = document.getElementById("grid");
+    const macroBar = document.getElementById("macroBar");
+    const cardControllers = [];
+
+    function syncMacroBar() {
+      const steps = cardControllers.map((c) => c.getStep());
+      const allSame = steps.every((s) => s === steps[0]);
+      macroBar.querySelectorAll("button").forEach((btn, i) => {
+        btn.classList.toggle("active", allSame && i === steps[0]);
+      });
+    }
+
+    function setGlobalStep(step) {
+      cardControllers.forEach((c) => c.setStep(step, true));
+      macroBar.querySelectorAll("button").forEach((btn, i) => {
+        btn.classList.toggle("active", i === step);
+      });
+    }
+
+    macroBar.querySelectorAll("button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setGlobalStep(+btn.dataset.step);
+      });
+    });
+
+    STUDENTS.forEach((student) => {
+      const images = imagesFor(student);
+      let step = 0;
+
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML =
+        '<div class="card-head"><h2>' + student.name + "</h2></div>" +
+        '<p class="stage-label"></p>' +
+        '<div class="frame"><img alt="" loading="lazy" decoding="async"></div>' +
+        '<div class="controls">' +
+          '<div class="dots"></div>' +
+          '<div class="nav-btns">' +
+            '<button type="button" class="nav prev">Prev</button>' +
+            '<button type="button" class="nav next">Next</button>' +
+          "</div>" +
+        "</div>";
+
+      const labelEl = card.querySelector(".stage-label");
+      const frameEl = card.querySelector(".frame");
+      const imgEl = card.querySelector("img");
+      const dotsEl = card.querySelector(".dots");
+      const prevBtn = card.querySelector(".prev");
+      const nextBtn = card.querySelector(".next");
+
+      for (let i = 0; i < images.length; i++) {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "dot" + (i === 0 ? " active" : "");
+        dot.setAttribute("aria-label", STEP_LABELS[i]);
+        dot.addEventListener("click", () => {
+          step = i;
+          render();
+        });
+        dotsEl.appendChild(dot);
+      }
+
+      function fitFrame() {
+        if (!imgEl.naturalWidth) return;
+        const portrait = imgEl.naturalHeight > imgEl.naturalWidth;
+        frameEl.classList.toggle("portrait", portrait);
+        frameEl.classList.toggle("landscape", !portrait);
+      }
+
+      imgEl.addEventListener("load", fitFrame);
+
+      function render(skipSync) {
+        labelEl.textContent = STEP_LABELS[step];
+        frameEl.classList.remove("portrait", "landscape");
+        imgEl.src = images[step];
+        imgEl.alt = student.name + " · " + STEP_LABELS[step];
+        if (imgEl.complete) fitFrame();
+        prevBtn.disabled = step === 0;
+        nextBtn.disabled = step === images.length - 1;
+        dotsEl.querySelectorAll(".dot").forEach((d, i) => {
+          d.classList.toggle("active", i === step);
+        });
+        if (!skipSync) syncMacroBar();
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (step > 0) {
+          step -= 1;
+          render();
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (step < images.length - 1) {
+          step += 1;
+          render();
+        }
+      });
+
+      cardControllers.push({
+        getStep: () => step,
+        setStep: (next, silent) => {
+          step = Math.min(next, student.maxStep);
+          render(silent);
+        },
+      });
+
+      render();
+      grid.appendChild(card);
+    });
+  </script>
+</body>
+</html>
