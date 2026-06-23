@@ -133,7 +133,7 @@
     }
 
     .frame {
-      margin: 0 14px 14px;
+      margin: 0 14px;
       min-height: 120px;
       background: #f1f5f9;
       border: 1px solid #e2e8f0;
@@ -161,6 +161,67 @@
       height: auto;
       max-height: min(520px, 72vh);
     }
+
+    .stage-label {
+      margin: 10px 14px 0;
+      font-size: 0.82rem;
+      font-weight: 650;
+      color: #334155;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 14px 14px;
+      margin-top: auto;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .dot.active { background: #1e4d8c; }
+
+    .nav-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    button.nav {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #334155;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button.nav:hover:not(:disabled) {
+      border-color: #1e4d8c;
+      color: #1e4d8c;
+      background: #eff6ff;
+    }
+
+    button.nav:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
   </style>
 </head>
 <body>
@@ -168,8 +229,10 @@
     <header>
       <h1>Part B · Example Improvements</h1>
       <p class="meta">
-        Compare each student's final piece with three enhancements by Mr Wong. Each version combines
-        several changes.
+        Compare each student's final piece with enhancements by Mr Wong.
+      </p>
+      <p class="meta" style="margin-top: 8px;">
+        <a href="quiz.html" style="color: #1e4d8c; font-weight: 600; text-decoration: none;">Light source quiz →</a>
       </p>
       <ul class="points">
         <li>Stronger mid-tones</li>
@@ -225,15 +288,21 @@
 
     const grid = document.getElementById("grid");
     const macroBar = document.getElementById("macroBar");
-    let currentStep = 0;
-    const cardRenderers = [];
+    const cardControllers = [];
+
+    function syncMacroBar() {
+      const steps = cardControllers.map((c) => c.getStep());
+      const allSame = steps.every((s) => s === steps[0]);
+      macroBar.querySelectorAll("button").forEach((btn, i) => {
+        btn.classList.toggle("active", allSame && i === steps[0]);
+      });
+    }
 
     function setGlobalStep(step) {
-      currentStep = step;
+      cardControllers.forEach((c) => c.setStep(step, true));
       macroBar.querySelectorAll("button").forEach((btn, i) => {
         btn.classList.toggle("active", i === step);
       });
-      cardRenderers.forEach((render) => render(step));
     }
 
     macroBar.querySelectorAll("button").forEach((btn) => {
@@ -244,6 +313,7 @@
 
     STUDENTS.forEach((student) => {
       const images = imagesFor(student);
+      let step = 0;
 
       const card = document.createElement("article");
       card.className = "card";
@@ -252,10 +322,34 @@
           '<h2>' + student.name + "</h2>" +
           '<p class="theme">Theme ' + student.theme + " · " + THEME_TITLES[student.theme] + "</p>" +
         "</div>" +
-        '<div class="frame"><img alt="" loading="lazy" decoding="async"></div>';
+        '<p class="stage-label"></p>' +
+        '<div class="frame"><img alt="" loading="lazy" decoding="async"></div>' +
+        '<div class="controls">' +
+          '<div class="dots"></div>' +
+          '<div class="nav-btns">' +
+            '<button type="button" class="nav prev">Prev</button>' +
+            '<button type="button" class="nav next">Next</button>' +
+          "</div>" +
+        "</div>";
 
+      const labelEl = card.querySelector(".stage-label");
       const frameEl = card.querySelector(".frame");
       const imgEl = card.querySelector("img");
+      const dotsEl = card.querySelector(".dots");
+      const prevBtn = card.querySelector(".prev");
+      const nextBtn = card.querySelector(".next");
+
+      STEPS.forEach((_, i) => {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "dot" + (i === 0 ? " active" : "");
+        dot.setAttribute("aria-label", STEPS[i].label);
+        dot.addEventListener("click", () => {
+          step = i;
+          render();
+        });
+        dotsEl.appendChild(dot);
+      });
 
       function fitFrame() {
         if (!imgEl.naturalWidth) return;
@@ -266,19 +360,46 @@
 
       imgEl.addEventListener("load", fitFrame);
 
-      function render(step) {
+      function render(skipSync) {
         const s = STEPS[step];
+        labelEl.textContent = s.label;
         frameEl.classList.remove("portrait", "landscape");
         imgEl.src = images[step];
         imgEl.alt = student.name + " · " + s.label;
         if (imgEl.complete) fitFrame();
+        prevBtn.disabled = step === 0;
+        nextBtn.disabled = step === STEPS.length - 1;
+        dotsEl.querySelectorAll(".dot").forEach((d, i) => {
+          d.classList.toggle("active", i === step);
+        });
+        if (!skipSync) syncMacroBar();
       }
 
-      cardRenderers.push(render);
+      prevBtn.addEventListener("click", () => {
+        if (step > 0) {
+          step -= 1;
+          render();
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (step < STEPS.length - 1) {
+          step += 1;
+          render();
+        }
+      });
+
+      cardControllers.push({
+        getStep: () => step,
+        setStep: (next, silent) => {
+          step = next;
+          render(silent);
+        },
+      });
+
+      render();
       grid.appendChild(card);
     });
-
-    setGlobalStep(0);
   </script>
 </body>
 </html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5C Part B · Light Source Quiz</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #fff;
+      color: #0f172a;
+      font-family: "Segoe UI", system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .bar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.28rem 0.65rem;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff;
+    }
+
+    .bar-text {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .bar-text h1 {
+      font-size: 0.78rem;
+      font-weight: 650;
+      color: #0f172a;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .bar-side {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 34rem;
+      margin: 0 auto;
+      padding: 0.55rem 0.85rem 1.15rem;
+    }
+
+    @media (min-width: 540px) {
+      .wrap {
+        max-width: 42rem;
+      }
+    }
+
+    .counter {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #94a3b8;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .lang {
+      display: flex;
+      gap: 0.1rem;
+      padding: 0.06rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      background: #f8fafc;
+    }
+
+    .lang button {
+      border: none;
+      background: transparent;
+      padding: 0.12rem 0.4rem;
+      border-radius: 3px;
+      font: inherit;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      line-height: 1.1;
+    }
+
+    .lang button.active {
+      background: #fff;
+      color: #0f172a;
+      box-shadow: 0 1px 1px rgba(15, 23, 42, 0.06);
+    }
+
+    .art-meta {
+      margin-bottom: 0.45rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    .frame {
+      margin-bottom: 0.85rem;
+      min-height: 120px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    .frame img {
+      display: block;
+      object-fit: contain;
+    }
+
+    .frame.landscape img {
+      width: 100%;
+      height: auto;
+    }
+
+    .frame.portrait img {
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      max-height: min(420px, 58vh);
+    }
+
+    .question {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.4;
+      margin-bottom: 0.85rem;
+      min-height: 2.6rem;
+    }
+
+    .opts {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (min-width: 540px) {
+      .opts {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.65rem;
+      }
+    }
+
+    .opt {
+      width: 100%;
+      min-height: 3.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #fff;
+      font: inherit;
+      font-size: 0.98rem;
+      font-weight: 500;
+      color: #0f172a;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+    }
+
+    @media (min-width: 540px) {
+      .opt {
+        min-height: 4.5rem;
+        padding: 0.85rem 1rem;
+        font-size: 1.05rem;
+      }
+    }
+
+    .opt .tag {
+      flex: none;
+      width: 1.65rem;
+      height: 1.65rem;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    @media (min-width: 540px) {
+      .opt .tag {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.9rem;
+        border-radius: 9px;
+      }
+
+      .opt[data-choice="A"] .tag { background: #fee2e2; color: #b91c1c; }
+      .opt[data-choice="B"] .tag { background: #dbeafe; color: #1d4ed8; }
+      .opt[data-choice="C"] .tag { background: #fef9c3; color: #a16207; }
+      .opt[data-choice="D"] .tag { background: #dcfce7; color: #15803d; }
+    }
+
+    .opt:hover:not(.blocked) {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+
+    .opt.correct {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .opt.correct .tag {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .opt.wrong {
+      border-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    .opt.wrong .tag {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .opt.blocked {
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    .opt.correct.blocked,
+    .opt.wrong.blocked {
+      opacity: 1;
+    }
+
+    .footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .fb {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #334155;
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn:hover:not(:disabled) {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .btn-primary {
+      background: #0f172a;
+      border-color: #0f172a;
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #1e293b;
+      border-color: #1e293b;
+    }
+
+    .ctx {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      font-size: 0.88rem;
+      color: #334155;
+      line-height: 1.55;
+    }
+
+    .ctx.show { display: block; }
+
+    .ctx-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      margin-bottom: 0.35rem;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #1e4d8c;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .wrap { padding: 0.55rem 0.85rem 1rem; }
+      .question { font-size: 1.05rem; }
+      .footer { flex-direction: column; align-items: stretch; }
+      .actions { width: 100%; }
+      .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <div class="bar-text">
+      <h1 id="barTitle">Light Source Quiz</h1>
+    </div>
+    <div class="bar-side">
+      <span class="counter" id="counter">1 / 9</span>
+      <div class="lang">
+        <button type="button" id="langEn" class="active">EN</button>
+        <button type="button" id="langZh">中</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <p class="art-meta" id="artMeta"></p>
+    <div class="frame" id="frame">
+      <img id="artImg" alt="" decoding="async">
+    </div>
+    <div class="question" id="qText"></div>
+    <div class="opts" id="opts"></div>
+
+    <div class="footer">
+      <span class="fb" id="fb">Choose an answer</span>
+      <div class="actions">
+        <button type="button" class="btn" id="hintBtn" disabled>Note</button>
+        <button type="button" class="btn btn-primary" id="nextBtn" disabled>Next</button>
+      </div>
+    </div>
+
+    <div class="ctx" id="ctx">
+      <span class="ctx-label" id="ctxLabel">Answer</span>
+      <span id="ctxContent"></span>
+    </div>
+
+    <a class="back-link" href="index.html">← Back to enhancements</a>
+  </div>
+
+  <script>
+    (function () {
+      const THEME_TITLES = {
+        1: "An Interpretation of a Chair",
+        2: "Take a Break",
+      };
+
+      const DIR = {
+        left: { en: "Left", zh: "左邊" },
+        right: { en: "Right", zh: "右邊" },
+        back: { en: "Back", zh: "後方" },
+        front: { en: "Front", zh: "前方" },
+        bottom: { en: "Bottom", zh: "下方" },
+        centre: { en: "Centre", zh: "中央" },
+        top: { en: "Top", zh: "上方" },
+      };
+
+      function q(student, optKeys, ansKey) {
+        const ans = optKeys.indexOf(ansKey);
+        const enDir = DIR[ansKey].en.toLowerCase();
+        const zhDir = DIR[ansKey].zh;
+        return {
+          image: student.key + "_v2c.webp",
+          name: student.name,
+          theme: student.theme,
+          en: {
+            q: "Where is the main light source in this artwork?",
+            opts: optKeys.map(function (k) { return DIR[k].en; }),
+            ans: ans,
+            ctx: student.name + " — main light from the " + enDir + ".",
+          },
+          zh: {
+            q: "這幅作品的主要光源來自哪裡？",
+            opts: optKeys.map(function (k) { return DIR[k].zh; }),
+            ans: ans,
+            ctx: student.name + " — 主要光源來自" + zhDir + "。",
+          },
+        };
+      }
+
+      const qs = [
+        q({ name: "Jaylee", key: "jaylee", theme: 1 }, ["left", "right", "back", "front"], "left"),
+        q({ name: "Mandip", key: "mandip", theme: 1 }, ["front", "back", "left", "right"], "back"),
+        q({ name: "Aqsa", key: "aqsa", theme: 2 }, ["left", "right", "back", "top"], "right"),
+        q({ name: "Biraz", key: "biraz", theme: 2 }, ["bottom", "left", "back", "right"], "back"),
+        q({ name: "Ibrahim", key: "ibrahim", theme: 2 }, ["left", "back", "right", "front"], "back"),
+        q({ name: "Junaid", key: "junaid", theme: 2 }, ["right", "left", "centre", "back"], "right"),
+        q({ name: "Mhavish", key: "mhavish", theme: 2 }, ["bottom", "top", "left", "right"], "bottom"),
+        q({ name: "Nikhil", key: "nikhil", theme: 2 }, ["left", "centre", "right", "back"], "centre"),
+        q({ name: "Soyal", key: "soyal", theme: 2 }, ["back", "front", "left", "right"], "right"),
+      ];
+
+      const UI = {
+        en: {
+          title: "Light Source Quiz",
+          choose: "Choose an answer",
+          correct: "Correct",
+          tryAgain: "Try again",
+          note: "Note",
+          next: "Next",
+          answer: "Answer",
+          done: "All done!",
+          great: "Well done!",
+          enhance: "Enhance 3",
+        },
+        zh: {
+          title: "光源方向小測驗",
+          choose: "選一個答案",
+          correct: "答對了",
+          tryAgain: "再試一次",
+          note: "說明",
+          next: "下一題",
+          answer: "答案",
+          done: "全部完成！",
+          great: "做得好！",
+          enhance: "增強 3",
+        },
+      };
+
+      let idx = 0;
+      let lang = "en";
+      let locked = false;
+      let done = false;
+
+      const counter = document.getElementById("counter");
+      const barTitle = document.getElementById("barTitle");
+      const artMeta = document.getElementById("artMeta");
+      const frame = document.getElementById("frame");
+      const artImg = document.getElementById("artImg");
+      const qText = document.getElementById("qText");
+      const opts = document.getElementById("opts");
+      const fb = document.getElementById("fb");
+      const hintBtn = document.getElementById("hintBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const ctx = document.getElementById("ctx");
+      const ctxLabel = document.getElementById("ctxLabel");
+      const ctxContent = document.getElementById("ctxContent");
+      const langEn = document.getElementById("langEn");
+      const langZh = document.getElementById("langZh");
+
+      function t() { return UI[lang]; }
+      function getQ() { return qs[idx][lang]; }
+      function getItem() { return qs[idx]; }
+
+      function fitFrame() {
+        if (!artImg.naturalWidth) return;
+        const portrait = artImg.naturalHeight > artImg.naturalWidth;
+        frame.classList.toggle("portrait", portrait);
+        frame.classList.toggle("landscape", !portrait);
+      }
+
+      artImg.addEventListener("load", fitFrame);
+
+      function syncUiText() {
+        const u = t();
+        barTitle.textContent = u.title;
+        hintBtn.textContent = u.note;
+        nextBtn.textContent = u.next;
+        ctxLabel.textContent = u.answer;
+      }
+
+      function render() {
+        const item = getItem();
+        const q = getQ();
+        const u = t();
+        locked = false;
+        done = false;
+        ctx.classList.remove("show");
+        hintBtn.disabled = true;
+        nextBtn.disabled = true;
+        fb.textContent = u.choose;
+        fb.style.color = "#64748b";
+        counter.textContent = (idx + 1) + " / " + qs.length;
+
+        const themeLabel = lang === "zh"
+          ? "主題 " + item.theme
+          : "Theme " + item.theme;
+        artMeta.textContent = item.name + " · " + themeLabel + " · " + THEME_TITLES[item.theme] + " · " + u.enhance;
+
+        frame.classList.remove("portrait", "landscape");
+        artImg.src = item.image;
+        artImg.alt = item.name + " · " + u.enhance;
+        if (artImg.complete) fitFrame();
+
+        qText.textContent = q.q;
+
+        opts.innerHTML = "";
+        const tags = ["A", "B", "C", "D"];
+        q.opts.forEach(function (txt, i) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "opt";
+          btn.dataset.choice = tags[i];
+          btn.innerHTML = '<span class="tag">' + tags[i] + "</span>" + txt;
+          btn.addEventListener("click", function () { clickOpt(btn, i, q); });
+          opts.appendChild(btn);
+        });
+      }
+
+      function clickOpt(btn, i, q) {
+        if (locked) return;
+        const all = document.querySelectorAll(".opt");
+        const correct = i === q.ans;
+        const u = t();
+
+        if (correct) {
+          locked = true;
+          done = true;
+          all.forEach(function (el, j) {
+            el.classList.add("blocked");
+            if (j === q.ans) el.classList.add("correct");
+          });
+          fb.textContent = u.correct;
+          fb.style.color = "#15803d";
+          hintBtn.disabled = false;
+          nextBtn.disabled = false;
+        } else {
+          btn.classList.add("wrong", "blocked");
+          fb.textContent = u.tryAgain;
+          fb.style.color = "#b91c1c";
+        }
+      }
+
+      function showCtx() {
+        if (!done) return;
+        ctxContent.textContent = getQ().ctx;
+        ctx.classList.add("show");
+      }
+
+      function next() {
+        if (!done) return;
+        const u = t();
+        if (idx < qs.length - 1) {
+          idx += 1;
+          render();
+        } else {
+          artMeta.textContent = "";
+          frame.classList.remove("portrait", "landscape");
+          artImg.removeAttribute("src");
+          artImg.alt = "";
+          qText.textContent = u.done;
+          opts.innerHTML = "";
+          counter.textContent = qs.length + " / " + qs.length;
+          fb.textContent = u.great;
+          fb.style.color = "#15803d";
+          ctx.classList.remove("show");
+          hintBtn.disabled = true;
+          nextBtn.disabled = true;
+        }
+      }
+
+      function setLang(l) {
+        if (l === lang) return;
+        lang = l;
+        langEn.classList.toggle("active", l === "en");
+        langZh.classList.toggle("active", l === "zh");
+        syncUiText();
+        if (idx < qs.length) {
+          render();
+          if (ctx.classList.contains("show")) {
+            ctxContent.textContent = getQ().ctx;
+          }
+        } else {
+          barTitle.textContent = t().title;
+          qText.textContent = t().done;
+          fb.textContent = t().great;
+        }
+      }
+
+      hintBtn.addEventListener("click", showCtx);
+      nextBtn.addEventListener("click", next);
+      langEn.addEventListener("click", function () { setLang("en"); });
+      langZh.addEventListener("click", function () { setLang("zh"); });
+
+      syncUiText();
+      render();
+    })();
+  </script>
+</body>
+</html>
