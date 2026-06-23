@@ -123,10 +123,7 @@
   <div class="hud">
     <h1>2A Lucky Draw</h1>
     <span id="pickBtn" class="control" role="button" tabindex="0">🔮 Pick Random</span>
-    <span id="resetBtn" class="control" role="button" tabindex="0" title="Move Everyone Back">↩️</span>
-    <span id="savePosBtn" class="control" role="button" tabindex="0" title="Save sides JSON">💾</span>
-    <span id="loadPosBtn" class="control" role="button" tabindex="0" title="Load sides JSON">📂</span>
-    <input id="loadPosInput" type="file" accept=".json,application/json" hidden />
+    <span id="resetBtn" class="control" role="button" tabindex="0">↩ Reset all to left</span>
   </div>
   <div id="countdown" class="countdown"></div>
   <div id="ufo" class="ufo">🛸</div>
@@ -153,15 +150,7 @@
       "36 方紫瑜", "37 邱若曦"
     ];
 
-    const defaultRightNameSet = new Set([
-      "莊曼妮",
-      "簡愷佑",
-      "梁柏宇",
-      "李一航",
-      "李狄達",
-      "方紫瑜",
-      "曾嘉欣"
-    ]);
+    const defaultRightNameSet = new Set();
 
     const drawState = {
       isDrawing: false,
@@ -176,9 +165,6 @@
 
     const pickBtn = document.getElementById("pickBtn");
     const resetBtn = document.getElementById("resetBtn");
-    const savePosBtn = document.getElementById("savePosBtn");
-    const loadPosBtn = document.getElementById("loadPosBtn");
-    const loadPosInput = document.getElementById("loadPosInput");
     const countdownEl = document.getElementById("countdown");
     const ufoEl = document.getElementById("ufo");
 
@@ -535,61 +521,6 @@
       pickBtn.setAttribute("aria-disabled", pickDisabled ? "true" : "false");
     }
 
-    function avatarZonesPayload() {
-      return {
-        type: "2A-avatar-zones",
-        version: 1,
-        savedAt: new Date().toISOString(),
-        students: avatars.map((a) => ({
-          id: a.id,
-          name: a.name,
-          zone: a.zone === "right" ? "right" : "left"
-        }))
-      };
-    }
-
-    function saveAvatarZonesToJson() {
-      const payload = avatarZonesPayload();
-      const json = JSON.stringify(payload, null, 2);
-      const blob = new Blob([json], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "2a-avatar-zones.json";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    function applyAvatarZones(payload) {
-      if (!payload || !Array.isArray(payload.students)) {
-        throw new Error("Invalid JSON format.");
-      }
-      const byId = new Map();
-      const byName = new Map();
-      for (const row of payload.students) {
-        if (!row) continue;
-        if (Number.isInteger(row.id)) byId.set(row.id, row.zone);
-        if (typeof row.name === "string") byName.set(row.name, row.zone);
-      }
-      avatars.forEach((avatar) => {
-        let zone = byId.get(avatar.id);
-        if (zone == null) zone = byName.get(avatar.name);
-        zone = zone === "right" ? "right" : "left";
-        avatar.zone = zone;
-        const targetZone = zone === "right" ? RIGHT_ZONE : LEFT_ZONE;
-        const p = randomPosInZone(targetZone);
-        avatar.mesh.position.set(p.x, 0, p.z);
-        avatar.mesh.rotation.set(0, 0, 0);
-        avatar.heading.copy(randomHeading());
-        avatar.nextTurnAt = performance.now() + 500 + Math.random() * 1600;
-      });
-      updateCounts();
-      hideCountdown();
-      hideUfo();
-    }
-
     function showCountdown(text) {
       countdownEl.style.display = "flex";
       countdownEl.textContent = text;
@@ -801,6 +732,7 @@
         a.nextTurnAt = performance.now() + 600 + Math.random() * 900;
       });
       updateCounts();
+      hideCountdown();
       hideUfo();
     }
 
@@ -830,17 +762,6 @@
     pickBtn.addEventListener("click", handlePick);
     resetBtn.addEventListener("click", handleReset);
 
-    savePosBtn.addEventListener("click", () => {
-      if (drawState.isDrawing) return;
-      saveAvatarZonesToJson();
-    });
-
-    loadPosBtn.addEventListener("click", () => {
-      if (drawState.isDrawing) return;
-      loadPosInput.value = "";
-      loadPosInput.click();
-    });
-
     function bindControlKey(el, handler) {
       el.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -852,30 +773,6 @@
 
     bindControlKey(pickBtn, handlePick);
     bindControlKey(resetBtn, handleReset);
-
-    bindControlKey(savePosBtn, () => {
-      if (drawState.isDrawing) return;
-      saveAvatarZonesToJson();
-    });
-
-    bindControlKey(loadPosBtn, () => {
-      if (drawState.isDrawing) return;
-      loadPosInput.value = "";
-      loadPosInput.click();
-    });
-
-    loadPosInput.addEventListener("change", async (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        const payload = JSON.parse(text);
-        if (drawState.isDrawing) return;
-        applyAvatarZones(payload);
-      } catch (err) {
-        alert("Could not load JSON file.");
-      }
-    });
 
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;

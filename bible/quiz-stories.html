@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bible Numbers Quiz</title>
+  <title>Bible Stories Quiz</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -301,7 +301,7 @@
 <body>
   <header class="bar">
     <div class="bar-text">
-      <h1 id="barTitle">Bible Numbers</h1>
+      <h1 id="barTitle">Bible Stories</h1>
     </div>
     <div class="bar-side">
       <span class="counter" id="counter">1 / 12</span>
@@ -333,35 +333,35 @@
   <script>
     (function () {
       const qs = [
-        { en: { q: "How many days did God take to create the world?", opts: ["6", "7", "10", "12"], ans: 0, ctx: "Genesis 1 — six days, rested on the seventh." },
-          zh: { q: "上帝用多少天創造世界？", opts: ["6天", "7天", "10天", "12天"], ans: 0, ctx: "創世記 1 章 — 六天創造，第七天安息。" } },
-        { en: { q: "How many days and nights did it rain in Noah's flood?", opts: ["7", "30", "40", "100"], ans: 2, ctx: "Genesis 7:12 — 40 days and 40 nights." },
-          zh: { q: "挪亞洪水時，雨下了多少天多少夜？", opts: ["7天", "30天", "40天", "100天"], ans: 2, ctx: "創世記 7:12 — 四十天四十夜。" } },
-        { en: { q: "How many books are in the whole Bible?", opts: ["27", "39", "66", "73"], ans: 2, ctx: "66 total — 39 OT, 27 NT." },
-          zh: { q: "整本聖經共有多少卷？", opts: ["27卷", "39卷", "66卷", "73卷"], ans: 2, ctx: "共66卷 — 舊約39，新約27。" } },
-        { en: { q: "How many disciples did Jesus have?", opts: ["7", "10", "12", "14"], ans: 2, ctx: "Matthew 10:2-4 — twelve apostles." },
-          zh: { q: "耶穌有多少個門徒？", opts: ["7個", "10個", "12個", "14個"], ans: 2, ctx: "馬太福音 10:2-4 — 十二使徒。" } },
-        { en: { q: "How many plagues did God send to Egypt?", opts: ["7", "10", "12", "14"], ans: 1, ctx: "Exodus 7–12 — ten plagues." },
-          zh: { q: "上帝向埃及降了多少災？", opts: ["7災", "10災", "12災", "14災"], ans: 1, ctx: "出埃及記 7–12 — 十災。" } },
-        { en: { q: "How many of each clean animal went into the ark?", opts: ["2 pairs", "7 pairs", "1 pair", "5 pairs"], ans: 1, ctx: "Genesis 7:2 — seven pairs of clean animals." },
-          zh: { q: "每種潔淨動物有多少對進方舟？", opts: ["2對", "7對", "1對", "5對"], ans: 1, ctx: "創世記 7:2 — 七對潔淨動物。" } },
-        { en: { q: "How many days did Jesus fast in the wilderness?", opts: ["10", "20", "40", "50"], ans: 2, ctx: "Matthew 4:2 — 40 days." },
-          zh: { q: "耶穌在曠野禁食多少天？", opts: ["10天", "20天", "40天", "50天"], ans: 2, ctx: "馬太福音 4:2 — 四十天。" } },
-        { en: { q: "How many years did Israel wander in the desert?", opts: ["20", "40", "60", "80"], ans: 1, ctx: "Numbers 14:33 — 40 years." },
-          zh: { q: "以色列人在曠野漂流多少年？", opts: ["20年", "40年", "60年", "80年"], ans: 1, ctx: "民數記 14:33 — 四十年。" } },
-        { en: { q: "How many loaves did the boy have to feed 5,000?", opts: ["2", "5", "7", "10"], ans: 1, ctx: "John 6:9 — five loaves and two fish." },
-          zh: { q: "小孩有多少個餅餵飽五千人？", opts: ["2個", "5個", "7個", "10個"], ans: 1, ctx: "約翰福音 6:9 — 五餅二魚。" } },
-        { en: { q: "How many stones did David pick for Goliath?", opts: ["3", "5", "7", "10"], ans: 1, ctx: "1 Samuel 17:40 — five smooth stones." },
-          zh: { q: "大衛揀了幾塊石子迎戰歌利亞？", opts: ["3塊", "5塊", "7塊", "10塊"], ans: 1, ctx: "撒母耳記上 17:40 — 五塊光滑石子。" } },
-        { en: { q: "How many brothers did Joseph have?", opts: ["10", "11", "12", "7"], ans: 1, ctx: "Genesis 37 — 11 brothers." },
-          zh: { q: "約瑟有多少個兄弟？", opts: ["10個", "11個", "12個", "7個"], ans: 1, ctx: "創世記 37 章 — 十一個兄弟。" } },
-        { en: { q: "How many wise men visited baby Jesus?", opts: ["2", "3", "4", "7"], ans: 1, ctx: "Matthew 2:1-12 — traditionally 3 gifts, 3 wise men." },
-          zh: { q: "有多少位博士來拜訪嬰孩耶穌？", opts: ["2位", "3位", "4位", "7位"], ans: 1, ctx: "馬太福音 2:1-12 — 三件禮物，三位博士。" } }
+        { en: { q: "Who built the ark to save the animals from the flood?", opts: ["Noah", "Moses", "David", "Abraham"], ans: 0, ctx: "Genesis 6–9 — God told Noah to build the ark." },
+          zh: { q: "誰建造方舟拯救動物脫離洪水？", opts: ["挪亞", "摩西", "大衛", "亞伯拉罕"], ans: 0, ctx: "創世記 6–9 章 — 上帝吩咐挪亞建造方舟。" } },
+        { en: { q: "Who was thrown into a lions' den but God kept him safe?", opts: ["Daniel", "Samson", "Joseph", "Elijah"], ans: 0, ctx: "Daniel 6 — Daniel prayed to God and was protected." },
+          zh: { q: "誰被扔進獅子坑，但上帝保守他平安？", opts: ["但以理", "參孫", "約瑟", "以利亞"], ans: 0, ctx: "但以理書 6 章 — 但以理禱告上帝，便得蒙保守。" } },
+        { en: { q: "Where was baby Jesus born?", opts: ["Jerusalem", "Bethlehem", "Nazareth", "Egypt"], ans: 1, ctx: "Luke 2:4-7 — Jesus was born in Bethlehem." },
+          zh: { q: "嬰孩耶穌在哪裡出生？", opts: ["耶路撒冷", "伯利恆", "拿撒勒", "埃及"], ans: 1, ctx: "路加福音 2:4-7 — 耶穌在伯利恆出生。" } },
+        { en: { q: "Who fought the giant Goliath?", opts: ["Saul", "Samuel", "David", "Jonathan"], ans: 2, ctx: "1 Samuel 17 — young David trusted God and won." },
+          zh: { q: "誰與巨人歌利亞作戰？", opts: ["掃羅", "撒母耳", "大衛", "約拿單"], ans: 2, ctx: "撒母耳記上 17 章 — 少年大衛倚靠上帝得勝。" } },
+        { en: { q: "Who was the first woman God created?", opts: ["Sarah", "Ruth", "Mary", "Eve"], ans: 3, ctx: "Genesis 2 — Eve was made to be Adam's wife." },
+          zh: { q: "上帝創造的第一個女人是誰？", opts: ["撒拉", "路得", "馬利亞", "夏娃"], ans: 3, ctx: "創世記 2 章 — 夏娃成為亞當的妻子。" } },
+        { en: { q: "Who led God's people out of Egypt?", opts: ["Joshua", "Moses", "Aaron", "Joseph"], ans: 1, ctx: "Exodus 14 — Moses led Israel through the Red Sea." },
+          zh: { q: "誰帶領上帝的子民離開埃及？", opts: ["約書亞", "摩西", "亞倫", "約瑟"], ans: 1, ctx: "出埃及記 14 章 — 摩西帶領以色列人過紅海。" } },
+        { en: { q: "Who was swallowed by a big fish?", opts: ["Peter", "Jonah", "Paul", "John"], ans: 1, ctx: "Jonah 1–2 — Jonah ran away, but God sent the fish." },
+          zh: { q: "誰被大魚吞了？", opts: ["彼得", "約拿", "保羅", "約翰"], ans: 1, ctx: "約拿書 1–2 章 — 約拿逃走，上帝卻派大魚留住他。" } },
+        { en: { q: "Who had a colourful coat and could explain dreams?", opts: ["Jacob", "Joseph", "Benjamin", "Isaac"], ans: 1, ctx: "Genesis 37 — Joseph's brothers were jealous of him." },
+          zh: { q: "誰有彩衣，又能解夢？", opts: ["雅各", "約瑟", "便雅憫", "以撒"], ans: 1, ctx: "創世記 37 章 — 約瑟的兄弟嫉妒他。" } },
+        { en: { q: "In which garden did Adam and Eve live?", opts: ["Garden of Gethsemane", "Garden of Eden", "Garden of Solomon", "Garden of Bethlehem"], ans: 1, ctx: "Genesis 2 — God placed them in Eden." },
+          zh: { q: "亞當和夏娃住在哪個園子？", opts: ["客西馬尼園", "伊甸園", "所羅門園", "伯利恆園"], ans: 1, ctx: "創世記 2 章 — 上帝把牠們安置在伊甸園。" } },
+        { en: { q: "Who denied knowing Jesus three times?", opts: ["Judas", "Thomas", "Peter", "John"], ans: 2, ctx: "Matthew 26:69-75 — Peter was sorry and wept." },
+          zh: { q: "誰三次不認識耶穌？", opts: ["猶大", "多馬", "彼得", "約翰"], ans: 2, ctx: "馬太福音 26:69-75 — 彼得後來懊悔哭泣。" } },
+        { en: { q: "Who baptized Jesus in the Jordan River?", opts: ["Peter", "John the Baptist", "Andrew", "James"], ans: 1, ctx: "Matthew 3:13-17 — the Spirit came like a dove." },
+          zh: { q: "誰在約旦河為耶穌施洗？", opts: ["彼得", "施洗約翰", "安得烈", "雅各"], ans: 1, ctx: "馬太福音 3:13-17 — 聖靈好像鴿子降下。" } },
+        { en: { q: "What did God use to feed the Israelites in the desert?", opts: ["Bread from heaven", "Fish and chips", "Rice cakes", "Chocolate"], ans: 0, ctx: "Exodus 16 — God sent manna each morning." },
+          zh: { q: "上帝在曠野用什麼餵飽以色列人？", opts: ["從天降下的食物", "炸魚和薯條", "米餅", "巧克力"], ans: 0, ctx: "出埃及記 16 章 — 上帝每天早晨賜下嗎哪。" } }
       ];
 
       const UI = {
         en: {
-          title: "Bible Numbers",
+          title: "Bible Stories",
           choose: "Choose an answer",
           correct: "Correct",
           tryAgain: "Try again",
@@ -372,7 +372,7 @@
           great: "Well done!",
         },
         zh: {
-          title: "你對聖經裡的數字認識多少？",
+          title: "聖經故事小測驗",
           choose: "選一個答案",
           correct: "答對了",
           tryAgain: "再試一次",
