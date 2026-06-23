@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>5C HKDSE VA Mock · SBA</title>
+  <title>5C · SBA Artworks</title>
   <style>
     * { box-sizing: border-box; }
 
@@ -15,16 +15,26 @@
       line-height: 1.5;
     }
 
-    body.viewer-open { overflow: hidden; }
+    body.lightbox-open { overflow: hidden; }
 
     main {
-      max-width: 640px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 20px 16px 40px;
+      padding: 20px 20px 40px;
     }
 
+    .back {
+      display: inline-block;
+      margin-bottom: 12px;
+      font-size: 0.84rem;
+      color: #64748b;
+      text-decoration: none;
+    }
+
+    .back:hover { color: #1e3a5f; }
+
     header {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       padding-bottom: 16px;
       border-bottom: 1px solid #e5e7eb;
     }
@@ -43,144 +53,143 @@
       color: #6b7280;
     }
 
-    .back {
-      display: inline-block;
-      margin-bottom: 12px;
-      font-size: 0.84rem;
-      color: #64748b;
-      text-decoration: none;
+    .students {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
     }
 
-    .back:hover { color: #1e3a5f; }
-
-    .student-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
+    @media (min-width: 700px) {
+      .students {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
     }
 
-    .student-row { border-bottom: 1px solid #e5e7eb; }
-    .student-row:last-child { border-bottom: none; }
+    .student-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fafafa;
+      overflow: hidden;
+    }
 
-    .student-btn {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      width: 100%;
+    .student-head {
+      padding: 10px 12px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .student-name {
       margin: 0;
-      padding: 14px 4px;
-      border: none;
-      background: none;
-      font: inherit;
       font-size: 1rem;
       font-weight: 600;
       color: #1e3a5f;
-      text-align: left;
-      cursor: pointer;
     }
 
-    .student-btn:hover { color: #2c5282; }
-
-    .student-btn .pages {
-      flex-shrink: 0;
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: #94a3b8;
+    .works {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: #e5e7eb;
     }
 
-    .viewer {
-      position: fixed;
-      inset: 0;
-      display: none;
-      flex-direction: column;
-      background: #f8fafc;
-      z-index: 1000;
-    }
-
-    .viewer.open { display: flex; }
-
-    .viewer-bar {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      height: 44px;
-      padding: 0 8px 0 12px;
-      border-bottom: 1px solid #e5e7eb;
+    .work {
+      margin: 0;
       background: #fff;
-      font-size: 0.9rem;
-      color: #475569;
     }
 
-    .viewer-bar-title {
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .work button {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: zoom-in;
+      font: inherit;
+      color: inherit;
+      text-align: center;
     }
 
-    .viewer-bar strong { font-weight: 650; color: #1e3a5f; }
-
-    .viewer-close {
+    .thumb {
+      aspect-ratio: 5 / 4;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      border: none;
-      background: transparent;
-      color: #64748b;
-      font-size: 1.35rem;
-      line-height: 1;
-      border-radius: 6px;
-      cursor: pointer;
+      padding: 10px;
+      background: #fff;
     }
 
-    .viewer-close:hover { background: #f1f5f9; color: #1e3a5f; }
-
-    .viewer-stage {
-      position: relative;
-      flex: 1;
-      min-height: 0;
-      padding: 12px 52px;
-      background: #eef2f7;
-      overflow: hidden;
-    }
-
-    .viewer-stage img {
+    .work img {
       display: block;
       width: 100%;
       height: 100%;
       object-fit: contain;
-      object-position: center;
+    }
+
+    .work figcaption {
+      margin: 0;
+      padding: 6px 8px 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #6b7280;
+      text-align: center;
+      background: #fafafa;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 1000;
+    }
+
+    .lightbox.open {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lightbox-caption {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #fff;
+      text-align: center;
+    }
+
+    .lightbox img {
+      max-width: min(100%, 1100px);
+      max-height: calc(90vh - 2rem);
+      border-radius: 6px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       background: #fff;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
 
     .nav {
-      position: absolute;
+      position: fixed;
       top: 50%;
       transform: translateY(-50%);
-      border: 1px solid #e5e7eb;
-      background: rgba(255, 255, 255, 0.95);
+      border: none;
+      background: rgba(255, 255, 255, 0.92);
       color: #1e3a5f;
-      font-size: 1.4rem;
-      line-height: 1;
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
+      font-size: 1.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
       cursor: pointer;
+      z-index: 1001;
     }
 
-    .nav.prev { left: 10px; }
-    .nav.next { right: 10px; }
-    .nav:disabled { opacity: 0.3; cursor: default; }
+    .nav.prev { left: 12px; }
+    .nav.next { right: 12px; }
+    .nav:disabled { opacity: 0.35; cursor: default; }
 
-    @media (max-width: 600px) {
-      .viewer-stage { padding: 12px 44px; }
+    @media (max-width: 400px) {
+      .works { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -188,22 +197,17 @@
   <main>
     <a class="back" href="../">← 5C</a>
     <header>
-      <h1>5C HKDSE VA Mock · SBA</h1>
-      <p class="meta">June 2026 · workbook pages</p>
+      <h1>5C · SBA Artworks</h1>
+      <p class="meta">June 2026 · click thumbnail to enlarge</p>
     </header>
-    <ul class="student-list" id="studentList"></ul>
+    <div class="students" id="gallery"></div>
   </main>
 
-  <div class="viewer" id="viewer" aria-hidden="true">
-    <div class="viewer-bar">
-      <span class="viewer-bar-title"><strong id="viewerName"></strong> · <span id="viewerPage"></span></span>
-      <button type="button" class="viewer-close" id="viewerClose" aria-label="Close">×</button>
-    </div>
-    <div class="viewer-stage">
-      <button type="button" class="nav prev" id="prevBtn" aria-label="Previous page">‹</button>
-      <img id="viewerImage" src="" alt="" />
-      <button type="button" class="nav next" id="nextBtn" aria-label="Next page">›</button>
-    </div>
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button type="button" class="nav prev" id="prevBtn" aria-label="Previous">‹</button>
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+    <img id="lightboxImage" src="" alt="" />
+    <button type="button" class="nav next" id="nextBtn" aria-label="Next">›</button>
   </div>
 
   <script>
@@ -242,90 +246,109 @@
       Soyal: ["soyal1.webp"],
     };
 
-    let viewName = "";
-    let viewIndex = 0;
+    const IMAGES = [];
+    ORDER.forEach((name) => {
+      const files = STUDENTS[name];
+      if (!files) return;
+      files.forEach((file, i) => {
+        IMAGES.push({
+          src: file,
+          label: name + " · Artwork " + (i + 1),
+        });
+      });
+    });
 
-    const studentList = document.getElementById("studentList");
-    const viewer = document.getElementById("viewer");
-    const viewerName = document.getElementById("viewerName");
-    const viewerPage = document.getElementById("viewerPage");
-    const viewerImage = document.getElementById("viewerImage");
-    const viewerClose = document.getElementById("viewerClose");
+    const gallery = document.getElementById("gallery");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImage = document.getElementById("lightboxImage");
+    const lightboxCaption = document.getElementById("lightboxCaption");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
-    function pageLabel(count) {
-      return count + (count === 1 ? " page" : " pages");
+    let currentIndex = 0;
+
+    ORDER.forEach((name) => {
+      const files = STUDENTS[name];
+      if (!files || !files.length) return;
+
+      const card = document.createElement("article");
+      card.className = "student-card";
+      card.innerHTML =
+        '<div class="student-head"><h2 class="student-name">' + name + "</h2></div>" +
+        '<div class="works"></div>';
+      const works = card.querySelector(".works");
+
+      files.forEach((file, i) => {
+        const idx = IMAGES.findIndex((img) => img.src === file);
+        const fig = document.createElement("figure");
+        fig.className = "work";
+        const btn = document.createElement("button");
+        btn.type = "button";
+        const thumb = document.createElement("div");
+        thumb.className = "thumb";
+        const img = document.createElement("img");
+        img.src = file;
+        img.alt = name + " artwork " + (i + 1);
+        img.loading = "lazy";
+        img.decoding = "async";
+        const cap = document.createElement("figcaption");
+        cap.textContent = "Artwork " + (i + 1);
+        thumb.appendChild(img);
+        btn.appendChild(thumb);
+        fig.appendChild(btn);
+        fig.appendChild(cap);
+        btn.addEventListener("click", () => openAt(idx));
+        works.appendChild(fig);
+      });
+
+      gallery.appendChild(card);
+    });
+
+    function openAt(index) {
+      currentIndex = index;
+      updateLightbox();
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.classList.add("lightbox-open");
     }
 
-    function openViewer(name, startIndex) {
-      viewName = name;
-      viewIndex = startIndex || 0;
-      updateViewer();
-      viewer.classList.add("open");
-      viewer.setAttribute("aria-hidden", "false");
-      document.body.classList.add("viewer-open");
+    function closeLightbox() {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("lightbox-open");
+      lightboxImage.removeAttribute("src");
+      lightboxCaption.textContent = "";
     }
 
-    function closeViewer() {
-      viewer.classList.remove("open");
-      viewer.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("viewer-open");
-      viewerImage.removeAttribute("src");
-    }
-
-    function updateViewer() {
-      const pages = STUDENTS[viewName];
-      const file = pages[viewIndex];
-      viewerName.textContent = viewName;
-      viewerPage.textContent = "Page " + (viewIndex + 1) + " of " + pages.length;
-      viewerImage.src = file;
-      viewerImage.alt = viewName + " SBA page " + (viewIndex + 1);
-      prevBtn.disabled = viewIndex <= 0;
-      nextBtn.disabled = viewIndex >= pages.length - 1;
+    function updateLightbox() {
+      const item = IMAGES[currentIndex];
+      lightboxImage.src = item.src;
+      lightboxImage.alt = item.label;
+      lightboxCaption.textContent = item.label;
+      prevBtn.disabled = currentIndex <= 0;
+      nextBtn.disabled = currentIndex >= IMAGES.length - 1;
     }
 
     function step(delta) {
-      const pages = STUDENTS[viewName];
-      const next = viewIndex + delta;
-      if (next < 0 || next >= pages.length) return;
-      viewIndex = next;
-      updateViewer();
+      const next = currentIndex + delta;
+      if (next < 0 || next >= IMAGES.length) return;
+      currentIndex = next;
+      updateLightbox();
     }
 
-    function renderList() {
-      ORDER.forEach((name) => {
-        const pages = STUDENTS[name];
-        if (!pages || !pages.length) return;
-
-        const li = document.createElement("li");
-        li.className = "student-row";
-
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "student-btn";
-        btn.innerHTML =
-          "<span>" + name + "</span>" +
-          '<span class="pages">' + pageLabel(pages.length) + "</span>";
-        btn.addEventListener("click", () => openViewer(name, 0));
-
-        li.appendChild(btn);
-        studentList.appendChild(li);
-      });
-    }
-
-    viewerClose.addEventListener("click", closeViewer);
     prevBtn.addEventListener("click", () => step(-1));
     nextBtn.addEventListener("click", () => step(1));
 
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
     document.addEventListener("keydown", (e) => {
-      if (!viewer.classList.contains("open")) return;
-      if (e.key === "Escape") closeViewer();
+      if (!lightbox.classList.contains("open")) return;
+      if (e.key === "Escape") closeLightbox();
       if (e.key === "ArrowLeft") step(-1);
       if (e.key === "ArrowRight") step(1);
     });
-
-    renderList();
   </script>
 </body>
 </html>
