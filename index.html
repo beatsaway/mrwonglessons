@@ -25,20 +25,50 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.5rem 0.75rem;
-      padding: 0.5rem 1rem;
+      gap: 0.35rem 0.6rem;
+      padding: 0.3rem 0.85rem;
       border-bottom: 1px solid #e2e8f0;
       background: #fff;
       flex-shrink: 0;
       position: relative;
       z-index: 200;
     }
+    .header-tabs {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-left: auto;
+    }
+    .header-tab {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.28rem 0.65rem;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      line-height: 1.2;
+      color: #475569;
+      text-decoration: none;
+      border: 1px solid #e2e8f0;
+      border-radius: 999px;
+      background: #fff;
+    }
+    .header-tab:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #1e3a5f;
+    }
+    .header-tab.is-active {
+      background: #e8f1f8;
+      border-color: rgba(30, 58, 95, 0.25);
+      color: #1e3a5f;
+    }
     .nav-toggle {
       display: none;
       align-items: center;
       justify-content: center;
-      width: 2.5rem;
-      height: 2.5rem;
+      width: 2.15rem;
+      height: 2.15rem;
       padding: 0;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
@@ -80,7 +110,7 @@
     .site-header .title {
       color: #1e3a5f;
       font-weight: 600;
-      font-size: 1.05rem;
+      font-size: 0.98rem;
     }
     .drawer-backdrop {
       display: none;
@@ -225,7 +255,7 @@
       .drawer-backdrop {
         display: block;
         position: fixed;
-        top: var(--header-h, 3.25rem);
+        top: var(--header-h, 2.75rem);
         left: 0;
         right: 0;
         bottom: 0;
@@ -242,7 +272,7 @@
       }
       .subject-panel {
         position: fixed;
-        top: var(--header-h, 3.25rem);
+        top: var(--header-h, 2.75rem);
         left: 0;
         bottom: 0;
         width: min(17.5rem, 86vw);
@@ -368,6 +398,14 @@
       <span class="bar" aria-hidden="true"></span>
     </button>
     <span class="title">Lessons</span>
+    <nav class="header-tabs" aria-label="Site">
+      <a
+        class="header-tab"
+        href="https://realtime-whiteboard.kennethwongsd.workers.dev/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >Whiteboard</a>
+    </nav>
   </header>
 
   <div class="shell" id="shell">
