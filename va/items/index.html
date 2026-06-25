@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VA · Barcode labels 2026</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: #fff;
+      color: #1f2937;
+      line-height: 1.5;
+    }
+
+    body.lightbox-open { overflow: hidden; }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 20px 40px;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 12px;
+      font-size: 0.84rem;
+      color: #64748b;
+      text-decoration: none;
+    }
+
+    .back:hover { color: #1e3a5f; }
+
+    header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.35rem;
+      font-weight: 650;
+      color: #1e3a5f;
+      letter-spacing: -0.02em;
+    }
+
+    .meta {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .search {
+      flex: 1 1 200px;
+      max-width: 320px;
+      padding: 8px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font: inherit;
+      color: inherit;
+      background: #fafafa;
+    }
+
+    .search:focus {
+      outline: none;
+      border-color: #94a3b8;
+      background: #fff;
+    }
+
+    .count {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media (min-width: 600px) {
+      .gallery { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (min-width: 900px) {
+      .gallery { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .item {
+      margin: 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fafafa;
+    }
+
+    .item.hidden { display: none; }
+
+    .item button {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: zoom-in;
+      font: inherit;
+      color: inherit;
+    }
+
+    .thumb {
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .item img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .item figcaption {
+      margin: 0;
+      padding: 8px;
+      font-size: 0.95rem;
+      font-weight: 650;
+      color: #1e3a5f;
+      text-align: center;
+      border-top: 1px solid #e5e7eb;
+      background: #fafafa;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 1000;
+    }
+
+    .lightbox.open {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lightbox-caption {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #fff;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .lightbox img {
+      max-width: min(100%, 1100px);
+      max-height: calc(90vh - 2rem);
+      border-radius: 6px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      background: #fff;
+    }
+
+    .nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1e3a5f;
+      font-size: 1.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .nav.prev { left: 12px; }
+    .nav.next { right: 12px; }
+    .nav:disabled { opacity: 0.35; cursor: default; }
+
+    .empty {
+      display: none;
+      padding: 32px 16px;
+      text-align: center;
+      color: #6b7280;
+      border: 1px dashed #e5e7eb;
+      border-radius: 8px;
+    }
+
+    .empty.show { display: block; }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="../../index.html">← Lessons</a>
+    <header>
+      <h1>VA · Barcode labels 2026</h1>
+      <p class="meta">Asset barcode stickers · click thumbnail to enlarge</p>
+    </header>
+
+    <div class="toolbar">
+      <input class="search" id="search" type="search" placeholder="Filter by barcode number…" autocomplete="off" />
+      <span class="count" id="count"></span>
+    </div>
+
+    <div class="gallery" id="gallery"></div>
+    <p class="empty" id="empty">No labels match your search.</p>
+  </main>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button type="button" class="nav prev" id="prevBtn" aria-label="Previous">‹</button>
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+    <img id="lightboxImage" src="" alt="" />
+    <button type="button" class="nav next" id="nextBtn" aria-label="Next">›</button>
+  </div>
+
+  <script>
+    const FILES = [
+      "100001.webp", "100007.webp", "100012.webp", "100043.webp", "100046.webp",
+      "100102.webp", "100103.webp", "101167.webp", "101295.webp", "101296.webp",
+      "101298.webp", "101301.webp", "136347.webp", "136393.webp", "137678.webp",
+      "137752.webp",
+    ];
+
+    const IMAGES = FILES.map((file) => ({
+      src: file,
+      label: file.replace(/\.webp$/i, ""),
+    }));
+
+    const gallery = document.getElementById("gallery");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImage = document.getElementById("lightboxImage");
+    const lightboxCaption = document.getElementById("lightboxCaption");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const searchInput = document.getElementById("search");
+    const countEl = document.getElementById("count");
+    const emptyEl = document.getElementById("empty");
+
+    const items = [];
+    let visibleIndices = IMAGES.map((_, i) => i);
+    let currentIndex = 0;
+
+    IMAGES.forEach((item, index) => {
+      const fig = document.createElement("figure");
+      fig.className = "item";
+      fig.dataset.label = item.label;
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+
+      const img = document.createElement("img");
+      img.src = item.src;
+      img.alt = "Barcode " + item.label;
+      img.loading = "lazy";
+      img.decoding = "async";
+
+      const cap = document.createElement("figcaption");
+      cap.textContent = item.label;
+
+      thumb.appendChild(img);
+      btn.appendChild(thumb);
+      fig.appendChild(btn);
+      fig.appendChild(cap);
+      btn.addEventListener("click", () => openAt(index));
+      gallery.appendChild(fig);
+      items.push(fig);
+    });
+
+    function updateCount() {
+      const shown = visibleIndices.length;
+      const total = IMAGES.length;
+      countEl.textContent = shown === total
+        ? shown + " labels"
+        : shown + " of " + total + " labels";
+      emptyEl.classList.toggle("show", shown === 0);
+    }
+
+    function applyFilter() {
+      const q = searchInput.value.trim().toLowerCase();
+      visibleIndices = [];
+
+      items.forEach((fig, index) => {
+        const match = !q || fig.dataset.label.includes(q);
+        fig.classList.toggle("hidden", !match);
+        if (match) visibleIndices.push(index);
+      });
+
+      updateCount();
+    }
+
+    function openAt(index) {
+      const pos = visibleIndices.indexOf(index);
+      if (pos < 0) return;
+      currentIndex = pos;
+      updateLightbox();
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.classList.add("lightbox-open");
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("lightbox-open");
+      lightboxImage.removeAttribute("src");
+      lightboxCaption.textContent = "";
+    }
+
+    function updateLightbox() {
+      const item = IMAGES[visibleIndices[currentIndex]];
+      lightboxImage.src = item.src;
+      lightboxImage.alt = "Barcode " + item.label;
+      lightboxCaption.textContent = item.label;
+      prevBtn.disabled = currentIndex <= 0;
+      nextBtn.disabled = currentIndex >= visibleIndices.length - 1;
+    }
+
+    function step(delta) {
+      const next = currentIndex + delta;
+      if (next < 0 || next >= visibleIndices.length) return;
+      currentIndex = next;
+      updateLightbox();
+    }
+
+    searchInput.addEventListener("input", applyFilter);
+    prevBtn.addEventListener("click", () => step(-1));
+    nextBtn.addEventListener("click", () => step(1));
+
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox.classList.contains("open")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") step(-1);
+      if (e.key === "ArrowRight") step(1);
+    });
+
+    updateCount();
+  </script>
+</body>
+</html>
