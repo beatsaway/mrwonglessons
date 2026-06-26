@@ -175,27 +175,32 @@ function renderMeritTable(records) {
   return `<table><tbody>${rows}</tbody></table>`;
 }
 
-function renderStudent(student) {
+function renderStudentHeadTotals(student) {
   const parts = [];
   if (student.demerits.length) {
     const t = sumDemeritTotals(student.demerits);
+    parts.push(`<div class="totals demerit">${fmtTotals(["大過", "小過", "缺點"], [t.majorOffence, t.minorOffence, t.demerit])}</div>`);
+  }
+  if (student.merits.length) {
+    const t = sumMeritTotals(student.merits);
+    parts.push(`<div class="totals merit">${fmtTotals(["大功", "小功", "優點"], [t.majorMerit, t.minorMerit, t.merit])}</div>`);
+  }
+  return parts.length ? `<div class="head-summaries">${parts.join("")}</div>` : "";
+}
+
+function renderStudent(student) {
+  const parts = [];
+  if (student.demerits.length) {
     parts.push(`
       <div class="section">
-        <div class="section-head demerit">
-          <span>懲罰</span>
-          <div class="totals">${fmtTotals(["大過", "小過", "缺點"], [t.majorOffence, t.minorOffence, t.demerit])}</div>
-        </div>
+        <div class="section-head demerit"><span>懲罰</span></div>
         ${renderDemeritTable(student.demerits)}
       </div>`);
   }
   if (student.merits.length) {
-    const t = sumMeritTotals(student.merits);
     parts.push(`
       <div class="section">
-        <div class="section-head merit">
-          <span>優點</span>
-          <div class="totals">${fmtTotals(["大功", "小功", "優點"], [t.majorMerit, t.minorMerit, t.merit])}</div>
-        </div>
+        <div class="section-head merit"><span>優點</span></div>
         ${renderMeritTable(student.merits)}
       </div>`);
   }
@@ -204,6 +209,7 @@ function renderStudent(student) {
       <div class="student-head">
         <span class="no">${student.no}.</span>
         <span class="name">${esc(student.name)}</span>
+        ${renderStudentHeadTotals(student)}
       </div>
       ${parts.join("")}
     </div>`;
@@ -245,13 +251,23 @@ const html = `<!DOCTYPE html>
     }
     .student-head {
       display: flex;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
       padding: 5px 8px;
       background: #f3f3f3;
       border-bottom: 1px solid #333;
       font-weight: 700;
     }
-    .name { flex: 1; font-size: 11pt; }
+    .name { flex: 1; font-size: 11pt; min-width: 4em; }
+    .head-summaries {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      align-items: center;
+      justify-content: flex-end;
+    }
     .section { border-top: 1px solid #ccc; }
     .section:first-of-type { border-top: none; }
     .section-head {
@@ -270,11 +286,12 @@ const html = `<!DOCTYPE html>
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-left: auto;
       font-size: 8pt;
       font-weight: 600;
       color: #333;
     }
+    .totals.demerit { color: #8b0000; }
+    .totals.merit { color: #0d5c2e; }
     .totals span::after { content: " ·"; }
     .totals span:last-child::after { content: ""; }
     table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }

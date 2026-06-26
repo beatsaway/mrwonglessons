@@ -146,6 +146,23 @@
     .name {
       font-size: 1.05rem;
       font-weight: 600;
+      flex: 1;
+      min-width: 4rem;
+    }
+
+    .head-summaries {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem .65rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .head-totals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem;
     }
 
     .section-label {
@@ -159,19 +176,6 @@
 
     .section-label.demerit { color: var(--serious); }
     .section-label.merit { color: var(--good); }
-
-    .section-totals {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .35rem;
-      padding: 0 .85rem .45rem;
-    }
-
-    .section-totals.demerit,
-    .section-totals.merit {
-      border-bottom: 1px solid var(--border);
-      margin-bottom: .15rem;
-    }
 
     .records {
       list-style: none;
@@ -632,12 +636,20 @@
 
     function renderDemeritTotals(records) {
       const t = sumDemeritTotals(records);
-      return `<div class="section-totals demerit">${renderCount("大過", t.majorOffence)}${renderCount("小過", t.minorOffence)}${renderCount("缺點", t.demerit)}</div>`;
+      return `<div class="head-totals demerit">${renderCount("大過", t.majorOffence)}${renderCount("小過", t.minorOffence)}${renderCount("缺點", t.demerit)}</div>`;
     }
 
     function renderMeritTotals(records) {
       const t = sumMeritTotals(records);
-      return `<div class="section-totals merit">${renderCount("大功", t.majorMerit, true)}${renderCount("小功", t.minorMerit, true)}${renderCount("優點", t.merit, true)}</div>`;
+      return `<div class="head-totals merit">${renderCount("大功", t.majorMerit, true)}${renderCount("小功", t.minorMerit, true)}${renderCount("優點", t.merit, true)}</div>`;
+    }
+
+    function renderStudentHeadTotals(student) {
+      const parts = [
+        student.demerits.length ? renderDemeritTotals(student.demerits) : "",
+        student.merits.length ? renderMeritTotals(student.merits) : "",
+      ].filter(Boolean).join("");
+      return parts ? `<div class="head-summaries">${parts}</div>` : "";
     }
 
     function renderRowCounts(label, items, good) {
@@ -713,17 +725,18 @@
       div.dataset.hasMerit = student.merits.length ? "1" : "0";
 
       const demeritSection = student.demerits.length
-        ? `<p class="section-label demerit">懲罰</p>${renderDemeritTotals(student.demerits)}<ul class="records">${student.demerits.map(renderDemerit).join("")}</ul>`
+        ? `<p class="section-label demerit">懲罰</p><ul class="records">${student.demerits.map(renderDemerit).join("")}</ul>`
         : "";
 
       const meritSection = student.merits.length
-        ? `<p class="section-label merit">優點</p>${renderMeritTotals(student.merits)}<ul class="records">${student.merits.map(renderMerit).join("")}</ul>`
+        ? `<p class="section-label merit">優點</p><ul class="records">${student.merits.map(renderMerit).join("")}</ul>`
         : "";
 
       div.innerHTML = `
         <div class="student-head">
           <span class="no">${student.no}</span>
           <span class="name">${student.name}</span>
+          ${renderStudentHeadTotals(student)}
         </div>
         ${demeritSection}
         ${meritSection}
