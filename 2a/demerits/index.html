@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>2A · 操行紀錄（學生版）</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #fff;
+      --text: #1a2332;
+      --muted: #6b7785;
+      --accent: #1e4d8c;
+      --accent-soft: #e8eef7;
+      --border: #e2e8f0;
+      --warn: #b45309;
+      --warn-soft: #fff7ed;
+      --serious: #b91c1c;
+      --serious-soft: #fef2f2;
+      --good: #15803d;
+      --good-soft: #f0fdf4;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      min-height: 36px;
+      padding: max(.35rem, env(safe-area-inset-top)) .75rem .35rem;
+      background: var(--accent);
+      color: #fff;
+      font-size: .85rem;
+      font-weight: 600;
+      border-bottom: 1px solid #163a6b;
+    }
+
+    .header a {
+      color: rgba(255, 255, 255, .85);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .header a:hover { color: #fff; }
+
+    main {
+      padding: .75rem .75rem 2rem;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .summary {
+      margin: 0 0 .75rem;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: .75rem;
+    }
+
+    .filter-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font: inherit;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .35rem .65rem;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .search {
+      flex: 1 1 160px;
+      min-width: 0;
+      padding: .4rem .65rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font: inherit;
+      font-size: .85rem;
+      background: var(--card);
+    }
+
+    .search:focus {
+      outline: none;
+      border-color: #94a3b8;
+    }
+
+    .student {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      margin-bottom: .65rem;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+    }
+
+    .student.hidden { display: none; }
+
+    .student-head {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      padding: .75rem .85rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #fafbfd 0%, #fff 100%);
+    }
+
+    .no {
+      flex: none;
+      width: 2.1rem;
+      height: 2.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: .9rem;
+      border-radius: 8px;
+    }
+
+    .name {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .badges {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .3rem;
+      justify-content: flex-end;
+    }
+
+    .badge {
+      font-size: .72rem;
+      font-weight: 600;
+      padding: .12rem .45rem;
+      border-radius: 999px;
+    }
+
+    .badge.demerit {
+      background: var(--serious-soft);
+      color: var(--serious);
+    }
+
+    .badge.merit {
+      background: var(--good-soft);
+      color: var(--good);
+    }
+
+    .section-label {
+      margin: 0;
+      padding: .45rem .85rem 0;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .section-label.demerit { color: var(--serious); }
+    .section-label.merit { color: var(--good); }
+
+    .section-totals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem;
+      padding: 0 .85rem .45rem;
+    }
+
+    .section-totals.demerit {
+      border-bottom: 1px solid var(--border);
+      margin-bottom: .15rem;
+    }
+
+    .section-totals.merit {
+      border-bottom: 1px solid var(--border);
+      margin-bottom: .15rem;
+    }
+
+    .records {
+      list-style: none;
+      margin: 0;
+      padding: .35rem .85rem .65rem;
+    }
+
+    .records + .section-label {
+      border-top: 1px solid var(--border);
+      padding-top: .55rem;
+    }
+
+    .record {
+      padding: .6rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .record:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .record-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: .35rem .55rem;
+      margin-bottom: .3rem;
+    }
+
+    .date {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .event {
+      font-size: .93rem;
+      font-weight: 600;
+    }
+
+    .event.minor { color: var(--warn); }
+    .event.major { color: var(--serious); }
+    .event.merit { color: var(--good); }
+
+    .meta {
+      display: grid;
+      gap: .2rem;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .25rem .5rem;
+    }
+
+    .meta-label {
+      flex: none;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .dates {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .25rem;
+    }
+
+    .date-tag {
+      background: var(--warn-soft);
+      color: var(--warn);
+      padding: .05rem .35rem;
+      border-radius: 4px;
+      font-size: .78rem;
+      font-weight: 600;
+    }
+
+    .record.major-record {
+      background: var(--serious-soft);
+      margin: 0 -.85rem;
+      padding: .6rem .85rem;
+    }
+
+    .record.merit-record {
+      background: var(--good-soft);
+      margin: 0 -.85rem;
+      padding: .6rem .85rem;
+    }
+
+    .counts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem;
+    }
+
+    .count-tag {
+      font-size: .75rem;
+      font-weight: 600;
+      padding: .1rem .4rem;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: var(--muted);
+    }
+
+    .count-tag.on {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .count-tag.on.good {
+      background: var(--good-soft);
+      color: var(--good);
+    }
+
+    .empty, .error {
+      padding: 1.5rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      background: var(--card);
+    }
+
+    .error { color: var(--serious); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <a href="../index.html">← 2A</a>
+    <span>操行紀錄（學生版）</span>
+    <a href="2A-conduct.pdf" style="margin-left:auto;color:rgba(255,255,255,.9);font-weight:500;text-decoration:none">PDF</a>
+  </div>
+
+  <main>
+    <p class="summary" id="summary"></p>
+    <div class="toolbar">
+      <input class="search" id="search" type="search" placeholder="搜尋姓名或班號…" autocomplete="off">
+      <button type="button" class="filter-btn active" data-filter="all">全部</button>
+      <button type="button" class="filter-btn" data-filter="demerit">有懲罰</button>
+      <button type="button" class="filter-btn" data-filter="merit">有優點</button>
+    </div>
+    <div id="students"></div>
+  </main>
+
+  <script>
+    (function () {
+      const PASSWORD = "1234567";
+      while (true) {
+        const input = window.prompt("Enter password to view conduct records:");
+        if (input === null) {
+          location.href = "about:blank";
+          return;
+        }
+        if (input === PASSWORD) break;
+        window.alert("Incorrect password");
+      }
+    })();
+
+    let allStudents = [];
+    let activeFilter = "all";
+
+    const RAW = `班別,班號,姓名,日期,事件,備註,其他跟進,大過,小過,缺點
+2A,2,陳錦賢,20/05/2026,遲到五次 缺點,19/3,27/4,28/4,13/5,19/5,-,0,0,1,FKK
+2A,5,封采,05/06/2026,遲到五次 缺點,25/3,20/4,22/4,4/5,20/5,-,0,0,1,FKK
+2A,6,郭君鵬,12/02/2026,校服儀容違規五次 缺點,6/1,7/1,12/1,19/1,21/1,-,0,0,1,LKLG
+2A,6,郭君鵬,24/04/2026,遲到五次 缺點,26/1,29/1,6/2,14/4,17/4,-,0,0,1,FKK
+2A,6,郭君鵬,21/05/2026,校服儀容違規五次 缺點,27/1,5/2,23/3,9/4,13/4,-,0,0,1,LKLG
+2A,6,郭君鵬,01/06/2026,不誠實 小過,-,-,0,1,0,CPWR
+2A,8,黃嘉樂,21/05/2026,校服儀容違規五次 缺點,21/1,28/1,3/3,4/3,15/4,-,0,0,1,LKLG
+2A,10,蔣少涵,30/04/2026,校服儀容違規五次 缺點,7/1,14/1,20/1,5/3,5/3,-,0,0,1,LKLG
+2A,12,梁柏宇,21/05/2026,校服儀容違規五次 缺點,19/1,5/3,6/3,11/3,17/3,-,0,0,1,FKK
+2A,12,梁柏宇,05/06/2026,遲到五次 缺點,11/5,14/5,15/5,28/5,2/6,-,0,1,0,GD
+2A,24,許學臻,26/03/2026,曠課/逃學 小過,-,-,0,1,1,LKLG
+2A,34,林煜翔,30/04/2026,校服儀容違規五次 缺點,21/1,28/1,11/2,4/3,4/3,-,0,0,1,FKK
+2A,35,蔡子萱,05/06/2026,遲到五次 缺點,20/4,4/5,11/5,26/5,28/5,-,0,0,1,
+
+
+
+頁碼,班別,班號,姓名,日期,前置補充,內容,後置補充,出處,類別,大功,小功,優點
+1,2A,1,陳政延,01/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+1,2A,1,陳政延,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+1,2A,1,陳政延,06/06/2026,,飛躍獎勵計劃銀章,,,,0,0,3,LMW
+1,2A,2,陳錦賢,22/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+1,2A,2,陳錦賢,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,2,CPWR
+1,2A,2,陳錦賢,06/06/2026,,飛躍獎勵計劃銀章,,,,0,0,3,LMW
+1,2A,3,陳思涵,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,2,CPWR
+1,2A,3,陳思涵,06/06/2026,,飛躍獎勵計劃銀章,,,,0,0,3,LMW
+1,2A,4,莊曼妮,30/04/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,WL
+1,2A,4,莊曼妮,20/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,PCW
+1,2A,4,莊曼妮,01/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+1,2A,4,莊曼妮,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,2,CPWR
+1,2A,4,莊曼妮,06/06/2026,,飛躍獎勵計劃銀章,,,,0,0,3,LMW
+1,2A,5,封采,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+2,2A,5,封采,30/04/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,WL
+2,2A,5,封采,22/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+2,2A,6,郭君鵬,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+2,2A,6,郭君鵬,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+2,2A,6,郭君鵬,22/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+2,2A,6,郭君鵬,06/06/2026,,飛躍獎勵計劃銅章,,,,0,0,1,LMW
+2,2A,7,何天恩,20/05/2026,,值得嘉許的表現,,,,0,0,1,CHY
+2,2A,7,何天恩,02/06/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+2,2A,7,何天恩,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+2,2A,7,何天恩,06/06/2026,,飛躍獎勵計劃銅章,,,,0,0,1,LMW
+2,2A,7,何天恩,11/06/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+2,2A,8,黃嘉樂,20/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,TLY
+2,2A,8,黃嘉樂,01/06/2026,,班長 優點,,,,0,0,1,PCW
+3,2A,8,黃嘉樂,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,2,CPWR
+3,2A,8,黃嘉樂,06/06/2026,,飛躍獎勵計劃銀章,,,,0,0,2,LMW
+3,2A,9,黃詩茹,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+3,2A,9,黃詩茹,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+3,2A,9,黃詩茹,20/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,PCW
+3,2A,9,黃詩茹,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,2,CPWR
+3,2A,9,黃詩茹,06/06/2026,,飛躍獎勵計劃金章,,,,0,0,3,LMW
+3,2A,10,蔣少涵,02/06/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,CPWR
+3,2A,10,蔣少涵,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,TLY
+3,2A,10,蔣少涵,11/06/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,PCW
+3,2A,12,梁柏宇,03/06/2026,,值得嘉許的表現,,,,0,0,1,LMW
+3,2A,12,梁柏宇,06/06/2026,,飛躍獎勵計劃銅章,,,,0,0,1,CHY
+3,2A,13,李秋達,22/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,HHL
+3,2A,13,李秋達,17/06/2026,,學會幹事,,,,0,0,1,
+4,2A,14,李一航,10/02/2026,,校外比賽/活動表現優異，為校爭光,,,,0,0,1,TLY
+4,2A,14,李一航,21/05/2026,,值得嘉許的表現,,,,0,0,1,WSH
+4,2A,14,李一航,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+4,2A,14,李一航,06/06/2026,,飛躍獎勵計劃銀章,,,,0,0,2,LMW
+4,2A,15,李一鳴,10/02/2026,,校外比賽/活動表現優異，為校爭光,,,,0,0,1,TLY
+4,2A,15,李一鳴,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+4,2A,16,呂錦峰,10/02/2026,,校外比賽/活動表現優異，為校爭光,,,,0,0,1,TLY
+4,2A,16,呂錦峰,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+4,2A,16,呂錦峰,11/03/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+4,2A,16,呂錦峰,22/04/2026,,校外比賽/活動表現優異，為校爭光,,,,0,0,1,TLY
+4,2A,16,呂錦峰,30/04/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,WL
+4,2A,16,呂錦峰,20/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,PCW
+4,2A,16,呂錦峰,02/06/2026,,學會幹事,,,,0,0,1,TLY
+4,2A,16,呂錦峰,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+5,2A,16,呂錦峰,06/06/2026,,飛躍獎勵計劃銀章,,,,0,0,2,LMW
+5,2A,16,呂錦峰,17/06/2026,,學會幹事,,,,0,0,1,HHL
+5,2A,17,蘇紫瑜,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+5,2A,17,蘇紫瑜,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+5,2A,17,蘇紫瑜,11/03/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+5,2A,17,蘇紫瑜,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+5,2A,17,蘇紫瑜,06/06/2026,,飛躍獎勵計劃銀章,,,,0,0,2,LMW
+5,2A,19,王復生,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+5,2A,19,王復生,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+5,2A,19,王復生,20/04/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+5,2A,19,王復生,02/06/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+5,2A,19,王復生,02/06/2026,,值得嘉許的表現,,,,0,0,1,XZQ
+5,2A,19,王復生,11/06/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+5,2A,20,吳國豪,02/06/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+6,2A,20,吳國豪,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,2,CPWR
+6,2A,20,吳國豪,06/06/2026,,飛躍獎勵計劃銅章,,,,0,0,1,LMW
+6,2A,20,吳國豪,11/06/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+6,2A,21,吳沅莹,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,CHY
+6,2A,21,吳沅莹,11/03/2026,,飛躍卡計劃表現優良,,,,0,0,1,WYM
+6,2A,21,吳沅莹,17/03/2026,,值得嘉許的表現,,,,0,0,1,TTC
+6,2A,21,吳沅莹,20/05/2026,,值得嘉許的表現,,,,0,0,1,CHY
+6,2A,21,吳沅莹,20/05/2026,,值得嘉許的表現,,,,0,0,1,CHY
+6,2A,21,吳沅莹,22/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,W CY
+6,2A,21,吳沅莹,26/05/2026,,學會幹事,,,,0,0,1,WCY
+6,2A,21,吳沅莹,01/06/2026,,值得嘉許的表現,,,,0,0,1,SPY
+6,2A,21,吳沅莹,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,3,CPWR
+6,2A,22,肖辰臻,06/06/2026,,飛躍獎勵計劃金章,,,,0,0,3,LMW
+6,2A,23,許繼耿,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+7,2A,23,許繼耿,11/03/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+7,2A,23,許繼耿,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+7,2A,23,許繼耿,06/06/2026,,飛躍獎勵計劃金章,,,,0,0,3,LMW
+7,2A,23,許繼耿,17/06/2026,,學會幹事,,,,0,0,1,HHL
+7,2A,23,許繼耿,17/06/2026,,學界體育比賽(個人)獲優異成績,,,,0,0,1,HHL
+7,2A,24,許學臻,30/04/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,WL
+7,2A,24,許學臻,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,2,CPWR
+7,2A,24,許學臻,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+7,2A,24,許學臻,06/06/2026,,飛躍獎勵計劃銅章,,,,0,0,1,LMW
+7,2A,25,楊星睿,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+7,2A,25,楊星睿,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+7,2A,25,楊星睿,02/06/2026,,值得嘉許的表現,,,,0,0,1,XZQ
+7,2A,25,楊星睿,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+7,2A,25,楊星睿,17/06/2026,,學會幹事,,,,0,0,1,HHL
+8,2A,26,姚銘,10/02/2026,,校外比賽/活動表現優異，為校爭光,,,,0,0,1,TLY
+8,2A,26,姚銘,11/03/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+8,2A,26,姚銘,09/04/2026,,校外比賽/活動表現優異，為校爭光,,,,0,0,1,TLY
+8,2A,26,姚銘,22/04/2026,,校外比賽/活動表現優異，為校爭光,,,,0,0,1,TLY
+8,2A,26,姚銘,06/06/2026,,飛躍獎勵計劃銅章,,,,0,0,1,LMW
+8,2A,27,易容妮,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+8,2A,27,易容妮,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+8,2A,27,易容妮,30/04/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,WL
+8,2A,27,易容妮,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,3,CPWR
+8,2A,27,易容妮,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+8,2A,27,易容妮,06/06/2026,,飛躍獎勵計劃金章,,,,0,0,3,LMW
+8,2A,27,易容妮,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+8,2A,28,余嘉浠,11/03/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+8,2A,28,余嘉浠,17/03/2026,,值得嘉許的表現,,,,0,0,1,WYM
+9,2A,28,余嘉浠,20/05/2026,,值得嘉許的表現,,,,0,0,1,TTC
+9,2A,28,余嘉浠,22/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,W CY
+9,2A,28,余嘉浠,26/05/2026,,學會幹事,,,,0,0,1,SPY
+9,2A,28,余嘉浠,26/05/2026,,值得嘉許的表現,,,,0,0,1,SPY
+9,2A,28,余嘉浠,01/06/2026,,值得嘉許的表現,,,,0,0,1,CPWR
+9,2A,28,余嘉浠,01/06/2026,,班長 優點,,,,0,0,4,CPWR
+9,2A,28,余嘉浠,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+9,2A,29,曾嘉欣,11/03/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+9,2A,29,曾嘉欣,22/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,TLY
+9,2A,29,曾嘉欣,02/06/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,5,CPWR
+9,2A,29,曾嘉欣,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,2,LMW
+9,2A,29,曾嘉欣,06/06/2026,,飛躍獎勵計劃銀章,,,,0,0,1,TLY
+9,2A,29,曾嘉欣,11/06/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+9,2A,30,張梓萱,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,CPWR
+10,2A,30,張梓萱,11/03/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
+10,2A,30,張梓萱,17/03/2026,,值得嘉許的表現,,,,0,0,1,WYM
+10,2A,30,張梓萱,20/05/2026,,值得嘉許的表現,,,,0,0,1,TTC
+10,2A,30,張梓萱,22/05/2026,,飛躍卡計劃表現優良,,,,0,0,1,W CY
+10,2A,30,張梓萱,26/05/2026,,學會幹事,,,,0,0,1,SPY
+10,2A,30,張梓萱,26/05/2026,,值得嘉許的表現,,,,0,0,1,SPY
+10,2A,30,張梓萱,01/06/2026,,值得嘉許的表現,,,,0,0,2,CPWR
+10,2A,30,張梓萱,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,LMW
+10,2A,31,鄭敬熹,06/06/2026,,飛躍獎勵計劃銅章,,,,0,0,1,WL
+10,2A,33,和仟惠,30/04/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,CPWR
+10,2A,33,和仟惠,01/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+10,2A,33,和仟惠,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,LMW
+10,2A,33,和仟惠,06/06/2026,,飛躍獎勵計劃銅章,,,,0,0,1,CPWR
+10,2A,34,林煜翔,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+11,2A,34,林煜翔,06/06/2026,,飛躍獎勵計劃金章,,,,0,0,3,LMW
+11,2A,35,蔡子萱,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+11,2A,36,方紫瑜,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+11,2A,37,邱若曦,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,2,LMW
+11,2A,37,邱若曦,06/06/2026,,飛躍獎勵計劃銀章,,,,0,0,,`;
+
+
+    function num(v) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function parseDemeritRow(line) {
+      const parts = line.split(",");
+      const staff = (parts.pop() || "").trim();
+      const demerit = parts.pop();
+      const minorOffence = parts.pop();
+      const majorOffence = parts.pop();
+      const followUp = parts.pop();
+      const klass = parts.shift();
+      const no = parts.shift();
+      const name = parts.shift();
+      const date = parts.shift();
+      const event = parts.shift();
+      const notes = parts.filter((p) => p && p !== "-");
+
+      return {
+        type: "demerit",
+        klass,
+        no: Number(no),
+        name,
+        date,
+        event,
+        notes,
+        followUp: followUp === "-" ? "" : followUp,
+        majorOffence: num(majorOffence),
+        minorOffence: num(minorOffence),
+        demerit: num(demerit),
+        staff,
+        isMajor: event.includes("小過"),
+      };
+    }
+
+    function parseMeritRow(line) {
+      const parts = line.split(",");
+      const staff = (parts.pop() || "").trim();
+      const merit = parts.pop();
+      const minorMerit = parts.pop();
+      const majorMerit = parts.pop();
+      const category = parts.pop();
+      const source = parts.pop();
+      const postNote = parts.pop();
+      const content = parts.pop();
+      const preNote = parts.pop();
+      const date = parts.pop();
+      const name = parts.pop();
+      const no = parts.pop();
+      const klass = parts.pop();
+      parts.shift();
+
+      return {
+        type: "merit",
+        klass,
+        no: Number(no),
+        name,
+        date,
+        content,
+        preNote: preNote === "-" ? "" : preNote,
+        postNote: postNote === "-" ? "" : postNote,
+        source: source === "-" ? "" : source,
+        category: category === "-" ? "" : category,
+        majorMerit: num(majorMerit),
+        minorMerit: num(minorMerit),
+        merit: num(merit),
+        staff,
+      };
+    }
+
+    function parseRaw(text) {
+      const demerits = [];
+      const merits = [];
+      let mode = null;
+
+      for (const line of text.trim().split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        if (trimmed.startsWith("班別,班號,姓名,日期,事件")) {
+          mode = "demerit";
+          continue;
+        }
+        if (trimmed.startsWith("頁碼,班別,班號,姓名")) {
+          mode = "merit";
+          continue;
+        }
+
+        if (mode === "demerit") demerits.push(parseDemeritRow(trimmed));
+        else if (mode === "merit") merits.push(parseMeritRow(trimmed));
+      }
+
+      return { demerits, merits };
+    }
+
+    function groupByStudent(demerits, merits) {
+      const map = new Map();
+
+      function ensure(row) {
+        const key = row.no + "|" + row.name;
+        if (!map.has(key)) {
+          map.set(key, {
+            no: row.no,
+            name: row.name,
+            klass: row.klass,
+            demerits: [],
+            merits: [],
+          });
+        }
+        return map.get(key);
+      }
+
+      demerits.forEach((row) => ensure(row).demerits.push(row));
+      merits.forEach((row) => ensure(row).merits.push(row));
+
+      return [...map.values()].sort((a, b) => a.no - b.no);
+    }
+
+    function renderCount(label, value, good) {
+      return `<span class="count-tag${value ? " on" + (good ? " good" : "") : ""}">${label} ${value}</span>`;
+    }
+
+    function sumDemeritTotals(records) {
+      return records.reduce(
+        (t, r) => ({
+          majorOffence: t.majorOffence + r.majorOffence,
+          minorOffence: t.minorOffence + r.minorOffence,
+          demerit: t.demerit + r.demerit,
+        }),
+        { majorOffence: 0, minorOffence: 0, demerit: 0 }
+      );
+    }
+
+    function sumMeritTotals(records) {
+      return records.reduce(
+        (t, r) => ({
+          majorMerit: t.majorMerit + r.majorMerit,
+          minorMerit: t.minorMerit + r.minorMerit,
+          merit: t.merit + r.merit,
+        }),
+        { majorMerit: 0, minorMerit: 0, merit: 0 }
+      );
+    }
+
+    function renderDemeritTotals(records) {
+      const t = sumDemeritTotals(records);
+      return `<div class="section-totals demerit">${renderCount("大過", t.majorOffence)}${renderCount("小過", t.minorOffence)}${renderCount("缺點", t.demerit)}</div>`;
+    }
+
+    function renderMeritTotals(records) {
+      const t = sumMeritTotals(records);
+      return `<div class="section-totals merit">${renderCount("大功", t.majorMerit, true)}${renderCount("小功", t.minorMerit, true)}${renderCount("優點", t.merit, true)}</div>`;
+    }
+
+    function renderDemerit(row) {
+      const notesHtml = row.notes.length
+        ? `<div class="meta-row"><span class="meta-label">相關日期</span><span class="dates">${row.notes.map((d) => `<span class="date-tag">${d}</span>`).join("")}</span></div>`
+        : "";
+
+      const followHtml = row.followUp
+        ? `<div class="meta-row"><span class="meta-label">其他跟進</span><span>${row.followUp}</span></div>`
+        : "";
+
+      return `<li class="record${row.isMajor ? " major-record" : ""}">
+        <div class="record-top">
+          <span class="date">${row.date}</span>
+          <span class="event ${row.isMajor ? "major" : "minor"}">${row.event}</span>
+        </div>
+        <div class="meta">${notesHtml}${followHtml}</div>
+      </li>`;
+    }
+
+    function renderMerit(row) {
+      const extra = [
+        row.preNote && `<div class="meta-row"><span class="meta-label">前置</span><span>${row.preNote}</span></div>`,
+        row.postNote && `<div class="meta-row"><span class="meta-label">後置</span><span>${row.postNote}</span></div>`,
+        row.source && `<div class="meta-row"><span class="meta-label">出處</span><span>${row.source}</span></div>`,
+        row.category && `<div class="meta-row"><span class="meta-label">類別</span><span>${row.category}</span></div>`,
+      ].filter(Boolean).join("");
+
+      return `<li class="record merit-record">
+        <div class="record-top">
+          <span class="date">${row.date}</span>
+          <span class="event merit">${row.content}</span>
+        </div>
+        ${extra ? `<div class="meta">${extra}</div>` : ""}
+      </li>`;
+    }
+
+    function renderStudent(student) {
+      const div = document.createElement("div");
+      div.className = "student";
+      div.dataset.no = student.no;
+      div.dataset.name = student.name;
+      div.dataset.hasDemerit = student.demerits.length ? "1" : "0";
+      div.dataset.hasMerit = student.merits.length ? "1" : "0";
+
+      const badges = [
+        student.demerits.length ? `<span class="badge demerit">${student.demerits.length} 懲</span>` : "",
+        student.merits.length ? `<span class="badge merit">${student.merits.length} 優</span>` : "",
+      ].filter(Boolean).join("");
+
+      const demeritSection = student.demerits.length
+        ? `<p class="section-label demerit">懲罰</p>${renderDemeritTotals(student.demerits)}<ul class="records">${student.demerits.map(renderDemerit).join("")}</ul>`
+        : "";
+
+      const meritSection = student.merits.length
+        ? `<p class="section-label merit">優點</p>${renderMeritTotals(student.merits)}<ul class="records">${student.merits.map(renderMerit).join("")}</ul>`
+        : "";
+
+      div.innerHTML = `
+        <div class="student-head">
+          <span class="no">${student.no}</span>
+          <span class="name">${student.name}</span>
+          <div class="badges">${badges}</div>
+        </div>
+        ${demeritSection}
+        ${meritSection}
+      `;
+      return div;
+    }
+
+    function applyFilters() {
+      const q = document.getElementById("search").value.trim().toLowerCase();
+      let shown = 0;
+
+      document.querySelectorAll(".student").forEach((el) => {
+        const matchSearch = !q
+          || el.dataset.name.toLowerCase().includes(q)
+          || el.dataset.no.includes(q);
+        const matchFilter = activeFilter === "all"
+          || (activeFilter === "demerit" && el.dataset.hasDemerit === "1")
+          || (activeFilter === "merit" && el.dataset.hasMerit === "1");
+        const visible = matchSearch && matchFilter;
+        el.classList.toggle("hidden", !visible);
+        if (visible) shown += 1;
+      });
+
+      const total = allStudents.length;
+      document.getElementById("summary").textContent = shown === total
+        ? document.getElementById("summary").dataset.full
+        : `${shown} / ${total} 位學生 · ${document.getElementById("summary").dataset.full}`;
+    }
+
+    function render(students, demeritCount, meritCount) {
+      allStudents = students;
+      const container = document.getElementById("students");
+      container.innerHTML = "";
+
+      students.forEach((student) => {
+        container.appendChild(renderStudent(student));
+      });
+
+      const summary = `${students.length} 位學生 · ${demeritCount} 項懲罰 · ${meritCount} 項優點`;
+      const summaryEl = document.getElementById("summary");
+      summaryEl.textContent = summary;
+      summaryEl.dataset.full = summary;
+    }
+
+    document.querySelectorAll(".filter-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeFilter = btn.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    document.getElementById("search").addEventListener("input", applyFilters);
+
+    const { demerits, merits } = parseRaw(RAW);
+    render(groupByStudent(demerits, merits), demerits.length, merits.length);
+  </script>
+</body>
+</html>
