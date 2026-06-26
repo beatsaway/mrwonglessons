@@ -137,14 +137,23 @@ function fmtTotals(labels, values) {
   return labels.map((label, i) => `<span>${esc(label)} ${values[i]}</span>`).join("");
 }
 
+function fmtRowAward(labels, values) {
+  return labels
+    .map((label, i) => (values[i] > 0 ? `${label} ${values[i]}` : ""))
+    .filter(Boolean)
+    .join(" · ");
+}
+
 function renderDemeritTable(records) {
   const rows = records
     .map((row) => {
       const notes = row.notes.length ? esc(row.notes.join("、")) : "";
+      const award = esc(fmtRowAward(["大過", "小過", "缺點"], [row.majorOffence, row.minorOffence, row.demerit]));
       const cls = row.isMajor ? "major" : "minor";
       return `<tr class="${cls}">
         <td class="date">${esc(row.date)}</td>
         <td class="detail">${esc(row.event)}</td>
+        <td class="award">${award}</td>
         <td class="notes">${notes}</td>
       </tr>`;
     })
@@ -154,10 +163,14 @@ function renderDemeritTable(records) {
 
 function renderMeritTable(records) {
   const rows = records
-    .map(
-      (row) =>
-        `<tr><td class="date">${esc(row.date)}</td><td class="detail" colspan="2">${esc(row.content)}</td></tr>`
-    )
+    .map((row) => {
+      const award = esc(fmtRowAward(["大功", "小功", "優點"], [row.majorMerit, row.minorMerit, row.merit]));
+      return `<tr>
+        <td class="date">${esc(row.date)}</td>
+        <td class="detail">${esc(row.content)}</td>
+        <td class="award">${award}</td>
+      </tr>`;
+    })
     .join("");
   return `<table><tbody>${rows}</tbody></table>`;
 }
@@ -267,8 +280,10 @@ const html = `<!DOCTYPE html>
     table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
     td { padding: 2px 8px; vertical-align: top; border-bottom: 1px solid #eee; }
     tr:last-child td { border-bottom: none; }
-    td.date { width: 18%; white-space: nowrap; font-weight: 600; }
-    td.notes { width: 32%; font-size: 8pt; color: #444; }
+    td.date { width: 16%; white-space: nowrap; font-weight: 600; }
+    td.detail { width: 38%; }
+    td.award { width: 18%; font-size: 8pt; font-weight: 600; color: #333; white-space: nowrap; }
+    td.notes { width: 28%; font-size: 8pt; color: #444; }
     tr.major td { background: #fde8e8; }
     tr.minor td.detail { color: #7a4a00; }
   </style>

@@ -148,31 +148,6 @@
       font-weight: 600;
     }
 
-    .badges {
-      margin-left: auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: .3rem;
-      justify-content: flex-end;
-    }
-
-    .badge {
-      font-size: .72rem;
-      font-weight: 600;
-      padding: .12rem .45rem;
-      border-radius: 999px;
-    }
-
-    .badge.demerit {
-      background: var(--serious-soft);
-      color: var(--serious);
-    }
-
-    .badge.merit {
-      background: var(--good-soft);
-      color: var(--good);
-    }
-
     .section-label {
       margin: 0;
       padding: .45rem .85rem 0;
@@ -466,13 +441,13 @@
 8,2A,26,姚銘,09/04/2026,,校外比賽/活動表現優異，為校爭光,,,,0,0,1,TLY
 8,2A,26,姚銘,22/04/2026,,校外比賽/活動表現優異，為校爭光,,,,0,0,1,TLY
 8,2A,26,姚銘,06/06/2026,,飛躍獎勵計劃銅章,,,,0,0,1,LMW
-8,2A,27,易容妮,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
-8,2A,27,易容妮,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
-8,2A,27,易容妮,30/04/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,WL
-8,2A,27,易容妮,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,3,CPWR
-8,2A,27,易容妮,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
-8,2A,27,易容妮,06/06/2026,,飛躍獎勵計劃金章,,,,0,0,3,LMW
-8,2A,27,易容妮,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+8,2A,27,易容妃,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+8,2A,27,易容妃,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
+8,2A,27,易容妃,30/04/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,WL
+8,2A,27,易容妃,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,3,CPWR
+8,2A,27,易容妃,03/06/2026,,飛躍卡計劃表現優良,,,,0,0,1,CPWR
+8,2A,27,易容妃,06/06/2026,,飛躍獎勵計劃金章,,,,0,0,3,LMW
+8,2A,27,易容妃,10/03/2026,,校外比賽/活動獲獎，為校爭光,,,,0,0,1,TLY
 8,2A,28,余嘉浠,11/03/2026,,飛躍卡計劃表現優良,,,,0,0,1,CHY
 8,2A,28,余嘉浠,17/03/2026,,值得嘉許的表現,,,,0,0,1,WYM
 9,2A,28,余嘉浠,20/05/2026,,值得嘉許的表現,,,,0,0,1,TTC
@@ -665,6 +640,14 @@
       return `<div class="section-totals merit">${renderCount("大功", t.majorMerit, true)}${renderCount("小功", t.minorMerit, true)}${renderCount("優點", t.merit, true)}</div>`;
     }
 
+    function renderRowCounts(label, items, good) {
+      const parts = items
+        .filter((item) => item.value > 0)
+        .map((item) => renderCount(item.label, item.value, good));
+      if (!parts.length) return "";
+      return `<div class="meta-row"><span class="meta-label">${label}</span><span class="counts">${parts.join("")}</span></div>`;
+    }
+
     function renderDemerit(row) {
       const notesHtml = row.notes.length
         ? `<div class="meta-row"><span class="meta-label">相關日期</span><span class="dates">${row.notes.map((d) => `<span class="date-tag">${d}</span>`).join("")}</span></div>`
@@ -678,12 +661,18 @@
         ? `<div class="meta-row"><span class="meta-label">負責人</span><span>${row.staff}</span></div>`
         : "";
 
+      const awardHtml = renderRowCounts("處分", [
+        { label: "大過", value: row.majorOffence },
+        { label: "小過", value: row.minorOffence },
+        { label: "缺點", value: row.demerit },
+      ], false);
+
       return `<li class="record${row.isMajor ? " major-record" : ""}">
         <div class="record-top">
           <span class="date">${row.date}</span>
           <span class="event ${row.isMajor ? "major" : "minor"}">${row.event}</span>
         </div>
-        <div class="meta">${notesHtml}${followHtml}${staffHtml}</div>
+        <div class="meta">${awardHtml}${notesHtml}${followHtml}${staffHtml}</div>
       </li>`;
     }
 
@@ -699,7 +688,13 @@
         ? `<div class="meta-row"><span class="meta-label">負責人</span><span>${row.staff}</span></div>`
         : "";
 
-      const meta = [extra, staffHtml].filter(Boolean).join("");
+      const awardHtml = renderRowCounts("獎勵", [
+        { label: "大功", value: row.majorMerit },
+        { label: "小功", value: row.minorMerit },
+        { label: "優點", value: row.merit },
+      ], true);
+
+      const meta = [awardHtml, extra, staffHtml].filter(Boolean).join("");
       return `<li class="record merit-record">
         <div class="record-top">
           <span class="date">${row.date}</span>
@@ -717,11 +712,6 @@
       div.dataset.hasDemerit = student.demerits.length ? "1" : "0";
       div.dataset.hasMerit = student.merits.length ? "1" : "0";
 
-      const badges = [
-        student.demerits.length ? `<span class="badge demerit">${student.demerits.length} 懲</span>` : "",
-        student.merits.length ? `<span class="badge merit">${student.merits.length} 優</span>` : "",
-      ].filter(Boolean).join("");
-
       const demeritSection = student.demerits.length
         ? `<p class="section-label demerit">懲罰</p>${renderDemeritTotals(student.demerits)}<ul class="records">${student.demerits.map(renderDemerit).join("")}</ul>`
         : "";
@@ -734,7 +724,6 @@
         <div class="student-head">
           <span class="no">${student.no}</span>
           <span class="name">${student.name}</span>
-          <div class="badges">${badges}</div>
         </div>
         ${demeritSection}
         ${meritSection}
