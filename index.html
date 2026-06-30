@@ -357,35 +357,6 @@
   </style>
 </head>
 <body>
-  <dialog id="notice-dialog" class="notice-dialog" aria-labelledby="notice-title">
-    <div class="notice-inner">
-      <h2 id="notice-title">To 5C,</h2>
-      <p>
-        Please email your images to
-        <a href="mailto:tortorken.education@gmail.com">tortorken.education@gmail.com</a>
-        if you want them printed.
-      </p>
-      <p><strong>Email title:</strong> Class + Name</p>
-      <h3>What you could print</h3>
-      <ul>
-        <li>Pictures of collections for inspiration</li>
-        <li>Pictures of artworks by an artist that you are studying</li>
-      </ul>
-      <p><strong>Important:</strong> Make sure you also write to mention what you like and dislike about those artworks and the artist that made them.</p>
-      <p>If you didn't bring your workbook home, you can write it on a piece of paper that you can glue into your workbook later.</p>
-      <div class="guidance-in-popup">
-        <p>
-          Check the
-          <a href="sba/workbook-pages-guide.html">workbook design guide</a>
-          for reference on what to do page by page.
-        </p>
-      </div>
-    </div>
-    <div class="dialog-actions">
-      <button type="button" class="dialog-close" data-close>Got it</button>
-    </div>
-  </dialog>
-
   <header class="site-header">
     <button
       type="button"
@@ -413,8 +384,8 @@
 
     <nav class="subject-panel" id="subject-sidebar" aria-label="Subject">
       <p class="panel-title">Subject</p>
-      <button type="button" class="is-active" id="sub-va" data-subject="va" aria-pressed="true" aria-controls="panel-va">Visual Art</button>
-      <button type="button" id="sub-ibdt" data-subject="ibdt" aria-pressed="false" aria-controls="panel-ibdt">IBDT</button>
+      <button type="button" class="is-active" id="sub-ibdt" data-subject="ibdt" aria-pressed="true" aria-controls="panel-ibdt">IBDT</button>
+      <button type="button" id="sub-va" data-subject="va" aria-pressed="false" aria-controls="panel-va">Visual Art</button>
       <button type="button" id="sub-rover" data-subject="rover" aria-pressed="false" aria-controls="panel-rover">ROVER</button>
       <button type="button" id="sub-en" data-subject="en" aria-pressed="false" aria-controls="panel-en">English</button>
       <button type="button" id="sub-zh" data-subject="zh" aria-pressed="false" aria-controls="panel-zh">中文</button>
@@ -423,7 +394,7 @@
     </nav>
 
     <div class="main">
-      <nav id="panel-va" aria-labelledby="sub-va">
+      <nav id="panel-va" hidden aria-labelledby="sub-va">
         <ul>
           <li class="group">HKDSE &amp; foundations</li>
           <li><a href="va/appreciation/index.html">HKDSE VA appreciation — how to answer</a></li>
@@ -518,7 +489,7 @@
           </li>
         </ul>
       </nav>
-      <nav id="panel-ibdt" hidden aria-labelledby="sub-ibdt">
+      <nav id="panel-ibdt" aria-labelledby="sub-ibdt">
         <ul>
           <li class="group">IB Design Technology</li>
           <li><a href="ibdt/index.html">IBDT home</a></li>
@@ -569,20 +540,6 @@
   </div>
 
   <script>
-    (function () {
-      var dlg = document.getElementById("notice-dialog");
-      var closeBtn = dlg.querySelector("[data-close]");
-      if (!dlg || typeof dlg.showModal !== "function") return;
-      dlg.showModal();
-      function close() {
-        dlg.close();
-      }
-      closeBtn.addEventListener("click", close);
-      dlg.addEventListener("click", function (e) {
-        if (e.target === dlg) close();
-      });
-    })();
-
     (function () {
       var panelVa = document.getElementById("panel-va");
       var panelIbdt = document.getElementById("panel-ibdt");
