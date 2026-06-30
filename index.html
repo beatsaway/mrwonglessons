@@ -415,6 +415,7 @@
       <p class="panel-title">Subject</p>
       <button type="button" class="is-active" id="sub-va" data-subject="va" aria-pressed="true" aria-controls="panel-va">Visual Art</button>
       <button type="button" id="sub-ibdt" data-subject="ibdt" aria-pressed="false" aria-controls="panel-ibdt">IBDT</button>
+      <button type="button" id="sub-rover" data-subject="rover" aria-pressed="false" aria-controls="panel-rover">ROVER</button>
       <button type="button" id="sub-en" data-subject="en" aria-pressed="false" aria-controls="panel-en">English</button>
       <button type="button" id="sub-zh" data-subject="zh" aria-pressed="false" aria-controls="panel-zh">中文</button>
       <button type="button" id="sub-is" data-subject="is" aria-pressed="false" aria-controls="panel-is">Integrated Science</button>
@@ -529,6 +530,12 @@
           <li><a href="ibdt/discussion/design-project-hl.html">Design project (HL)</a></li>
         </ul>
       </nav>
+      <nav id="panel-rover" hidden aria-labelledby="sub-rover">
+        <ul>
+          <li class="group">MYP Design · Rover</li>
+          <li><a href="rover/questiontypes.html">Evaluate rover designs</a></li>
+        </ul>
+      </nav>
       <nav id="panel-en" hidden aria-labelledby="sub-en">
         <ul>
           <li><a href="https://www.bbc.co.uk/learningenglish/features/the_reading_room" target="_blank" rel="noopener noreferrer">English Reading: Advanced</a></li>
@@ -579,6 +586,7 @@
     (function () {
       var panelVa = document.getElementById("panel-va");
       var panelIbdt = document.getElementById("panel-ibdt");
+      var panelRover = document.getElementById("panel-rover");
       var panelEn = document.getElementById("panel-en");
       var panelZh = document.getElementById("panel-zh");
       var panelIs = document.getElementById("panel-is");
@@ -589,6 +597,7 @@
       function setSubject(which) {
         panelVa.hidden = which !== "va";
         panelIbdt.hidden = which !== "ibdt";
+        panelRover.hidden = which !== "rover";
         panelEn.hidden = which !== "en";
         panelZh.hidden = which !== "zh";
         panelIs.hidden = which !== "is";
