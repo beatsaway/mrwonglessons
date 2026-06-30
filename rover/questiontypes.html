@@ -404,6 +404,13 @@
       font-weight: 600;
       color: var(--muted);
     }
+    .chat-sender[hidden] {
+      display: none;
+    }
+    .chat-msg.you + .chat-msg.you .chat-bubble,
+    .chat-msg.client + .chat-msg.client .chat-bubble {
+      margin-top: 0.15rem;
+    }
     .chat-bubble {
       display: inline-block;
       padding: 0.5rem 0.75rem;
@@ -537,6 +544,23 @@
       border-color: var(--accent);
       background: var(--accent-soft);
     }
+    .drop-zone.wrong {
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+    .drop-zone.wrong:not(:empty) {
+      min-width: 6rem;
+      min-height: 1.35rem;
+      padding: 0.05rem 0.25rem;
+      border: 1.5px solid #fca5a5;
+      background: #fef2f2;
+    }
+    .drop-zone.wrong:not(:empty) .chip {
+      padding: 0.12rem 0.3rem;
+      border: 1px solid #fecaca;
+      background: #fff;
+      border-radius: 3px;
+    }
     .drop-zone:not(:empty) {
       min-width: 0;
       min-height: 0;
@@ -600,7 +624,7 @@
           <div class="chat-msg you">
             <span class="chat-sender">You</span>
             <div class="chat-bubble">
-              <p>What is it for?</p>
+              <p>May I ask what is it for?</p>
             </div>
           </div>
           <div class="chat-msg you">
@@ -838,12 +862,28 @@
     }
   }
 
+  function syncSenderLabels() {
+    let prevSide = null;
+    msgs.forEach(function (msg) {
+      const sender = msg.querySelector('.chat-sender');
+      if (!sender) return;
+      if (!msg.classList.contains('visible')) {
+        sender.hidden = false;
+        return;
+      }
+      const side = msg.classList.contains('you') ? 'you' : 'client';
+      sender.hidden = prevSide === side;
+      prevSide = side;
+    });
+  }
+
   function revealMessage(index, onTyped) {
     const msg = msgs[index];
     const bubble = msg.querySelector('.chat-bubble');
     const p = bubble.querySelector('p');
     const img = bubble.querySelector('.chat-img');
     msg.classList.add('visible');
+    syncSenderLabels();
     bubble.classList.remove('chat-next');
     if (img) img.hidden = true;
     typeInto(p, p.dataset.fullText, function () {
@@ -859,6 +899,8 @@
     showUse(0, false);
     msgs.forEach(function (m) {
       m.classList.remove('visible');
+      const sender = m.querySelector('.chat-sender');
+      if (sender) sender.hidden = false;
     });
     thread.querySelectorAll('.chat-bubble').forEach(function (b) {
       b.classList.remove('chat-next', 'typing');
@@ -1294,15 +1336,29 @@
   }
 
   function returnToBank(chip) {
+    const zone = chip.closest('.drop-zone');
     bank.appendChild(chip);
+    if (zone) updateZoneState(zone);
+  }
+
+  function updateZoneState(zone) {
+    zone.classList.remove('wrong');
+    const chip = zone.querySelector('.chip');
+    if (!chip) return;
+    if (chip.dataset.id !== zone.dataset.answer) {
+      zone.classList.add('wrong');
+    }
   }
 
   function placeChip(chip, zone) {
     if (!zone.classList.contains('drop-zone')) return;
+    const fromZone = chip.closest('.drop-zone');
     const existing = zone.querySelector('.chip');
     if (existing && existing !== chip) returnToBank(existing);
     zone.appendChild(chip);
     clearSelected();
+    updateZoneState(zone);
+    if (fromZone && fromZone !== zone) updateZoneState(fromZone);
   }
 
   shuffle(chips).forEach(function (data) {
