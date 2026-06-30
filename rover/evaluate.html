@@ -54,6 +54,7 @@
       align-items: center;
       gap: 0.28rem;
       min-width: 0;
+      flex-wrap: wrap;
     }
     .scenario-context {
       font-size: 0.66rem;
@@ -82,19 +83,22 @@
     }
     .scenario-context .context-item:last-child { margin-bottom: 0; }
     .scenario-select {
-      flex: 1;
-      min-width: 0;
+      flex: 0 1 auto;
+      width: auto;
+      max-width: min(10.5rem, 52vw);
+      min-height: 0;
+      height: 1.5rem;
       font: inherit;
       font-size: 0.72rem;
       font-weight: 600;
       color: var(--text);
-      padding: 0.16rem 1.35rem 0.16rem 0.38rem;
+      padding: 0 1.35rem 0 0.38rem;
       border: 1px solid var(--border);
       border-radius: 4px;
-      background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235c6370' d='M2 3.5 5 6.5 8 3.5'/%3E%3C/svg%3E") no-repeat right 0.4rem center;
+      background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235c6370' d='M2 3.5 5 6.5 8 3.5'/%3E%3C/svg%3E") no-repeat right 0.35rem center;
       appearance: none;
       cursor: pointer;
-      line-height: 1.15;
+      line-height: 1.5rem;
     }
     .scenario-select:focus {
       outline: none;
@@ -106,14 +110,15 @@
       gap: 0.25rem;
     }
     .top-action {
-      padding: 0.16rem 0.38rem;
+      padding: 0 0.38rem;
+      height: 1.5rem;
       border: 1px solid var(--border);
       border-radius: 4px;
       background: var(--bg);
       font: inherit;
       font-size: 0.64rem;
       font-weight: 600;
-      line-height: 1.1;
+      line-height: 1.5rem;
       color: var(--muted);
       cursor: pointer;
       white-space: nowrap;
@@ -132,8 +137,18 @@
       background: var(--accent-soft);
       color: var(--accent);
     }
-    .top-sub {
-      display: block;
+    .stage-head {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.25rem 0.45rem;
+      margin: 0 0 0.25rem;
+    }
+    .stage-head h2 {
+      margin: 0;
+    }
+    .stage-prompt {
+      display: inline;
       margin: 0;
       padding: 0;
       border: none;
@@ -144,19 +159,19 @@
       font-weight: 600;
       text-align: left;
       line-height: 1.1;
-      width: 100%;
+      text-transform: none;
+      letter-spacing: normal;
     }
-    .top-sub.clickable {
+    .stage-prompt.clickable {
       cursor: pointer;
     }
-    .top-sub.clickable:hover {
+    .stage-prompt.clickable:hover {
       text-decoration: underline;
     }
-    .top-sub:disabled {
-      opacity: 0.55;
+    .stage-prompt:disabled {
       cursor: default;
     }
-    .top-sub.clickable[aria-expanded="true"] {
+    .stage-prompt.clickable[aria-expanded="true"] {
       text-decoration: underline;
     }
     .top-action.facts-btn.active {
@@ -635,12 +650,14 @@
         <button type="button" class="top-action facts-btn" id="scenario-facts-btn" disabled aria-expanded="false" aria-controls="scenario-context">Info</button>
       </div>
     </div>
-    <button type="button" class="top-sub" id="scenario-prompt" disabled aria-expanded="false" aria-controls="rover-grid">Which design is more suitable?</button>
     <div class="scenario-context" id="scenario-context" hidden></div>
   </header>
 
   <div class="stage">
-    <h2>Rover designs</h2>
+    <div class="stage-head">
+      <h2>Rover designs</h2>
+      <button type="button" class="stage-prompt" id="scenario-prompt" disabled aria-expanded="false" aria-controls="rover-grid">Which is more suitable?</button>
+    </div>
     <div class="thumb-grid" id="rover-grid"></div>
   </div>
 </div>
@@ -751,7 +768,7 @@
   const thread = document.getElementById('brief-chat');
   if (!thread) return;
 
-  const TYPE_DELAY = 50;
+  const TYPE_DELAY = 36;
   const msgs = [...thread.querySelectorAll('.chat-msg')];
   const cycleText = document.getElementById('client-use-text');
   const cycleImg = document.getElementById('client-use-img');
