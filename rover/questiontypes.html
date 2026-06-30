@@ -57,20 +57,53 @@
       flex-wrap: wrap;
     }
     .scenario-context {
+      margin: 0 0 0.35rem;
+      padding: 0.2rem 0 0.35rem;
+      border-bottom: 1px solid var(--border);
       font-size: 0.66rem;
-      line-height: 1.25;
+      line-height: 1.3;
       color: var(--muted);
     }
     .scenario-context[hidden] { display: none; }
-    .scenario-context p {
-      margin: 0 0 0.2rem;
+    .context-subs {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.28rem;
     }
-    .scenario-context p:last-child { margin-bottom: 0; }
-    .scenario-context strong {
+    .context-sub-q {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.18rem 0.35rem;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: var(--surface);
+      font: inherit;
+      font-size: 0.64rem;
       font-weight: 600;
-      color: var(--muted);
+      line-height: 1.25;
+      color: var(--factual);
+      cursor: pointer;
     }
-    .scenario-context .context-img {
+    .context-sub-q:hover {
+      background: #f3f4f6;
+      border-color: #d1d5db;
+    }
+    .context-sub-q.open {
+      border-color: #9ca3af;
+    }
+    .context-sub-a {
+      margin: 0.2rem 0 0;
+      padding-left: 0.15rem;
+      font-size: 0.64rem;
+      line-height: 1.35;
+      color: var(--muted);
+      font-weight: 400;
+    }
+    .context-sub-a .context-img {
       display: block;
       width: 100%;
       max-width: 13.5rem;
@@ -78,10 +111,7 @@
       border-radius: 6px;
       border: 1px solid var(--border);
     }
-    .scenario-context .context-item {
-      margin: 0 0 0.55rem;
-    }
-    .scenario-context .context-item:last-child { margin-bottom: 0; }
+    .context-sub-a[hidden] { display: none; }
     .scenario-select {
       flex: 0 1 auto;
       width: auto;
@@ -653,7 +683,7 @@
         <p class="intro-kicker">MYP Design · Inquiry</p>
         <h1 class="intro-topic" id="intro-topic">Planetary Rover Engineering</h1>
         <p class="intro-label">Lesson objective</p>
-        <p class="intro-objective">Learn how <span class="t-factual">factual</span>, <span class="t-conceptual">conceptual</span>, and <span class="t-debatable">debatable</span> questions are used in the design process.</p>
+        <p class="intro-objective">Learn and apply how <span class="t-factual">factual</span>, <span class="t-conceptual">conceptual</span>, and <span class="t-debatable">debatable</span> questions are used in the design process.</p>
       </div>
     </div>
   </div>
@@ -675,10 +705,10 @@
         <button type="button" class="top-action facts-btn" id="scenario-facts-btn" disabled aria-expanded="false" aria-controls="scenario-context">Info</button>
       </div>
     </div>
-    <div class="scenario-context" id="scenario-context" hidden></div>
   </header>
 
   <div class="stage">
+    <div class="scenario-context" id="scenario-context" hidden></div>
     <div class="stage-head">
       <h2>Rover designs</h2>
       <button type="button" class="stage-prompt" id="scenario-prompt" disabled aria-expanded="false" aria-controls="rover-grid">Which is more suitable?</button>
@@ -847,20 +877,14 @@
     tick();
   }
 
-  function showUse(idx, animate) {
+  function showUse(idx) {
     const u = clientUses[idx];
+    clearTyping();
+    cycleText.textContent = u.text;
     cycleImg.src = u.img;
     cycleImg.alt = u.alt;
     cycleText.dataset.fullText = u.text;
-    if (animate) {
-      cycleImg.hidden = true;
-      typeInto(cycleText, u.text, function () {
-        cycleImg.hidden = false;
-      });
-    } else {
-      cycleText.textContent = u.text;
-      cycleImg.hidden = false;
-    }
+    cycleImg.hidden = false;
   }
 
   function syncSenderLabels() {
@@ -886,9 +910,13 @@
     msg.classList.add('visible');
     syncSenderLabels();
     bubble.classList.remove('chat-next');
-    if (img) img.hidden = true;
+    if (img) {
+      p.textContent = p.dataset.fullText;
+      img.hidden = false;
+      if (onTyped) onTyped(bubble);
+      return;
+    }
     typeInto(p, p.dataset.fullText, function () {
-      if (img) img.hidden = false;
       if (onTyped) onTyped(bubble);
     });
   }
@@ -897,7 +925,7 @@
     clearTyping();
     step = 0;
     cycleIdx = 0;
-    showUse(0, false);
+    showUse(0);
     msgs.forEach(function (m) {
       m.classList.remove('visible');
       const sender = m.querySelector('.chat-sender');
@@ -935,7 +963,7 @@
       const msg = cycleTrigger.closest('.chat-msg');
       if (!msg.classList.contains('visible') || typing) return;
       cycleIdx = (cycleIdx + 1) % clientUses.length;
-      showUse(cycleIdx, true);
+      showUse(cycleIdx);
       return;
     }
 
@@ -952,7 +980,7 @@
     const msg = trigger.closest('.chat-msg');
     if (!msg.classList.contains('visible') || typing) return;
     cycleIdx = (cycleIdx + 1) % clientUses.length;
-    showUse(cycleIdx, true);
+    showUse(cycleIdx);
   });
 
   resetBriefChat();
@@ -1063,6 +1091,20 @@
           a: 'Sunlit routes near the Moon\'s south pole — close to permanently shadowed craters, but not inside them.',
           img: 'sunlitroutes.webp',
           alt: 'Sunlit routes near shadowed craters at the Moon\'s south pole',
+        },
+      ],
+      extraFacts: [
+        {
+          q: 'How cold is the rim compared with inside the crater?',
+          a: 'Sunlit ground on the rim can swing from about 120°C in daytime to below −170°C during the ~14-day lunar night. Permanently shadowed crater floors stay around −230°C or colder — far too cold for a solar-powered rover.',
+        },
+        {
+          q: 'How long does a signal take to reach Earth?',
+          a: 'Radio travels at light speed — roughly 1.3 seconds one way from the Moon to Earth, so a round trip is about 2.6 seconds. Driving from Earth will have noticeable lag.',
+        },
+        {
+          q: 'How strong is gravity on the Moon?',
+          a: 'About one-sixth of Earth\'s — the rover weighs far less, so it has less grip on loose dust and can slip or tip more easily on steep crater rims.',
         },
       ],
       scores: [
@@ -1192,16 +1234,47 @@
     });
   });
 
+  function renderFactItem(item, idPrefix, j) {
+    const subId = idPrefix + '-' + j;
+    let ansHtml = item.a;
+    if (item.img) {
+      ansHtml += '<img class="context-img" src="' + item.img + '" alt="' + (item.alt || '') + '" width="216" height="144" loading="lazy">';
+    }
+    return (
+      '<li class="context-sub-item">' +
+        '<button type="button" class="context-sub-q" aria-expanded="false" aria-controls="' + subId + '">' + item.q + '</button>' +
+        '<div class="context-sub-a" id="' + subId + '" hidden>' + ansHtml + '</div>' +
+      '</li>'
+    );
+  }
+
+  function renderSubList(subs, idPrefix) {
+    return subs.map(function (sub, j) {
+      return renderFactItem(sub, idPrefix, j);
+    }).join('');
+  }
+
+  function wireSubButtons(root) {
+    root.querySelectorAll('.context-sub-q').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const ans = document.getElementById(btn.getAttribute('aria-controls'));
+        const open = ans.hidden;
+        ans.hidden = !open;
+        btn.setAttribute('aria-expanded', open);
+        btn.classList.toggle('open', open);
+      });
+    });
+  }
+
   function renderContext(index) {
     const s = scenarios[index];
-    scenarioContext.innerHTML = s.context.map(function (item) {
-      let html = '<div class="context-item"><p><strong>' + item.q + '</strong> ' + item.a + '</p>';
-      if (item.img) {
-        html += '<img class="context-img" src="' + item.img + '" alt="' + (item.alt || '') + '" width="216" height="144" loading="lazy">';
-      }
-      html += '</div>';
-      return html;
-    }).join('');
+    const facts = s.context.slice();
+    if (s.extraFacts && s.extraFacts.length) {
+      facts.push.apply(facts, s.extraFacts);
+    }
+    scenarioContext.innerHTML =
+      '<ul class="context-subs">' + renderSubList(facts, 'context-fact-' + index) + '</ul>';
+    wireSubButtons(scenarioContext);
   }
 
   function setContextVisible(visible) {
