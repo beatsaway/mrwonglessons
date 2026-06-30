@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design inquiry questions</title>
+  <style>
+    :root {
+      --bg: #fff;
+      --surface: #f6f7f9;
+      --border: #e2e5ea;
+      --text: #1a1d23;
+      --muted: #5c6370;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --factual: #6b7280;
+      --conceptual: #2563eb;
+      --debatable: #dc2626;
+      --purpose: #a16207;
+      --radius: 8px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .shell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: min(68rem, 100% - 2.5rem);
+      width: 100%;
+      margin: 0 auto;
+      padding: 0.35rem 1.25rem 0;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.2rem 0 0.35rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .top .step-title {
+      margin: 0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      line-height: 1.2;
+      min-width: 0;
+    }
+    .step-select {
+      flex-shrink: 0;
+      max-width: 11rem;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--muted);
+      padding: 0.15rem 1.4rem 0.15rem 0.4rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235c6370' d='M2 3.5 5 6.5 8 3.5'/%3E%3C/svg%3E") no-repeat right 0.35rem center;
+      appearance: none;
+      cursor: pointer;
+      line-height: 1.2;
+    }
+    .step-select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .stage {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      padding: 0.5rem 0 1rem;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .slides {
+      position: relative;
+      width: 100%;
+    }
+    .slide {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+    .slide.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide-body {
+      margin: 0;
+      font-size: 1.05rem;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .chat-msg {
+      max-width: 22rem;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .chat-msg.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .chat-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      max-width: 26rem;
+    }
+    .chat-msg.client { align-self: flex-start; }
+    .chat-msg.you {
+      align-self: flex-end;
+      text-align: right;
+    }
+    .chat-msg.you .chat-sender { text-align: right; color: var(--accent); }
+    .chat-msg.you .chat-bubble {
+      background: #dcf8c6;
+      border-color: #d1f4cc;
+      border-radius: 10px 0 10px 10px;
+    }
+    .chat-sender {
+      display: block;
+      margin-bottom: 0.2rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .chat-bubble {
+      display: inline-block;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--text);
+      background: #fff;
+      border: 1px solid #e9edef;
+      border-radius: 0 10px 10px 10px;
+      box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.08);
+      text-align: left;
+    }
+    .chat-bubble.chat-next {
+      cursor: pointer;
+    }
+    .chat-bubble.chat-next:hover { filter: brightness(0.97); }
+    .chat-sender.chat-cycle-trigger {
+      cursor: pointer;
+    }
+    .chat-msg.visible .chat-sender.chat-cycle-trigger:hover {
+      color: var(--text);
+    }
+    .chat-bubble p {
+      margin: 0;
+    }
+    .chat-bubble .chat-img {
+      display: block;
+      width: 100%;
+      max-width: 16rem;
+      margin-top: 0.45rem;
+      border-radius: 6px;
+    }
+    #client-use-msg {
+      max-width: 18rem;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+    }
+    .panel ul {
+      margin: 0;
+      padding-left: 1.15rem;
+    }
+    .panel li {
+      margin: 0.4rem 0;
+      font-size: 0.95rem;
+    }
+    .q-prompt {
+      border-left: 3px solid var(--accent);
+      padding-left: 1rem;
+    }
+    .fill-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem 0.5rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .drop-zone {
+      display: inline-flex;
+      align-items: center;
+      min-width: 8rem;
+      min-height: 1.6rem;
+      padding: 0.1rem 0.3rem;
+      border: 1.5px dashed var(--border);
+      border-radius: 4px;
+      background: var(--surface);
+      vertical-align: middle;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .drop-zone:empty::after {
+      content: '';
+      display: block;
+      width: 6rem;
+      height: 1rem;
+    }
+    .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .drop-zone:not(:empty) {
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+    }
+    .drop-zone:not(:empty) .chip {
+      padding: 0;
+      border: none;
+      background: transparent;
+    }
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 1rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--border);
+    }
+    .word-bank.drag-over {
+      background: var(--accent-soft);
+      border-radius: var(--radius);
+    }
+    .chip {
+      display: inline-block;
+      padding: 0.15rem 0.35rem;
+      font-size: 0.85rem;
+      line-height: 1.3;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--bg);
+      color: var(--text);
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+    .chip:active { cursor: grabbing; }
+    .chip.dragging { opacity: 0.45; }
+    .chip.selected {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+    .check-list {
+      display: grid;
+      gap: 0.65rem;
+    }
+    .hint {
+      margin: 0.75rem 0 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .nav {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      padding: 0.85rem 0 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+    button {
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    button:hover:not(:disabled) {
+      background: var(--surface);
+      border-color: #c8cdd6;
+    }
+    button:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    button.primary:hover:not(:disabled) {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+    .t-factual { color: var(--factual); font-weight: 600; }
+    .t-conceptual { color: var(--conceptual); font-weight: 600; }
+    .t-debatable { color: var(--debatable); font-weight: 600; }
+    .t-purpose { color: var(--purpose); font-weight: 500; }
+    .reveal-trigger {
+      cursor: pointer;
+    }
+    .reveal-trigger:hover { opacity: 0.8; }
+    .examples-block[hidden] { display: none; }
+    .examples-eg {
+      margin: 0.6rem 0 0.35rem;
+      font-size: 0.88rem;
+    }
+    .examples-block--factual .examples-eg,
+    .examples-block--factual .example-q { color: var(--factual); }
+    .examples-block--conceptual .examples-eg,
+    .examples-block--conceptual .example-q { color: var(--conceptual); }
+    .examples-block--debatable .examples-eg,
+    .examples-block--debatable .example-q { color: var(--debatable); }
+    .examples {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.85rem;
+      align-items: baseline;
+    }
+    .example-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.15rem;
+    }
+    .example-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.35rem;
+    }
+    .example-emoji {
+      font: inherit;
+      font-size: 1.15rem;
+      padding: 0.1rem 0.2rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .example-emoji:hover { opacity: 0.75; }
+    .example-q {
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .example-q:hover { opacity: 0.8; }
+    .example-q[hidden],
+    .example-a[hidden],
+    .example-img[hidden] { display: none; }
+    .example-a {
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--muted);
+      padding-left: 1.65rem;
+      max-width: 20rem;
+    }
+    .examples-block--factual .examples {
+      align-items: flex-start;
+      gap: 0.85rem 1rem;
+    }
+    .examples-block--factual .example-item {
+      max-width: 13.5rem;
+    }
+    .example-img {
+      display: block;
+      width: 100%;
+      max-width: 13.5rem;
+      margin-top: 0.2rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <h1 class="step-title" id="step-title">What you'll learn</h1>
+    <select class="step-select" id="step-select" aria-label="Jump to step"></select>
+  </header>
+
+  <div class="stage">
+    <div class="slides">
+
+      <section class="slide active" data-step="0" data-title="What you'll learn" data-nav="Objectives">
+        <div class="panel">
+          <ul>
+            <li>Distinguish and ask <span class="t-factual">factual</span>, <span class="t-conceptual">conceptual</span>, and <span class="t-debatable">debatable</span> questions about a design problem.</li>
+            <li>Understand why each type of question is useful.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="slide" data-step="1" data-title="Your design brief" data-nav="Design brief">
+        <div class="chat-thread" id="brief-chat">
+          <div class="chat-msg client visible">
+            <span class="chat-sender">Client</span>
+            <div class="chat-bubble chat-next">
+              <p>Please design an autonomous rover.</p>
+            </div>
+          </div>
+          <div class="chat-msg you">
+            <span class="chat-sender">You</span>
+            <div class="chat-bubble chat-next">
+              <p>May I ask what is it for?</p>
+            </div>
+          </div>
+          <div class="chat-msg client" id="client-use-msg">
+            <span class="chat-sender chat-cycle-trigger" role="button" tabindex="0" aria-label="Show other answers">Client</span>
+            <div class="chat-bubble" id="client-use-bubble">
+              <p id="client-use-text">Food delivery to homes and doorsteps.</p>
+              <img class="chat-img" id="client-use-img" src="campus.webp" alt="Robot delivering food" width="256" height="171">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-step="2" data-title="Factual questions" data-nav="Facts" data-reveal="factual">
+        <div class="q-prompt">
+          <p class="slide-body">What <span class="t-factual">factual</span> questions should we be asking <span class="t-purpose reveal-trigger" id="factual-trigger" role="button" tabindex="0" aria-expanded="false" aria-controls="factual-examples">to learn more about the situation</span>?</p>
+        </div>
+        <div class="examples-block examples-block--factual" id="factual-examples" hidden>
+          <p class="examples-eg">e.g.</p>
+          <ul class="examples">
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Who is it for?">👤</button>
+                <span class="example-q" hidden role="button" tabindex="0">Who is it for?</span>
+              </div>
+              <img class="example-img" src="cnsa.webp" alt="CNSA Chang'e-7 mission with international partners" width="216" height="144" hidden>
+              <span class="example-a" hidden>For the China National Space Administration — their Chang'e-7 mission at the Moon's south pole, with an orbiter, lander, hopper, and relay working alongside this rover.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="What is it for?">🎯</button>
+                <span class="example-q" hidden role="button" tabindex="0">What is it for?</span>
+              </div>
+              <img class="example-img" src="moonwaterice.webp" alt="Permanently shadowed lunar crater where water ice may be trapped" width="216" height="144" hidden>
+              <span class="example-a" hidden>Drive on sunlit ground, map the area, and search for signs of water ice — targets for a hopper to sample in nearby shadow.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Where will it drive?">📍</button>
+                <span class="example-q" hidden role="button" tabindex="0">Where will it drive?</span>
+              </div>
+              <img class="example-img" src="sunlitroutes.webp" alt="Sunlit routes near shadowed craters at the Moon's south pole" width="216" height="144" hidden>
+              <span class="example-a" hidden>Sunlit routes near the Moon's south pole — close to permanently shadowed craters, but not inside them.</span>
+            </li>
+          </ul>
+        </div>
+        <p class="hint"><span class="t-factual">Facts</span> describe what is — context, constraints, existing conditions.</p>
+      </section>
+
+      <section class="slide" data-step="3" data-title="Define the problems" data-nav="Concepts" data-reveal="conceptual">
+        <div class="q-prompt">
+          <p class="slide-body">What <span class="t-conceptual">conceptual</span> questions could we be asking <span class="t-purpose reveal-trigger" id="conceptual-trigger" role="button" tabindex="0" aria-expanded="false" aria-controls="conceptual-examples">to better define the problems</span>?</p>
+        </div>
+        <div class="examples-block examples-block--conceptual" id="conceptual-examples" hidden>
+          <p class="examples-eg">e.g.</p>
+          <ul class="examples">
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Why look for water ice">💧</button>
+                <span class="example-q" hidden role="button" tabindex="0">Why do we want water ice?</span>
+              </div>
+              <span class="example-a" hidden>Ice isn't just for drinking — it could support air and fuel for a long-term base. Finding it changes whether staying on the Moon is even worth planning.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Why stay in the light">☀️</button>
+                <span class="example-q" hidden role="button" tabindex="0">Why would we want to stay in the light?</span>
+              </div>
+              <span class="example-a" hidden>At the south pole the Sun sits low — routes that stay in sunlight may be the only way to keep solar panels charging and batteries warm enough to work.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Why avoid staying in craters">🌑</button>
+                <span class="example-q" hidden role="button" tabindex="0">Why would we want to avoid staying in the craters?</span>
+              </div>
+              <span class="example-a" hidden>Shadowed crater floors may have no sunlight for billions of years — a solar-powered rover could freeze and lose power long before it reaches the ice. That's why the mission may send a hopper for the dark craters instead.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="How find water ice">🔬</button>
+                <span class="example-q" hidden role="button" tabindex="0">How can it find water ice?</span>
+              </div>
+              <span class="example-a" hidden>On sunlit ground it may use radar and spectrometers to hunt for signs of ice below the surface — then flag the best spots near crater rims for a hopper to sample.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="How follow the light">🛤️</button>
+                <span class="example-q" hidden role="button" tabindex="0">How can we follow the light?</span>
+              </div>
+              <span class="example-a" hidden>Plan routes along sunny crater rims and lit patches, avoid shadow, and save enough battery to survive the long lunar night (~14 Earth days without Sun).</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="How avoid craters">🛑</button>
+                <span class="example-q" hidden role="button" tabindex="0">How can it avoid driving into craters?</span>
+              </div>
+              <span class="example-a" hidden>Use maps from orbit, cameras and sensors at crater edges, and strict route rules — stay on known sunlit paths and let a hopper handle the dark floors instead.</span>
+            </li>
+          </ul>
+        </div>
+        <p class="hint"><span class="t-conceptual">Conceptual</span> questions clarify meaning, relationships, and the nature of the problem — mostly why and how questions.</p>
+      </section>
+
+      <section class="slide" data-step="4" data-title="Debatable questions" data-nav="Debatable ideas" data-reveal="debatable">
+        <div class="q-prompt">
+          <p class="slide-body">What <span class="t-debatable">debatable</span> questions could we be asking <span class="t-purpose reveal-trigger" id="debatable-trigger" role="button" tabindex="0" aria-expanded="false" aria-controls="debatable-examples">to suggest potential solutions</span>?</p>
+        </div>
+        <div class="examples-block examples-block--debatable" id="debatable-examples" hidden>
+          <p class="examples-eg">e.g.</p>
+          <ul class="examples">
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Same jobs or specific roles">💧</button>
+                <span class="example-q" hidden role="button" tabindex="0">Should rovers be doing the same jobs, or should each take on a specific role?</span>
+              </div>
+              <span class="example-a" hidden>Every rover doing the same thing is easier to plan — but one might map, one might scout ice, and one might carry tools. Teams could disagree on how to split the work.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Same or different rovers">☀️</button>
+                <span class="example-q" hidden role="button" tabindex="0">Should all rovers be the same, or should some carry bigger solar panels, comm tools, soil analysers, and so on?</span>
+              </div>
+              <span class="example-a" hidden>Identical rovers are simpler to build and fix — but specialised rovers might do one job really well. A team could split the work instead of loading everything onto one machine.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Wheel size">🛞</button>
+                <span class="example-q" hidden role="button" tabindex="0">Should the rover have bigger wheels, or more smaller wheels?</span>
+              </div>
+              <span class="example-a" hidden>Big wheels might roll over bumps and loose dust better. Many small wheels might keep going if one gets stuck. Real rover teams argue about this.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Drill shovel or other tool">🔬</button>
+                <span class="example-q" hidden role="button" tabindex="0">Should the rover use a drill, a shovel, or something else to dig into the soil?</span>
+              </div>
+              <span class="example-a" hidden>A drill might reach deeper ice — a shovel or scoop could be lighter and simpler. Different tools suit different ground, and teams could disagree on the best pick.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Remote control or autonomous">📡</button>
+                <span class="example-q" hidden role="button" tabindex="0">Should humans on Earth remote-control the rover, or should it drive on its own?</span>
+              </div>
+              <span class="example-a" hidden>Humans can think things through — but signals take time to reach the Moon. A rover that drives itself reacts faster, but it might make a mistake humans would have caught.</span>
+            </li>
+            <li class="example-item">
+              <div class="example-row">
+                <button type="button" class="example-emoji" aria-expanded="false" aria-label="Share map data frequently">🤝</button>
+                <span class="example-q" hidden role="button" tabindex="0">Should the rovers and hoppers share map data frequently, or only when they need to?</span>
+              </div>
+              <span class="example-a" hidden>Sharing often keeps everyone up to date — but it uses power and radio time. Sharing only sometimes is lighter, but one robot might work from old information.</span>
+            </li>
+          </ul>
+        </div>
+        <p class="hint"><span class="t-debatable">Debatable</span> questions suggest design choices — open-ended, with more than one reasonable answer.</p>
+      </section>
+
+      <section class="slide" data-step="5" data-title="Check understanding" data-nav="Check">
+        <div class="check-list">
+          <div class="fill-line">
+            <span>We ask <span class="t-factual">factual</span> questions to</span>
+            <span class="drop-zone" data-answer="context" tabindex="0" aria-label="Blank for factual questions"></span>
+          </div>
+          <div class="fill-line">
+            <span>We ask <span class="t-conceptual">conceptual</span> questions to</span>
+            <span class="drop-zone" data-answer="define" tabindex="0" aria-label="Blank for conceptual questions"></span>
+          </div>
+          <div class="fill-line">
+            <span>We ask <span class="t-debatable">debatable</span> questions to</span>
+            <span class="drop-zone" data-answer="envision" tabindex="0" aria-label="Blank for debatable questions"></span>
+          </div>
+          <div class="fill-line">
+            <span>*defining problems means</span>
+            <span class="drop-zone" data-answer="connect" tabindex="0" aria-label="Defining problems — first blank"></span>
+            <span>and</span>
+            <span class="drop-zone" data-answer="breakdown" tabindex="0" aria-label="Defining problems — second blank"></span>
+          </div>
+        </div>
+        <div class="word-bank" id="word-bank" aria-label="Word bank"></div>
+      </section>
+
+    </div>
+  </div>
+
+  <nav class="nav" aria-label="Slide navigation">
+    <button type="button" id="prev" disabled>Back</button>
+    <button type="button" id="next" class="primary">Next</button>
+  </nav>
+</div>
+
+<script>
+(function () {
+  const slides = [...document.querySelectorAll('.slide')];
+  const total = slides.length;
+  let current = 0;
+
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const stepTitle = document.getElementById('step-title');
+  const stepSelect = document.getElementById('step-select');
+
+  slides.forEach((slide, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = slide.dataset.nav || slide.dataset.title;
+    stepSelect.appendChild(opt);
+  });
+
+  function colorizeTypes(text) {
+    return text.replace(/\b(factual|conceptual|debatable)\b/gi, (m) => {
+      const cls = 't-' + m.toLowerCase();
+      return '<span class="' + cls + '">' + m + '</span>';
+    });
+  }
+
+  function goTo(n) {
+    current = Math.max(0, Math.min(n, total - 1));
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    stepSelect.value = current;
+    stepTitle.innerHTML = colorizeTypes(slides[current].dataset.title);
+    prevBtn.disabled = current === 0;
+    nextBtn.textContent = current === total - 1 ? 'Done' : 'Next';
+    if (slides[current].dataset.step === '1') resetBriefChat();
+    if (window.syncRevealUrl) window.syncRevealUrl();
+  }
+
+  window.goToSlide = goTo;
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+  stepSelect.addEventListener('change', () => goTo(Number(stepSelect.value)));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.closest('.chat-cycle-trigger, .example-emoji, .example-q')) return;
+    if (e.key === ' ') {
+      e.preventDefault();
+      if (slides[current].dataset.step === '1') {
+        if (window.advanceBriefChat && window.advanceBriefChat()) return;
+        if (window.cycleBriefClientIfReady && window.cycleBriefClientIfReady()) return;
+        return;
+      }
+      if (slides[current].dataset.reveal && window.cycleActiveReveal && window.cycleActiveReveal()) return;
+      if (e.target.closest('.reveal-trigger')) return;
+      if (current < total - 1) goTo(current + 1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      if (current < total - 1) goTo(current + 1);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (current > 0) goTo(current - 1);
+    }
+  });
+
+  goTo(0);
+})();
+
+(function () {
+  const thread = document.getElementById('brief-chat');
+  if (!thread) return;
+
+  const msgs = [...thread.querySelectorAll('.chat-msg')];
+  const cycleText = document.getElementById('client-use-text');
+  const cycleImg = document.getElementById('client-use-img');
+  const clientUses = [
+    { text: 'Food delivery to homes and doorsteps.', img: 'campus.webp', alt: 'Robot delivering food' },
+    { text: 'Golf cart shuttle between holes and the clubhouse.', img: 'elderhome.webp', alt: 'Golf cart shuttle on a course' },
+    { text: 'Spraying crops across farmland.', img: 'farm.webp', alt: 'Agricultural rover spraying crops in a field' },
+    { text: 'Moving pallets inside a warehouse.', img: 'warehouse.webp', alt: 'Autonomous robot moving pallets in a warehouse' },
+  ];
+  let step = 0;
+  let cycleIdx = 0;
+
+  function showUse(idx) {
+    const u = clientUses[idx];
+    cycleText.textContent = u.text;
+    cycleImg.src = u.img;
+    cycleImg.alt = u.alt;
+  }
+
+  window.resetBriefChat = function () {
+    step = 0;
+    cycleIdx = 0;
+    showUse(0);
+    msgs.forEach((m, i) => m.classList.toggle('visible', i === 0));
+    thread.querySelectorAll('.chat-bubble').forEach((b) => b.classList.remove('chat-next'));
+    msgs[0].querySelector('.chat-bubble').classList.add('chat-next');
+  };
+
+  thread.addEventListener('click', (e) => {
+    const cycleTrigger = e.target.closest('.chat-cycle-trigger');
+    if (cycleTrigger) {
+      const msg = cycleTrigger.closest('.chat-msg');
+      if (!msg.classList.contains('visible')) return;
+      cycleIdx = (cycleIdx + 1) % clientUses.length;
+      showUse(cycleIdx);
+      return;
+    }
+
+    const bubble = e.target.closest('.chat-bubble.chat-next');
+    if (!bubble) return;
+    advanceBriefChat(bubble);
+  });
+
+  function advanceBriefChat(bubble) {
+    const msg = bubble.closest('.chat-msg');
+    const idx = msgs.indexOf(msg);
+    if (idx !== step) return false;
+
+    bubble.classList.remove('chat-next');
+    step++;
+
+    if (step < msgs.length) {
+      const next = msgs[step];
+      next.classList.add('visible');
+      if (step < msgs.length - 1) {
+        next.querySelector('.chat-bubble').classList.add('chat-next');
+      }
+    }
+    return true;
+  }
+
+  window.advanceBriefChat = function () {
+    const bubble = thread.querySelector('.chat-bubble.chat-next');
+    if (!bubble) return false;
+    return advanceBriefChat(bubble);
+  };
+
+  window.cycleBriefClientIfReady = function () {
+    const lastMsg = msgs[msgs.length - 1];
+    if (!lastMsg.classList.contains('visible')) return false;
+    cycleIdx = (cycleIdx + 1) % clientUses.length;
+    showUse(cycleIdx);
+    return true;
+  };
+
+  thread.addEventListener('keydown', (e) => {
+    const trigger = e.target.closest('.chat-cycle-trigger');
+    if (!trigger || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const msg = trigger.closest('.chat-msg');
+    if (!msg.classList.contains('visible')) return;
+    cycleIdx = (cycleIdx + 1) % clientUses.length;
+    showUse(cycleIdx);
+  });
+
+  resetBriefChat();
+})();
+
+(function () {
+  const reveals = [];
+
+  function applyLevel(entry, level) {
+    const { trigger, block } = entry;
+    const items = [...block.querySelectorAll('.example-item')];
+    entry.level = Math.max(0, Math.min(3, level));
+    if (entry.level === 0) {
+      block.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+      items.forEach((item) => {
+        item.querySelector('.example-q').hidden = true;
+        item.querySelector('.example-a').hidden = true;
+        const img = item.querySelector('.example-img');
+        if (img) img.hidden = true;
+        item.querySelector('.example-emoji').setAttribute('aria-expanded', 'false');
+      });
+    } else {
+      block.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+      items.forEach((item) => {
+        const q = item.querySelector('.example-q');
+        const a = item.querySelector('.example-a');
+        const img = item.querySelector('.example-img');
+        const btn = item.querySelector('.example-emoji');
+        q.hidden = entry.level < 2;
+        a.hidden = entry.level < 3;
+        if (img) img.hidden = entry.level < 2;
+        btn.setAttribute('aria-expanded', entry.level >= 2 ? 'true' : 'false');
+      });
+    }
+    if (window.syncRevealUrl) window.syncRevealUrl();
+  }
+
+  function registerReveal(key, triggerId, blockId) {
+    const trigger = document.getElementById(triggerId);
+    const block = document.getElementById(blockId);
+    if (!trigger || !block) return;
+
+    const entry = { key, trigger, block, level: 0 };
+    reveals.push(entry);
+
+    trigger.addEventListener('click', () => {
+      applyLevel(entry, entry.level === 0 ? 1 : 0);
+    });
+    trigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        e.stopPropagation();
+        applyLevel(entry, entry.level === 0 ? 1 : 0);
+      }
+    });
+
+    block.querySelectorAll('.example-item').forEach((item) => {
+      const btn = item.querySelector('.example-emoji');
+      const q = item.querySelector('.example-q');
+      const a = item.querySelector('.example-a');
+      const img = item.querySelector('.example-img');
+
+      btn.addEventListener('click', () => {
+        if (entry.level === 0) applyLevel(entry, 1);
+        const show = q.hidden;
+        q.hidden = !show;
+        btn.setAttribute('aria-expanded', show);
+        if (img) img.hidden = !show;
+        if (!show) a.hidden = true;
+      });
+
+      q.addEventListener('click', () => {
+        a.hidden = !a.hidden;
+      });
+
+      q.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          a.hidden = !a.hidden;
+        }
+      });
+    });
+  }
+
+  window.cycleActiveReveal = function () {
+    const slide = document.querySelector('.slide.active');
+    const key = slide?.dataset.reveal;
+    if (!key) return false;
+    const entry = reveals.find((r) => r.key === key);
+    if (!entry) return false;
+    applyLevel(entry, (entry.level + 1) % 4);
+    return true;
+  };
+
+  window.syncRevealUrl = function () {
+    const slide = document.querySelector('.slide.active');
+    const params = new URLSearchParams();
+    const key = slide?.dataset.reveal;
+    if (key) {
+      params.set('reveal', key);
+    } else if (slide) {
+      params.set('step', slide.dataset.step || '0');
+    }
+    const qs = params.toString();
+    history.replaceState(null, '', qs ? '?' + qs : location.pathname);
+  };
+
+  window.initRevealFromUrl = function (goToFn, slides) {
+    const params = new URLSearchParams(location.search);
+    const revealKey = params.get('reveal');
+    if (revealKey) {
+      const idx = slides.findIndex((s) => s.dataset.reveal === revealKey);
+      if (idx >= 0) goToFn(idx);
+      return;
+    }
+    const step = params.get('step');
+    if (step !== null) {
+      const idx = slides.findIndex((s) => s.dataset.step === step);
+      if (idx >= 0) goToFn(idx);
+    }
+  };
+
+  registerReveal('factual', 'factual-trigger', 'factual-examples');
+  registerReveal('conceptual', 'conceptual-trigger', 'conceptual-examples');
+  registerReveal('debatable', 'debatable-trigger', 'debatable-examples');
+
+  if (window.goToSlide) {
+    window.initRevealFromUrl(window.goToSlide, [...document.querySelectorAll('.slide')]);
+  }
+})();
+
+(function () {
+  const bank = document.getElementById('word-bank');
+  if (!bank) return;
+
+  const chips = [
+    { id: 'context', text: 'get more information about the design context' },
+    { id: 'define', text: 'better define the problems we need to solve' },
+    { id: 'envision', text: 'envision potential solutions' },
+    { id: 'connect', text: 'connecting the dots from facts' },
+    { id: 'breakdown', text: 'breaking down bigger problems into smaller ones' },
+  ];
+
+  let selectedChip = null;
+  let dragChip = null;
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function createChip(data) {
+    const el = document.createElement('span');
+    el.className = 'chip';
+    el.draggable = true;
+    el.dataset.id = data.id;
+    el.textContent = data.text;
+    return el;
+  }
+
+  function clearSelected() {
+    if (selectedChip) selectedChip.classList.remove('selected');
+    selectedChip = null;
+  }
+
+  function chipParent(chip) {
+    return chip.closest('.drop-zone, .word-bank');
+  }
+
+  function returnToBank(chip) {
+    bank.appendChild(chip);
+  }
+
+  function placeChip(chip, zone) {
+    if (!zone.classList.contains('drop-zone')) return;
+    const existing = zone.querySelector('.chip');
+    if (existing && existing !== chip) returnToBank(existing);
+    zone.appendChild(chip);
+    clearSelected();
+  }
+
+  shuffle(chips).forEach((data) => bank.appendChild(createChip(data)));
+
+  bank.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    bank.classList.add('drag-over');
+  });
+  bank.addEventListener('dragleave', () => bank.classList.remove('drag-over'));
+  bank.addEventListener('drop', (e) => {
+    e.preventDefault();
+    bank.classList.remove('drag-over');
+    const id = e.dataTransfer.getData('text/plain');
+    const chip = document.querySelector('.chip[data-id="' + id + '"]');
+    if (chip) returnToBank(chip);
+  });
+
+  document.querySelectorAll('.drop-zone').forEach((zone) => {
+    zone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const id = e.dataTransfer.getData('text/plain');
+      const chip = document.querySelector('.chip[data-id="' + id + '"]');
+      if (chip) placeChip(chip, zone);
+    });
+    zone.addEventListener('click', () => {
+      if (selectedChip) placeChip(selectedChip, zone);
+    });
+  });
+
+  document.addEventListener('dragstart', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    dragChip = chip;
+    chip.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', chip.dataset.id);
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  document.addEventListener('dragend', () => {
+    if (dragChip) dragChip.classList.remove('dragging');
+    dragChip = null;
+    document.querySelectorAll('.drop-zone').forEach((z) => z.classList.remove('drag-over'));
+    bank.classList.remove('drag-over');
+  });
+
+  bank.addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip || chipParent(chip) !== bank) return;
+    if (selectedChip === chip) {
+      clearSelected();
+    } else {
+      clearSelected();
+      selectedChip = chip;
+      chip.classList.add('selected');
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

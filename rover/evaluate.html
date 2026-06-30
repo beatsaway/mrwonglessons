@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluate robot designs</title>
+  <style>
+    :root {
+      --bg: #fff;
+      --surface: #f6f7f9;
+      --border: #e2e5ea;
+      --text: #1a1d23;
+      --muted: #5c6370;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --prompt: #dc2626;
+      --factual: #6b7280;
+      --conceptual: #2563eb;
+      --debatable: #dc2626;
+      --radius: 8px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.35;
+      color: var(--text);
+      background: var(--bg);
+    }
+    .shell {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: 100%;
+    }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      padding: max(0.18rem, env(safe-area-inset-top, 0px)) max(0.5rem, env(safe-area-inset-right, 0px)) 0.15rem max(0.5rem, env(safe-area-inset-left, 0px));
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    .top-row {
+      display: flex;
+      align-items: center;
+      gap: 0.28rem;
+      min-width: 0;
+    }
+    .scenario-context {
+      font-size: 0.66rem;
+      line-height: 1.25;
+      color: var(--muted);
+    }
+    .scenario-context[hidden] { display: none; }
+    .scenario-context p {
+      margin: 0 0 0.2rem;
+    }
+    .scenario-context p:last-child { margin-bottom: 0; }
+    .scenario-context strong {
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .scenario-context .context-img {
+      display: block;
+      width: 100%;
+      max-width: 13.5rem;
+      margin-top: 0.25rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+    .scenario-context .context-item {
+      margin: 0 0 0.55rem;
+    }
+    .scenario-context .context-item:last-child { margin-bottom: 0; }
+    .scenario-select {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text);
+      padding: 0.16rem 1.35rem 0.16rem 0.38rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235c6370' d='M2 3.5 5 6.5 8 3.5'/%3E%3C/svg%3E") no-repeat right 0.4rem center;
+      appearance: none;
+      cursor: pointer;
+      line-height: 1.15;
+    }
+    .scenario-select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .top-actions {
+      display: flex;
+      flex-shrink: 0;
+      gap: 0.25rem;
+    }
+    .top-action {
+      padding: 0.16rem 0.38rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg);
+      font: inherit;
+      font-size: 0.64rem;
+      font-weight: 600;
+      line-height: 1.1;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .top-action:hover:not(:disabled) {
+      border-color: #cbd5e1;
+      background: var(--surface);
+      color: var(--text);
+    }
+    .top-action:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    .top-action.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .top-sub {
+      display: block;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: none;
+      font: inherit;
+      font-size: 0.66rem;
+      color: var(--prompt);
+      font-weight: 600;
+      text-align: left;
+      line-height: 1.1;
+      width: 100%;
+    }
+    .top-sub.clickable {
+      cursor: pointer;
+    }
+    .top-sub.clickable:hover {
+      text-decoration: underline;
+    }
+    .top-sub:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+    .top-sub.clickable[aria-expanded="true"] {
+      text-decoration: underline;
+    }
+    .top-action.facts-btn.active {
+      border-color: var(--factual);
+      background: #f3f4f6;
+      color: var(--factual);
+    }
+    .stage {
+      flex: 1;
+      width: 100%;
+      max-width: min(68rem, 100% - 1rem);
+      margin: 0 auto;
+      padding: 0.2rem 0.5rem 1rem;
+    }
+    h2 {
+      margin: 0 0 0.25rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+      gap: 0.35rem;
+    }
+    .thumb {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--bg);
+      transition: border-color 0.15s;
+    }
+    .thumb.open { border-color: var(--accent); background: var(--accent-soft); }
+    .thumb-visual {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .thumb-link {
+      position: absolute;
+      inset: 0;
+      display: block;
+      line-height: 0;
+    }
+    .thumb-num {
+      position: absolute;
+      top: 0.12rem;
+      left: 0.12rem;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 0.85rem;
+      height: 0.85rem;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.48rem;
+      font-weight: 700;
+      line-height: 1;
+      text-transform: lowercase;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(26, 29, 35, 0.12);
+    }
+    .thumb-num:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+    .thumb-link:hover + .thumb-meta,
+    .thumb-link:hover { opacity: 1; }
+    .thumb-link img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+    .thumb-meta {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.25rem;
+      width: 100%;
+      padding: 0.25rem 0.35rem;
+      border: none;
+      background: none;
+      font: inherit;
+      color: inherit;
+      text-align: left;
+      cursor: default;
+    }
+    .thumb-grid.scores-visible .thumb-meta {
+      cursor: pointer;
+    }
+    .thumb-grid.scores-visible .thumb-meta:hover { background: var(--surface); }
+    .thumb-name {
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1.15;
+    }
+    .thumb-score {
+      flex-shrink: 0;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+    }
+    .thumb-score[hidden] { display: none; }
+    .thumb-why {
+      display: none;
+      margin: 0;
+      padding: 0 0.35rem 0.35rem;
+      font-size: 0.72rem;
+      line-height: 1.3;
+    }
+    .thumb-why-q {
+      display: block;
+      margin-bottom: 0.15rem;
+      font-weight: 600;
+      color: var(--conceptual);
+    }
+    .thumb-why-a {
+      color: var(--conceptual);
+    }
+    .thumb.open .thumb-why { display: block; }
+    .t-factual { color: var(--factual); font-weight: 600; }
+    .t-conceptual { color: var(--conceptual); font-weight: 600; }
+    .t-debatable { color: var(--debatable); font-weight: 600; }
+    .intro-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(26, 29, 35, 0.35);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+    .intro-overlay[hidden] { display: none; }
+    .intro-panel {
+      width: min(48rem, 98vw);
+      max-height: min(42rem, 92vh);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      box-shadow: 0 12px 32px rgba(26, 29, 35, 0.16);
+    }
+    .intro-tabs {
+      display: flex;
+      gap: 0.15rem;
+      padding: 0.35rem 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .intro-tab {
+      padding: 0.35rem 0.6rem;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      background: none;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .intro-tab[aria-selected="true"] {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .intro-body {
+      overflow-y: auto;
+      max-height: calc(min(42rem, 92vh) - 2.25rem);
+      padding: 1.25rem 1.5rem 1.35rem;
+    }
+    .intro-pane[hidden] { display: none; }
+    .intro-card {
+      width: min(22rem, 100%);
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      box-shadow: 0 8px 24px rgba(26, 29, 35, 0.12);
+    }
+    .chat-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      width: 100%;
+    }
+    .chat-msg {
+      max-width: 28rem;
+      display: none;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .chat-msg.visible {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .chat-msg.client { align-self: flex-start; }
+    .chat-msg.you {
+      align-self: flex-end;
+      text-align: right;
+    }
+    .chat-msg.you .chat-sender { text-align: right; color: var(--accent); }
+    .chat-msg.you .chat-bubble {
+      background: #dcf8c6;
+      border-color: #d1f4cc;
+      border-radius: 10px 0 10px 10px;
+    }
+    .chat-sender {
+      display: block;
+      margin-bottom: 0.2rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .chat-bubble {
+      display: inline-block;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      color: var(--text);
+      background: #fff;
+      border: 1px solid #e9edef;
+      border-radius: 0 10px 10px 10px;
+      box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.08);
+      text-align: left;
+    }
+    .chat-bubble.chat-next { cursor: pointer; }
+    .chat-bubble.chat-next:hover { filter: brightness(0.97); }
+    .chat-sender.chat-cycle-trigger { cursor: pointer; }
+    .chat-msg.visible .chat-sender.chat-cycle-trigger:hover { color: var(--text); }
+    .chat-bubble p { margin: 0; }
+    .chat-bubble .chat-img {
+      display: block;
+      width: 100%;
+      max-width: 20rem;
+      margin-top: 0.45rem;
+      border-radius: 6px;
+    }
+    .chat-bubble .chat-img[hidden] { display: none; }
+    .chat-bubble.typing { cursor: default; }
+    #client-use-msg { max-width: 22rem; }
+    .intro-kicker {
+      margin: 0 0 0.35rem;
+      font-size: 0.58rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .intro-topic {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .intro-label {
+      margin: 0 0 0.25rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .intro-objective {
+      margin: 0;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      color: var(--text);
+    }
+    .intro-overlay { cursor: pointer; }
+    .intro-panel,
+    .intro-card { cursor: default; }
+    #rover-intro-overlay { cursor: pointer; }
+    #rover-intro-overlay .intro-card { cursor: default; }
+    .check-section {
+      margin: 0;
+    }
+    .check-section h2 { margin-bottom: 0.5rem; }
+    .check-fab {
+      position: fixed;
+      right: 0.75rem;
+      bottom: 0.75rem;
+      z-index: 50;
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--bg);
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(26, 29, 35, 0.12);
+    }
+    .check-fab:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .check-panel {
+      width: min(28rem, 94vw);
+      padding: 1rem 1.1rem 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      box-shadow: 0 12px 32px rgba(26, 29, 35, 0.16);
+      cursor: default;
+    }
+    #check-overlay { cursor: pointer; }
+    .check-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .fill-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.25rem 0.35rem;
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+    .drop-zone {
+      display: inline-flex;
+      align-items: center;
+      min-width: 6rem;
+      min-height: 1.35rem;
+      padding: 0.05rem 0.25rem;
+      border: 1.5px dashed var(--border);
+      border-radius: 4px;
+      background: var(--surface);
+      vertical-align: middle;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .drop-zone:empty::after {
+      content: '';
+      display: block;
+      width: 5rem;
+      height: 0.85rem;
+    }
+    .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .drop-zone:not(:empty) {
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+    }
+    .drop-zone:not(:empty) .chip {
+      padding: 0;
+      border: none;
+      background: transparent;
+    }
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.5rem;
+      padding-top: 0.45rem;
+      border-top: 1px solid var(--border);
+    }
+    .word-bank.drag-over {
+      background: var(--accent-soft);
+      border-radius: var(--radius);
+    }
+    .chip {
+      display: inline-block;
+      padding: 0.12rem 0.3rem;
+      font-size: 0.72rem;
+      line-height: 1.25;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--bg);
+      color: var(--text);
+      cursor: grab;
+      user-select: none;
+    }
+    .chip.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .chip.dragging { opacity: 0.45; }
+  </style>
+</head>
+<body>
+
+<div class="intro-overlay" id="intro-overlay" role="dialog" aria-modal="true" aria-labelledby="intro-topic">
+  <div class="intro-panel">
+    <div class="intro-tabs" role="tablist" aria-label="Lesson sections">
+      <button type="button" class="intro-tab" id="tab-btn-starter" role="tab" aria-selected="true" aria-controls="tab-starter" data-tab="starter">Messages</button>
+      <button type="button" class="intro-tab" id="tab-btn-lesson" role="tab" aria-selected="false" aria-controls="tab-lesson" data-tab="lesson">Lesson</button>
+    </div>
+    <div class="intro-body">
+      <div class="intro-pane" id="tab-starter" role="tabpanel" aria-labelledby="tab-btn-starter">
+        <div class="chat-thread" id="brief-chat">
+          <div class="chat-msg client">
+            <span class="chat-sender">Client</span>
+            <div class="chat-bubble">
+              <p>Please design an autonomous rover.</p>
+            </div>
+          </div>
+          <div class="chat-msg you">
+            <span class="chat-sender">You</span>
+            <div class="chat-bubble">
+              <p>What is it for?</p>
+            </div>
+          </div>
+          <div class="chat-msg you">
+            <span class="chat-sender">You</span>
+            <div class="chat-bubble">
+              <p>Where will it be used?</p>
+            </div>
+          </div>
+          <div class="chat-msg you">
+            <span class="chat-sender">You</span>
+            <div class="chat-bubble">
+              <p>When and how often will it have to operate?</p>
+            </div>
+          </div>
+          <div class="chat-msg client" id="client-use-msg">
+            <span class="chat-sender chat-cycle-trigger" role="button" tabindex="0" aria-label="Show other answers">Client</span>
+            <div class="chat-bubble" id="client-use-bubble">
+              <p id="client-use-text">Food delivery to homes and doorsteps.</p>
+              <img class="chat-img" id="client-use-img" src="campus.webp" alt="Robot delivering food" width="256" height="171">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="intro-pane" id="tab-lesson" role="tabpanel" aria-labelledby="tab-btn-lesson" hidden>
+        <p class="intro-kicker">MYP Design · Inquiry</p>
+        <h1 class="intro-topic" id="intro-topic">Planetary Rover Engineering</h1>
+        <p class="intro-label">Lesson objective</p>
+        <p class="intro-objective">Learn how <span class="t-factual">factual</span>, <span class="t-conceptual">conceptual</span>, and <span class="t-debatable">debatable</span> questions are used in the design process.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="intro-overlay" id="rover-intro-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="rover-intro-name">
+  <div class="intro-card">
+    <p class="intro-kicker">Rover design <span id="rover-intro-num"></span></p>
+    <h2 class="intro-topic" id="rover-intro-name"></h2>
+    <p class="intro-objective" id="rover-intro-text"></p>
+  </div>
+</div>
+
+<div class="shell">
+  <header class="top">
+    <div class="top-row">
+      <select class="scenario-select" id="scenario-select" aria-label="Scenario"></select>
+      <div class="top-actions">
+        <button type="button" class="top-action facts-btn" id="scenario-facts-btn" disabled aria-expanded="false" aria-controls="scenario-context">Info</button>
+      </div>
+    </div>
+    <button type="button" class="top-sub" id="scenario-prompt" disabled aria-expanded="false" aria-controls="rover-grid">Which design is more suitable?</button>
+    <div class="scenario-context" id="scenario-context" hidden></div>
+  </header>
+
+  <div class="stage">
+    <h2>Rover designs</h2>
+    <div class="thumb-grid" id="rover-grid"></div>
+  </div>
+</div>
+
+<button type="button" class="check-fab" id="check-fab" aria-label="Check understanding" aria-haspopup="dialog" aria-controls="check-overlay">?</button>
+
+<div class="intro-overlay" id="check-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="check-heading">
+  <div class="check-panel">
+    <section class="check-section" aria-labelledby="check-heading">
+      <h2 id="check-heading">Check understanding</h2>
+      <div class="check-list">
+        <div class="fill-line">
+          <span>We ask <span class="t-factual">factual</span> questions to</span>
+          <span class="drop-zone" data-answer="context" tabindex="0" aria-label="Blank for factual questions"></span>
+        </div>
+        <div class="fill-line">
+          <span>We ask <span class="t-conceptual">conceptual</span> questions to</span>
+          <span class="drop-zone" data-answer="define" tabindex="0" aria-label="Blank for conceptual questions"></span>
+        </div>
+        <div class="fill-line">
+          <span>We ask <span class="t-debatable">debatable</span> questions to</span>
+          <span class="drop-zone" data-answer="envision" tabindex="0" aria-label="Blank for debatable questions"></span>
+        </div>
+      </div>
+      <div class="word-bank" id="word-bank" aria-label="Word bank"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function () {
+  const introOverlay = document.getElementById('intro-overlay');
+  const introPanel = introOverlay.querySelector('.intro-panel');
+  const tabBtns = [...introOverlay.querySelectorAll('.intro-tab')];
+  const tabPanes = {
+    starter: document.getElementById('tab-starter'),
+    lesson: document.getElementById('tab-lesson'),
+  };
+
+  function closeIntro() {
+    introOverlay.hidden = true;
+  }
+
+  function setTab(name) {
+    tabBtns.forEach(function (btn) {
+      const on = btn.dataset.tab === name;
+      btn.setAttribute('aria-selected', on);
+    });
+    Object.keys(tabPanes).forEach(function (key) {
+      tabPanes[key].hidden = key !== name;
+    });
+  }
+
+  tabBtns.forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setTab(btn.dataset.tab);
+    });
+  });
+
+  introOverlay.addEventListener('click', function (e) {
+    if (e.target === introOverlay) closeIntro();
+  });
+  if (introPanel) {
+    introPanel.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (!introOverlay.hidden) closeIntro();
+    const roverIntro = document.getElementById('rover-intro-overlay');
+    if (roverIntro && !roverIntro.hidden) roverIntro.hidden = true;
+    const checkOverlay = document.getElementById('check-overlay');
+    if (checkOverlay && !checkOverlay.hidden) checkOverlay.hidden = true;
+  });
+
+  setTab('starter');
+})();
+
+(function () {
+  const checkFab = document.getElementById('check-fab');
+  const checkOverlay = document.getElementById('check-overlay');
+  const checkPanel = checkOverlay && checkOverlay.querySelector('.check-panel');
+  if (!checkFab || !checkOverlay) return;
+
+  function openCheck() {
+    checkOverlay.hidden = false;
+  }
+
+  function closeCheck() {
+    checkOverlay.hidden = true;
+  }
+
+  checkFab.addEventListener('click', openCheck);
+  checkOverlay.addEventListener('click', function (e) {
+    if (e.target === checkOverlay) closeCheck();
+  });
+  if (checkPanel) {
+    checkPanel.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+  }
+})();
+
+(function () {
+  const thread = document.getElementById('brief-chat');
+  if (!thread) return;
+
+  const TYPE_DELAY = 50;
+  const msgs = [...thread.querySelectorAll('.chat-msg')];
+  const cycleText = document.getElementById('client-use-text');
+  const cycleImg = document.getElementById('client-use-img');
+  const clientUses = [
+    { text: 'Food delivery to homes and doorsteps.', img: 'campus.webp', alt: 'Robot delivering food' },
+    { text: 'Golf cart shuttle between holes and the clubhouse.', img: 'elderhome.webp', alt: 'Golf cart shuttle on a course' },
+    { text: 'Spraying crops across farmland.', img: 'farm.webp', alt: 'Agricultural rover spraying crops in a field' },
+    { text: 'Moving pallets inside a warehouse.', img: 'warehouse.webp', alt: 'Autonomous robot moving pallets in a warehouse' },
+  ];
+  let step = 0;
+  let cycleIdx = 0;
+  let typeTimer = null;
+  let typing = false;
+
+  msgs.forEach(function (m) {
+    const p = m.querySelector('.chat-bubble p');
+    if (p) p.dataset.fullText = p.textContent;
+  });
+  cycleText.dataset.fullText = cycleText.textContent;
+
+  function clearTyping() {
+    if (typeTimer) {
+      clearTimeout(typeTimer);
+      typeTimer = null;
+    }
+    typing = false;
+    thread.querySelectorAll('.chat-bubble.typing').forEach(function (b) {
+      b.classList.remove('typing');
+    });
+  }
+
+  function typeInto(el, fullText, onDone) {
+    clearTyping();
+    typing = true;
+    const bubble = el.closest('.chat-bubble');
+    if (bubble) bubble.classList.add('typing');
+    el.textContent = '';
+    let i = 0;
+    function tick() {
+      if (i < fullText.length) {
+        el.textContent += fullText.charAt(i);
+        i++;
+        typeTimer = setTimeout(tick, TYPE_DELAY);
+      } else {
+        typing = false;
+        typeTimer = null;
+        if (bubble) bubble.classList.remove('typing');
+        if (onDone) onDone();
+      }
+    }
+    tick();
+  }
+
+  function showUse(idx, animate) {
+    const u = clientUses[idx];
+    cycleImg.src = u.img;
+    cycleImg.alt = u.alt;
+    cycleText.dataset.fullText = u.text;
+    if (animate) {
+      cycleImg.hidden = true;
+      typeInto(cycleText, u.text, function () {
+        cycleImg.hidden = false;
+      });
+    } else {
+      cycleText.textContent = u.text;
+      cycleImg.hidden = false;
+    }
+  }
+
+  function revealMessage(index, onTyped) {
+    const msg = msgs[index];
+    const bubble = msg.querySelector('.chat-bubble');
+    const p = bubble.querySelector('p');
+    const img = bubble.querySelector('.chat-img');
+    msg.classList.add('visible');
+    bubble.classList.remove('chat-next');
+    if (img) img.hidden = true;
+    typeInto(p, p.dataset.fullText, function () {
+      if (img) img.hidden = false;
+      if (onTyped) onTyped(bubble);
+    });
+  }
+
+  function resetBriefChat() {
+    clearTyping();
+    step = 0;
+    cycleIdx = 0;
+    showUse(0, false);
+    msgs.forEach(function (m) {
+      m.classList.remove('visible');
+    });
+    thread.querySelectorAll('.chat-bubble').forEach(function (b) {
+      b.classList.remove('chat-next', 'typing');
+    });
+    revealMessage(0, function (bubble) {
+      bubble.classList.add('chat-next');
+    });
+  }
+
+  function advanceBriefChat(bubble) {
+    if (typing) return false;
+    const msg = bubble.closest('.chat-msg');
+    const idx = msgs.indexOf(msg);
+    if (idx !== step) return false;
+
+    bubble.classList.remove('chat-next');
+    step++;
+
+    if (step < msgs.length) {
+      const isLast = step === msgs.length - 1;
+      revealMessage(step, function (nextBubble) {
+        if (!isLast) nextBubble.classList.add('chat-next');
+      });
+    }
+    return true;
+  }
+
+  thread.addEventListener('click', function (e) {
+    const cycleTrigger = e.target.closest('.chat-cycle-trigger');
+    if (cycleTrigger) {
+      const msg = cycleTrigger.closest('.chat-msg');
+      if (!msg.classList.contains('visible') || typing) return;
+      cycleIdx = (cycleIdx + 1) % clientUses.length;
+      showUse(cycleIdx, true);
+      return;
+    }
+
+    const bubble = e.target.closest('.chat-bubble.chat-next');
+    if (!bubble) return;
+    advanceBriefChat(bubble);
+  });
+
+  thread.addEventListener('keydown', function (e) {
+    const trigger = e.target.closest('.chat-cycle-trigger');
+    if (!trigger || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const msg = trigger.closest('.chat-msg');
+    if (!msg.classList.contains('visible') || typing) return;
+    cycleIdx = (cycleIdx + 1) % clientUses.length;
+    showUse(cycleIdx, true);
+  });
+
+  resetBriefChat();
+})();
+
+(function () {
+  const rovers = [
+    { id: 'uWObkOV71ZI', name: 'Disney training droids', intro: 'Small wheeled robots trained to move like characters. Disney uses them to study cute, expressive motion for theme-park shows.' },
+    { id: 'YR-dGPR2mqM', name: 'Argus', intro: 'A hexapod with six legs and many cameras. Built to climb, scout rough ground, and keep going even after a fall.' },
+    { id: 'kGxbQOPV7Ew', name: 'Ringbot', intro: 'A tall robot that balances on a single ring-shaped wheel. It can spin and turn sharply, but must stay upright.' },
+    { id: 'sV_r-Rns6UQ', name: 'Xiaoi wheel–leg', intro: 'A hybrid that uses wheels on flat ground and legs for steps or bumps — two movement styles in one machine.' },
+    { id: '_vUUs5rrRAs', name: 'Rotunbot RT-G', intro: 'A robot inside a rolling ball shell. It moves by spinning and shifting weight, like a hamster ball.' },
+    { id: 'UYII1-n2iVQ', name: 'TARS replica', intro: 'A small walking replica inspired by the robot in Interstellar. Compact biped design, mostly built as a demo.' },
+    { id: 'mom98kHobqQ', name: 'M4 Morphobot', intro: 'A modular robot that changes shape — wheels, legs, crawler, even rotors — for extreme mixed terrain.' },
+    { id: 'J6eVQ8C7aBM', name: 'Corleo robot horse', intro: 'A large rideable quadruped built to look and move like a mechanical horse on outdoor ground.' },
+  ];
+
+  const scenarios = [
+    {
+      title: 'Food delivery',
+      context: [
+        { q: 'Where does it go?', a: 'Streets, pavements, apartment blocks, and sometimes stairs or lifts to a front door.' },
+        { q: 'What must it carry?', a: 'Hot meals and drinks in sealed bags — usually 1–3 kg, kept upright.' },
+        { q: 'Who is nearby?', a: 'Pedestrians, cyclists, and drivers; it must stop safely and not block the pavement.' },
+      ],
+      scores: [
+        { q: 'How does a friendly look help around pedestrians?', score: 5, why: 'Small and friendly on busy streets, but it is remote-controlled and not built to carry meal bags up steps.' },
+        { q: 'Why might an unusual shape put people off everyday delivery?', score: 3, why: 'Can turn sharply in tight spaces, but it has no insulated box and looks odd dropping off takeaway.' },
+        { q: 'How does balance affect carrying hot food safely?', score: 5, why: 'Could cross some bumps, but balancing hot food on a monocycle-style robot would be risky.' },
+        { q: 'Why combine wheels and legs for pavement and kerbs?', score: 6, why: 'Wheels on pavement and legs on kerbs — still needs a sealed food compartment added.' },
+        { q: 'Why can\'t a rolling ball carry sealed bags?', score: 3, why: 'Fast on open pavement, but a rolling ball cannot carry bags or climb stairs.' },
+        { q: 'Why is a show replica a poor match for real delivery?', score: 2, why: 'Built as a show replica — too small and not meant for real food delivery.' },
+        { q: 'Why might complexity be a problem for simple meal runs?', score: 5, why: 'Versatile movement, but overly complex and expensive for simple meal runs.' },
+        { q: 'How do size and shape affect handing over takeaway?', score: 2, why: 'Rideable horse scale — wrong size and shape for handing over a takeaway bag.' },
+      ],
+    },
+    {
+      title: 'Golf cart shuttle',
+      context: [
+        { q: 'Who rides?', a: 'Golfers, staff, and visitors moving between holes, the clubhouse, and the car park.' },
+        { q: 'Where does it go?', a: 'Cart paths, fairways, gentle slopes, and grass — mostly outdoors.' },
+        { q: 'What matters most?', a: 'Stable seats, room for bags or clubs, low safe speed, and reliable runs all day.' },
+      ],
+      scores: [
+        { q: 'Why do passengers need seats and cargo space?', score: 2, why: 'Too small for two riders and golf bags — no seat, roof, or cargo space.' },
+        { q: 'Why is a research demo not a people carrier?', score: 2, why: 'Built for research demos, not carrying passengers around a course.' },
+        { q: 'Why is a bench seat safer than balancing on one wheel?', score: 3, why: 'Could roll on flat paths, but riders need a proper bench seat, not a balancing wheel.' },
+        { q: 'How do legs help on rough ground near the fairway?', score: 5, why: 'Legs help on rough ground near the fairway — still needs seats and a club rack added.' },
+        { q: 'Why can\'t riders sit safely inside a sphere?', score: 2, why: 'A rolling ball has no seats; passengers cannot ride inside safely.' },
+        { q: 'Why is there no room for people or golf bags?', score: 3, why: 'Interesting to watch on a path, but no room for people or golf bags.' },
+        { q: 'Why is a simple cart path better served by a simple design?', score: 4, why: 'Could handle mixed course ground, but far too complex for a simple cart-path shuttle.' },
+        { q: 'Why does a rideable outdoor design fit a golf course?', score: 9, why: 'Already built to carry a rider outdoors — closest match if speed stays low and a cart seat is added.' },
+      ],
+    },
+    {
+      title: 'Living room companion',
+      context: [
+        { q: 'Where does it move?', a: 'Carpets, tight gaps between furniture, and around pets or children.' },
+        { q: 'What is the job?', a: 'Company and light entertainment — not heavy lifting or outdoor work.' },
+        { q: 'What should it feel like?', a: 'Small, friendly, and quiet enough for a normal home.' },
+      ],
+      scores: [
+        { q: 'Why does friendly movement matter at home?', score: 9, why: 'Built to look cute and move in friendly ways — a strong fit for company at home, though it is not a real carer.' },
+        { q: 'How might an unusual shape feel indoors?', score: 2, why: 'Many legs and an unusual shape could feel unsettling next to a sofa or a pet.' },
+        { q: 'Why is height risky around furniture?', score: 3, why: 'Tall and balance-focused — easy to knock over lamps or tables indoors.' },
+        { q: 'Why is outdoor ruggedness a poor fit for carpets?', score: 4, why: 'Made for rough outdoor ground, not soft carpets and tight spaces between furniture.' },
+        { q: 'Why is stopping quickly important near people?', score: 5, why: 'Could be a fun indoor gadget, but a rolling ball is hard to stop quickly near people.' },
+        { q: 'Why might a small replica work as a hobby companion?', score: 7, why: 'Small and interesting to watch — good as a hobby companion, not for daily help.' },
+        { q: 'Why might noise and complexity feel wrong at home?', score: 4, why: 'Impressive tricks, but loud, complex, and not designed to feel homely.' },
+        { q: 'Why is scale important in a living room?', score: 1, why: 'Far too large — a rideable robot horse does not belong in a living room.' },
+      ],
+    },
+    {
+      title: 'Restaurant waitering',
+      context: [
+        { q: 'What does it carry?', a: 'Trays with plates, glasses, and hot food — balance matters.' },
+        { q: 'Where does it move?', a: 'Narrow gaps between tables and chairs on a smooth floor.' },
+        { q: 'Who is nearby?', a: 'Diners sitting close; it must not startle people or knock things over.' },
+      ],
+      scores: [
+        { q: 'Why is being noticed different from carrying trays?', score: 4, why: 'Friendly and easy to notice, but too small to carry trays and not built for table service.' },
+        { q: 'How might shape affect diner trust near food?', score: 2, why: 'Unusual shape could unsettle diners — hard to trust near food and glasses.' },
+        { q: 'Why is weaving between tables not enough without stability?', score: 6, why: 'Could weave between tables on a flat floor, but balancing plates would still be hard.' },
+        { q: 'Why do smooth floors suit wheels for table service?', score: 7, why: 'Wheels suit smooth restaurant floors; would need a stable tray and careful speed limits.' },
+        { q: 'Why can\'t a ball grip plates or stop beside a chair?', score: 3, why: 'Fast on open floor, but a ball cannot grip plates or stop gently beside a chair.' },
+        { q: 'Why is carrying capacity essential for a waiter?', score: 2, why: 'Too small and not made to carry anything — more toy than waiter.' },
+        { q: 'Why are many moving parts risky around spills?', score: 5, why: 'Could be adapted with a flat top, but many moving parts are risky around spills and people.' },
+        { q: 'Why must a waiter fit between tables?', score: 1, why: 'Far too large — cannot move between tables or serve food safely.' },
+      ],
+    },
+    {
+      title: 'Moon crater rim',
+      context: [
+        {
+          q: 'Who is it for?',
+          a: 'For the China National Space Administration — their Chang\'e-7 mission at the Moon\'s south pole, with an orbiter, lander, hopper, and relay working alongside this rover.',
+          img: 'cnsa.webp',
+          alt: 'CNSA Chang\'e-7 mission with international partners',
+        },
+        {
+          q: 'What is it for?',
+          a: 'Drive on sunlit ground, map the area, and search for signs of water ice — targets for a hopper to sample in nearby shadow.',
+          img: 'moonwaterice.webp',
+          alt: 'Permanently shadowed lunar crater where water ice may be trapped',
+        },
+        {
+          q: 'Where will it drive?',
+          a: 'Sunlit routes near the Moon\'s south pole — close to permanently shadowed craters, but not inside them.',
+          img: 'sunlitroutes.webp',
+          alt: 'Sunlit routes near shadowed craters at the Moon\'s south pole',
+        },
+      ],
+      scores: [
+        { q: 'Why can\'t a toy approach a dangerous rim?', score: 1, why: 'Cannot approach a dangerous rim or carry scout instruments.' },
+        { q: 'How do many legs help on loose rim dust?', score: 7, why: 'Many legs and cameras could scout edges and survive some slips — strong for careful rim work.' },
+        { q: 'Why is a tall shape unstable on regolith?', score: 5, why: 'Could stop at the rim, but tall unstable shapes are risky on loose dust.' },
+        { q: 'Why split legs and wheels for rim scouting?', score: 7, why: 'Legs for rim terrain, wheels for the approach — good split if kept back from the edge.' },
+        { q: 'Why is precise stopping hard at a cliff edge?', score: 4, why: 'Hard to stop precisely at a cliff edge; a rolling ball lacks sampling tools.' },
+        { q: 'Why isn\'t a replica built for scouting missions?', score: 2, why: 'Not built for real scouting missions.' },
+        { q: 'How does reconfiguring help tricky rim work?', score: 8, why: 'Can crawl, tumble, and reconfigure — useful for tricky rim work with careful driving.' },
+        { q: 'Why is riding different from delicate rim scouting?', score: 6, why: 'Stable on slopes, but large and better for riding than delicate rim scouting.' },
+      ],
+    },
+    {
+      title: 'Steep rocky mountain trail',
+      context: [
+        { q: 'What is the ground?', a: 'Loose rocks, mud, roots, and slopes too steep for normal wheels.' },
+        { q: 'What might go wrong?', a: 'Falls, stuck wheels, and broken parts far from help.' },
+        { q: 'What is the robot for?', a: 'Search, rescue, or carrying gear where humans struggle to walk.' },
+      ],
+      scores: [
+        { q: 'Why isn\'t a friendly look enough for mountain rescue?', score: 1, why: 'Not rugged enough for mountain rescue or trail work.' },
+        { q: 'How does recovering from falls matter on trails?', score: 9, why: 'Climbs walls, recovers from falls, keeps going if legs fail — one of the best fits here.' },
+        { q: 'Why is monocycle balance harder on steep slopes?', score: 7, why: 'Legs help on rocks; monocycle balance is harder on steep slopes.' },
+        { q: 'Why switch between wheels and climbing on mixed paths?', score: 8, why: 'Built to switch between wheels and climbing — strong on mixed mountain paths.' },
+        { q: 'Why can\'t a ball climb cliffs or grab rocks?', score: 3, why: 'A ball rolls on slopes but cannot climb cliffs or grab rocks.' },
+        { q: 'Why is flat-ground walking not enough here?', score: 2, why: 'Flat-ground walker, not a mountain climber.' },
+        { q: 'How do tumbling and crawling suit extreme terrain?', score: 9, why: 'Tumbles, crawls, and uses rotors — designed for extreme mixed terrain.' },
+        { q: 'Why is carrying a rider useful on rough slopes?', score: 9, why: 'Made for mountainous outdoor ground and carrying a rider over rough slopes.' },
+      ],
+    },
+    {
+      title: 'Theme park entertainment',
+      context: [
+        { q: 'Who watches?', a: 'Families and children — it should feel fun, not scary or boring.' },
+        { q: 'What does “good” look like?', a: 'Clear character, safe movement near crowds, and repeatable shows.' },
+        { q: 'Where does it perform?', a: 'Stages, walkways, or photo spots — often indoors or on flat paths.' },
+      ],
+      scores: [
+        { q: 'Why does expressive movement matter for guests?', score: 10, why: 'Trained to look cute and move expressively — exactly what a park wants.' },
+        { q: 'Why might amazing tech still confuse a family crowd?', score: 3, why: 'Amazing tech, but creepy or confusing for a family crowd.' },
+        { q: 'How could a stunt robot work with the right scripting?', score: 6, why: 'Could be a fun stunt show robot with the right scripting.' },
+        { q: 'Why is utility less magical than character?', score: 4, why: 'More utility than character — less magical for guests.' },
+        { q: 'Why might a rolling spectacle need a clear fence?', score: 5, why: 'A fast rolling ball could be a fun spectacle with a clear fence.' },
+        { q: 'Why is an iconic replica good for photo moments?', score: 8, why: 'Iconic walking replica — great photo moment for fans of the film.' },
+        { q: 'How does transforming create a “wow” factor?', score: 8, why: 'Transforms in many ways — strong “wow” factor on a stage.' },
+        { q: 'Why is a rideable horse a headline attraction?', score: 9, why: 'Rideable robot horse is a headline attraction if operated safely.' },
+      ],
+    },
+  ];
+
+  function formatWhy(item) {
+    return '<span class="thumb-why-q">' + item.q + '</span><span class="thumb-why-a">' + item.why + '</span>';
+  }
+
+  function thumbUrl(id) {
+    return 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+  }
+
+  const roverGrid = document.getElementById('rover-grid');
+  const scenarioPrompt = document.getElementById('scenario-prompt');
+  const scenarioFactsBtn = document.getElementById('scenario-facts-btn');
+  const scenarioContext = document.getElementById('scenario-context');
+  const scenarioSelect = document.getElementById('scenario-select');
+  const roverIntroOverlay = document.getElementById('rover-intro-overlay');
+  const roverIntroNum = document.getElementById('rover-intro-num');
+  const roverIntroName = document.getElementById('rover-intro-name');
+  const roverIntroText = document.getElementById('rover-intro-text');
+  const thumbEls = [];
+  let activeScenarioIndex = null;
+  let scoresVisible = false;
+  let contextVisible = false;
+
+  const ROVER_TAGS = 'abcdefgh';
+
+  function roverTag(index) {
+    return ROVER_TAGS[index] || '';
+  }
+
+  function openRoverIntro(index) {
+    const r = rovers[index];
+    roverIntroNum.textContent = roverTag(index);
+    roverIntroName.textContent = r.name;
+    roverIntroText.textContent = r.intro;
+    roverIntroOverlay.hidden = false;
+  }
+
+  function closeRoverIntro() {
+    roverIntroOverlay.hidden = true;
+  }
+
+  roverIntroOverlay.addEventListener('click', closeRoverIntro);
+
+  rovers.forEach(function (r, index) {
+    const card = document.createElement('div');
+    card.className = 'thumb';
+    card.innerHTML =
+      '<div class="thumb-visual">' +
+        '<button type="button" class="thumb-num" aria-label="About rover design ' + roverTag(index) + '">' + roverTag(index) + '</button>' +
+        '<a class="thumb-link" href="https://www.youtube.com/shorts/' + r.id + '" target="_blank" rel="noopener">' +
+          '<img src="' + thumbUrl(r.id) + '" alt="" width="120" height="90" loading="lazy">' +
+        '</a>' +
+      '</div>' +
+      '<button type="button" class="thumb-meta" aria-expanded="false">' +
+        '<span class="thumb-name">' + r.name + '</span>' +
+        '<span class="thumb-score" hidden></span>' +
+      '</button>' +
+      '<div class="thumb-why"></div>';
+    const numBtn = card.querySelector('.thumb-num');
+    numBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openRoverIntro(index);
+    });
+    const meta = card.querySelector('.thumb-meta');
+    meta.addEventListener('click', function () {
+      if (!scoresVisible) return;
+      const open = card.classList.toggle('open');
+      meta.setAttribute('aria-expanded', open);
+    });
+    roverGrid.appendChild(card);
+    thumbEls.push({
+      card: card,
+      score: card.querySelector('.thumb-score'),
+      why: card.querySelector('.thumb-why'),
+      meta: meta,
+    });
+  });
+
+  function renderContext(index) {
+    const s = scenarios[index];
+    scenarioContext.innerHTML = s.context.map(function (item) {
+      let html = '<div class="context-item"><p><strong>' + item.q + '</strong> ' + item.a + '</p>';
+      if (item.img) {
+        html += '<img class="context-img" src="' + item.img + '" alt="' + (item.alt || '') + '" width="216" height="144" loading="lazy">';
+      }
+      html += '</div>';
+      return html;
+    }).join('');
+  }
+
+  function setContextVisible(visible) {
+    contextVisible = visible;
+    scenarioContext.hidden = !visible;
+    scenarioFactsBtn.classList.toggle('active', visible);
+    scenarioFactsBtn.setAttribute('aria-expanded', visible);
+  }
+
+  function setScoresVisible(visible) {
+    scoresVisible = visible;
+    roverGrid.classList.toggle('scores-visible', visible);
+    scenarioPrompt.setAttribute('aria-expanded', visible);
+    thumbEls.forEach(function (t) {
+      t.score.hidden = !visible;
+      if (!visible) {
+        t.card.classList.remove('open');
+        t.meta.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  function clearScores() {
+    activeScenarioIndex = null;
+    scoresVisible = false;
+    contextVisible = false;
+    roverGrid.classList.remove('scores-visible');
+    scenarioPrompt.disabled = true;
+    scenarioPrompt.classList.remove('clickable');
+    scenarioPrompt.setAttribute('aria-expanded', 'false');
+    scenarioFactsBtn.disabled = true;
+    scenarioFactsBtn.classList.remove('active');
+    scenarioFactsBtn.setAttribute('aria-expanded', 'false');
+    scenarioContext.hidden = true;
+    scenarioContext.innerHTML = '';
+    thumbEls.forEach(function (t) {
+      t.score.hidden = true;
+      t.score.textContent = '';
+      t.why.innerHTML = '';
+      t.card.classList.remove('open');
+      t.meta.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  function selectScenario(index) {
+    const s = scenarios[index];
+    activeScenarioIndex = index;
+    scenarioSelect.value = String(index);
+    scenarioPrompt.disabled = false;
+    scenarioPrompt.classList.add('clickable');
+    scenarioFactsBtn.disabled = false;
+    renderContext(index);
+    setContextVisible(false);
+    thumbEls.forEach(function (t, i) {
+      const item = s.scores[i];
+      t.score.textContent = item.score + '/10';
+      t.why.innerHTML = formatWhy(item);
+      t.score.hidden = true;
+      t.card.classList.remove('open');
+      t.meta.setAttribute('aria-expanded', 'false');
+    });
+    setScoresVisible(false);
+  }
+
+  scenarioPrompt.addEventListener('click', function () {
+    if (activeScenarioIndex === null) return;
+    setScoresVisible(!scoresVisible);
+  });
+
+  scenarioFactsBtn.addEventListener('click', function () {
+    if (activeScenarioIndex === null) return;
+    setContextVisible(!contextVisible);
+  });
+
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = 'Choose scenario…';
+  scenarioSelect.appendChild(placeholder);
+  scenarios.forEach(function (s, index) {
+    const opt = document.createElement('option');
+    opt.value = String(index);
+    opt.textContent = s.title;
+    scenarioSelect.appendChild(opt);
+  });
+
+  scenarioSelect.addEventListener('change', function () {
+    if (scenarioSelect.value === '') {
+      clearScores();
+      return;
+    }
+    selectScenario(Number(scenarioSelect.value));
+  });
+})();
+
+(function () {
+  const bank = document.getElementById('word-bank');
+  if (!bank) return;
+
+  const chips = [
+    { id: 'context', text: 'get more information about the design context' },
+    { id: 'define', text: 'better define the problems we need to solve' },
+    { id: 'envision', text: 'envision potential solutions' },
+  ];
+
+  let selectedChip = null;
+  let dragChip = null;
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function createChip(data) {
+    const el = document.createElement('span');
+    el.className = 'chip';
+    el.draggable = true;
+    el.dataset.id = data.id;
+    el.textContent = data.text;
+    return el;
+  }
+
+  function clearSelected() {
+    if (selectedChip) selectedChip.classList.remove('selected');
+    selectedChip = null;
+  }
+
+  function chipParent(chip) {
+    return chip.closest('.drop-zone, .word-bank');
+  }
+
+  function returnToBank(chip) {
+    bank.appendChild(chip);
+  }
+
+  function placeChip(chip, zone) {
+    if (!zone.classList.contains('drop-zone')) return;
+    const existing = zone.querySelector('.chip');
+    if (existing && existing !== chip) returnToBank(existing);
+    zone.appendChild(chip);
+    clearSelected();
+  }
+
+  shuffle(chips).forEach(function (data) {
+    bank.appendChild(createChip(data));
+  });
+
+  bank.addEventListener('dragover', function (e) {
+    e.preventDefault();
+    bank.classList.add('drag-over');
+  });
+  bank.addEventListener('dragleave', function () {
+    bank.classList.remove('drag-over');
+  });
+  bank.addEventListener('drop', function (e) {
+    e.preventDefault();
+    bank.classList.remove('drag-over');
+    const id = e.dataTransfer.getData('text/plain');
+    const chip = document.querySelector('.chip[data-id="' + id + '"]');
+    if (chip) returnToBank(chip);
+  });
+
+  document.querySelectorAll('.drop-zone').forEach(function (zone) {
+    zone.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', function () {
+      zone.classList.remove('drag-over');
+    });
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const id = e.dataTransfer.getData('text/plain');
+      const chip = document.querySelector('.chip[data-id="' + id + '"]');
+      if (chip) placeChip(chip, zone);
+    });
+    zone.addEventListener('click', function () {
+      if (selectedChip) placeChip(selectedChip, zone);
+    });
+  });
+
+  document.addEventListener('dragstart', function (e) {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    dragChip = chip;
+    chip.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', chip.dataset.id);
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  document.addEventListener('dragend', function () {
+    if (dragChip) dragChip.classList.remove('dragging');
+    dragChip = null;
+    document.querySelectorAll('.drop-zone').forEach(function (z) {
+      z.classList.remove('drag-over');
+    });
+    bank.classList.remove('drag-over');
+  });
+
+  bank.addEventListener('click', function (e) {
+    const chip = e.target.closest('.chip');
+    if (!chip || chipParent(chip) !== bank) return;
+    if (selectedChip === chip) {
+      clearSelected();
+    } else {
+      clearSelected();
+      selectedChip = chip;
+      chip.classList.add('selected');
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
