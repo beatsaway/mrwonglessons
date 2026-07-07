@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project modules — student building blocks</title>
+  <style>
+    :root {
+      --bg: #fff;
+      --surface: #f6f7f9;
+      --border: #e2e5ea;
+      --text: #1a1d23;
+      --muted: #5c6370;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --y7: #7c3aed;
+      --y7-soft: #f5f3ff;
+      --y8: #059669;
+      --y8-soft: #ecfdf5;
+      --y9: #d97706;
+      --y9-soft: #fffbeb;
+      --radius: 8px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--text);
+      background: var(--bg);
+    }
+    .shell {
+      max-width: min(42rem, 100% - 1.5rem);
+      margin: 0 auto;
+      padding: 0.25rem 0.75rem 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.15rem 0 0.25rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+    .top-title {
+      margin: 0;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+      min-width: 0;
+    }
+    .tab-select {
+      flex-shrink: 0;
+      max-width: 10rem;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--muted);
+      padding: 0.1rem 1.3rem 0.1rem 0.35rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235c6370' d='M2 3.5 5 6.5 8 3.5'/%3E%3C/svg%3E") no-repeat right 0.35rem center;
+      appearance: none;
+      cursor: pointer;
+      line-height: 1.1;
+    }
+    .tab-select:focus { outline: none; border-color: var(--accent); }
+    .stage { flex: 1; padding-top: 0.65rem; }
+    .pane[hidden] { display: none; }
+    h2 {
+      margin: 0 0 0.45rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    p { margin: 0 0 0.5rem; font-size: 0.92rem; }
+    .kit-link {
+      margin: 0.65rem 0;
+      font-size: 0.88rem;
+    }
+    .item-grid {
+      display: grid;
+      gap: 0.4rem;
+      margin: 0.55rem 0;
+    }
+    @media (min-width: 480px) {
+      .item-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    }
+    .item {
+      padding: 0.55rem 0.65rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.86rem;
+      line-height: 1.35;
+    }
+    .item strong {
+      display: block;
+      margin-bottom: 0.12rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .item span {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .item.tag-only {
+      font-size: 0.82rem;
+      font-weight: 500;
+      background: var(--bg);
+    }
+    .level-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.55rem 0;
+      counter-reset: lvl;
+    }
+    .level-list li {
+      position: relative;
+      margin: 0;
+      padding: 0.45rem 0 0.45rem 1.85rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .level-list li:last-child { border-bottom: none; }
+    .level-list li::before {
+      counter-increment: lvl;
+      content: counter(lvl);
+      position: absolute;
+      left: 0;
+      top: 0.42rem;
+      width: 1.2rem;
+      height: 1.2rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      line-height: 1.2rem;
+      text-align: center;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .year-block {
+      margin: 0.65rem 0;
+      padding: 0.65rem 0.75rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    .year-block.y7 { background: var(--y7-soft); border-left: 3px solid var(--y7); }
+    .year-block.y8 { background: var(--y8-soft); border-left: 3px solid var(--y8); }
+    .year-block.y9 { background: var(--y9-soft); border-left: 3px solid var(--y9); }
+    .year-block h3 {
+      margin: 0 0 0.35rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .year-block.y7 h3 { color: var(--y7); }
+    .year-block.y8 h3 { color: var(--y8); }
+    .year-block.y9 h3 { color: var(--y9); }
+    .year-block ul {
+      margin: 0;
+      padding-left: 1.1rem;
+      font-size: 0.86rem;
+    }
+    .year-block li { margin: 0.18rem 0; }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin: 0.5rem 0;
+    }
+    .chip {
+      padding: 0.2rem 0.45rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg);
+    }
+    button.chip {
+      font: inherit;
+      cursor: pointer;
+    }
+    button.chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .mission-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(26, 29, 35, 0.35);
+      cursor: pointer;
+    }
+    .mission-overlay[hidden] { display: none; }
+    .mission-card {
+      width: min(22rem, 94vw);
+      padding: 0.9rem 1rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      box-shadow: 0 12px 32px rgba(26, 29, 35, 0.16);
+      cursor: default;
+    }
+    .mission-card h3 {
+      margin: 0 0 0.4rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .mission-card p {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--text);
+    }
+    .foot {
+      margin-top: 1rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .card {
+      margin: 0.55rem 0;
+      padding: 0.75rem 0.85rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.92rem;
+    }
+    .card h3 {
+      margin: 0 0 0.35rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+    .card p:last-child { margin-bottom: 0; }
+    .links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .links li { margin: 0.3rem 0; }
+    .tag {
+      display: inline-block;
+      margin-right: 0.3rem;
+      padding: 0.08rem 0.35rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-radius: 3px;
+      background: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .quote {
+      margin: 0.55rem 0;
+      padding: 0.65rem 0.8rem;
+      border-left: 3px solid var(--accent);
+      background: var(--accent-soft);
+      font-size: 0.88rem;
+      font-style: italic;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <p class="top-title">Project modules · KS3 &amp; 4</p>
+    <select class="tab-select" id="tab-select" aria-label="Section"></select>
+  </header>
+
+  <div class="stage">
+    <section class="pane" id="pane-how" data-nav="📖 How it works">
+      <h2>How students use these modules</h2>
+      <p>Every student starts from a shared <strong>foundation</strong> (micro:bit, basic I/O, preset builds). They then <strong>pick and combine</strong> elements from the categories below to shape their own rover project.</p>
+      <p>The more categories used, the more complex the build. Students can stay on guided presets or extend with custom sensors, outputs, mechanics, and mission goals.</p>
+      <p>Projects follow <strong>three progression stages</strong> across KS3 &amp; 4 — remote control, then sensing &amp; autonomy, then payload &amp; coordination — without being locked to a single school year.</p>
+
+      <h2 style="margin-top:1rem">Difficulty levels (optional add-ons)</h2>
+      <ol class="level-list">
+        <li>Preset logic — e.g. LED on when temperature crosses a threshold</li>
+        <li>Preset rover chassis — standard car build</li>
+        <li>Custom sensor choice — students map inputs to their sub-problem</li>
+        <li>Custom mechanics — LEGO joints, gears, cams, 3D-printed tools</li>
+        <li>Stretch — Arduino, lander deployment, multi-rover coordination</li>
+      </ol>
+
+      <p class="kit-link">Reference kits (all stages): <a href="https://www.yahboom.net/study/WOM-Sensor-Kit-microbit" target="_blank" rel="noopener">Yahboom WOM sensor kit</a> · <a href="https://www.yahboom.com/study/buildingbit-super-kit" target="_blank" rel="noopener">Yahboom Superkit building blocks</a></p>
+    </section>
+
+    <section class="pane" id="pane-experience" data-nav="📁 Previous projects" hidden>
+      <h2>Previous projects</h2>
+      <p><span class="tag">8+ years</span> Designing interactive systems — digital, physical, and mixed.</p>
+      <div class="card">
+        <h3>Physical &amp; gestural interfaces</h3>
+        <ul class="links">
+          <li><a href="https://www.instagram.com/p/CWjk__wIrZ2/" target="_blank" rel="noopener">Wireless pen that triggers music</a></li>
+          <li><a href="https://www.instagram.com/p/DVeItekD2mD/" target="_blank" rel="noopener">Hand-gesture chord system</a></li>
+          <li><a href="https://www.instagram.com/p/CWnPVangri8/" target="_blank" rel="noopener">Gesture-controlled sound texture</a></li>
+          <li><a href="https://www.youtube.com/watch?v=-YGAT97flgc" target="_blank" rel="noopener">VR piano with finger gestures</a></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>3D environments &amp; connected devices</h3>
+        <p>Three.js simulations driven by real inputs (micro:bit, phone, custom sensors).</p>
+        <ul class="links">
+          <li><a href="https://www.instagram.com/p/DUWBiSYjyQe/" target="_blank" rel="noopener">Flying bird — interactive 3D</a></li>
+          <li><a href="https://www.instagram.com/p/DX4jP--PtvI/" target="_blank" rel="noopener">Infinite avatar loop on a 3D track</a></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Music production &amp; game audio</h3>
+        <p>Arranging, mixing, and sound design for games — <a href="https://youtu.be/68BiqGcBzi8?si=JJh5l5zstXyju2gl" target="_blank" rel="noopener">sample on YouTube</a>. Supports sensor-driven sound projects and thinking about <strong>parameters that work together</strong>.</p>
+      </div>
+      <div class="quote">
+        Creativity is about exploring possibilities within a <strong>defined framework</strong>: customisable elements, adjustable parameters, and rules for how parts work together.
+      </div>
+    </section>
+
+    <section class="pane" id="pane-environment" data-nav="💻 IDE" hidden>
+      <h2>IDE · integrated development environment</h2>
+      <p>Where students write code and test the rover — on screen, on hardware, or both.</p>
+      <div class="item-grid">
+        <div class="item">
+          <strong>Scratch + micro:bit</strong>
+          <span>Block coding; a good first step for I/O mapping</span>
+        </div>
+        <div class="item">
+          <strong>JavaScript + micro:bit</strong>
+          <span>More control; links to browser tools and simulations</span>
+        </div>
+        <div class="item">
+          <strong>Three.js moon simulation</strong>
+          <span>Browser rover on a lunar surface; driven by micro:bit or other inputs</span>
+        </div>
+        <div class="item">
+          <strong>AI-assisted prototyping</strong>
+          <span>Rapid iteration in code (“vibe coding”) with teacher oversight</span>
+        </div>
+        <div class="item">
+          <strong>Data visualisation</strong>
+          <span>Charts or on-screen readouts for sensor values while testing</span>
+        </div>
+        <div class="item">
+          <strong>Remote-control simulation</strong>
+          <span>micro:bit as controller; rover behaviour shown on screen before the full hardware build</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="pane" id="pane-inputs" data-nav="📥 Inputs" hidden>
+      <h2>Inputs · sensors &amp; controllers</h2>
+      <p>What the rover (or controller) can sense or receive. Mapped through code to outputs and movement.</p>
+      <div class="item-grid cols-2">
+        <div class="item tag-only">Temperature</div>
+        <div class="item tag-only">Light level</div>
+        <div class="item tag-only">Accelerometer (tilt / shake)</div>
+        <div class="item tag-only">Compass / direction</div>
+        <div class="item tag-only">Ultrasound (distance)</div>
+        <div class="item tag-only">Magnetism</div>
+        <div class="item tag-only">Sound level / microphone</div>
+        <div class="item tag-only">Buttons (A / B, pins)</div>
+        <div class="item tag-only">Proximity</div>
+        <div class="item tag-only">Battery level</div>
+        <div class="item tag-only">Pitch / roll / yaw (orientation)</div>
+        <div class="item tag-only">GPS / location (where available)</div>
+        <div class="item tag-only">Infrared (cool / warm surfaces)</div>
+        <div class="item tag-only">Phone tilt (BLE / companion app)</div>
+        <div class="item tag-only">Hand gestures (custom interface)</div>
+        <div class="item tag-only">Musical notes (pitch from instrument)</div>
+      </div>
+      <div class="item" style="margin-top:0.5rem">
+        <strong>Custom physical controllers</strong>
+        <span>Chopsticks, fidget spinners, wireless pens — anything that can send a signal that the micro:bit can read</span>
+      </div>
+    </section>
+
+    <section class="pane" id="pane-outputs" data-nav="📤 Outputs" hidden>
+      <h2>Outputs · actuators &amp; feedback</h2>
+      <p>What the rover can do or show in response to sensor data.</p>
+      <div class="item-grid cols-2">
+        <div class="item">
+          <strong>LED matrix / LEDs</strong>
+          <span>Status icons, direction hints, debug signals</span>
+        </div>
+        <div class="item">
+          <strong>Speaker / buzzer</strong>
+          <span>Beeps, melodies, alert tones</span>
+        </div>
+        <div class="item">
+          <strong>Motors (wheel drive)</strong>
+          <span>Forward, reverse, turn; speed from PWM</span>
+        </div>
+        <div class="item">
+          <strong>Servo motors</strong>
+          <span>Steering, arms, tool angles</span>
+        </div>
+        <div class="item">
+          <strong>Radio / signal</strong>
+          <span>Message another micro:bit rover</span>
+        </div>
+        <div class="item">
+          <strong>On-screen rover</strong>
+          <span>Simulated movement, jump, dash in Three.js</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="pane" id="pane-mechanics" data-nav="⚙️ Mechanics" hidden>
+      <h2>Mechanics &amp; build materials</h2>
+      <p>Physical structure and moving parts — combined with the outputs above.</p>
+      <div class="item-grid">
+        <div class="item">
+          <strong>Wooden chassis parts</strong>
+          <span>Pre-cut rover base; wheels and motor mounts</span>
+        </div>
+        <div class="item">
+          <strong>LEGO Technic</strong>
+          <span>Joints, beams, custom frames</span>
+        </div>
+        <div class="item">
+          <strong>Gears &amp; cams</strong>
+          <span>Lifting, pushing, timed motion</span>
+        </div>
+        <div class="item">
+          <strong>3D-printed parts</strong>
+          <span>Grippers, scoops, spoons, crane arms, wheel variants</span>
+        </div>
+        <div class="item">
+          <strong>Suction tool / straw</strong>
+          <span>Liquid sample collection (advanced stage)</span>
+        </div>
+        <div class="item">
+          <strong>Cargo box / tray</strong>
+          <span>Move blocks, regolith, or goods from A to B</span>
+        </div>
+        <div class="item">
+          <strong>Solar panel model</strong>
+          <span>Orient toward light; power / energy theme</span>
+        </div>
+        <div class="item">
+          <strong>Foldable / deployable parts</strong>
+          <span>Lander-style deployment of a smaller rover (stretch)</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="pane" id="pane-remote" data-nav="🎮 Remote control" hidden>
+      <h2>Foundation stage · remote manoeuvring</h2>
+      <p>Entry level (typically KS3): the micro:bit controls a rover in a <strong>simulation</strong>. Choose an input module and an IDE option.</p>
+      <div class="year-block y7">
+        <h3>Example project combinations</h3>
+        <ul>
+          <li>Buttons → drive rover in Three.js sim</li>
+          <li>Phone tilt (pitch / roll) → steer on moon surface</li>
+          <li>Hand gestures → turn or speed changes</li>
+          <li>Sound level → jump or dash</li>
+          <li>Piano or guitar notes → different movements per pitch</li>
+          <li>Chopstick or fidget spinner → custom steering interface</li>
+          <li>Proximity sensor → avoid obstacles while driving</li>
+        </ul>
+      </div>
+      <p class="chips" aria-hidden="true">
+        <span class="chip">IDE: Three.js</span>
+        <span class="chip">Inputs: pick one</span>
+        <span class="chip">Outputs: on-screen rover</span>
+      </p>
+    </section>
+
+    <section class="pane" id="pane-autonomy" data-nav="🤖 Sensing &amp; autonomy" hidden>
+      <h2>Intermediate stage · sensing &amp; autonomy</h2>
+      <p>Building on foundations (KS3–4): a <strong>real micro:bit rover</strong> reads the environment and moves on its own.</p>
+      <div class="year-block y8">
+        <h3>Example project combinations</h3>
+        <ul>
+          <li>Temperature → seek or avoid hot / cold zones</li>
+          <li>Light sensor → seek brightness or avoid darkness</li>
+          <li>Compass / location → navigate to assigned points</li>
+          <li>Ultrasound + tilt → bumpy ground; avoid steep slopes</li>
+          <li>Temperature / IR → detect cool regions (water-ice scout proxy)</li>
+          <li>Battery monitor → return to base when low</li>
+        </ul>
+      </div>
+      <p class="chips" aria-hidden="true">
+        <span class="chip">Inputs: on-board sensors</span>
+        <span class="chip">Outputs: motors + LEDs</span>
+        <span class="chip">Mechanics: preset chassis</span>
+      </p>
+    </section>
+
+    <section class="pane" id="pane-payload" data-nav="📦 Payload &amp; coordination" hidden>
+      <h2>Advanced stage · payload &amp; coordination</h2>
+      <p>Extended projects (KS3–4): move resources <strong>from A to B</strong>; tools and <strong>two or more rovers</strong> working together.</p>
+      <div class="year-block y9">
+        <h3>Example project combinations</h3>
+        <ul>
+          <li>Crane / grabber → lift brick-like blocks</li>
+          <li>Suction straw → collect liquid sample</li>
+          <li>Spoon / scoop → pick up regolith</li>
+          <li>Cargo box → deliver goods to a drop zone</li>
+          <li>Radio signal → call a partner rover to rendezvous</li>
+          <li>Exchange tray → swap cargo between two rovers</li>
+        </ul>
+      </div>
+      <p class="chips" aria-hidden="true">
+        <span class="chip">Mechanics: custom tools</span>
+        <span class="chip">Outputs: servos + radio</span>
+        <span class="chip">Mission: A to B + teamwork</span>
+      </p>
+    </section>
+
+    <section class="pane" id="pane-missions" data-nav="🎯 Missions" hidden>
+      <h2>Mission problems (pick one or combine)</h2>
+      <p>Mission themes students can link their module choices to. <span style="color:var(--muted);font-size:0.82rem">Click a topic for a short explanation.</span></p>
+      <div class="chips" id="mission-chips"></div>
+      <div class="item" style="margin-top:0.65rem">
+        <strong>Client brief (starter)</strong>
+        <span><em>Good day, engineers — we need a new rover for the next mission.</em></span>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="mission-overlay" id="mission-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="mission-title">
+  <div class="mission-card">
+    <h3 id="mission-title"></h3>
+    <p id="mission-text"></p>
+  </div>
+</div>
+
+<script>
+(function () {
+  const panes = [...document.querySelectorAll('.pane')];
+  const select = document.getElementById('tab-select');
+
+  panes.forEach(function (pane, i) {
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    opt.textContent = pane.dataset.nav;
+    select.appendChild(opt);
+  });
+
+  function goTo(index) {
+    panes.forEach(function (pane, i) {
+      pane.hidden = i !== index;
+    });
+    select.value = String(index);
+  }
+
+  select.addEventListener('change', function () {
+    goTo(Number(select.value));
+  });
+
+  goTo(0);
+})();
+
+(function () {
+  const missions = [
+    {
+      emoji: '🛞',
+      title: 'Movement',
+      text: 'How the rover actually moves — wheels or legs, speed, turning, and grip on dust, rock, or flat ground. Students choose motors and a chassis that can reach the goal without getting stuck.',
+    },
+    {
+      emoji: '🧭',
+      title: 'Navigation',
+      text: 'How the rover knows where it is and where to go next — compass headings, waypoints, or following a planned path. Often combines sensors with code that steers toward a target.',
+    },
+    {
+      emoji: '🔋',
+      title: 'Fuel / battery',
+      text: 'Power does not last forever. Students track battery level, use energy wisely, and plan when to slow down, turn off tools, or head home before the rover stops.',
+    },
+    {
+      emoji: '☀️',
+      title: 'Solar facing',
+      text: 'On the Moon, solar panels need sunlight to charge. Students think about which way the rover or panels face, and whether routes stay in sunlit areas long enough to keep working.',
+    },
+    {
+      emoji: '💧',
+      title: 'Finding water',
+      text: 'Scout for signs of water ice — often in cold, shadowed places near craters. Students might use temperature or infrared sensors to flag spots worth a closer look.',
+    },
+    {
+      emoji: '🌡️',
+      title: 'Temperature swings',
+      text: 'The Moon swings from very hot in sunlight to very cold in shadow. Students design routes or behaviour that avoid extremes, or protect sensitive parts from heat and cold.',
+    },
+    {
+      emoji: '📦',
+      title: 'Transporting resources',
+      text: 'Carry something useful from point A to point B — regolith, samples, tools, or cargo boxes — safely and more than once if the mission requires it.',
+    },
+    {
+      emoji: '🛬',
+      title: 'Landing impact',
+      text: 'Survive arrival on the surface — shock from touchdown, folding parts, or releasing a smaller rover from a lander without breaking. Good for deployable or sturdy builds.',
+    },
+    {
+      emoji: '🔧',
+      title: 'Wheel / chassis redesign',
+      text: 'Standard wheels may slip on moon dust or rocks. Students test different wheel shapes, suspension, or body layout so the rover can cross the terrain in the brief.',
+    },
+    {
+      emoji: '🚧',
+      title: 'Avoiding obstacles',
+      text: 'Detect rocks, holes, or steep drops before hitting them — usually ultrasound, infrared, or bump sensors — then slow down, stop, or steer around.',
+    },
+    {
+      emoji: '🏠',
+      title: 'Finding base',
+      text: 'Return to a home station to recharge, send data, or drop off samples. Students define what “home” means (a light, a marker, coordinates) and how the rover recognises it.',
+    },
+    {
+      emoji: '🌑',
+      title: 'Crater rim scouting',
+      text: 'Explore the edge of a crater carefully — steep slopes and loose dust make it risky, but the rim is a useful place to study what lies in the shadow below. Slow, stable driving matters here.',
+    },
+  ];
+
+  const chipsEl = document.getElementById('mission-chips');
+  const overlay = document.getElementById('mission-overlay');
+  const card = overlay.querySelector('.mission-card');
+  const titleEl = document.getElementById('mission-title');
+  const textEl = document.getElementById('mission-text');
+
+  missions.forEach(function (m) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip';
+    btn.textContent = m.emoji + ' ' + m.title;
+    btn.addEventListener('click', function () {
+      titleEl.textContent = m.emoji + ' ' + m.title;
+      textEl.textContent = m.text;
+      overlay.hidden = false;
+    });
+    chipsEl.appendChild(btn);
+  });
+
+  function closeMission() {
+    overlay.hidden = true;
+  }
+
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) closeMission();
+  });
+  card.addEventListener('click', function (e) {
+    e.stopPropagation();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !overlay.hidden) closeMission();
+  });
+})();
+</script>
+
+</body>
+</html>
