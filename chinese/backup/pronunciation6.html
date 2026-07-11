@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>pronunciation6 — ⑥ 弱讀（施瓦）</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --border: #e2e8f0;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --ok-bg: #dcfce7;
+      --ok-border: #22c55e;
+      --bad-bg: #fce7f3;
+      --bad-border: #ec4899;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: system-ui, "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    .wrap { max-width: 52rem; margin: 0 auto; padding: 1rem 1.1rem 6rem; }
+    .subtitle { margin: 0 0 0.65rem; font-size: 0.92rem; color: var(--muted); font-weight: 600; line-height: 1.45; }
+    .fill-examples { margin: 0 0 1rem; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; font-size: 0.95rem; line-height: 1.55; color: var(--ink); }
+    .fill-examples p { margin: 0.45rem 0; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 0; margin: 0.65rem 0 1rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; width: fit-content; max-width: 100%; }
+    .tabs button { font: inherit; font-weight: 600; font-size: 0.9rem; padding: 0.45rem 1.1rem; border: none; border-right: 1px solid var(--border); background: #fff; color: var(--muted); cursor: pointer; }
+    .tabs button:last-child { border-right: none; }
+    .tabs button:hover { background: #f1f5f9; color: var(--ink); }
+    .tabs button[aria-selected="true"] { background: var(--accent); color: #fff; }
+    .tab-panel[hidden] { display: none !important; }
+    .mc-quiz { margin: 0.9rem 0 0; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+    .mc-quiz h3 { margin: 0 0 0.6rem; font-size: 0.95rem; color: #1e3a5f; }
+    .mc-quiz fieldset { margin: 0.65rem 0; padding: 0.6rem 0.75rem; border: 1px solid var(--border); border-radius: 10px; }
+    .mc-quiz legend { padding: 0 0.35rem; font-weight: 700; font-size: 0.9rem; color: var(--ink); }
+    .mc-quiz label { display: block; margin: 0.35rem 0; font-size: 0.92rem; color: var(--ink); cursor: pointer; }
+    .mc-quiz input { margin-right: 0.45rem; }
+    .mc-quiz fieldset.ok { border-color: var(--ok-border); background: var(--ok-bg); }
+    .mc-quiz fieldset.bad { border-color: var(--bad-border); background: var(--bad-bg); }
+    .article { margin: 0 0 1rem; }
+    h2.section { margin: 1.2rem 0 0.5rem; font-size: 1.02rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
+    h3.ex-block-title { margin: 1rem 0 0.35rem; font-size: 0.98rem; font-weight: 600; color: #1e3a5f; }
+    .fmt-ex { margin: 0.45rem 0 0.75rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: #fff; font-size: 0.92rem; }
+    .fmt-ex .ex-line { margin: 0.2rem 0; line-height: 1.55; }
+    .ex-label { font-weight: 600; color: #1e3a5f; margin-right: 0.25rem; }
+    .blank-line { margin: 0.65rem 0; line-height: 1.75; }
+    span.blank {
+      display: inline-block; vertical-align: baseline; min-width: 3.2em; padding: 0.1rem 0.35rem; margin: 0 0.08rem; font-size: 0.95em;
+      border: 2px dashed #94a3b8; border-radius: 4px; cursor: pointer; text-align: center; line-height: 1.45; background: #fff; user-select: none;
+    }
+    span.blank:empty::before { content: "⋯"; color: #94a3b8; pointer-events: none; }
+    span.blank.is-active { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+    span.blank.ok { border-style: solid; border-color: var(--ok-border); background: var(--ok-bg); }
+    span.blank.bad { border-style: solid; border-color: var(--bad-border); background: var(--bad-bg); }
+    .actions { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .actions button { font: inherit; font-weight: 600; padding: 0.45rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: #fff; cursor: pointer; }
+    .actions button.primary { background: var(--accent); color: #fff; border-color: #1d4ed8; }
+    #result { font-size: 0.9rem; color: var(--muted); }
+    .discuss { margin-top: 2rem; padding: 1rem 1.1rem; border-radius: 10px; border: 1px solid var(--border); background: #fff; }
+    .discuss h2.section { margin-top: 0; font-size: 1rem; }
+    .discuss ol { margin: 0.35rem 0 0; padding-left: 1.35rem; }
+    .discuss .form-p { margin: 1rem 0 0; font-size: 0.92rem; }
+    .discuss .form-p a { font-weight: 600; color: var(--accent); text-decoration: none; }
+    .form-pending { display: block; margin-top: 0.4rem; font-size: 0.88rem; color: var(--muted); }
+    .discuss-dialog { max-width: min(38rem, 94vw); width: 100%; margin: auto; padding: 0; border: none; border-radius: 12px; background: #fff; box-shadow: 0 24px 64px rgba(0,0,0,0.28); }
+    .discuss-dialog::backdrop { background: rgba(15, 23, 42, 0.52); }
+    .discuss-dialog .dlg-banner { margin: 0; padding: 0.75rem 1.1rem; font-size: 0.95rem; font-weight: 600; color: #14532d; background: #dcfce7; border-radius: 12px 12px 0 0; border-bottom: 1px solid #bbf7d0; }
+    .discuss-dialog .discuss { margin: 0; border: none; }
+    .discuss-dialog .dlg-footer { padding: 0.65rem 1rem; border-top: 1px solid var(--border); text-align: right; background: #f8fafc; border-radius: 0 0 12px 12px; }
+    .word-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 100; max-height: min(48vh, 22rem); overflow-y: auto; background: #fff; border-radius: 14px 14px 0 0; border: 1px solid var(--border); box-shadow: 0 -10px 40px rgba(0,0,0,0.14); padding: 0.35rem 1rem calc(0.85rem + env(safe-area-inset-bottom,0)); transform: translateY(105%); transition: transform 0.24s ease; }
+    .word-sheet.is-open { transform: translateY(0); }
+    .word-sheet .sheet-bar { width: 2.5rem; height: 4px; margin: 0.2rem auto 0.5rem; border-radius: 99px; background: #cbd5e1; }
+    .word-sheet h2 { margin: 0 0 0.5rem; font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .chip { font: inherit; font-size: 0.82rem; padding: 0.3rem 0.55rem; border-radius: 6px; border: 1px solid var(--border); background: #f1f5f9; cursor: pointer; }
+    .chip:hover { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
+    .lesson-top { border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.94); }
+    .lesson-top-inner { max-width: 52rem; margin: 0 auto; padding: 0.35rem 1.1rem; min-height: 1.65rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .lesson-top-title { margin: 0; font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 600; color: var(--ink); flex: 1 1 8rem; min-width: 0; }
+    .lesson-home { text-decoration: none; color: var(--ink); border-radius: 6px; padding: 0.12rem 0.4rem; line-height: 1; }
+    .lesson-home:hover { background: #e2e8f0; }
+    .lesson-home-emoji { font-size: 1.12rem; }
+    .syll-demo { margin: 0.65rem 0 1rem; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+    .syll-demo p { margin: 0 0 0.45rem; font-size: 0.9rem; color: var(--muted); }
+    .syll-row, .link-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.35rem 0.4rem; font-family: system-ui, "Segoe UI", "Lucida Sans Unicode", sans-serif; }
+    .syll-bub { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; border: 2px solid #cbd5e1; background: #f8fafc; line-height: 1.2; }
+    .syll-bub--stress,
+    .syll-bub--weak { min-height: 2.1rem; min-width: 2.1rem; padding: 0.28rem 0.6rem; font-size: 0.95em; font-weight: 600; color: #1e3a5f; border: 2px solid #94a3b8; background: #fff; }
+    .link-join { font-size: 1.15rem; font-weight: 800; color: var(--accent); padding: 0 0.1rem; align-self: center; }
+    .link-note { margin: 0.45rem 0 0; font-size: 0.82rem; color: var(--muted); line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <header class="lesson-top">
+    <div class="lesson-top-inner">
+      <a class="lesson-home" href="read.html" aria-label="回到中文閱讀理解索引"><span class="lesson-home-emoji" aria-hidden="true">🏠</span></a>
+      <h1 class="lesson-top-title">⑥ 短字、功能詞讀得較輕（極短 a 一類；學名：施瓦 <span lang="en">schwa</span>）</h1>
+    </div>
+  </header>
+  <main class="wrap">
+    <p class="subtitle">功能詞在句中常又短又輕（施瓦 <span lang="en">schwa</span>）。用「課文／練習」切換。</p>
+    <div class="tabs" role="tablist" aria-label="課文或練習">
+      <button type="button" role="tab" id="tab-read" aria-controls="panel-read" aria-selected="true">課文</button>
+      <button type="button" role="tab" id="tab-fill" aria-controls="panel-fill" aria-selected="false">練習</button>
+    </div>
+    <div class="tab-panel" id="panel-fill" role="tabpanel" aria-labelledby="tab-fill" hidden>
+    <div class="fill-examples">
+      <p><strong>示範（不用填）：</strong><span lang="en">go to school</span> 的 <span lang="en">to</span> 有時寫 <span lang="en">tuh</span> 一類幫聽；<span lang="en">a cup of coffee</span> 的 <span lang="en">of</span> 常是很短很輕、接近 <span lang="en">uh</span>。</p>
+      <p>用耳辨輕重，勿死背音標。用連讀小表第 6 點的關鍵字，把下面填好。</p>
+    </div>
+      <p class="blank-line">
+        ⑥
+        <span class="blank" tabindex="0" role="button" data-accept="功能詞" aria-label="空格1"></span>
+        常
+        <span class="blank" tabindex="0" role="button" data-accept="弱讀" aria-label="空格2"></span>
+        ，多數會變成
+        <span class="blank" tabindex="0" role="button" data-accept="施瓦" aria-label="空格3"></span>
+        那種短音。
+      </p>
+      <form class="mc-quiz" id="mc-quiz">
+        <h3>小測（選擇題）</h3>
+        <fieldset data-answer="tuh">
+          <legend>1) <span lang="en">go to school</span> 當中 <span lang="en">to</span> 較常讀成？</legend>
+          <label><input type="radio" name="q1" value="too" /> <span lang="en">too</span></label>
+          <label><input type="radio" name="q1" value="tuh" /> <span lang="en">tuh</span></label>
+        </fieldset>
+        <fieldset data-answer="uh">
+          <legend>2) <span lang="en">a cup of coffee</span> 當中 <span lang="en">of</span> 較常接近？</legend>
+          <label><input type="radio" name="q2" value="ov" /> <span lang="en">ov</span></label>
+          <label><input type="radio" name="q2" value="uh" /> <span lang="en">uh</span></label>
+        </fieldset>
+        <fieldset data-answer="weak">
+          <legend>3) <span lang="en">for / to / can</span> 在句中較常似？</legend>
+          <label><input type="radio" name="q3" value="strong" /> <span lang="en">for / to / can</span></label>
+          <label><input type="radio" name="q3" value="weak" /> <span lang="en">fer / tuh / ken</span></label>
+        </fieldset>
+        <fieldset data-answer="schwa">
+          <legend>4) 施瓦（<span lang="en">schwa</span>）聽感較似？</legend>
+          <label><input type="radio" name="q4" value="consonant" /> <span lang="en">t / d / k</span></label>
+          <label><input type="radio" name="q4" value="schwa" /> <span lang="en">uh</span></label>
+        </fieldset>
+      </form>
+      <div class="actions">
+        <button type="button" class="primary" id="btn-check">對答案</button>
+        <button type="button" id="btn-clear">清除對錯</button>
+        <span id="result" aria-live="polite"></span>
+      </div>
+      <div class="fill-bottom-spacer" aria-hidden="true">
+        <br /><br /><br /><br /><br />
+      </div>
+    </div>
+    <div class="tab-panel" id="panel-read" role="tabpanel" aria-labelledby="tab-read">
+      <p class="article">高頻出現的短字如 <span lang="en">of、to、for、can</span>，內中母音常讀得<strong>好短好輕</strong>。英語學理稱作<strong>施瓦</strong>，用英語字常寫 <span lang="en">tuh、fuh、kuh</span> 一類幫聽，不必使用音標。</p>
+      <h3 class="ex-block-title">對照：<span lang="en">go to school</span>（<span lang="en">to</span> 讀成 <span lang="en">tuh</span> 一類）</h3>
+      <div class="syll-demo">
+        <div class="link-row" lang="en">
+          <span class="syll-bub syll-bub--weak">go</span>
+          <span class="syll-bub syll-bub--weak" lang="en">tuh</span>
+          <span class="syll-bub syll-bub--stress">school</span>
+        </div>
+        <p class="link-note">對照：寫 <span lang="en">to</span> 那一下聽成又短又輕（<span lang="en">tuh</span> 一類寫法）；<span lang="en">go</span> 與 <span lang="en">school</span> 的清楚度亦可比較。</p>
+      </div>
+    </div>
+  </main>
+  <dialog class="discuss-dialog" id="discuss-success-dialog" aria-labelledby="discuss-dlg-banner">
+    <p class="dlg-banner" id="discuss-dlg-banner">本頁 5 格全數正確。</p>
+    <section class="discuss" aria-labelledby="discuss-title">
+      <h2 class="section" id="discuss-title">討論</h2>
+      <p>選 <span lang="en">for、can、to</span> 其一，寫一兩句，說明在句內讀得短、輕的情況。Google 表單由教師公布。</p>
+      <p class="form-p" id="discussion-form-line">
+        <a id="discussion-google-form" href="#" target="_blank" rel="noopener noreferrer">開啟 Google 表單</a>
+      </p>
+    </section>
+    <div class="dlg-footer">
+      <button type="button" id="discuss-dialog-close">關閉</button>
+    </div>
+  </dialog>
+  <div class="word-sheet" id="word-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true">
+    <div class="sheet-bar" aria-hidden="true"></div>
+    <h2 id="sheet-title">關鍵字</h2>
+    <div class="chips" id="kw-chips" role="group" aria-label="可選詞"></div>
+  </div>
+  <script>
+    (function () {
+      var GOOGLE_DISCUSSION_FORM_URL = "";
+      var WORDS = "功能詞、弱讀、施瓦".split("、");
+      function shuffleInPlace(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = arr[i];
+          arr[i] = arr[j];
+          arr[j] = t;
+        }
+        return arr;
+      }
+      var chipsEl = document.getElementById("kw-chips");
+      var sheet = document.getElementById("word-sheet");
+      var activeBlank = null;
+      shuffleInPlace(WORDS).forEach(function (w) {
+        if (!w.trim()) return;
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip";
+        b.setAttribute("data-word", w.trim());
+        b.textContent = w.trim();
+        chipsEl.appendChild(b);
+      });
+      function openSheet() { sheet.classList.add("is-open"); sheet.setAttribute("aria-hidden", "false"); }
+      function closeSheet() {
+        sheet.classList.remove("is-open");
+        sheet.setAttribute("aria-hidden", "true");
+        document.querySelectorAll("span.blank.is-active").forEach(function (s) { s.classList.remove("is-active"); });
+        activeBlank = null;
+      }
+      function setActiveBlank(el) {
+        document.querySelectorAll("span.blank.is-active").forEach(function (s) { s.classList.remove("is-active"); });
+        activeBlank = el;
+        if (!el) { closeSheet(); return; }
+        el.classList.add("is-active");
+        openSheet();
+      }
+      function norm(s) { return (s || "").trim().replace(/\s+/g, ""); }
+      function blankValue(el) { return norm(el.textContent); }
+      function matchesBlank(el) {
+        var v = blankValue(el);
+        if (!v) return false;
+        var opts = (el.getAttribute("data-accept") || "").split("|").map(norm).filter(Boolean);
+        return opts.indexOf(v) !== -1;
+      }
+      var blanks = Array.prototype.slice.call(document.querySelectorAll("span.blank"));
+      blanks.forEach(function (el) {
+        el.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); setActiveBlank(el); });
+        el.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); setActiveBlank(el); } });
+      });
+      chipsEl.addEventListener("click", function (e) {
+        var btn = e.target.closest(".chip");
+        if (!btn || !activeBlank) return;
+        activeBlank.textContent = btn.getAttribute("data-word") || btn.textContent;
+        activeBlank.classList.remove("ok", "bad");
+      });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && sheet.classList.contains("is-open")) closeSheet(); });
+      var discussDlg = document.getElementById("discuss-success-dialog");
+      function revealAll() {
+        var pf = document.getElementById("panel-fill");
+        if (!pf || pf.hidden) return;
+        closeSheet();
+        blanks.forEach(function (b) {
+          var d = (b.getAttribute("data-accept") || "").split("|")[0].trim();
+          if (d) b.textContent = d;
+          b.classList.remove("bad");
+          b.classList.add("ok");
+        });
+        var res = document.getElementById("result");
+        if (res) res.textContent = "參考答案已顯示。";
+      }
+      document.addEventListener("keydown", function (e) {
+        if (e.code !== "Space" && e.key !== " ") return;
+        var p = document.getElementById("panel-fill");
+        if (!p || p.hidden) return;
+        if (discussDlg && discussDlg.open) return;
+        var t = e.target;
+        if (t && t.closest && (t.closest("#discuss-success-dialog") || t.closest(".chips") || t.closest("button#btn-check") || t.closest("button#btn-clear"))) return;
+        if (t && t.closest && t.closest(".tabs") && t.tagName === "BUTTON") return;
+        e.preventDefault();
+        revealAll();
+      }, true);
+      document.getElementById("btn-check").addEventListener("click", function () {
+        closeSheet();
+        var ok = 0, bad = 0, empty = 0;
+        blanks.forEach(function (inp) {
+          inp.classList.remove("ok", "bad");
+          var v = blankValue(inp);
+          if (!v) { empty++; return; }
+          if (matchesBlank(inp)) { inp.classList.add("ok"); ok++; } else { inp.classList.add("bad"); bad++; }
+        });
+        var mcOk = 0, mcBad = 0, mcEmpty = 0;
+        var quiz = document.getElementById("mc-quiz");
+        if (quiz) {
+          Array.prototype.slice.call(quiz.querySelectorAll("fieldset[data-answer]")).forEach(function (fs) {
+            fs.classList.remove("ok", "bad");
+            var ans = (fs.getAttribute("data-answer") || "").trim();
+            var picked = fs.querySelector("input[type=radio]:checked");
+            if (!picked) { mcEmpty++; return; }
+            if ((picked.value || "") === ans) { mcOk++; fs.classList.add("ok"); } else { mcBad++; fs.classList.add("bad"); }
+          });
+        }
+        if (bad === 0 && empty === 0 && ok === blanks.length && mcBad === 0 && mcEmpty === 0) {
+          document.getElementById("result").textContent = "全數正確（練習＋小測）！";
+          if (discussDlg && discussDlg.showModal) { try { if (discussDlg.open) discussDlg.close(); discussDlg.showModal(); } catch (x) {} }
+        } else {
+          var msg = "練習：正確 " + ok + "、要改 " + bad + (empty ? "、空白" + empty : "");
+          if (quiz) msg += "｜小測：正確 " + mcOk + "、要改 " + mcBad + (mcEmpty ? "、未選" + mcEmpty : "");
+          document.getElementById("result").textContent = msg;
+        }
+      });
+      document.getElementById("btn-clear").addEventListener("click", function () {
+        blanks.forEach(function (i) { i.classList.remove("ok", "bad"); });
+        var quiz = document.getElementById("mc-quiz");
+        if (quiz && quiz.reset) quiz.reset();
+        if (quiz) Array.prototype.slice.call(quiz.querySelectorAll("fieldset.ok, fieldset.bad")).forEach(function (fs) { fs.classList.remove("ok", "bad"); });
+        document.getElementById("result").textContent = "";
+        if (discussDlg && discussDlg.open) discussDlg.close();
+      });
+      document.getElementById("discuss-dialog-close").addEventListener("click", function () { discussDlg.close(); });
+      var tabRead = document.getElementById("tab-read");
+      var tabFill = document.getElementById("tab-fill");
+      var panelRead = document.getElementById("panel-read");
+      var panelFill = document.getElementById("panel-fill");
+      function setTab(w) {
+        var isRead = w === "read";
+        tabRead.setAttribute("aria-selected", isRead ? "true" : "false");
+        tabFill.setAttribute("aria-selected", isRead ? "false" : "true");
+        panelRead.hidden = !isRead;
+        panelFill.hidden = isRead;
+        if (isRead) closeSheet();
+      }
+      tabRead.addEventListener("click", function () { setTab("read"); });
+      tabFill.addEventListener("click", function () { setTab("fill"); });
+      (function () {
+        var a = document.getElementById("discussion-google-form");
+        var u = (GOOGLE_DISCUSSION_FORM_URL || "").trim();
+        if (a && u && /^https?:\/\//i.test(u)) a.href = u;
+        if (a && !/^https?:\/\//i.test(u)) {
+          a.removeAttribute("href");
+          a.style.pointerEvents = "none";
+          a.style.opacity = "0.6";
+          a.textContent = "Google 表單（聽老師公佈連結）";
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>

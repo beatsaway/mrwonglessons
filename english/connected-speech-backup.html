@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connected speech — match what you hear</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #fff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --ok: #16a34a;
+      --ok-soft: #dcfce7;
+      --bad: #dc2626;
+      --bad-soft: #fee2e2;
+      --pron: #7c3aed;
+      --radius: 10px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--text);
+      background: var(--bg);
+    }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.85rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.96);
+    }
+    .top a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+    .top a:hover { background: var(--bg); }
+    .top h1 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      flex: 1;
+      min-width: 0;
+    }
+    .wrap {
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: 0.85rem 0.85rem 2.5rem;
+    }
+    .intro {
+      margin: 0 0 1rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .intro strong { color: var(--text); }
+    .section {
+      margin: 0 0 1.25rem;
+      padding: 0.85rem 0.9rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.35rem 0.65rem;
+      margin: 0 0 0.75rem;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .section-head a {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .section-head a:hover { text-decoration: underline; }
+    .match-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .match-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: 0.45rem 0.55rem;
+      align-items: center;
+      padding: 0.55rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+    }
+    .match-row.ok {
+      border-color: #86efac;
+      background: var(--ok-soft);
+    }
+    .match-row.bad {
+      border-color: #fca5a5;
+      background: var(--bad-soft);
+    }
+    .pron {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: var(--pron);
+      line-height: 1.25;
+    }
+    .pron-label {
+      display: block;
+      margin: 0 0 0.12rem;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .match-select {
+      width: 100%;
+      font: inherit;
+      font-size: 0.88rem;
+      padding: 0.42rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--text);
+    }
+    .match-select:focus {
+      outline: 2px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+    .match-select.input-ok {
+      border-color: #86efac;
+      background: var(--ok-soft);
+    }
+    .match-select.input-bad {
+      border-color: #fca5a5;
+      background: var(--bad-soft);
+    }
+    @media (max-width: 560px) {
+      .match-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a href="../index.html" aria-label="Back to lessons">🏠</a>
+    <h1>Connected speech — match what you hear</h1>
+  </header>
+
+  <main class="wrap">
+    <p class="intro">
+      Each row shows how a phrase can <strong>sound</strong> in everyday conversational British English.
+      The proper phrase is hidden — pick the phrase that matches each pronunciation.
+    </p>
+
+    <div id="sections"></div>
+  </main>
+
+  <script>
+    const sections = [
+      {
+        title: 'Set 1',
+        video: 'https://www.youtube.com/shorts/dwJqJgaZGPI',
+        pairs: [
+          { phrase: 'Jacket Potato', sound: 'Jakit Pataya' },
+          { phrase: 'Bottle of Water', sound: 'Botlawoola' },
+          { phrase: 'Cup of tea', sound: 'Cuppa T' },
+          { phrase: 'Tomato', sound: 'Tamar-A' },
+        ],
+      },
+      {
+        title: 'Set 2',
+        video: 'https://www.youtube.com/shorts/BnmpYrBb1Vo',
+        pairs: [
+          { phrase: 'I need to', sound: 'Anita' },
+          { phrase: 'Do you have to', sound: 'Jafta' },
+          { phrase: 'Here you are', sound: 'Eyar' },
+          { phrase: "What's the matter", sound: 'Smatter' },
+        ],
+      },
+      {
+        title: 'Set 3',
+        video: 'https://www.youtube.com/shorts/eXbHI8JWxJM',
+        pairs: [
+          { phrase: 'Did you have a laugh?', sound: 'Javalarf' },
+          { phrase: 'Do you remember?', sound: 'Jamemba' },
+          { phrase: 'Did you order?', sound: 'Jorder' },
+          { phrase: "You haven't", sound: 'Yavin' },
+        ],
+      },
+      {
+        title: 'Set 4',
+        video: 'https://www.youtube.com/shorts/B2s5yBXDoCA',
+        pairs: [
+          { phrase: 'What did you have', sound: 'Whatjav' },
+          { phrase: 'How is it going', sound: 'Owsitgan' },
+          { phrase: 'How did you', sound: 'Owja' },
+          { phrase: 'What did she do?', sound: 'Washydo' },
+        ],
+      },
+      {
+        title: 'Set 5',
+        video: 'https://www.youtube.com/shorts/4G3wJgwEDWI',
+        pairs: [
+          { phrase: 'Have you had it?', sound: 'Yadit?' },
+          { phrase: "Don't half", sound: 'Danarf' },
+          { phrase: 'What is happening?', sound: 'Sapnin' },
+          { phrase: 'Do you have?', sound: 'Jav' },
+        ],
+      },
+    ];
+
+    const root = document.getElementById('sections');
+
+    function shuffle(arr) {
+      const copy = arr.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function updateRow(row) {
+      const select = row.querySelector('.match-select');
+      const answer = row.getAttribute('data-answer');
+      const chosen = select.value;
+
+      row.classList.remove('ok', 'bad');
+      select.classList.remove('input-ok', 'input-bad');
+
+      if (!chosen) return;
+
+      if (chosen === answer) {
+        row.classList.add('ok');
+        select.classList.add('input-ok');
+      } else {
+        row.classList.add('bad');
+        select.classList.add('input-bad');
+      }
+    }
+
+    function buildSection(section, index) {
+      const phrases = section.pairs.map(function (p) { return p.phrase; });
+      const block = document.createElement('section');
+      block.className = 'section';
+
+      let rowsHtml = '';
+      section.pairs.forEach(function (pair, rowIndex) {
+        const id = 's' + index + '-r' + rowIndex;
+        const options = shuffle(phrases).map(function (phrase) {
+          return '<option value="' + phrase.replace(/"/g, '&quot;') + '">' + phrase + '</option>';
+        }).join('');
+        rowsHtml +=
+          '<li class="match-row" data-answer="' + pair.phrase.replace(/"/g, '&quot;') + '">' +
+            '<div><span class="pron-label">Sounds like</span><p class="pron">' + pair.sound + '</p></div>' +
+            '<select class="match-select" id="' + id + '" aria-label="Match phrase for ' + pair.sound + '">' +
+              '<option value="">Choose phrase…</option>' +
+              options +
+            '</select>' +
+          '</li>';
+      });
+
+      block.innerHTML =
+        '<div class="section-head">' +
+          '<h2>' + section.title + '</h2>' +
+          '<a href="' + section.video + '" target="_blank" rel="noopener noreferrer">Watch clip</a>' +
+        '</div>' +
+        '<ol class="match-list">' + rowsHtml + '</ol>';
+
+      block.querySelectorAll('.match-select').forEach(function (select) {
+        select.addEventListener('change', function () {
+          updateRow(select.closest('.match-row'));
+        });
+      });
+
+      return block;
+    }
+
+    sections.forEach(function (section, index) {
+      root.appendChild(buildSection(section, index));
+    });
+  </script>
+</body>
+</html>

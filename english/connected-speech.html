@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connected speech — match what you hear</title>
+  <style>
+    :root {
+      --border: #e8e8e8;
+      --text: #111;
+      --muted: #666;
+      --ok: #dcfce7;
+      --bad: #fee2e2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 14px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background: #fff;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.55rem;
+      padding: 0.35rem 0.65rem;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+    header a.home {
+      width: 1.75rem;
+      height: 1.75rem;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      text-decoration: none;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      flex: 1 1 10rem;
+      min-width: 0;
+    }
+    .sort-toggle {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .sort-toggle button {
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.28rem 0.55rem;
+      border: none;
+      border-right: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .sort-toggle button:last-child { border-right: none; }
+    .sort-toggle button.is-active {
+      background: #f3f4f6;
+      color: var(--text);
+    }
+    main {
+      max-width: min(56rem, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 0.65rem 1rem 1.5rem;
+    }
+    .list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      gap: 0.5rem 1rem;
+      align-items: center;
+      padding: 0.4rem 0.65rem;
+      border-top: 1px solid var(--border);
+      background: #fff;
+    }
+    .row:first-child { border-top: none; }
+    .row.ok { background: var(--ok); }
+    .row.bad { background: var(--bad); }
+    .sound {
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .sound:hover { text-decoration: underline; }
+    select {
+      width: 100%;
+      font: inherit;
+      font-size: 0.82rem;
+      padding: 0.28rem 0.35rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: #fff;
+    }
+    select:focus { outline: 2px solid #ddd; outline-offset: 0; }
+    select.ok { border-color: #86efac; background: #f0fdf4; }
+    select.bad { border-color: #fca5a5; background: #fef2f2; }
+    @media (max-width: 520px) {
+      .row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="home" href="../index.html" aria-label="Back to lessons">🏠</a>
+    <h1>Connected speech — match what you hear</h1>
+    <div class="sort-toggle" role="group" aria-label="Sort order">
+      <button type="button" class="is-active" data-sort="alpha">A–Z</button>
+      <button type="button" data-sort="video">By video</button>
+    </div>
+  </header>
+  <main>
+    <ol class="list" id="list"></ol>
+  </main>
+  <script>
+    const videos = [
+      { url: 'https://www.youtube.com/shorts/dwJqJgaZGPI', color: '#7c3aed' },
+      { url: 'https://www.youtube.com/shorts/BnmpYrBb1Vo', color: '#2563eb' },
+      { url: 'https://www.youtube.com/shorts/eXbHI8JWxJM', color: '#059669' },
+      { url: 'https://www.youtube.com/shorts/B2s5yBXDoCA', color: '#d97706' },
+      { url: 'https://www.youtube.com/shorts/4G3wJgwEDWI', color: '#e11d48' },
+    ];
+
+    const videoOrder = {};
+    const videoColor = {};
+    videos.forEach(function (v, i) {
+      videoOrder[v.url] = i;
+      videoColor[v.url] = v.color;
+    });
+
+    const items = [
+      { sound: 'Jakit Pataya', phrase: 'Jacket Potato', video: videos[0].url, seq: 0 },
+      { sound: 'Botlawoola', phrase: 'Bottle of Water', video: videos[0].url, seq: 1 },
+      { sound: 'Cuppa T', phrase: 'Cup of tea', video: videos[0].url, seq: 2 },
+      { sound: 'Tamar-A', phrase: 'Tomato', video: videos[0].url, seq: 3 },
+      { sound: 'Anita', phrase: 'I need to', video: videos[1].url, seq: 0 },
+      { sound: 'Jafta', phrase: 'Do you have to', video: videos[1].url, seq: 1 },
+      { sound: 'Eyar', phrase: 'Here you are', video: videos[1].url, seq: 2 },
+      { sound: 'Smatter', phrase: "What's the matter", video: videos[1].url, seq: 3 },
+      { sound: 'Javalarf', phrase: 'Did you have a laugh?', video: videos[2].url, seq: 0 },
+      { sound: 'Jamemba', phrase: 'Do you remember?', video: videos[2].url, seq: 1 },
+      { sound: 'Jorder', phrase: 'Did you order?', video: videos[2].url, seq: 2 },
+      { sound: 'Yavin', phrase: "You haven't", video: videos[2].url, seq: 3 },
+      { sound: 'Whatjav', phrase: 'What did you have', video: videos[3].url, seq: 0 },
+      { sound: 'Owsitgan', phrase: 'How is it going', video: videos[3].url, seq: 1 },
+      { sound: 'Owja', phrase: 'How did you', video: videos[3].url, seq: 2 },
+      { sound: 'Washydo', phrase: 'What did she do?', video: videos[3].url, seq: 3 },
+      { sound: 'Yadit?', phrase: 'Have you had it?', video: videos[4].url, seq: 0 },
+      { sound: 'Danarf', phrase: "Don't half", video: videos[4].url, seq: 1 },
+      { sound: 'Sapnin', phrase: 'What is happening?', video: videos[4].url, seq: 2 },
+      { sound: 'Jav', phrase: 'Do you have?', video: videos[4].url, seq: 3 },
+    ];
+
+    const phrases = items.map(function (item) { return item.phrase; }).sort(function (a, b) {
+      return a.localeCompare(b, 'en', { sensitivity: 'base' });
+    });
+
+    const optionsHtml = '<option value="">Choose phrase…</option>' +
+      phrases.map(function (p) {
+        return '<option value="' + p.replace(/"/g, '&quot;') + '">' + p + '</option>';
+      }).join('');
+
+    const list = document.getElementById('list');
+    const sortButtons = document.querySelectorAll('.sort-toggle button');
+    let sortMode = 'alpha';
+
+    function sortedItems() {
+      const copy = items.slice();
+      if (sortMode === 'alpha') {
+        copy.sort(function (a, b) {
+          return a.sound.localeCompare(b.sound, 'en', { sensitivity: 'base' });
+        });
+      } else {
+        copy.sort(function (a, b) {
+          const byVideo = videoOrder[a.video] - videoOrder[b.video];
+          return byVideo !== 0 ? byVideo : a.seq - b.seq;
+        });
+      }
+      return copy;
+    }
+
+    function readAnswers() {
+      const saved = {};
+      list.querySelectorAll('.row').forEach(function (row) {
+        saved[row.dataset.key] = row.querySelector('select').value;
+      });
+      return saved;
+    }
+
+    function renderList(saved) {
+      list.innerHTML = '';
+      sortedItems().forEach(function (item) {
+        const key = item.sound;
+        const li = document.createElement('li');
+        li.className = 'row';
+        li.dataset.key = key;
+        li.dataset.answer = item.phrase;
+        li.innerHTML =
+          '<a class="sound" style="color:' + videoColor[item.video] + '" href="' + item.video + '" target="_blank" rel="noopener noreferrer">' + item.sound + '</a>' +
+          '<select aria-label="Match phrase for ' + item.sound + '">' + optionsHtml + '</select>';
+        const select = li.querySelector('select');
+        const value = saved && saved[key] ? saved[key] : '';
+        if (value) {
+          select.value = value;
+          updateRow(li, select);
+        }
+        list.appendChild(li);
+      });
+    }
+
+    function updateRow(row, select) {
+      const chosen = select.value;
+      const answer = row.dataset.answer;
+      row.classList.remove('ok', 'bad');
+      select.classList.remove('ok', 'bad');
+      if (!chosen) return;
+      if (chosen === answer) {
+        row.classList.add('ok');
+        select.classList.add('ok');
+      } else {
+        row.classList.add('bad');
+        select.classList.add('bad');
+      }
+    }
+
+    function showAllAnswers() {
+      list.querySelectorAll('.row').forEach(function (row) {
+        const select = row.querySelector('select');
+        select.value = row.dataset.answer;
+        updateRow(row, select);
+      });
+    }
+
+    list.addEventListener('change', function (e) {
+      if (e.target.tagName !== 'SELECT') return;
+      updateRow(e.target.closest('.row'), e.target);
+    });
+
+    sortButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const next = btn.getAttribute('data-sort');
+        if (next === sortMode) return;
+        sortMode = next;
+        sortButtons.forEach(function (b) {
+          b.classList.toggle('is-active', b.getAttribute('data-sort') === sortMode);
+        });
+        renderList(readAnswers());
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.code !== 'Space' && e.key !== ' ') return;
+      if (e.target.matches('input, textarea, select, button')) return;
+      e.preventDefault();
+      showAllAnswers();
+    });
+
+    renderList();
+  </script>
+</body>
+</html>

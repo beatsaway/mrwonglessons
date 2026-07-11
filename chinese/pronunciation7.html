@@ -36,33 +36,55 @@
     .tabs button:hover { background: #f1f5f9; color: var(--ink); }
     .tabs button[aria-selected="true"] { background: var(--accent); color: #fff; }
     .tab-panel[hidden] { display: none !important; }
-    .mc-quiz { margin: 0.9rem 0 0; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
-    .mc-quiz h3 { margin: 0 0 0.6rem; font-size: 0.95rem; color: #1e3a5f; }
-    .mc-quiz fieldset { margin: 0.65rem 0; padding: 0.6rem 0.75rem; border: 1px solid var(--border); border-radius: 10px; }
-    .mc-quiz legend { padding: 0 0.35rem; font-weight: 700; font-size: 0.9rem; color: var(--ink); }
-    .mc-quiz label { display: block; margin: 0.35rem 0; font-size: 0.92rem; color: var(--ink); cursor: pointer; }
-    .mc-quiz input { margin-right: 0.45rem; }
-    .mc-quiz fieldset.ok { border-color: var(--ok-border); background: var(--ok-bg); }
-    .mc-quiz fieldset.bad { border-color: var(--bad-border); background: var(--bad-bg); }
     .article { margin: 0 0 1rem; }
     h2.section { margin: 1.2rem 0 0.5rem; font-size: 1.02rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
     h3.ex-block-title { margin: 1rem 0 0.35rem; font-size: 0.98rem; font-weight: 600; color: #1e3a5f; }
     .fmt-ex { margin: 0.45rem 0 0.75rem; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: #fff; font-size: 0.92rem; }
     .fmt-ex .ex-line { margin: 0.2rem 0; line-height: 1.55; }
     .ex-label { font-weight: 600; color: #1e3a5f; margin-right: 0.25rem; }
-    .blank-line { margin: 0.65rem 0; line-height: 1.75; }
-    span.blank {
-      display: inline-block; vertical-align: baseline; min-width: 3.2em; padding: 0.1rem 0.35rem; margin: 0 0.08rem; font-size: 0.95em;
-      border: 2px dashed #94a3b8; border-radius: 4px; cursor: pointer; text-align: center; line-height: 1.45; background: #fff; user-select: none;
+    .match-heading { margin: 0.85rem 0 0.45rem; font-size: 0.88rem; font-weight: 700; color: #1e3a5f; }
+    .match-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
     }
-    span.blank:empty::before { content: "⋯"; color: #94a3b8; pointer-events: none; }
-    span.blank.is-active { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
-    span.blank.ok { border-style: solid; border-color: var(--ok-border); background: var(--ok-bg); }
-    span.blank.bad { border-style: solid; border-color: var(--bad-border); background: var(--bad-bg); }
-    .actions { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-    .actions button { font: inherit; font-weight: 600; padding: 0.45rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: #fff; cursor: pointer; }
-    .actions button.primary { background: var(--accent); color: #fff; border-color: #1d4ed8; }
-    #result { font-size: 0.9rem; color: var(--muted); }
+    .match-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 0.45rem 0.65rem;
+      align-items: center;
+      padding: 0.45rem 0.6rem;
+      border-top: 1px solid var(--border);
+    }
+    .match-row:first-child { border-top: none; }
+    .match-row.ok { background: var(--ok-bg); }
+    .match-row.bad { background: var(--bad-bg); }
+    .match-prompt { margin: 0; font-size: 0.9rem; line-height: 1.4; }
+    .sound {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #7c3aed;
+    }
+    select.match-pick {
+      width: 100%;
+      font: inherit;
+      font-size: 0.88rem;
+      padding: 0.32rem 0.4rem;
+      border: 1px solid #94a3b8;
+      border-radius: 6px;
+      background: #fff;
+    }
+    select.match-pick:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+    select.match-pick.ok { border-color: var(--ok-border); background: var(--ok-bg); }
+    select.match-pick.bad { border-color: var(--bad-border); background: var(--bad-bg); }
+    @media (max-width: 560px) {
+      .match-row { grid-template-columns: 1fr; }
+    }
     .discuss { margin-top: 2rem; padding: 1rem 1.1rem; border-radius: 10px; border: 1px solid var(--border); background: #fff; }
     .discuss h2.section { margin-top: 0; font-size: 1rem; }
     .discuss ol { margin: 0.35rem 0 0; padding-left: 1.35rem; }
@@ -74,13 +96,6 @@
     .discuss-dialog .dlg-banner { margin: 0; padding: 0.75rem 1.1rem; font-size: 0.95rem; font-weight: 600; color: #14532d; background: #dcfce7; border-radius: 12px 12px 0 0; border-bottom: 1px solid #bbf7d0; }
     .discuss-dialog .discuss { margin: 0; border: none; }
     .discuss-dialog .dlg-footer { padding: 0.65rem 1rem; border-top: 1px solid var(--border); text-align: right; background: #f8fafc; border-radius: 0 0 12px 12px; }
-    .word-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 100; max-height: min(48vh, 22rem); overflow-y: auto; background: #fff; border-radius: 14px 14px 0 0; border: 1px solid var(--border); box-shadow: 0 -10px 40px rgba(0,0,0,0.14); padding: 0.35rem 1rem calc(0.85rem + env(safe-area-inset-bottom,0)); transform: translateY(105%); transition: transform 0.24s ease; }
-    .word-sheet.is-open { transform: translateY(0); }
-    .word-sheet .sheet-bar { width: 2.5rem; height: 4px; margin: 0.2rem auto 0.5rem; border-radius: 99px; background: #cbd5e1; }
-    .word-sheet h2 { margin: 0 0 0.5rem; font-size: 0.82rem; font-weight: 700; color: var(--muted); }
-    .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-    .chip { font: inherit; font-size: 0.82rem; padding: 0.3rem 0.55rem; border-radius: 6px; border: 1px solid var(--border); background: #f1f5f9; cursor: pointer; }
-    .chip:hover { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
     .lesson-top { border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.94); }
     .lesson-top-inner { max-width: 52rem; margin: 0 auto; padding: 0.35rem 1.1rem; min-height: 1.65rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
     .lesson-top-title { margin: 0; font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 600; color: var(--ink); flex: 1 1 8rem; min-width: 0; }
@@ -115,43 +130,20 @@
       <p><strong>示範（不用填）：</strong><span lang="en">tell him</span> 有時聽成 <span lang="en">tell–im</span>，<span lang="en">h</span> 不帶出；<span lang="en">let her</span> 有時 <span lang="en">h</span> 亦極弱，連讀過去。</p>
       <p>以耳跟讀。用本單元最下面「補充」那一欄的關鍵字，把下面填好。</p>
     </div>
-      <p class="blank-line">
-        補充一欄寫到：這類情況叫
-        <span class="blank" tabindex="0" role="button" data-accept="擊穿" aria-label="空格1"></span>
-        ，即
-        <span class="blank" tabindex="0" role="button" data-accept="h不讀" aria-label="空格2"></span>
-        ，兩邊就
-        <span class="blank" tabindex="0" role="button" data-accept="連讀" aria-label="空格3"></span>
-        。
-      </p>
-      <form class="mc-quiz" id="mc-quiz">
-        <h3>小測（選擇題）</h3>
-        <fieldset data-answer="tellim">
-          <legend>1) <span lang="en">tell him</span> 連讀時，較多時聽起來似？</legend>
-          <label><input type="radio" name="q1" value="tellhim" /> <span lang="en">tell him</span></label>
-          <label><input type="radio" name="q1" value="tellim" /> <span lang="en">tell-im</span></label>
-        </fieldset>
-        <fieldset data-answer="weak">
-          <legend>2) <span lang="en">let her</span> 當中的 <span lang="en">h</span>，較自然是？</legend>
-          <label><input type="radio" name="q2" value="clear" /> <span lang="en">let her</span></label>
-          <label><input type="radio" name="q2" value="weak" /> <span lang="en">let-er</span></label>
-        </fieldset>
-        <fieldset data-answer="link">
-          <legend>3) <span lang="en">tell him</span> 弱化後較似？</legend>
-          <label><input type="radio" name="q3" value="break" /> <span lang="en">tell / him</span></label>
-          <label><input type="radio" name="q3" value="link" /> <span lang="en">tell-im</span></label>
-        </fieldset>
-        <fieldset data-answer="hint">
-          <legend>4) <span lang="en">tell-im</span> 在本課定位較似？</legend>
-          <label><input type="radio" name="q4" value="spelling" /> <span lang="en">tell him</span>（正式）</label>
-          <label><input type="radio" name="q4" value="hint" /> <span lang="en">tell-im</span>（提示）</label>
-        </fieldset>
-      </form>
-      <div class="actions">
-        <button type="button" class="primary" id="btn-check">對答案</button>
-        <button type="button" id="btn-clear">清除對錯</button>
-        <span id="result" aria-live="polite"></span>
-      </div>
+      <h3 class="match-heading">關鍵字</h3>
+      <ol class="match-list">
+        <li class="match-row"><p class="match-prompt">這類情況叫 …</p><select class="match-pick kw-pick" data-answer="擊穿" aria-label="擊穿"></select></li>
+        <li class="match-row"><p class="match-prompt">即 …</p><select class="match-pick kw-pick" data-answer="h不讀" aria-label="h不讀"></select></li>
+        <li class="match-row"><p class="match-prompt">兩邊就 …</p><select class="match-pick kw-pick" data-answer="連讀" aria-label="連讀"></select></li>
+      </ol>
+      <h3 class="match-heading">連讀</h3>
+      <ol class="match-list">
+        <li class="match-row"><p class="sound" lang="en">tellim</p><select class="match-pick" data-answer="tell him" aria-label="tellim"></select></li>
+        <li class="match-row"><p class="sound" lang="en">leter</p><select class="match-pick" data-answer="let her" aria-label="leter"></select></li>
+        <li class="match-row"><p class="sound" lang="en">tellhim</p><select class="match-pick" data-answer="tell him" aria-label="tellhim"></select></li>
+        <li class="match-row"><p class="sound" lang="en">letur</p><select class="match-pick" data-answer="let her" aria-label="letur"></select></li>
+      </ol>
+
       <div class="fill-bottom-spacer" aria-hidden="true">
         <br /><br /><br /><br /><br />
       </div>
@@ -170,7 +162,7 @@
     </div>
   </main>
   <dialog class="discuss-dialog" id="discuss-success-dialog" aria-labelledby="discuss-dlg-banner">
-    <p class="dlg-banner" id="discuss-dlg-banner">本頁 5 格全數正確。</p>
+    <p class="dlg-banner" id="discuss-dlg-banner">本頁 7 格全數正確。歡迎完成討論一題。</p>
     <section class="discuss" aria-labelledby="discuss-title">
       <h2 class="section" id="discuss-title">討論</h2>
       <p>寫兩三句：你何時聽到 <span lang="en">h</span> 不發音。Google 表單由教師公布。</p>
@@ -182,83 +174,69 @@
       <button type="button" id="discuss-dialog-close">關閉</button>
     </div>
   </dialog>
-  <div class="word-sheet" id="word-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true">
-    <div class="sheet-bar" aria-hidden="true"></div>
-    <h2 id="sheet-title">關鍵字</h2>
-    <div class="chips" id="kw-chips" role="group" aria-label="可選詞"></div>
-  </div>
   <script>
     (function () {
       var GOOGLE_DISCUSSION_FORM_URL = "";
-      var WORDS = "擊穿、h不讀、連讀".split("、");
-      function shuffleInPlace(arr) {
-        for (var i = arr.length - 1; i > 0; i--) {
+      var KEYWORDS = "擊穿、h不讀、連讀".split("、");
+
+      function shuffle(copy) {
+        for (var i = copy.length - 1; i > 0; i--) {
           var j = Math.floor(Math.random() * (i + 1));
-          var t = arr[i];
-          arr[i] = arr[j];
-          arr[j] = t;
+          var t = copy[i]; copy[i] = copy[j]; copy[j] = t;
         }
-        return arr;
+        return copy;
       }
-      var chipsEl = document.getElementById("kw-chips");
-      var sheet = document.getElementById("word-sheet");
-      var activeBlank = null;
-      shuffleInPlace(WORDS).forEach(function (w) {
-        if (!w.trim()) return;
-        var b = document.createElement("button");
-        b.type = "button";
-        b.className = "chip";
-        b.setAttribute("data-word", w.trim());
-        b.textContent = w.trim();
-        chipsEl.appendChild(b);
+
+      function buildOptions(items) {
+        var html = '<option value="">⋯</option>';
+        shuffle(items.slice()).forEach(function (item) {
+          html += '<option value="' + item.replace(/"/g, "&quot;") + '">' + item + '</option>';
+        });
+        return html;
+      }
+
+      var phraseAnswers = [];
+      document.querySelectorAll("select.match-pick:not(.kw-pick)").forEach(function (sel) {
+        var p = (sel.getAttribute("data-answer") || "").trim();
+        if (p && phraseAnswers.indexOf(p) === -1) phraseAnswers.push(p);
       });
-      function openSheet() { sheet.classList.add("is-open"); sheet.setAttribute("aria-hidden", "false"); }
-      function closeSheet() {
-        sheet.classList.remove("is-open");
-        sheet.setAttribute("aria-hidden", "true");
-        document.querySelectorAll("span.blank.is-active").forEach(function (s) { s.classList.remove("is-active"); });
-        activeBlank = null;
+      phraseAnswers.sort(function (a, b) { return a.localeCompare(b, "en", { sensitivity: "base" }); });
+
+      function updatePick(sel) {
+        sel.classList.remove("ok", "bad");
+        var row = sel.closest(".match-row");
+        if (row) row.classList.remove("ok", "bad");
+        if (!sel.value) return;
+        var ans = (sel.getAttribute("data-answer") || "").trim();
+        var ok = sel.value === ans;
+        sel.classList.add(ok ? "ok" : "bad");
+        if (row) row.classList.add(ok ? "ok" : "bad");
       }
-      function setActiveBlank(el) {
-        document.querySelectorAll("span.blank.is-active").forEach(function (s) { s.classList.remove("is-active"); });
-        activeBlank = el;
-        if (!el) { closeSheet(); return; }
-        el.classList.add("is-active");
-        openSheet();
-      }
-      function norm(s) { return (s || "").trim().replace(/\s+/g, ""); }
-      function blankValue(el) { return norm(el.textContent); }
-      function matchesBlank(el) {
-        var v = blankValue(el);
-        if (!v) return false;
-        var opts = (el.getAttribute("data-accept") || "").split("|").map(norm).filter(Boolean);
-        return opts.indexOf(v) !== -1;
-      }
-      var blanks = Array.prototype.slice.call(document.querySelectorAll("span.blank"));
-      blanks.forEach(function (el) {
-        el.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); setActiveBlank(el); });
-        el.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); setActiveBlank(el); } });
+
+      document.querySelectorAll("select.kw-pick").forEach(function (sel) {
+        sel.innerHTML = buildOptions(KEYWORDS);
+        sel.addEventListener("change", function () { updatePick(sel); });
       });
-      chipsEl.addEventListener("click", function (e) {
-        var btn = e.target.closest(".chip");
-        if (!btn || !activeBlank) return;
-        activeBlank.textContent = btn.getAttribute("data-word") || btn.textContent;
-        activeBlank.classList.remove("ok", "bad");
+
+      document.querySelectorAll("select.match-pick:not(.kw-pick)").forEach(function (sel) {
+        sel.innerHTML = buildOptions(phraseAnswers);
+        sel.addEventListener("change", function () { updatePick(sel); });
       });
-      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && sheet.classList.contains("is-open")) closeSheet(); });
+
+      var picks = Array.prototype.slice.call(document.querySelectorAll("select.match-pick"));
+
       var discussDlg = document.getElementById("discuss-success-dialog");
       function revealAll() {
         var pf = document.getElementById("panel-fill");
         if (!pf || pf.hidden) return;
-        closeSheet();
-        blanks.forEach(function (b) {
-          var d = (b.getAttribute("data-accept") || "").split("|")[0].trim();
-          if (d) b.textContent = d;
+        picks.forEach(function (b) {
+          var d = (b.getAttribute("data-answer") || "").trim();
+          if (d) b.value = d;
           b.classList.remove("bad");
           b.classList.add("ok");
+          var row = b.closest(".match-row");
+          if (row) { row.classList.remove("bad"); row.classList.add("ok"); }
         });
-        var res = document.getElementById("result");
-        if (res) res.textContent = "參考答案已顯示。";
       }
       document.addEventListener("keydown", function (e) {
         if (e.code !== "Space" && e.key !== " ") return;
@@ -266,48 +244,11 @@
         if (!p || p.hidden) return;
         if (discussDlg && discussDlg.open) return;
         var t = e.target;
-        if (t && t.closest && (t.closest("#discuss-success-dialog") || t.closest(".chips") || t.closest("button#btn-check") || t.closest("button#btn-clear"))) return;
+        if (t && t.closest && (t.closest("#discuss-success-dialog") || t.closest("select"))) return;
         if (t && t.closest && t.closest(".tabs") && t.tagName === "BUTTON") return;
         e.preventDefault();
         revealAll();
       }, true);
-      document.getElementById("btn-check").addEventListener("click", function () {
-        closeSheet();
-        var ok = 0, bad = 0, empty = 0;
-        blanks.forEach(function (inp) {
-          inp.classList.remove("ok", "bad");
-          var v = blankValue(inp);
-          if (!v) { empty++; return; }
-          if (matchesBlank(inp)) { inp.classList.add("ok"); ok++; } else { inp.classList.add("bad"); bad++; }
-        });
-        var mcOk = 0, mcBad = 0, mcEmpty = 0;
-        var quiz = document.getElementById("mc-quiz");
-        if (quiz) {
-          Array.prototype.slice.call(quiz.querySelectorAll("fieldset[data-answer]")).forEach(function (fs) {
-            fs.classList.remove("ok", "bad");
-            var ans = (fs.getAttribute("data-answer") || "").trim();
-            var picked = fs.querySelector("input[type=radio]:checked");
-            if (!picked) { mcEmpty++; return; }
-            if ((picked.value || "") === ans) { mcOk++; fs.classList.add("ok"); } else { mcBad++; fs.classList.add("bad"); }
-          });
-        }
-        if (bad === 0 && empty === 0 && ok === blanks.length && mcBad === 0 && mcEmpty === 0) {
-          document.getElementById("result").textContent = "全數正確（練習＋小測）！";
-          if (discussDlg && discussDlg.showModal) { try { if (discussDlg.open) discussDlg.close(); discussDlg.showModal(); } catch (x) {} }
-        } else {
-          var msg = "練習：正確 " + ok + "、要改 " + bad + (empty ? "、空白" + empty : "");
-          if (quiz) msg += "｜小測：正確 " + mcOk + "、要改 " + mcBad + (mcEmpty ? "、未選" + mcEmpty : "");
-          document.getElementById("result").textContent = msg;
-        }
-      });
-      document.getElementById("btn-clear").addEventListener("click", function () {
-        blanks.forEach(function (i) { i.classList.remove("ok", "bad"); });
-        var quiz = document.getElementById("mc-quiz");
-        if (quiz && quiz.reset) quiz.reset();
-        if (quiz) Array.prototype.slice.call(quiz.querySelectorAll("fieldset.ok, fieldset.bad")).forEach(function (fs) { fs.classList.remove("ok", "bad"); });
-        document.getElementById("result").textContent = "";
-        if (discussDlg && discussDlg.open) discussDlg.close();
-      });
       document.getElementById("discuss-dialog-close").addEventListener("click", function () { discussDlg.close(); });
       var tabRead = document.getElementById("tab-read");
       var tabFill = document.getElementById("tab-fill");
@@ -319,7 +260,6 @@
         tabFill.setAttribute("aria-selected", isRead ? "false" : "true");
         panelRead.hidden = !isRead;
         panelFill.hidden = isRead;
-        if (isRead) closeSheet();
       }
       tabRead.addEventListener("click", function () { setTab("read"); });
       tabFill.addEventListener("click", function () { setTab("fill"); });
